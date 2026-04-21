@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>RingCut Pro</title>
@@ -315,12 +315,21 @@ body{
 .wave-wrap{
   position:relative;
   height:100px;
-  background:var(--wave-bg);
   border-radius:12px;
-  overflow:hidden;
+  overflow:visible;
   border:1px solid var(--border);
   touch-action:none;
   transition:background .35s;
+}
+/* Inner clip area for canvas and masks */
+.wave-inner{
+  position:absolute;
+  inset:0;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--wave-bg);
+  transition:background .35s;
+  pointer-events:none;
 }
 
 #wvCanvas{
@@ -328,7 +337,45 @@ body{
   display:block;
 }
 
-/* masks & handles */
+/* ── Playhead — line + draggable circle on top ───────────── */
+.playhead{
+  pointer-events:none;
+  position:absolute;
+  top:0; bottom:0;
+  width:2px;
+  background:rgba(255,255,255,0.9);
+  z-index:30;
+  transform:translateX(-50%);
+}
+
+/* Big draggable circle sitting at the bottom of the line */
+.ph-circle{
+  pointer-events:all;
+  position:absolute;
+  bottom:-18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:36px; height:36px;
+  border-radius:50%;
+  background:white;
+  box-shadow:0 2px 12px rgba(0,0,0,0.55), 0 0 0 3px rgba(124,106,255,0.5);
+  cursor:grab;
+  touch-action:none;
+  display:flex; align-items:center; justify-content:center;
+  gap:3px;
+  z-index:31;
+}
+.ph-circle:active{ cursor:grabbing; box-shadow:0 3px 18px rgba(0,0,0,0.65), 0 0 0 5px rgba(124,106,255,0.7); }
+.ph-circle::before,
+.ph-circle::after{
+  content:'';
+  width:2px; height:11px;
+  background:rgba(80,80,180,0.4);
+  border-radius:2px;
+}
+
+/* ── Scrubber bar below waveform — REMOVED ───────────────── */
+.scrubber-wrap{ display:none; }
 .ov-mask{
   position:absolute;top:0;bottom:0;
   background:rgba(0,0,0,0.65);
@@ -360,14 +407,6 @@ body{
 }
 #hL .hdl-bar{background:var(--handle-l);box-shadow:0 0 12px var(--handle-l)}
 #hR .hdl-bar{background:var(--handle-r);box-shadow:0 0 12px var(--handle-r)}
-
-.playhead{
-  position:absolute;top:0;bottom:0;
-  width:2px;
-  background:rgba(255,255,255,0.5);
-  pointer-events:none;
-  z-index:10;
-}
 
 /* timeline ticks */
 .timeline{
@@ -402,21 +441,25 @@ body{
 }
 .play-btn:active{transform:scale(0.93)}
 
-.restart-btn{
-  width:38px;height:38px;
+/* Playhead handle styles */
+.playhead-handle{
+  position:absolute;
+  top:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:16px;height:16px;
+  background:rgba(255,255,255,0.9);
+  border:2px solid rgba(255,255,255,0.6);
   border-radius:50%;
-  background:var(--s3);
-  border:1px solid var(--border2);
-  color:var(--muted);
-  font-size:15px;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  transition:all .2s;
-  -webkit-appearance:none;
+  cursor:grab;
+  z-index:15;
+  box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  touch-action:none;
 }
-.restart-btn:hover{color:var(--a1);border-color:var(--a1)}
-.restart-btn:active{transform:scale(0.93)}
+.playhead-handle:active{cursor:grabbing;}
+.playhead{
+  pointer-events:none;
+}
 
 .play-info{flex:1}
 .play-time{
@@ -730,16 +773,26 @@ body{
   <div class="wave-card">
     <div class="card-label">dalga formu</div>
     <div class="wave-wrap" id="waveWrap">
-      <canvas id="wvCanvas"></canvas>
-      <!-- Masks -->
-      <div class="ov-mask" id="mL"></div>
-      <div class="ov-mask" id="mR"></div>
-      <div class="ov-sel" id="sel"></div>
-      <!-- Handles -->
+      <div class="wave-inner">
+        <canvas id="wvCanvas"></canvas>
+        <!-- Masks -->
+        <div class="ov-mask" id="mL"></div>
+        <div class="ov-mask" id="mR"></div>
+        <div class="ov-sel" id="sel"></div>
+      </div>
+      <!-- Trim handles -->
       <div class="hdl" id="hL"><div class="hdl-bar"></div></div>
       <div class="hdl" id="hR"><div class="hdl-bar"></div></div>
-      <!-- Playhead -->
-      <div class="playhead" id="ph" style="left:0"></div>
+      <!-- Playhead line + draggable circle -->
+      <div class="playhead" id="ph" style="left:0">
+        <div class="ph-circle" id="phCircle"></div>
+      </div>
+    </div>
+
+    <!-- Scrubber bar — easy to drag on mobile -->
+    <div class="scrubber-wrap" id="scrubberWrap">
+      <div class="scrubber-track"><div class="scrubber-fill" id="scrubFill"></div></div>
+      <div class="scrubber-thumb" id="scrubThumb" style="left:0%"></div>
     </div>
     <div class="timeline" id="tl">
       <span>0:00</span><span></span><span></span><span></span><span></span>
@@ -749,10 +802,8 @@ body{
   <!-- Play controls -->
   <div class="play-row">
     <button class="play-btn" id="playBtn" title="Oynat / Duraklat">▶</button>
-    <button class="restart-btn" id="restartBtn" title="Seçimi baştan oynat">⏮</button>
     <div class="play-info">
       <div class="play-time" id="playTime">0:00 / 0:00</div>
-      <div class="pbar-bg"><div class="pbar-fill" id="pbFill"></div></div>
     </div>
   </div>
 
@@ -846,7 +897,7 @@ body{
 <script>
 // ─── State ──────────────────────────────────────────────────────────
 let audioBuf = null, audioCtx = null, src = null;
-let isPlaying = false, startedAt = 0, pauseAt = 0;
+let isPlaying = false, startedAt = 0, pauseAt = 0, playOffset = 0;
 let trimS = 0, trimE = 10, dur = 0;
 let fmt = 'm4r';
 let origFile = null;
@@ -866,7 +917,7 @@ const sel=document.getElementById('sel');
 const hL=document.getElementById('hL'),hR=document.getElementById('hR');
 const ph=document.getElementById('ph');
 const playBtn  = document.getElementById('playBtn');
-const pbFill   = document.getElementById('pbFill');
+const pbFill   = { style: { width: '' } }; // removed, scrubber handles progress
 const playTime = document.getElementById('playTime');
 const durVal   = document.getElementById('durVal');
 const expBtn   = document.getElementById('expBtn');
@@ -935,6 +986,8 @@ async function loadFile(file) {
     syncInputs();
     syncDur();
     buildTimeline();
+    // Second pass ensures layout is complete and handles are correctly positioned
+    requestAnimationFrame(() => { syncHandles(); });
   });
 
   expBtn.disabled = false;
@@ -1002,6 +1055,7 @@ function syncHandles() {
   sel.style.left = (pS*100)+'%';
   sel.style.width = ((pE-pS)*100)+'%';
 
+  // Center handles on their respective positions (handle is 44px wide, centered)
   hL.style.left = (pS*W - 22)+'px';
   hR.style.left = (pE*W - 22)+'px';
 
@@ -1014,12 +1068,14 @@ function makeDrag(el, type) {
 
   const start = (e) => {
     active = true;
+    _handleDragging = false;
     e.preventDefault();
     window.addEventListener('pointermove', move, {passive:false});
     window.addEventListener('pointerup', end);
   };
   const move = (e) => {
     if (!active) return;
+    _handleDragging = true;
     e.preventDefault();
     const rect = waveWrap.getBoundingClientRect();
     let ratio = (e.clientX - rect.left) / rect.width;
@@ -1027,15 +1083,20 @@ function makeDrag(el, type) {
     const t = ratio * dur;
     if (type === 'L') {
       trimS = Math.max(0, Math.min(t, trimE - 0.05));
+      if (pauseAt < trimS) { pauseAt = trimS; syncPosition(trimS); }
     } else {
       trimE = Math.min(dur, Math.max(t, trimS + 0.05));
+      if (pauseAt > trimE) { pauseAt = trimE; syncPosition(trimE); }
     }
     syncHandles();
     syncInputs();
     syncDur();
+    // Keep scrubber in sync with current pauseAt as trim region changes
+    syncPosition(pauseAt);
   };
   const end = () => {
     active = false;
+    setTimeout(() => { _handleDragging = false; }, 50);
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', end);
   };
@@ -1046,16 +1107,57 @@ function makeDrag(el, type) {
 makeDrag(hL, 'L');
 makeDrag(hR, 'R');
 
-// Click waveform to seek
+// Click waveform to seek (only if not dragging a handle)
+let _handleDragging = false;
 waveWrap.addEventListener('click', (e) => {
-  if (!audioBuf) return;
+  if (!audioBuf || _handleDragging) return;
+  if (e.target.id === 'phHandle') return;
   const rect = waveWrap.getBoundingClientRect();
   const ratio = (e.clientX - rect.left) / rect.width;
   const t = ratio * dur;
   pauseAt = Math.max(trimS, Math.min(t, trimE));
-  movePH(pauseAt);
+  syncPosition(pauseAt);
   if (isPlaying) { stopAudio(); startAudio(); }
 });
+
+// ─── Playhead circle drag ─────────────────────────────────────────────
+const phCircle = document.getElementById('phCircle');
+let scrubDragging = false;
+
+// syncPosition: given absolute track time t, move the playhead line+circle
+function syncPosition(t) {
+  t = Math.max(trimS, Math.min(t, trimE));
+  const W = waveWrap.clientWidth;
+  ph.style.left = ((t / dur) * W) + 'px';
+}
+
+phCircle.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  scrubDragging = true;
+  phCircle.setPointerCapture(e.pointerId);
+});
+phCircle.addEventListener('pointermove', (e) => {
+  if (!scrubDragging || !audioBuf) return;
+  e.preventDefault();
+  const rect = waveWrap.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const t = ratio * dur;
+  pauseAt = Math.max(trimS, Math.min(t, trimE));
+  syncPosition(pauseAt);
+  playTime.textContent = fmtTime(pauseAt) + ' / ' + fmtTime(trimE);
+});
+phCircle.addEventListener('pointerup', () => {
+  if (!scrubDragging) return;
+  scrubDragging = false;
+  if (isPlaying) {
+    const seekTo = pauseAt; // save dragged position before stopAudio overwrites it
+    stopAudio();
+    pauseAt = seekTo;       // restore so startAudio uses the dragged position
+    startAudio();
+  }
+});
+phCircle.addEventListener('pointercancel', () => { scrubDragging = false; });
 
 // ─── Time inputs ──────────────────────────────────────────────────────
 function syncInputs() {
@@ -1076,14 +1178,22 @@ function getT(prefix) {
 }
 
 ['sM','sS','sCe','eM','eS','eCe'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => {
+  const el = document.getElementById(id);
+  el.addEventListener('focus', () => {
+    el.select();
+    // Klavye açılınca input görünür kalsın
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 350);
+  });
+  el.addEventListener('input', () => {
     if (!audioBuf) return;
     const ns = getT('s'), ne = getT('e');
     if (ns >= 0 && ne <= dur && ns < ne) {
       trimS = ns; trimE = ne;
       // Reset playhead to new start so preview plays from correct position
       pauseAt = trimS;
-      movePH(trimS);
+      syncPosition(trimS);
       if (isPlaying) { stopAudio(); startAudio(); }
       syncHandles(); syncDur();
     }
@@ -1111,23 +1221,17 @@ playBtn.addEventListener('click', () => {
   isPlaying ? stopAudio() : startAudio();
 });
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-  if (!audioBuf) return;
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  stopAudio();
-  pauseAt = trimS;
-  movePH(trimS);
-  startAudio();
-});
-
 function startAudio() {
   if (!audioCtx) return;
+  // Always stop any existing source first to prevent double audio
+  if (src) { try { src.onended = null; src.stop(); } catch(e) {} src = null; }
   src = audioCtx.createBufferSource();
   src.buffer = audioBuf;
   src.connect(audioCtx.destination);
   const offset = Math.max(trimS, Math.min(pauseAt || trimS, trimE - 0.01));
   const playDur = trimE - offset;
-  startedAt = audioCtx.currentTime - (offset - trimS);
+  startedAt = audioCtx.currentTime;   // wall-clock when we pressed play
+  playOffset = offset;                 // where in the track we started
   src.start(0, offset, playDur);
   isPlaying = true;
   playBtn.textContent = '⏸';
@@ -1136,9 +1240,8 @@ function startAudio() {
       isPlaying = false;
       playBtn.textContent = '▶';
       pauseAt = trimS;
-      movePH(trimS);
       cancelAnimationFrame(animId);
-      pbFill.style.width = '0%';
+      syncPosition(trimS);
       playTime.textContent = fmtTime(trimS)+' / '+fmtTime(trimE);
     }
   };
@@ -1146,9 +1249,12 @@ function startAudio() {
 }
 
 function stopAudio() {
-  try { src && src.stop(); } catch(e) {}
-  const elapsed = audioCtx.currentTime - startedAt;
-  pauseAt = Math.min(trimS + elapsed, trimE);
+  if (src) {
+    try { src.onended = null; src.stop(); } catch(e) {}
+    src = null;
+  }
+  const elapsed = audioCtx ? (audioCtx.currentTime - startedAt) : 0;
+  pauseAt = Math.min((playOffset || trimS) + elapsed, trimE);
   isPlaying = false;
   playBtn.textContent = '▶';
   cancelAnimationFrame(animId);
@@ -1157,18 +1263,11 @@ function stopAudio() {
 function loopAnim() {
   animId = requestAnimationFrame(loopAnim);
   const elapsed = audioCtx.currentTime - startedAt;
-  const cur = trimS + elapsed;
+  const cur = (playOffset || trimS) + elapsed;
   if (cur >= trimE) return;
-  movePH(cur);
-  const d = trimE - trimS;
-  pbFill.style.width = Math.min(100, (elapsed/d)*100)+'%';
-  playTime.textContent = fmtTime(cur)+' / '+fmtTime(trimE);
+  if (!scrubDragging) syncPosition(cur);
+  playTime.textContent = fmtTime(cur) + ' / ' + fmtTime(trimE);
 }
-
-function movePH(t) {
-  ph.style.left = ((t/dur)*100)+'%';
-}
-
 // ─── Format chips ─────────────────────────────────────────────────────
 const qNotes = {
   m4r: ['AAC 256kbps — iPhone zil sesi için ideal', 'YÜKSEK'],
