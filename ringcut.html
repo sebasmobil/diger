@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RingCut Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #050508;
+  --s1: #0d0d14;
+  --s2: #14141f;
+  --s3: #1c1c2e;
+  --border: #ffffff12;
+  --border2: #ffffff20;
+  --a1: #7c6aff;
+  --a2: #ff6b6b;
+  --a3: #06d6a0;
+  --a4: #ffd166;
+  --text: #f2f2ff;
+  --muted: #6e6e9a;
+  --muted2: #4a4a6a;
+  --handle-l: #5b8cff;
+  --handle-r: #ff5c7c;
+  --r: 16px;
+  --r2: 12px;
+  --body-grad1: rgba(124,106,255,0.12);
+  --body-grad2: rgba(255,107,107,0.08);
+  --wave-bg: #050508;
+  --shadow-toast: rgba(0,0,0,0.6);
+}
+
+html.light {
+  --bg: #f0f0f8;
+  --s1: #ffffff;
+  --s2: #e8e8f4;
+  --s3: #dcdcec;
+  --border: #00000010;
+  --border2: #00000018;
+  --text: #111128;
+  --muted: #7070a0;
+  --muted2: #b0b0cc;
+  --body-grad1: rgba(124,106,255,0.06);
+  --body-grad2: rgba(255,107,107,0.04);
+  --wave-bg: #e0e0ee;
+  --shadow-toast: rgba(0,0,0,0.12);
+}
+
+/* ── Theme Toggle ──────────────────── */
+.theme-row{
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.theme-icon{ font-size:14px; user-select:none; }
+.theme-toggle{
+  width:42px;height:24px;
+  border-radius:12px;
+  background:var(--s3);
+  border:1px solid var(--border2);
+  cursor:pointer;
+  position:relative;
+  transition:background .3s;
+  flex-shrink:0;
+  -webkit-appearance:none;
+  appearance:none;
+  padding:0;
+}
+.theme-toggle::after{
+  content:'';
+  position:absolute;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  top:2px;left:2px;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 2px 6px rgba(124,106,255,0.4);
+}
+html.light .theme-toggle::after{ transform:translateX(18px); }
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html{
+  background:var(--bg);
+  scroll-behavior:smooth;
+  transition:background .35s;
+}
+
+body{
+  font-family:'Outfit',sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, var(--body-grad1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, var(--body-grad2) 0%, transparent 60%),
+    var(--bg);
+  transition:background .35s,color .35s;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.wrap{
+  max-width:780px;
+  margin:0 auto;
+  padding:env(safe-area-inset-top,24px) 20px calc(env(safe-area-inset-bottom,24px) + 32px);
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.hdr{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:28px 0 36px;
+}
+
+.logo{
+  width:46px;height:46px;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  flex-shrink:0;
+  box-shadow:0 8px 24px rgba(124,106,255,0.35);
+}
+
+.hdr-text h1{
+  font-size:clamp(20px,5vw,26px);
+  font-weight:800;
+  letter-spacing:-0.5px;
+  line-height:1;
+}
+.hdr-text h1 em{color:var(--a1);font-style:normal}
+.hdr-text p{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+  font-family:'Fira Code',monospace;
+}
+
+.badges{
+  margin-left:auto;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  align-items:flex-end;
+}
+.badge{
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:6px;
+  font-family:'Fira Code',monospace;
+  font-weight:500;
+}
+.badge-ios{background:rgba(0,122,255,0.2);color:#4da6ff;border:1px solid rgba(0,122,255,0.3)}
+.badge-and{background:rgba(6,214,160,0.15);color:#06d6a0;border:1px solid rgba(6,214,160,0.3)}
+.badge-web{background:rgba(124,106,255,0.15);color:var(--a1);border:1px solid rgba(124,106,255,0.3)}
+
+/* ── Cards ──────────────────────────────────────────────── */
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:16px;
+}
+
+.card-label{
+  font-size:10px;
+  font-family:'Fira Code',monospace;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:2.5px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-label::after{
+  content:'';flex:1;height:1px;
+  background:var(--border);
+}
+
+/* ── Upload Zone ─────────────────────────────────────────── */
+#uploadCard{
+  border:2px dashed var(--border2);
+  background:var(--s1);
+  border-radius:20px;
+  padding:0;
+  margin-bottom:16px;
+  overflow:hidden;
+  transition:border-color .3s,background .3s;
+}
+#uploadCard.drag{
+  border-color:var(--a1);
+  background:rgba(124,106,255,0.05);
+}
+
+.upload-inner{
+  padding:52px 24px;
+  text-align:center;
+  cursor:pointer;
+  position:relative;
+}
+
+.upload-anim{
+  font-size:52px;
+  margin-bottom:16px;
+  display:block;
+  animation:bob 3s ease-in-out infinite;
+}
+@keyframes bob{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-10px) rotate(3deg)}
+}
+
+.upload-inner h2{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.upload-inner p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+/* Big tap button for mobile */
+.tap-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:20px;
+  padding:14px 28px;
+  background:linear-gradient(135deg,var(--a1),#a855f7);
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(124,106,255,0.4);
+  transition:transform .15s,box-shadow .15s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.tap-btn:active{transform:scale(0.97);box-shadow:0 4px 12px rgba(124,106,255,0.3)}
+
+/* Supported formats */
+.fmt-row{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:14px;
+  flex-wrap:wrap;
+}
+.fmt-pill{
+  font-size:11px;
+  font-family:'Fira Code',monospace;
+  padding:4px 10px;
+  border-radius:8px;
+  background:var(--s2);
+  border:1px solid var(--border2);
+  color:var(--muted);
+}
+
+/* ── Editor ──────────────────────────────────────────────── */
+#editor{display:none}
+#editor.on{display:block}
+
+/* File Info Bar */
+.file-bar{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:16px;
+}
+.file-icon{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--a1)50%,var(--a2));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+}
+.file-meta{flex:1;min-width:0}
+.file-meta h3{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta p{font-size:11px;color:var(--muted);font-family:'Fira Code',monospace;margin-top:2px}
+.change-btn{
+  font-size:11px;
+  font-family:'Fira Code',monospace;
+  padding:6px 12px;
+  border-radius:8px;
+  background:var(--s3);
+  border:1px solid var(--border2);
+  color:var(--muted);
+  cursor:pointer;
+  white-space:nowrap;
+  -webkit-appearance:none;
+}
+.change-btn:active{opacity:.7}
+
+/* ── Waveform ────────────────────────────────────────────── */
+.wave-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.wave-wrap{
+  position:relative;
+  height:100px;
+  background:var(--wave-bg);
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  touch-action:none;
+  transition:background .35s;
+}
+
+#wvCanvas{
+  width:100%;height:100%;
+  display:block;
+}
+
+/* masks & handles */
+.ov-mask{
+  position:absolute;top:0;bottom:0;
+  background:rgba(0,0,0,0.65);
+  pointer-events:none;
+}
+#mL{left:0}
+#mR{right:0}
+
+.ov-sel{
+  position:absolute;top:0;bottom:0;
+  border-top:2px solid rgba(255,209,102,0.6);
+  border-bottom:2px solid rgba(255,209,102,0.6);
+  background:rgba(255,209,102,0.04);
+  pointer-events:none;
+}
+
+.hdl{
+  position:absolute;top:0;bottom:0;
+  width:44px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:ew-resize;
+  z-index:20;
+  touch-action:none;
+}
+.hdl-bar{
+  width:4px;
+  height:55%;
+  border-radius:4px;
+}
+#hL .hdl-bar{background:var(--handle-l);box-shadow:0 0 12px var(--handle-l)}
+#hR .hdl-bar{background:var(--handle-r);box-shadow:0 0 12px var(--handle-r)}
+
+.playhead{
+  position:absolute;top:0;bottom:0;
+  width:2px;
+  background:rgba(255,255,255,0.5);
+  pointer-events:none;
+  z-index:10;
+}
+
+/* timeline ticks */
+.timeline{
+  display:flex;justify-content:space-between;
+  padding:6px 2px 0;
+}
+.timeline span{
+  font-size:10px;
+  font-family:'Fira Code',monospace;
+  color:var(--muted2);
+}
+
+/* ── Play Controls ───────────────────────────────────────── */
+.play-row{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:16px;
+}
+
+.play-btn{
+  width:52px;height:52px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--a1),#a855f7);
+  border:none;
+  color:#fff;
+  font-size:20px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 6px 20px rgba(124,106,255,0.4);
+  transition:transform .15s;
+  -webkit-appearance:none;
+}
+.play-btn:active{transform:scale(0.93)}
+
+.restart-btn{
+  width:38px;height:38px;
+  border-radius:50%;
+  background:var(--s3);
+  border:1px solid var(--border2);
+  color:var(--muted);
+  font-size:15px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:all .2s;
+  -webkit-appearance:none;
+}
+.restart-btn:hover{color:var(--a1);border-color:var(--a1)}
+.restart-btn:active{transform:scale(0.93)}
+
+.play-info{flex:1}
+.play-time{
+  font-size:13px;
+  font-family:'Fira Code',monospace;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.pbar-bg{
+  height:4px;
+  background:var(--s3);
+  border-radius:4px;
+  overflow:hidden;
+}
+.pbar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--a1),var(--a2));
+  border-radius:4px;
+  width:0%;
+  transition:width .1s linear;
+}
+
+/* ── Time Inputs ─────────────────────────────────────────── */
+.time-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.time-grid{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:16px;
+  align-items:end;
+}
+
+.tg{display:flex;flex-direction:column;gap:8px}
+.tg-label{
+  font-size:10px;
+  font-family:'Fira Code',monospace;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  display:flex;align-items:center;gap:6px;
+}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-l{background:var(--handle-l);box-shadow:0 0 6px var(--handle-l)}
+.dot-r{background:var(--handle-r);box-shadow:0 0 6px var(--handle-r)}
+
+.time-inputs-row{display:flex;gap:4px;align-items:center}
+.ti{
+  width:0;
+  flex:1;
+  min-width:0;
+  background:var(--bg);
+  border:1px solid var(--border2);
+  border-radius:10px;
+  color:var(--text);
+  font-family:'Fira Code',monospace;
+  font-size:clamp(14px,4vw,18px);
+  font-weight:500;
+  text-align:center;
+  padding:10px 4px;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  -moz-appearance:textfield;
+  transition:border-color .2s;
+}
+.ti::-webkit-outer-spin-button,.ti::-webkit-inner-spin-button{-webkit-appearance:none}
+.ti:focus{border-color:var(--a1)}
+.ti-sep{color:var(--muted2);font-size:16px;font-family:'Fira Code',monospace;flex-shrink:0;padding:0 1px}
+
+.dur-box{
+  text-align:center;
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+}
+.dur-box .lbl{font-size:9px;color:var(--muted);font-family:'Fira Code',monospace;text-transform:uppercase;letter-spacing:1.5px}
+.dur-box .val{font-size:clamp(16px,4vw,22px);font-weight:800;font-family:'Fira Code',monospace;color:var(--a4);margin-top:2px}
+.dur-box .val.over{color:var(--a2)}
+.dur-box .sub{font-size:9px;color:var(--muted2);margin-top:2px}
+
+/* ── Format & Export ─────────────────────────────────────── */
+.fmt-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.fmt-chips{
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+
+.fc{
+  flex:1;min-width:80px;
+  padding:14px 10px;
+  border-radius:12px;
+  border:1px solid var(--border2);
+  background:var(--s2);
+  color:var(--muted);
+  cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  text-align:center;
+  transition:all .2s;
+  -webkit-appearance:none;
+  line-height:1.3;
+}
+.fc .ic{font-size:20px;display:block;margin-bottom:4px}
+.fc .sub{font-size:10px;font-weight:400;opacity:.7;display:block;margin-top:2px;font-family:'Fira Code',monospace}
+.fc.on{
+  background:var(--a1);
+  border-color:var(--a1);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(124,106,255,0.35);
+}
+.fc:active{transform:scale(0.97)}
+
+.quality-row{
+  display:flex;align-items:center;gap:8px;
+  margin-top:14px;
+  padding:10px 14px;
+  background:var(--s2);
+  border-radius:10px;
+  border:1px solid var(--border);
+}
+.quality-row .qicon{font-size:16px}
+.quality-row .qtxt{font-size:12px;color:var(--muted);font-family:'Fira Code',monospace}
+.quality-row .qval{margin-left:auto;font-size:11px;color:var(--a3);font-family:'Fira Code',monospace;font-weight:600}
+
+/* Export button */
+.export-btn{
+  width:100%;
+  padding:18px;
+  border-radius:16px;
+  border:none;
+  background:linear-gradient(135deg,var(--a2),#ff8c42);
+  color:#fff;
+  font-family:'Outfit',sans-serif;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 8px 28px rgba(255,107,107,0.35);
+  transition:transform .15s,box-shadow .15s,opacity .2s;
+  margin-bottom:16px;
+  letter-spacing:0.3px;
+  -webkit-appearance:none;
+}
+.export-btn:active{transform:scale(0.98);box-shadow:0 4px 16px rgba(255,107,107,0.25)}
+.export-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Progress bar */
+.exp-progress{
+  height:4px;
+  background:var(--s2);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:16px;
+  display:none;
+}
+.exp-progress.on{display:block}
+.ep-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--a1),var(--a2));
+  border-radius:4px;
+  transition:width .3s ease;
+}
+
+/* ── iPhone Guide ────────────────────────────────────────── */
+.guide-card{
+  background:rgba(0,122,255,0.08);
+  border:1px solid rgba(0,122,255,0.2);
+  border-radius:16px;
+  padding:18px 20px;
+  margin-bottom:16px;
+  display:none;
+}
+.guide-card.on{display:block}
+.guide-title{font-size:13px;font-weight:700;color:#4da6ff;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.guide-steps{list-style:none;display:flex;flex-direction:column;gap:8px}
+.guide-steps li{font-size:12px;color:var(--muted);display:flex;gap:8px;line-height:1.5}
+.guide-steps li .n{
+  width:18px;height:18px;
+  border-radius:6px;
+  background:rgba(0,122,255,0.25);
+  color:#4da6ff;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.toast{
+  position:fixed;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
+  left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--s2);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:12px 20px;
+  font-size:13px;
+  font-weight:600;
+  white-space:nowrap;
+  box-shadow:0 16px 48px rgba(0,0,0,0.6);
+  z-index:9999;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+  max-width:90vw;
+}
+.toast.up{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(6,214,160,0.4);color:var(--a3)}
+.toast.err{border-color:rgba(255,107,107,0.4);color:var(--a2)}
+.toast.inf{border-color:rgba(124,106,255,0.4);color:var(--a1)}
+
+/* Loading spinner inside toast */
+.spin{
+  width:14px;height:14px;
+  border:2px solid rgba(124,106,255,0.3);
+  border-top-color:var(--a1);
+  border-radius:50%;
+  animation:spin .6s linear infinite;
+  flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media(max-width:480px){
+  .hdr{padding:20px 0 28px}
+  .badges{display:none}
+  .time-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .dur-box{grid-column:1/-1;display:flex;align-items:center;gap:12px}
+  .dur-box .val{font-size:20px}
+  .dur-box .sub{margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- Header -->
+<div class="hdr">
+  <div class="logo">🎵</div>
+  <div class="hdr-text">
+    <h1>Ring<em>Cut</em> Pro</h1>
+    <p>// evrensel zil sesi yapıcı</p>
+  </div>
+  <div class="badges">
+    <span class="badge badge-ios">📱 iPhone</span>
+    <span class="badge badge-and">🤖 Android</span>
+    <span class="badge badge-web">💻 Web</span>
+  </div>
+  <div class="theme-row">
+    <span class="theme-icon" id="themeIconDark">🌙</span>
+    <button class="theme-toggle" id="themeToggle" title="Tema değiştir"></button>
+    <span class="theme-icon" id="themeIconLight">☀️</span>
+  </div>
+</div>
+
+<!-- Upload Card -->
+<div id="uploadCard">
+  <div class="upload-inner" id="uploadInner">
+    <span class="upload-anim">🎧</span>
+    <h2>Ses Dosyası Seç</h2>
+    <p>MP3, WAV, FLAC, AAC, OGG, M4A ve diğerleri</p>
+
+    <!-- Primary: hidden file input, triggered by button -->
+    <input type="file" id="fi" accept="audio/*,audio/mpeg,audio/wav,audio/ogg,audio/flac,audio/aac,audio/mp4,audio/x-m4a" style="display:none">
+
+    <button class="tap-btn" id="tapBtn">
+      <span>📂</span> Dosyayı Seç
+    </button>
+
+    <div class="fmt-row">
+      <span class="fmt-pill">MP3</span>
+      <span class="fmt-pill">WAV</span>
+      <span class="fmt-pill">FLAC</span>
+      <span class="fmt-pill">AAC</span>
+      <span class="fmt-pill">OGG</span>
+      <span class="fmt-pill">M4A</span>
+      <span class="fmt-pill">AIFF</span>
+    </div>
+  </div>
+</div>
+
+<!-- Editor (hidden until file loaded) -->
+<div id="editor">
+
+  <!-- File bar -->
+  <div class="file-bar">
+    <div class="file-icon">🎵</div>
+    <div class="file-meta">
+      <h3 id="fName">—</h3>
+      <p id="fMeta">—</p>
+    </div>
+    <button class="change-btn" id="changeBtn">değiştir</button>
+  </div>
+
+  <!-- Waveform -->
+  <div class="wave-card">
+    <div class="card-label">dalga formu</div>
+    <div class="wave-wrap" id="waveWrap">
+      <canvas id="wvCanvas"></canvas>
+      <!-- Masks -->
+      <div class="ov-mask" id="mL"></div>
+      <div class="ov-mask" id="mR"></div>
+      <div class="ov-sel" id="sel"></div>
+      <!-- Handles -->
+      <div class="hdl" id="hL"><div class="hdl-bar"></div></div>
+      <div class="hdl" id="hR"><div class="hdl-bar"></div></div>
+      <!-- Playhead -->
+      <div class="playhead" id="ph" style="left:0"></div>
+    </div>
+    <div class="timeline" id="tl">
+      <span>0:00</span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Play controls -->
+  <div class="play-row">
+    <button class="play-btn" id="playBtn" title="Oynat / Duraklat">▶</button>
+    <button class="restart-btn" id="restartBtn" title="Seçimi baştan oynat">⏮</button>
+    <div class="play-info">
+      <div class="play-time" id="playTime">0:00 / 0:00</div>
+      <div class="pbar-bg"><div class="pbar-fill" id="pbFill"></div></div>
+    </div>
+  </div>
+
+  <!-- Time inputs -->
+  <div class="time-card">
+    <div class="card-label">hassas kesim noktaları</div>
+    <div class="time-grid">
+
+      <div class="tg">
+        <div class="tg-label"><span class="dot dot-l"></span>BAŞLANGIÇ</div>
+        <div class="time-inputs-row">
+          <input class="ti" type="number" id="sM" min="0" value="0">
+          <span class="ti-sep">:</span>
+          <input class="ti" type="number" id="sS" min="0" max="59" value="0">
+          <span class="ti-sep">.</span>
+          <input class="ti" type="number" id="sCe" min="0" max="99" value="0">
+        </div>
+      </div>
+
+      <div class="dur-box">
+        <div>
+          <div class="lbl">SÜRE</div>
+          <div class="val" id="durVal">0.0s</div>
+          <div class="sub">serbestçe kes</div>
+        </div>
+      </div>
+
+      <div class="tg">
+        <div class="tg-label"><span class="dot dot-r"></span>BİTİŞ</div>
+        <div class="time-inputs-row">
+          <input class="ti" type="number" id="eM" min="0" value="0">
+          <span class="ti-sep">:</span>
+          <input class="ti" type="number" id="eS" min="0" max="59" value="0">
+          <span class="ti-sep">.</span>
+          <input class="ti" type="number" id="eCe" min="0" max="99" value="0">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Format -->
+  <div class="fmt-card">
+    <div class="card-label">çıktı formatı</div>
+    <div class="fmt-chips">
+      <button class="fc on" data-fmt="m4r">
+        <span class="ic">📱</span>
+        M4R
+        <span class="sub">iPhone Zil</span>
+      </button>
+      <button class="fc" data-fmt="mp3">
+        <span class="ic">🎵</span>
+        MP3
+        <span class="sub">Evrensel</span>
+      </button>
+      <button class="fc" data-fmt="wav">
+        <span class="ic">🎙</span>
+        WAV
+        <span class="sub">Lossless</span>
+      </button>
+    </div>
+    <div class="quality-row">
+      <span class="qicon">⚡</span>
+      <span class="qtxt" id="qNote">AAC 256kbps — iPhone zil sesi için ideal</span>
+      <span class="qval" id="qVal">YÜKSEK</span>
+    </div>
+  </div>
+
+  <!-- iPhone guide (shown when M4R selected) -->
+  <div class="guide-card on" id="guide">
+    <div class="guide-title">📱 iPhone'a Yükleme Rehberi</div>
+    <ul class="guide-steps">
+      <li><span class="n">1</span>M4R dosyasını indir → iPhone'da Dosyalar uygulamasında bul</li>
+      <li><span class="n">2</span>GarageBand'i aç → Ses Kaydedicisi → üç nokta → Zil Sesi Olarak Paylaş</li>
+      <li><span class="n">3</span>Ayarlar → Sesler → Zil Sesi'nden seç</li>
+      <li><span class="n">4</span>Alternatif: Dosyayı Mac'e at → iTunes → Zil Sesleri bölümü</li>
+    </ul>
+  </div>
+
+  <!-- Export -->
+  <div class="exp-progress" id="expProg"><div class="ep-fill" id="epFill"></div></div>
+  <button class="export-btn" id="expBtn" disabled>
+    <span>⬇</span> Kes ve İndir
+  </button>
+
+</div><!-- /editor -->
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────
+let audioBuf = null, audioCtx = null, src = null;
+let isPlaying = false, startedAt = 0, pauseAt = 0;
+let trimS = 0, trimE = 10, dur = 0;
+let fmt = 'm4r';
+let origFile = null;
+let animId = null;
+
+// ─── DOM ─────────────────────────────────────────────────────────────
+const fi       = document.getElementById('fi');
+const tapBtn   = document.getElementById('tapBtn');
+const changeBtn= document.getElementById('changeBtn');
+const uploadCard=document.getElementById('uploadCard');
+const editor   = document.getElementById('editor');
+const waveWrap = document.getElementById('waveWrap');
+const canvas   = document.getElementById('wvCanvas');
+const cx       = canvas.getContext('2d');
+const mL=document.getElementById('mL'),mR=document.getElementById('mR');
+const sel=document.getElementById('sel');
+const hL=document.getElementById('hL'),hR=document.getElementById('hR');
+const ph=document.getElementById('ph');
+const playBtn  = document.getElementById('playBtn');
+const pbFill   = document.getElementById('pbFill');
+const playTime = document.getElementById('playTime');
+const durVal   = document.getElementById('durVal');
+const expBtn   = document.getElementById('expBtn');
+const expProg  = document.getElementById('expProg');
+const epFill   = document.getElementById('epFill');
+const guide    = document.getElementById('guide');
+
+// ─── File input — works on iOS Safari, Android, Desktop ──────────────
+// We avoid form elements and use direct input click for broadest support
+tapBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  fi.click();
+});
+
+changeBtn.addEventListener('click', () => { fi.click(); });
+
+fi.addEventListener('change', (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (f) loadFile(f);
+  fi.value = ''; // reset so same file can be re-selected
+});
+
+// Drag & drop (desktop)
+const uploadInner = document.getElementById('uploadInner');
+uploadInner.addEventListener('dragover', e => { e.preventDefault(); uploadCard.classList.add('drag'); });
+uploadInner.addEventListener('dragleave', () => uploadCard.classList.remove('drag'));
+uploadInner.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadCard.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
+
+// ─── Load file ────────────────────────────────────────────────────────
+async function loadFile(file) {
+  if (!file.type.startsWith('audio/') && !isAudioFile(file.name)) {
+    showToast('❌ Ses dosyası seçin (MP3, WAV, vb.)', 'err'); return;
+  }
+  origFile = file;
+  showToast('', 'inf', true); // spinner
+
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ab = await file.arrayBuffer();
+    audioBuf = await audioCtx.decodeAudioData(ab);
+  } catch(e) {
+    showToast('❌ Bu ses dosyası desteklenmiyor', 'err'); return;
+  }
+
+  dur = audioBuf.duration;
+  trimS = 0;
+  trimE = dur;
+  pauseAt = 0;
+
+  document.getElementById('fName').textContent = file.name;
+  document.getElementById('fMeta').textContent =
+    `${fmtDur(dur)} • ${(file.size/1024/1024).toFixed(1)} MB • ${file.type || 'audio'}`;
+
+  uploadCard.style.display = 'none';
+  editor.classList.add('on');
+
+  requestAnimationFrame(() => {
+    drawWave();
+    syncHandles();
+    syncInputs();
+    syncDur();
+    buildTimeline();
+  });
+
+  expBtn.disabled = false;
+  showToast('✅ Dosya yüklendi!', 'ok');
+}
+
+function isAudioFile(name) {
+  return /\.(mp3|wav|ogg|flac|aac|m4a|aiff|wma|opus)$/i.test(name);
+}
+
+// ─── Waveform ─────────────────────────────────────────────────────────
+function drawWave() {
+  const W = waveWrap.clientWidth * (window.devicePixelRatio||1);
+  const H = waveWrap.clientHeight * (window.devicePixelRatio||1);
+  canvas.width = W; canvas.height = H;
+  canvas.style.width = waveWrap.clientWidth + 'px';
+  canvas.style.height = waveWrap.clientHeight + 'px';
+
+  const data = audioBuf.getChannelData(0);
+  const mid = H / 2;
+  const bW = Math.max(1, Math.floor(W / 300));
+  const gap = Math.max(1, bW < 3 ? 1 : 2);
+  const count = Math.floor(W / (bW + gap));
+
+  cx.clearRect(0, 0, W, H);
+
+  for (let i = 0; i < count; i++) {
+    const s = Math.floor(i * data.length / count);
+    const e2 = Math.floor((i+1) * data.length / count);
+    let peak = 0;
+    for (let j = s; j < e2; j++) {
+      const v = Math.abs(data[j]);
+      if (v > peak) peak = v;
+    }
+    const h = Math.max(2, peak * mid * 0.88);
+    const x = i * (bW + gap);
+    const ratio = i / count;
+    const inTrim = ratio >= trimS/dur && ratio <= trimE/dur;
+
+    if (inTrim) {
+      const g = cx.createLinearGradient(0, mid-h, 0, mid+h);
+      g.addColorStop(0, 'rgba(91,140,255,0.95)');
+      g.addColorStop(0.5, 'rgba(255,209,102,0.85)');
+      g.addColorStop(1, 'rgba(255,92,124,0.95)');
+      cx.fillStyle = g;
+    } else {
+      const isLight = document.documentElement.classList.contains('light');
+      cx.fillStyle = isLight ? 'rgba(100,100,160,0.18)' : 'rgba(90,90,120,0.25)';
+    }
+
+    cx.beginPath();
+    if (cx.roundRect) cx.roundRect(x, mid-h, bW, h*2, 1);
+    else cx.rect(x, mid-h, bW, h*2);
+    cx.fill();
+  }
+}
+
+function syncHandles() {
+  const W = waveWrap.clientWidth;
+  const pS = trimS / dur;
+  const pE = trimE / dur;
+
+  mL.style.width = (pS*100)+'%';
+  mR.style.width = ((1-pE)*100)+'%';
+  sel.style.left = (pS*100)+'%';
+  sel.style.width = ((pE-pS)*100)+'%';
+
+  hL.style.left = (pS*W - 22)+'px';
+  hR.style.left = (pE*W - 22)+'px';
+
+  drawWave();
+}
+
+// ─── Handle dragging — unified pointer/touch/mouse ────────────────────
+function makeDrag(el, type) {
+  let active = false;
+
+  const start = (e) => {
+    active = true;
+    e.preventDefault();
+    window.addEventListener('pointermove', move, {passive:false});
+    window.addEventListener('pointerup', end);
+  };
+  const move = (e) => {
+    if (!active) return;
+    e.preventDefault();
+    const rect = waveWrap.getBoundingClientRect();
+    let ratio = (e.clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+    const t = ratio * dur;
+    if (type === 'L') {
+      trimS = Math.max(0, Math.min(t, trimE - 0.05));
+    } else {
+      trimE = Math.min(dur, Math.max(t, trimS + 0.05));
+    }
+    syncHandles();
+    syncInputs();
+    syncDur();
+  };
+  const end = () => {
+    active = false;
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', end);
+  };
+
+  el.addEventListener('pointerdown', start, {passive:false});
+}
+
+makeDrag(hL, 'L');
+makeDrag(hR, 'R');
+
+// Click waveform to seek
+waveWrap.addEventListener('click', (e) => {
+  if (!audioBuf) return;
+  const rect = waveWrap.getBoundingClientRect();
+  const ratio = (e.clientX - rect.left) / rect.width;
+  const t = ratio * dur;
+  pauseAt = Math.max(trimS, Math.min(t, trimE));
+  movePH(pauseAt);
+  if (isPlaying) { stopAudio(); startAudio(); }
+});
+
+// ─── Time inputs ──────────────────────────────────────────────────────
+function syncInputs() {
+  const setT = (prefix, t) => {
+    document.getElementById(prefix+'M').value = Math.floor(t/60);
+    document.getElementById(prefix+'S').value = Math.floor(t%60);
+    document.getElementById(prefix+'Ce').value = Math.round((t%1)*100);
+  };
+  setT('s', trimS);
+  setT('e', trimE);
+}
+
+function getT(prefix) {
+  const m = +document.getElementById(prefix+'M').value||0;
+  const s = +document.getElementById(prefix+'S').value||0;
+  const c = +document.getElementById(prefix+'Ce').value||0;
+  return m*60 + s + c/100;
+}
+
+['sM','sS','sCe','eM','eS','eCe'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    if (!audioBuf) return;
+    const ns = getT('s'), ne = getT('e');
+    if (ns >= 0 && ne <= dur && ns < ne) {
+      trimS = ns; trimE = ne;
+      // Reset playhead to new start so preview plays from correct position
+      pauseAt = trimS;
+      movePH(trimS);
+      if (isPlaying) { stopAudio(); startAudio(); }
+      syncHandles(); syncDur();
+    }
+  });
+});
+
+function syncDur() {
+  const d = trimE - trimS;
+  durVal.textContent = d.toFixed(1)+'s';
+  durVal.className = 'val';
+}
+
+function buildTimeline() {
+  const tl = document.getElementById('tl');
+  const spans = tl.querySelectorAll('span');
+  spans.forEach((sp, i) => {
+    sp.textContent = fmtTime((i/(spans.length-1))*dur);
+  });
+}
+
+// ─── Playback ─────────────────────────────────────────────────────────
+playBtn.addEventListener('click', () => {
+  if (!audioBuf) return;
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  isPlaying ? stopAudio() : startAudio();
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  if (!audioBuf) return;
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  stopAudio();
+  pauseAt = trimS;
+  movePH(trimS);
+  startAudio();
+});
+
+function startAudio() {
+  if (!audioCtx) return;
+  src = audioCtx.createBufferSource();
+  src.buffer = audioBuf;
+  src.connect(audioCtx.destination);
+  const offset = Math.max(trimS, Math.min(pauseAt || trimS, trimE - 0.01));
+  const playDur = trimE - offset;
+  startedAt = audioCtx.currentTime - (offset - trimS);
+  src.start(0, offset, playDur);
+  isPlaying = true;
+  playBtn.textContent = '⏸';
+  src.onended = () => {
+    if (isPlaying) {
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      pauseAt = trimS;
+      movePH(trimS);
+      cancelAnimationFrame(animId);
+      pbFill.style.width = '0%';
+      playTime.textContent = fmtTime(trimS)+' / '+fmtTime(trimE);
+    }
+  };
+  loopAnim();
+}
+
+function stopAudio() {
+  try { src && src.stop(); } catch(e) {}
+  const elapsed = audioCtx.currentTime - startedAt;
+  pauseAt = Math.min(trimS + elapsed, trimE);
+  isPlaying = false;
+  playBtn.textContent = '▶';
+  cancelAnimationFrame(animId);
+}
+
+function loopAnim() {
+  animId = requestAnimationFrame(loopAnim);
+  const elapsed = audioCtx.currentTime - startedAt;
+  const cur = trimS + elapsed;
+  if (cur >= trimE) return;
+  movePH(cur);
+  const d = trimE - trimS;
+  pbFill.style.width = Math.min(100, (elapsed/d)*100)+'%';
+  playTime.textContent = fmtTime(cur)+' / '+fmtTime(trimE);
+}
+
+function movePH(t) {
+  ph.style.left = ((t/dur)*100)+'%';
+}
+
+// ─── Format chips ─────────────────────────────────────────────────────
+const qNotes = {
+  m4r: ['AAC 256kbps — iPhone zil sesi için ideal', 'YÜKSEK'],
+  mp3: ['MP3 320kbps — Her cihazda çalışır', 'YÜKSEK'],
+  wav: ['PCM 44.1kHz 16bit — Kayıpsız kalite', 'MAX'],
+};
+
+document.querySelectorAll('.fc').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fc').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    fmt = btn.dataset.fmt;
+    const [note, q] = qNotes[fmt];
+    document.getElementById('qNote').textContent = note;
+    document.getElementById('qVal').textContent = q;
+    guide.classList.toggle('on', fmt === 'm4r');
+  });
+});
+
+// ─── Export ───────────────────────────────────────────────────────────
+expBtn.addEventListener('click', doExport);
+
+async function doExport() {
+  if (!audioBuf) return;
+  const d = trimE - trimS;
+  // no duration limit
+
+  expBtn.disabled = true;
+  expProg.classList.add('on');
+  epFill.style.width = '10%';
+  showToast('', 'inf', true);
+
+  try {
+    const sr = audioBuf.sampleRate;
+    const ch = audioBuf.numberOfChannels;
+    const sampleStart = Math.floor(trimS * sr);
+    const sampleEnd = Math.floor(trimE * sr);
+    const len = sampleEnd - sampleStart;
+
+    // Render trimmed audio offline
+    const oCtx = new OfflineAudioContext(ch, len, sr);
+    const oSrc = oCtx.createBufferSource();
+    oSrc.buffer = audioBuf;
+    oSrc.connect(oCtx.destination);
+    oSrc.start(0, trimS, d);
+    epFill.style.width = '30%';
+
+    const rendered = await oCtx.startRendering();
+    epFill.style.width = '50%';
+
+    const baseName = (origFile.name.replace(/\.[^.]+$/, '') || 'ringtone') + '_trim';
+
+    if (fmt === 'wav') {
+      const blob = encodeWAV(rendered);
+      epFill.style.width = '90%';
+      dl(blob, baseName+'.wav', 'audio/wav');
+      done('✅ WAV indirildi!');
+    } else {
+      // Use MediaRecorder to encode as compressed audio
+      const ac2 = new AudioContext({sampleRate: sr});
+      const dest = ac2.createMediaStreamDestination();
+      const s2 = ac2.createBufferSource();
+      s2.buffer = rendered;
+      s2.connect(dest);
+
+      // Pick best supported MIME
+      const mimes = fmt === 'mp3'
+        ? ['audio/mpeg','audio/mp4','audio/webm;codecs=opus','audio/webm']
+        : ['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm'];
+      const mime = mimes.find(m => {
+        try { return MediaRecorder.isTypeSupported(m); } catch(e) { return false; }
+      }) || 'audio/webm';
+
+      const rec = new MediaRecorder(dest.stream, {
+        mimeType: mime,
+        audioBitsPerSecond: fmt === 'wav' ? undefined : 256000
+      });
+      const chunks = [];
+      rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      rec.onstop = () => {
+        ac2.close();
+        const ext = fmt; // m4r or mp3
+        const type = mime;
+        const blob = new Blob(chunks, {type});
+        epFill.style.width = '95%';
+        dl(blob, baseName+'.'+ext, type);
+        done('✅ '+(fmt.toUpperCase())+' indirildi!');
+      };
+
+      rec.start(50);
+      s2.start(0);
+      epFill.style.width = '60%';
+      s2.onended = () => setTimeout(() => { rec.stop(); }, 300);
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Hata: '+err.message, 'err');
+    expBtn.disabled = false;
+    expProg.classList.remove('on');
+  }
+}
+
+function done(msg) {
+  epFill.style.width = '100%';
+  setTimeout(() => {
+    expProg.classList.remove('on');
+    epFill.style.width = '0%';
+    expBtn.disabled = false;
+  }, 800);
+  showToast(msg, 'ok');
+}
+
+// ─── WAV encoder ──────────────────────────────────────────────────────
+function encodeWAV(buf) {
+  const ch = buf.numberOfChannels;
+  const sr = buf.sampleRate;
+  const n = buf.length;
+  const pcm = new Float32Array(n * ch);
+  for (let c = 0; c < ch; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = 0; i < n; i++) pcm[i*ch+c] = d[i];
+  }
+  const i16 = new Int16Array(pcm.length);
+  for (let i = 0; i < pcm.length; i++) {
+    const s = Math.max(-1, Math.min(1, pcm[i]));
+    i16[i] = s < 0 ? s * 32768 : s * 32767;
+  }
+  const ds = i16.byteLength;
+  const ab = new ArrayBuffer(44+ds);
+  const v = new DataView(ab);
+  const ws = (o, s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+  ws(0,'RIFF'); v.setUint32(4,36+ds,true); ws(8,'WAVE');
+  ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true);
+  v.setUint16(22,ch,true); v.setUint32(24,sr,true);
+  v.setUint32(28,sr*ch*2,true); v.setUint16(32,ch*2,true); v.setUint16(34,16,true);
+  ws(36,'data'); v.setUint32(40,ds,true);
+  new Int16Array(ab,44).set(i16);
+  return new Blob([ab], {type:'audio/wav'});
+}
+
+// ─── Download ─────────────────────────────────────────────────────────
+function dl(blob, name, type) {
+  const url = URL.createObjectURL(blob);
+  // iOS Safari doesn't support download attribute well —
+  // open in new tab as fallback so user can long-press > Save
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  // For iOS, open in new tab if download doesn't work
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='inf', loading=false) {
+  const t = document.getElementById('toast');
+  t.innerHTML = loading
+    ? '<div class="spin"></div> Ses işleniyor...'
+    : msg;
+  t.className = 'toast '+type+' up';
+  clearTimeout(toastTimer);
+  if (!loading) toastTimer = setTimeout(() => t.classList.remove('up'), 3200);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────
+function fmtTime(t) {
+  const m = Math.floor(t/60);
+  const s = Math.floor(t%60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+function fmtDur(t) {
+  const m = Math.floor(t/60);
+  const s = Math.floor(t%60);
+  return m > 0 ? `${m}dk ${s}s` : `${s}s`;
+}
+
+// ─── Resize ───────────────────────────────────────────────────────────
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (audioBuf) { drawWave(); syncHandles(); }
+  }, 150);
+});
+
+// ─── Theme Toggle ─────────────────────────────────────────────────────
+const themeToggle = document.getElementById('themeToggle');
+const html = document.documentElement;
+
+// Safe storage wrapper — file:// protocol can block localStorage on some browsers
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+};
+
+// Load saved preference on startup
+if (store.get('ringcut-theme') === 'light') html.classList.add('light');
+
+themeToggle.addEventListener('click', () => {
+  html.classList.toggle('light');
+  const isLight = html.classList.contains('light');
+  store.set('ringcut-theme', isLight ? 'light' : 'dark');
+  // Redraw waveform with new colors
+  if (audioBuf) setTimeout(() => { drawWave(); syncHandles(); }, 50);
+});
+</script>
+</body>
+</html>
