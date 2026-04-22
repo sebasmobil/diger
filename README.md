@@ -1,1 +1,1 @@
-# s-haber
+# sebasmobil / diğer
