@@ -1,10 +1,11 @@
+<!DOCTYPE html>
 <!--
-  Timer - Zamanlayıcı Uygulaması
+  Timer Pro 2.0
   Copyright (C) 2026 sebasmobil
-
+  
   This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published
-  by the Free Software Foundation, either version 3 of the License, or
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
   This program is distributed in the hope that it will be useful,
@@ -15,1233 +16,1190 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0c0d10" id="metaThemeColor">
-<meta name="msapplication-navbutton-color" content="#0c0d10">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Timer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Timer Pro 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ==============================
+     AGPL v3.0 - © sebasmobil 2026
+     ============================== */
 
-/* ═══════════════════════════════════════════
-   TOKENS
-═══════════════════════════════════════════ */
-:root {
-  --ease: cubic-bezier(.16,1,.3,1);
-  --ease-back: cubic-bezier(.34,1.56,.64,1);
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #f0f0ff;
+    --text2: rgba(240,240,255,0.5);
+    --text3: rgba(240,240,255,0.25);
+    --glow: rgba(108,99,255,0.3);
+    --ring: rgba(108,99,255,0.15);
+    --danger: #ff4757;
+    --warning: #ffa502;
+    --success: #43e97b;
+    --bar-bg: rgba(10,10,15,0.92);
+    --bar-border: rgba(255,255,255,0.06);
+    --bar-text: rgba(240,240,255,0.55);
+  }
+  .light {
+    --bg: #f0f0f8;
+    --surface: #ffffff;
+    --surface2: #e8e8f4;
+    --border: rgba(0,0,0,0.07);
+    --accent: #5a54e8;
+    --accent2: #e84b6a;
+    --accent3: #22c55e;
+    --text: #1a1a2e;
+    --text2: rgba(26,26,46,0.5);
+    --text3: rgba(26,26,46,0.25);
+    --glow: rgba(90,84,232,0.2);
+    --ring: rgba(90,84,232,0.1);
+    --danger: #e8324a;
+    --warning: #f59e0b;
+    --success: #22c55e;
+    --bar-bg: rgba(240,240,248,0.95);
+    --bar-border: rgba(0,0,0,0.06);
+    --bar-text: rgba(26,26,46,0.5);
+  }
 
-  /* ring geometry */
-  --r: 108;          /* SVG radius */
-  --circ: 678.58;    /* 2π×108 */
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-[data-theme="dark"] {
-  --bg:        #0c0d10;
-  --bg2:       #13141a;
-  --surface:   rgba(255,255,255,.035);
-  --surface2:  rgba(255,255,255,.065);
-  --border:    rgba(255,255,255,.08);
-  --border2:   rgba(255,255,255,.18);
-  --text:      #f0f0f5;
-  --text2:     #8888a0;
-  --text3:     #44445a;
-  --accent:    #c8ff00;          /* electric lime */
-  --accent2:   #7b52f5;          /* violet */
-  --danger:    #ff4a6e;
-  --done:      #00e5a0;
-  --inp-bg:    rgba(255,255,255,.05);
-  --inp-focus: rgba(200,255,0,.08);
-  --shadow:    0 24px 80px rgba(0,0,0,.6);
-  --glow:      0 0 40px rgba(200,255,0,.15);
-  --glow-d:    0 0 40px rgba(255,74,110,.2);
-}
+  html, body {
+    height: 100%;
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.4s ease, color 0.4s ease;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
 
-[data-theme="light"] {
-  --bg:        #f4f3ee;
-  --bg2:       #ebe9e1;
-  --surface:   rgba(0,0,0,.04);
-  --surface2:  rgba(0,0,0,.07);
-  --border:    rgba(0,0,0,.1);
-  --border2:   rgba(0,0,0,.22);
-  --text:      #1a1a22;
-  --text2:     #66667a;
-  --text3:     #b0b0c0;
-  --accent:    #4a00e0;          /* deep violet */
-  --accent2:   #e0005e;          /* magenta */
-  --danger:    #e00040;
-  --done:      #007a5c;
-  --inp-bg:    rgba(0,0,0,.05);
-  --inp-focus: rgba(74,0,224,.06);
-  --shadow:    0 24px 80px rgba(0,0,0,.12);
-  --glow:      0 0 40px rgba(74,0,224,.12);
-  --glow-d:    0 0 40px rgba(224,0,64,.15);
-}
+  /* ── TOP BAR ── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    height: 36px;
+    background: var(--bar-bg);
+    border-bottom: 1px solid var(--bar-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.4s ease, border-color 0.4s ease;
+  }
+  #topbar span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--bar-text);
+    transition: color 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #topbar .sep { opacity: 0.35; }
+  #topbar a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  #topbar a:hover { color: var(--accent); }
 
-/* ═══════════════════════════════════════════
-   GLOBAL TOP BAR
-═══════════════════════════════════════════ */
-.global-topbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 200;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 16px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: background .4s, border-color .4s;
-}
-.gtb-text {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  color: var(--text3);
-  text-transform: uppercase;
-  white-space: nowrap;
-  user-select: none;
-  transition: color .4s;
-}
-.gtb-sep {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--border2);
-  user-select: none;
-}
-.gtb-link {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  color: var(--text3);
-  text-transform: uppercase;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color .3s;
-  cursor: pointer;
-}
-.gtb-link:hover { color: var(--accent); }
+  /* ── BG GRADIENT ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 30% 20%, rgba(108,99,255,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 70% 80%, rgba(255,101,132,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.5s ease;
+  }
+  .light body::before {
+    background: radial-gradient(ellipse 60% 50% at 30% 20%, rgba(90,84,232,0.05) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 70% 80%, rgba(232,75,106,0.04) 0%, transparent 70%);
+  }
 
-/* ═══════════════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { height: 100%; }
-body {
-  min-height: 100dvh;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Syne', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  overflow-x: hidden;
-  overflow-y: auto;
-  transition: background .5s var(--ease), color .5s var(--ease);
-  -webkit-tap-highlight-color: transparent;
-  padding-top: 28px;
-}
+  /* ── MAIN LAYOUT ── */
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 36px;
+  }
 
-/* ═══════════════════════════════════════════
-   BACKGROUND LAYER
-═══════════════════════════════════════════ */
-.bg-layer {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  overflow: hidden;
-}
-/* Mesh blobs */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: .55;
-  transition: background .6s var(--ease);
-  will-change: transform;
-}
-.blob-1 {
-  width: 500px; height: 500px;
-  top: -150px; left: -100px;
-  background: radial-gradient(circle, var(--accent), transparent 70%);
-  opacity: .12;
-  animation: blob1 14s ease-in-out infinite alternate;
-}
-.blob-2 {
-  width: 400px; height: 400px;
-  bottom: -100px; right: -80px;
-  background: radial-gradient(circle, var(--accent2), transparent 70%);
-  opacity: .1;
-  animation: blob2 18s ease-in-out infinite alternate;
-}
-@keyframes blob1 { from{transform:translate(0,0) scale(1)} to{transform:translate(40px,30px) scale(1.15)} }
-@keyframes blob2 { from{transform:translate(0,0) scale(1)} to{transform:translate(-30px,-40px) scale(1.1)} }
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+  }
+  .theme-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 18px;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); transform: rotate(20deg); }
 
-/* Fine grid */
-[data-theme="dark"] .bg-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-[data-theme="light"] .bg-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    margin: 20px 24px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 5px;
+    gap: 4px;
+    transition: background 0.4s ease;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--glow);
+    transform: scale(1.02);
+  }
+  .tab:not(.active):hover { color: var(--text); background: var(--surface2); }
 
-/* ═══════════════════════════════════════════
-   APP SHELL
-═══════════════════════════════════════════ */
-.app {
-  position: relative; z-index: 1;
-  width: 100%; max-width: 420px;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
-  display: flex; flex-direction: column; align-items: center;
-  gap: 20px;
-}
+  /* ── MAIN PANEL ── */
+  .panel { display: none; flex: 1; flex-direction: column; }
+  .panel.active { display: flex; }
 
-/* ═══════════════════════════════════════════
-   TOP BAR
-═══════════════════════════════════════════ */
-.topbar {
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
-  animation: fadeUp .6s .0s var(--ease) both;
-}
-.brand {
-  font-size: 11px; font-weight: 800;
-  letter-spacing: 5px; text-transform: uppercase;
-  color: var(--text2);
-  transition: color .4s;
-}
-.theme-toggle {
-  width: 40px; height: 22px; border-radius: 11px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  position: relative; cursor: pointer;
-  transition: background .4s, border-color .4s;
-  flex-shrink: 0;
-}
-.theme-toggle::after {
-  content: '';
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  transition: transform .35s var(--ease-back), background .4s;
-  box-shadow: 0 2px 6px rgba(0,0,0,.3);
-}
-[data-theme="light"] .theme-toggle::after { transform: translateX(18px) }
+  /* ── CLOCK DISPLAY ── */
+  .clock-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+  }
 
-/* ═══════════════════════════════════════════
-   BIG RING
-═══════════════════════════════════════════ */
-.ring-section {
-  position: relative;
-  animation: fadeUp .7s .08s var(--ease) both;
-}
-.ring-wrap {
-  position: relative;
-  width: min(260px, 66vw);
-  height: min(260px, 66vw);
-}
+  /* Ring */
+  .ring-container {
+    position: relative;
+    width: min(280px, 65vw);
+    height: min(280px, 65vw);
+    margin-bottom: 28px;
+  }
+  .ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 0 12px var(--glow));
+  }
+  .ring-bg { fill: none; stroke: var(--ring); stroke-width: 3; }
+  .ring-fg {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1),
+                stroke 0.4s ease,
+                filter 0.4s ease;
+  }
+  .ring-fg.warning { stroke: var(--warning); filter: drop-shadow(0 0 8px rgba(255,165,2,0.5)); }
+  .ring-fg.danger  { stroke: var(--danger);  filter: drop-shadow(0 0 8px rgba(255,71,87,0.5)); animation: pulsering 0.8s ease-in-out infinite; }
 
-/* Orbiting dots */
-.orbit {
-  position: absolute; inset: -18px;
-  border-radius: 50%;
-  border: 1px dashed var(--border);
-  animation: spin 28s linear infinite;
-}
-.orbit::before, .orbit::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  top: 50%; left: -5px;
-  width: 9px; height: 9px;
-  margin-top: -4.5px;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent), 0 0 22px var(--accent);
-  transition: background .4s, box-shadow .4s;
-}
-.orbit::after {
-  top: auto; bottom: -4.5px; left: 50%; margin-left: -4.5px;
-  width: 6px; height: 6px;
-  background: var(--accent2);
-  box-shadow: 0 0 8px var(--accent2);
-}
-@keyframes spin { to { transform: rotate(360deg) } }
+  @keyframes pulsering {
+    0%,100% { filter: drop-shadow(0 0 8px rgba(255,71,87,0.5)); }
+    50%      { filter: drop-shadow(0 0 20px rgba(255,71,87,0.9)); }
+  }
 
-.ring-svg-wrap { position: absolute; inset: 0; }
-.ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-inner {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.4s ease;
+    overflow: hidden;
+  }
+  .ring-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(108,99,255,0.05) 0%, transparent 60%);
+  }
 
-.rtrack { fill: none; stroke: var(--border); stroke-width: 5; }
-.rfill {
-  fill: none; stroke-width: 5; stroke-linecap: round;
-  stroke-dasharray: var(--circ); stroke-dashoffset: var(--circ);
-  transition: stroke-dashoffset 1s linear, stroke .5s, filter .5s;
-}
+  .time-display {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(34px, 9vw, 56px);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .time-display.warning { color: var(--warning); }
+  .time-display.danger  { color: var(--danger); animation: pulsetext 0.8s ease-in-out infinite; }
+  .time-display.finished { color: var(--success); }
 
-/* Default gradient via filter */
-.rfill.idle { stroke: var(--accent); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 70%, transparent)); }
-.rfill.running { stroke: var(--accent); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 80%, transparent)); }
-.rfill.danger { stroke: var(--danger); filter: drop-shadow(0 0 12px rgba(255,74,110,.8)); }
-.rfill.done { stroke: var(--done); filter: drop-shadow(0 0 10px rgba(0,229,160,.6)); }
-.rfill.paused { stroke: var(--text3); filter: none; }
+  @keyframes pulsetext {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+  }
 
-/* Center */
-.ring-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 4px;
-}
-.ring-time {
-  font-family: 'DM Mono', monospace;
-  font-size: clamp(34px, 9vw, 52px);
-  font-weight: 500;
-  letter-spacing: 2px;
-  color: var(--text);
-  line-height: 1;
-  transition: color .4s;
-  text-shadow: none;
-}
-.ring-time.danger { color: var(--danger); }
-.ring-time.done   { color: var(--done); }
-.ring-label {
-  font-family: 'Syne', sans-serif;
-  font-size: 10px; font-weight: 600;
-  letter-spacing: 4px; text-transform: uppercase;
-  color: var(--text3);
-  transition: color .4s, opacity .4s;
-}
-.ring-label.active { color: var(--accent); opacity: 1; }
+  .time-ms {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(14px, 3.5vw, 22px);
+    font-weight: 300;
+    color: var(--text2);
+    margin-top: 4px;
+    position: relative; z-index: 1;
+  }
+  .time-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-top: 6px;
+    position: relative; z-index: 1;
+  }
 
-/* ═══════════════════════════════════════════
-   INPUT PANEL
-═══════════════════════════════════════════ */
-.input-panel {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 16px 14px 14px;
-  backdrop-filter: blur(20px);
-  position: relative; overflow: hidden;
-  animation: fadeUp .7s .15s var(--ease) both;
-  transition: background .4s, border-color .4s;
-}
-.input-panel::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 55%);
-  pointer-events: none;
-  border-radius: 20px;
-}
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 24px 20px;
+  }
+  .btn {
+    border: none;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .btn:active::after { opacity: 1; }
+  .btn:active { transform: scale(0.95) !important; }
 
-.hms-row {
-  display: flex; align-items: flex-end;
-  justify-content: center; gap: 6px;
-}
-.hms-col {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; gap: 6px;
-}
-.hms-lbl {
-  font-size: 8px; font-weight: 700;
-  letter-spacing: 3px; color: var(--text3);
-  text-transform: uppercase;
-  transition: color .3s;
-}
-.hms-inp {
-  width: 100%;
-  background: var(--inp-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: clamp(26px, 7vw, 36px);
-  font-weight: 500;
-  text-align: center;
-  padding: 10px 4px;
-  outline: none;
-  transition: border-color .2s, background .2s, box-shadow .2s;
-  -moz-appearance: textfield;
-  inputmode: numeric;
-  caret-color: var(--accent);
-}
-.hms-inp::-webkit-inner-spin-button,
-.hms-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
-.hms-inp:focus {
-  border-color: var(--accent);
-  background: var(--inp-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
-}
-.hms-inp::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
-.hms-sep {
-  font-family: 'DM Mono', monospace;
-  font-size: clamp(24px, 6vw, 32px);
-  font-weight: 400; color: var(--text3);
-  padding-bottom: 12px; flex-shrink: 0;
-  transition: color .3s, opacity .3s;
-}
-.hms-sep.pulse { animation: sepPulse 1s step-end infinite; }
-@keyframes sepPulse { 0%,100%{opacity:1} 50%{opacity:.1} }
+  .btn-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.08); }
 
-/* Label input below HMS */
-.label-row {
-  margin-top: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.label-inp {
-  flex: 1;
-  background: var(--inp-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  font-family: 'Syne', sans-serif;
-  font-size: 13px; font-weight: 500;
-  padding: 9px 12px;
-  outline: none;
-  transition: border-color .2s, background .2s, box-shadow .2s;
-}
-.label-inp:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-.label-inp::placeholder { color: var(--text3); }
-.save-preset-btn {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  color: var(--text2); font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s; flex-shrink: 0;
-}
-.save-preset-btn:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); border-color: var(--accent); }
+  .btn-main {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 8px 32px var(--glow);
+  }
+  .btn-main:hover { transform: scale(1.1); box-shadow: 0 12px 40px var(--glow); }
+  .btn-main.running {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    animation: mainpulse 2s ease-in-out infinite;
+  }
+  @keyframes mainpulse {
+    0%,100% { box-shadow: 0 8px 32px var(--glow); }
+    50%      { box-shadow: 0 8px 48px rgba(108,99,255,0.5); }
+  }
 
-/* ═══════════════════════════════════════════
-   CONTROLS
-═══════════════════════════════════════════ */
-.controls {
-  display: flex; align-items: center;
-  justify-content: center; gap: 16px;
-  animation: fadeUp .7s .22s var(--ease) both;
-}
-.ctrl-btn {
-  border: none; outline: none; cursor: pointer;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform .2s var(--ease-back), box-shadow .2s;
-  -webkit-tap-highlight-color: transparent;
-  position: relative; overflow: hidden;
-}
-.ctrl-btn::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.2), transparent 70%);
-  opacity: 0; transition: opacity .1s;
-}
-.ctrl-btn:active::after { opacity: 1; }
-.ctrl-btn:active { transform: scale(.92); }
+  /* ── LAPS (stopwatch) ── */
+  .laps-section {
+    padding: 0 24px;
+    max-height: 180px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+  }
+  .laps-section::-webkit-scrollbar { width: 3px; }
+  .laps-section::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+  .lap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    animation: lapIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes lapIn {
+    from { opacity: 0; transform: translateX(-12px) scale(0.96); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .lap-num { color: var(--text3); font-size: 11px; }
+  .lap-split { color: var(--accent); font-size: 12px; }
+  .lap-item.best  { border-color: var(--success); }
+  .lap-item.worst { border-color: var(--danger); }
 
-.btn-play {
-  width: 68px; height: 68px; font-size: 22px;
-  background: var(--accent);
-  color: #000;
-  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent) 45%, transparent);
-  animation: idlePulse 3s ease-in-out infinite;
-}
-@keyframes idlePulse {
-  0%,100% { box-shadow: 0 4px 24px color-mix(in srgb, var(--accent) 35%, transparent); }
-  50%      { box-shadow: 0 4px 44px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 0 8px color-mix(in srgb, var(--accent) 8%, transparent); }
-}
-.btn-play:hover { transform: scale(1.07); }
-.btn-play.running {
-  background: var(--danger);
-  color: #fff;
-  box-shadow: 0 4px 24px color-mix(in srgb, var(--danger) 45%, transparent);
-  animation: runPulse 1.4s ease-in-out infinite;
-}
-@keyframes runPulse {
-  0%,100% { box-shadow: 0 4px 20px color-mix(in srgb, var(--danger) 35%, transparent); }
-  50%      { box-shadow: 0 4px 40px color-mix(in srgb, var(--danger) 55%, transparent), 0 0 0 8px color-mix(in srgb, var(--danger) 8%, transparent); }
-}
+  /* ── TIMER INPUT ── */
+  .timer-input-wrap {
+    padding: 0 24px 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  .time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .time-unit label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+  .time-picker {
+    width: 64px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 300;
+    text-align: center;
+    padding: 12px 0;
+    outline: none;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .time-picker:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+  .time-picker:disabled { opacity: 0.4; }
+  .colon {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    color: var(--text3);
+    padding-bottom: 20px;
+  }
 
-.btn-sm {
-  width: 48px; height: 48px; font-size: 17px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  color: var(--text2);
-  transition: all .2s;
-}
-.btn-sm:hover { border-color: var(--border2); color: var(--text); background: var(--surface2); }
+  /* ── PRESETS ── */
+  .presets-section {
+    padding: 0 24px 20px;
+  }
+  .presets-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .presets-header h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .btn-add-preset {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+  .btn-add-preset:hover { background: var(--ring); }
+  .presets-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .preset-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px 7px 14px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    transition: all 0.25s ease;
+    animation: chipIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .preset-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .preset-chip .del-preset {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--text3);
+    color: var(--bg);
+    font-size: 9px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .preset-chip .del-preset:hover { background: var(--danger); }
 
-/* ═══════════════════════════════════════════
-   PRESETS
-═══════════════════════════════════════════ */
-.presets-section {
-  width: 100%;
-  animation: fadeUp .7s .29s var(--ease) both;
-}
-.prow {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.ptitle {
-  font-size: 9px; font-weight: 700; letter-spacing: 3px;
-  color: var(--text3); text-transform: uppercase;
-}
-.btn-add {
-  display: flex; align-items: center; gap: 4px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-  color: var(--accent);
-  font-family: 'Syne', sans-serif;
-  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-  padding: 5px 11px; border-radius: 20px; cursor: pointer;
-  text-transform: uppercase; transition: all .2s;
-}
-.btn-add:hover {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  border-color: var(--accent);
-}
-.pgrid { display: flex; flex-wrap: wrap; gap: 7px; }
-.chip {
-  display: flex; align-items: center; gap: 7px;
-  padding: 7px 12px; border-radius: 22px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  transition: all .2s var(--ease);
-  position: relative; overflow: hidden;
-  user-select: none;
-}
-.chip::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
-  opacity: 0; transition: opacity .2s;
-}
-.chip:hover::before { opacity: 1; }
-.chip:hover {
-  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,.25);
-}
-.cdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.clabel { font-size: 11px; font-weight: 600; color: var(--text); }
-.ctime { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text2); }
-.cdel {
-  width: 16px; height: 16px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; cursor: pointer;
-  background: transparent; color: transparent;
-  transition: all .15s; flex-shrink: 0; margin-left: 2px;
-}
-.chip:hover .cdel { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); }
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+    width: 100%;
+    max-width: 360px;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal { transform: translateY(0) scale(1); }
+  .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .modal p  { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-modal {
+    flex: 1; padding: 13px;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+  .btn-modal.primary  { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 16px var(--glow); }
+  .btn-modal.secondary { background: var(--surface2); color: var(--text2); }
+  .btn-modal:hover { transform: translateY(-1px); }
 
-/* ═══════════════════════════════════════════
-   NOTIF BANNER
-═══════════════════════════════════════════ */
-.nbanner {
-  display: none; width: 100%; max-width: 420px;
-  background: color-mix(in srgb, #ffb300 8%, transparent);
-  border: 1px solid color-mix(in srgb, #ffb300 25%, transparent);
-  border-radius: 14px; padding: 10px 14px;
-  align-items: center; gap: 9px;
-  font-size: 11px; color: #ffb300;
-  position: relative; z-index: 2;
-  animation: fadeUp .5s var(--ease) both;
-  font-family: 'Syne', sans-serif;
-}
-.nbanner.show { display: flex; }
-.nbanner button {
-  margin-left: auto; padding: 5px 12px; border-radius: 7px;
-  background: color-mix(in srgb, #ffb300 15%, transparent);
-  border: 1px solid color-mix(in srgb, #ffb300 30%, transparent);
-  color: #ffb300; font-size: 10px; font-weight: 700;
-  letter-spacing: 1px; cursor: pointer; transition: all .15s;
-  text-transform: uppercase; font-family: 'Syne', sans-serif; flex-shrink: 0;
-}
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    white-space: nowrap;
+    max-width: 85vw;
+    text-align: center;
+    opacity: 0;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-/* ═══════════════════════════════════════════
-   STATUS
-═══════════════════════════════════════════ */
-.status {
-  font-size: 9px; font-weight: 600; letter-spacing: 2.5px;
-  color: var(--text3); text-transform: uppercase;
-  text-align: center; min-height: 14px;
-  animation: fadeUp .7s .34s var(--ease) both;
-  transition: color .3s;
-}
-.status.ok  { color: var(--done); }
-.status.err { color: var(--danger); }
+  /* ── FINISH ANIMATION ── */
+  @keyframes finishPop {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.06); }
+    60%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
+  }
+  .ring-container.finished { animation: finishPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
 
-/* ═══════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════ */
-.modal-bg {
-  display: none; position: fixed; inset: 0; z-index: 50;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(12px);
-  align-items: center; justify-content: center; padding: 20px;
-}
-.modal-bg.open { display: flex; animation: fadeIn .2s ease; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-.modal {
-  width: 100%; max-width: 340px;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 24px; padding: 28px 22px;
-  display: flex; flex-direction: column; gap: 18px;
-  animation: scaleIn .25s var(--ease);
-  box-shadow: var(--shadow);
-  transition: background .4s, border-color .4s;
-}
-@keyframes scaleIn { from{transform:scale(.88);opacity:0} to{transform:scale(1);opacity:1} }
-.modal-title {
-  font-size: 13px; font-weight: 800; letter-spacing: 4px;
-  color: var(--accent); text-transform: uppercase;
-  transition: color .4s;
-}
-.mlbl {
-  font-size: 8px; font-weight: 700; letter-spacing: 3px;
-  color: var(--text3); text-transform: uppercase; margin-bottom: 7px;
-}
-.mfield {
-  width: 100%; background: var(--inp-bg); border: 1.5px solid var(--border);
-  border-radius: 12px; color: var(--text); font-family: 'Syne', sans-serif;
-  font-size: 14px; font-weight: 500; padding: 11px 13px; outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.mfield:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
-.mfield::placeholder { color: var(--text3); }
-.mtime-row { display: flex; align-items: center; gap: 6px; }
-.mtime-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.minp {
-  width: 100%; text-align: center;
-  background: var(--inp-bg); border: 1.5px solid var(--border);
-  border-radius: 12px; color: var(--text);
-  font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500;
-  padding: 9px 2px; outline: none;
-  transition: border-color .2s, box-shadow .2s;
-  -moz-appearance: textfield; inputmode: numeric;
-}
-.minp::-webkit-inner-spin-button,.minp::-webkit-outer-spin-button{-webkit-appearance:none}
-.minp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
-.mcolon { font-family: 'DM Mono', monospace; font-size: 20px; color: var(--text3); padding-bottom: 14px; }
-.colors { display: flex; gap: 10px; justify-content: center; }
-.cdot-opt {
-  width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-  border: 2.5px solid transparent; transition: all .15s;
-}
-.cdot-opt:hover, .cdot-opt.sel { border-color: var(--text); transform: scale(1.2); }
-.mactions { display: flex; gap: 9px; }
-.mbtn {
-  flex: 1; padding: 12px; border-radius: 12px;
-  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
-  cursor: pointer; transition: all .15s; letter-spacing: .5px;
-}
-.mcancel { background: var(--surface); border: 1px solid var(--border); color: var(--text2); }
-.mcancel:hover { color: var(--text); border-color: var(--border2); }
-.msave { background: var(--accent); color: #000; border: none; }
-.msave:hover { opacity: .88; transform: translateY(-1px); }
+  /* ── PARTICLES ── */
+  .particle {
+    position: fixed;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 800;
+    animation: particleFly 1.2s ease-out forwards;
+  }
+  @keyframes particleFly {
+    from { opacity: 1; transform: translate(0,0) scale(1); }
+    to   { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
 
-/* ═══════════════════════════════════════════
-   ALARM OVERLAY
-═══════════════════════════════════════════ */
-.alarm-ov {
-  display: none; position: fixed; inset: 0; z-index: 100;
-  flex-direction: column; align-items: center; justify-content: center;
-  gap: 18px;
-  background: color-mix(in srgb, var(--bg) 95%, transparent);
-  backdrop-filter: blur(4px);
-}
-.alarm-ov.show { display: flex; animation: fadeIn .35s ease; }
-
-/* concentric rings */
-.alarm-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.aring {
-  position: absolute; border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
-  animation: aRingExpand 2s ease-out infinite;
-}
-.aring:nth-child(1){width:160px;height:160px;animation-delay:0s}
-.aring:nth-child(2){width:290px;height:290px;animation-delay:.5s}
-.aring:nth-child(3){width:430px;height:430px;animation-delay:1s}
-@keyframes aRingExpand { 0%{transform:scale(.4);opacity:.8} 100%{transform:scale(1.6);opacity:0} }
-
-.aicon { font-size: 64px; position: relative; z-index: 1; animation: aIconShake .3s ease-in-out infinite alternate; }
-@keyframes aIconShake { from{transform:rotate(-10deg)scale(1)} to{transform:rotate(10deg)scale(1.1)} }
-.atitle {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(22px, 7vw, 42px); font-weight: 800;
-  letter-spacing: 5px; text-transform: uppercase;
-  color: var(--danger);
-  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--danger) 60%, transparent));
-  position: relative; z-index: 1;
-  animation: aFlicker 1.5s ease-in-out infinite;
-}
-@keyframes aFlicker { 0%,100%{opacity:1} 48%{opacity:.8} 52%{opacity:1} }
-.atag {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--danger) 28%, transparent);
-  border-radius: 20px; padding: 6px 18px;
-  font-size: 12px; letter-spacing: 2px; font-weight: 700;
-  color: var(--danger); text-transform: uppercase;
-  font-family: 'Syne', sans-serif;
-  position: relative; z-index: 1;
-}
-.asub { font-size: 10px; letter-spacing: 3px; color: var(--text2); text-transform: uppercase; position: relative; z-index: 1; }
-.adismiss {
-  padding: 14px 48px; border-radius: 14px;
-  background: var(--danger); color: #fff; border: none;
-  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800;
-  letter-spacing: 3px; cursor: pointer; text-transform: uppercase;
-  position: relative; z-index: 1;
-  box-shadow: 0 4px 30px color-mix(in srgb, var(--danger) 50%, transparent);
-  transition: all .15s;
-}
-.adismiss:hover { transform: scale(1.05); }
-
-/* ═══════════════════════════════════════════
-   ANIMATIONS
-═══════════════════════════════════════════ */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ring appear/disappear */
-.ring-in { animation: ringIn .6s var(--ease) both; }
-@keyframes ringIn {
-  from { stroke-dashoffset: var(--circ); opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* number tick */
-.tick-flash { animation: tickFlash .18s ease; }
-@keyframes tickFlash { 0%{opacity:.4} 100%{opacity:1} }
-
-/* done burst */
-@keyframes doneBurst {
-  0%  { transform: scale(1); }
-  40% { transform: scale(1.06); }
-  100%{ transform: scale(1); }
-}
-.done-burst { animation: doneBurst .5s var(--ease-back); }
-
+  /* ── RESPONSIVE ── */
+  @media (max-height: 700px) {
+    .ring-container { width: min(200px, 50vw); height: min(200px, 50vw); margin-bottom: 16px; }
+    .laps-section { max-height: 120px; }
+    .time-display { font-size: clamp(26px, 8vw, 42px); }
+  }
+  @media (max-width: 380px) {
+    header { padding: 14px 16px 0; }
+    .tabs { margin: 14px 16px 0; }
+    .timer-input-wrap, .presets-section, .controls { padding-left: 16px; padding-right: 16px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Global Top Bar -->
-<div class="global-topbar">
-  <span class="gtb-text">Pro 2.0</span>
-  <span class="gtb-sep">|</span>
-  <span class="gtb-text">©sebasmobil 2026</span>
-  <span class="gtb-sep">|</span>
-  <a class="gtb-link" href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
+<!-- TOP BAR -->
+<div id="topbar">
+  <span>
+    Pro 2.0
+    <span class="sep">|</span>
+    ©sebasmobil 2026
+    <span class="sep">|</span>
+    <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL v3.0</a>
+  </span>
 </div>
 
-<!-- Background -->
-<div class="bg-layer">
-  <div class="bg-grid"></div>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-</div>
+<div id="app">
+  <header>
+    <div style="font-size:20px; font-weight:800; letter-spacing:-0.02em;">⏱</div>
+    <button class="theme-btn" id="themeBtn" title="Tema değiştir">🌙</button>
+  </header>
 
-<!-- Notif banner -->
-<div class="nbanner" id="nbanner">
-  <span>⚠</span>
-  <span>Arka planda bildirim almak için izin verin</span>
-  <button onclick="askNotif()">İzin Ver</button>
-</div>
-
-<div class="app">
-
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="brand">Zamanlayıcı</div>
-    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Tema değiştir"></div>
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" data-tab="timer">Geri Sayım</div>
+    <div class="tab" data-tab="stopwatch">Kronometre</div>
   </div>
 
-  <!-- Ring -->
-  <div class="ring-section">
-    <div class="ring-wrap">
-      <div class="orbit"></div>
-      <div class="ring-svg-wrap">
-        <svg class="ring-svg" viewBox="0 0 240 240">
-          <circle class="rtrack" cx="120" cy="120" r="108"/>
-          <circle class="rfill idle" id="rfill" cx="120" cy="120" r="108"/>
+  <!-- ═══════════════ TIMER PANEL ═══════════════ -->
+  <div class="panel active" id="panel-timer">
+    <div class="clock-wrap">
+      <div class="ring-container" id="timerRingWrap">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="46"/>
+          <circle class="ring-fg" id="timerRing" cx="50" cy="50" r="46"/>
         </svg>
+        <div class="ring-inner">
+          <div class="time-display" id="timerDisplay">00:00:00</div>
+          <div class="time-label" id="timerLabel">HAZIR</div>
+        </div>
       </div>
-      <div class="ring-center">
-        <div class="ring-time" id="ringTime">00:00:00</div>
-        <div class="ring-label" id="ringLabel">hazır</div>
+    </div>
+
+    <!-- Input row -->
+    <div class="timer-input-wrap" id="timerInputWrap">
+      <div class="time-unit">
+        <label>sa</label>
+        <input class="time-picker" id="tHour" type="number" min="0" max="23" value="0">
       </div>
+      <div class="colon">:</div>
+      <div class="time-unit">
+        <label>dk</label>
+        <input class="time-picker" id="tMin" type="number" min="0" max="59" value="5">
+      </div>
+      <div class="colon">:</div>
+      <div class="time-unit">
+        <label>sn</label>
+        <input class="time-picker" id="tSec" type="number" min="0" max="59" value="0">
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="presets-section">
+      <div class="presets-header">
+        <h3>Kayıtlı Süreler</h3>
+        <button class="btn-add-preset" id="addPresetBtn">+ Kaydet</button>
+      </div>
+      <div class="presets-list" id="presetsList"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" style="padding-bottom:32px;">
+      <button class="btn btn-icon" id="timerResetBtn" title="Sıfırla">↺</button>
+      <button class="btn btn-main" id="timerStartBtn">▶</button>
+      <button class="btn btn-icon" id="timerSoundBtn" title="Ses">🔔</button>
     </div>
   </div>
 
-  <!-- Input Panel -->
-  <div class="input-panel">
-    <div class="hms-row">
-      <div class="hms-col">
-        <div class="hms-lbl">Saat</div>
-        <input class="hms-inp" id="inpH" type="number" inputmode="numeric" min="0" max="23" value="0" placeholder="00">
-      </div>
-      <div class="hms-sep" id="sep1">:</div>
-      <div class="hms-col">
-        <div class="hms-lbl">Dakika</div>
-        <input class="hms-inp" id="inpM" type="number" inputmode="numeric" min="0" max="59" value="0" placeholder="00">
-      </div>
-      <div class="hms-sep" id="sep2">:</div>
-      <div class="hms-col">
-        <div class="hms-lbl">Saniye</div>
-        <input class="hms-inp" id="inpS" type="number" inputmode="numeric" min="0" max="59" value="0" placeholder="00">
+  <!-- ═══════════════ STOPWATCH PANEL ═══════════════ -->
+  <div class="panel" id="panel-stopwatch">
+    <div class="clock-wrap">
+      <div class="ring-container" id="swRingWrap">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="46"/>
+          <circle class="ring-fg" id="swRing" cx="50" cy="50" r="46"
+            style="stroke:var(--accent3); filter:drop-shadow(0 0 12px rgba(67,233,123,0.3))"/>
+        </svg>
+        <div class="ring-inner">
+          <div class="time-display" id="swDisplay">00:00</div>
+          <div class="time-ms" id="swMs">.00</div>
+          <div class="time-label" id="swLabel">HAZIR</div>
+        </div>
       </div>
     </div>
-    <div class="label-row">
-      <input class="label-inp" id="labelInp" type="text" placeholder="Etiket (isteğe bağlı)…" maxlength="28">
-      <button class="save-preset-btn" onclick="openModal()" title="Preset kaydet">＋</button>
+
+    <!-- Laps -->
+    <div class="laps-section" id="lapsList"></div>
+
+    <!-- Controls -->
+    <div class="controls" style="padding-bottom:32px;">
+      <button class="btn btn-icon" id="swLapBtn" title="Tur">◎</button>
+      <button class="btn btn-main" id="swStartBtn" style="background:var(--accent3); box-shadow:0 8px 32px rgba(67,233,123,0.3);">▶</button>
+      <button class="btn btn-icon" id="swResetBtn" title="Sıfırla">↺</button>
     </div>
   </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button class="ctrl-btn btn-sm" onclick="resetTimer()">↺</button>
-    <button class="ctrl-btn btn-play" id="playBtn" onclick="toggleTimer()">▶</button>
-    <button class="ctrl-btn btn-sm" onclick="openModal()" title="Preset ekle">＋</button>
-  </div>
-
-  <!-- Presets -->
-  <div class="presets-section">
-    <div class="prow">
-      <div class="ptitle">Kayıtlı Zamanlayıcılar</div>
-      <button class="btn-add" onclick="openModal()">+ Ekle</button>
-    </div>
-    <div class="pgrid" id="pgrid"></div>
-  </div>
-
-  <div class="status" id="statusEl"></div>
 </div>
 
-<!-- Preset Modal -->
-<div class="modal-bg" id="modalBg" onclick="outsideClose(event)">
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
   <div class="modal">
-    <div class="modal-title">Preset Kaydet</div>
-    <div>
-      <div class="mlbl">Etiket</div>
-      <input class="mfield" id="mlabel" type="text" placeholder="örn. Kahve Molası, Pomodoro…" maxlength="28">
-    </div>
-    <div>
-      <div class="mlbl">Süre</div>
-      <div class="mtime-row">
-        <div class="mtime-col">
-          <input class="minp" id="mH" type="number" inputmode="numeric" min="0" max="23" value="0">
-          <div class="mlbl" style="margin:0">saat</div>
-        </div>
-        <div class="mcolon">:</div>
-        <div class="mtime-col">
-          <input class="minp" id="mM" type="number" inputmode="numeric" min="0" max="59" value="5">
-          <div class="mlbl" style="margin:0">dakika</div>
-        </div>
-        <div class="mcolon">:</div>
-        <div class="mtime-col">
-          <input class="minp" id="mSm" type="number" inputmode="numeric" min="0" max="59" value="0">
-          <div class="mlbl" style="margin:0">saniye</div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="mlbl">Renk</div>
-      <div class="colors" id="colorRow">
-        <div class="cdot-opt sel" style="background:#c8ff00" data-c="#c8ff00" onclick="pickC(this)"></div>
-        <div class="cdot-opt" style="background:#7b52f5" data-c="#7b52f5" onclick="pickC(this)"></div>
-        <div class="cdot-opt" style="background:#ff4a6e" data-c="#ff4a6e" onclick="pickC(this)"></div>
-        <div class="cdot-opt" style="background:#ffb300" data-c="#ffb300" onclick="pickC(this)"></div>
-        <div class="cdot-opt" style="background:#00e5a0" data-c="#00e5a0" onclick="pickC(this)"></div>
-        <div class="cdot-opt" style="background:#ff6d00" data-c="#ff6d00" onclick="pickC(this)"></div>
-      </div>
-    </div>
-    <div class="mactions">
-      <button class="mbtn mcancel" onclick="closeModal()">İptal</button>
-      <button class="mbtn msave" onclick="savePreset()">Kaydet</button>
-    </div>
+    <h2 id="modalTitle">Uyarı</h2>
+    <p id="modalMsg">Mesaj</p>
+    <div class="modal-actions" id="modalActions"></div>
   </div>
 </div>
 
-<!-- Alarm -->
-<div class="alarm-ov" id="alarmOv">
-  <div class="alarm-rings">
-    <div class="aring"></div><div class="aring"></div><div class="aring"></div>
-  </div>
-  <div class="aicon">⏰</div>
-  <div class="atitle">Süre Doldu!</div>
-  <div class="atag" id="alarmTag" style="display:none"></div>
-  <div class="asub">Zamanlayıcın tamamlandı</div>
-  <button class="adismiss" onclick="dismissAlarm()">Kapat</button>
-</div>
+<!-- TOAST -->
+<div id="toast"></div>
 
 <script>
-// ═══ THEME ════════════════════════════════════════
-const THEME_COLORS = {
-  dark:  '#0c0d10',
-  light: '#f4f3ee'
-};
+/*
+ * Timer Pro 2.0 — JavaScript Logic
+ * © sebasmobil 2026 — AGPL v3.0
+ * https://www.gnu.org/licenses/agpl-3.0.html
+ */
 
-function applyThemeColor(theme) {
-  const color = THEME_COLORS[theme] || THEME_COLORS.dark;
-  // Standard theme-color (Chrome, Samsung, Firefox)
-  const meta = document.getElementById('metaThemeColor');
-  if (meta) meta.setAttribute('content', color);
-  // MS
-  const msMeta = document.querySelector('meta[name="msapplication-navbutton-color"]');
-  if (msMeta) msMeta.setAttribute('content', color);
-  // Apple status bar style
-  const appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-  if (appleMeta) appleMeta.setAttribute('content', theme === 'dark' ? 'black-translucent' : 'default');
-}
+/* ──────────────── THEME ──────────────── */
+const themeBtn = document.getElementById('themeBtn');
+let isDark = true;
+themeBtn.addEventListener('click', () => {
+  isDark = !isDark;
+  document.body.className = isDark ? '' : 'light';
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('timerTheme', isDark ? 'dark' : 'light');
+});
+(function initTheme() {
+  const saved = localStorage.getItem('timerTheme');
+  if (saved === 'light') { isDark = false; document.body.className = 'light'; themeBtn.textContent = '☀️'; }
+})();
 
-function toggleTheme() {
-  const html = document.documentElement;
-  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
-  html.dataset.theme = next;
-  localStorage.setItem('timerTheme', next);
-  applyThemeColor(next);
-  updateColorOptions();
-}
-// Restore theme
-const savedTheme = localStorage.getItem('timerTheme');
-if (savedTheme) document.documentElement.dataset.theme = savedTheme;
-applyThemeColor(savedTheme || 'dark');
-
-function updateColorOptions() {
-  // Nothing needed – CSS vars handle it via color-mix
-}
-
-// ═══ INPUTS ═══════════════════════════════════════
-const inpH = document.getElementById('inpH');
-const inpM = document.getElementById('inpM');
-const inpS = document.getElementById('inpS');
-
-function setupInput(inp, max) {
-  inp.addEventListener('focus', () => setTimeout(() => inp.select(), 10));
-  inp.addEventListener('touchstart', () => { inp.focus(); setTimeout(() => inp.select(), 30); }, {passive:true});
-  inp.addEventListener('blur', () => {
-    let v = parseInt(inp.value) || 0;
-    inp.value = Math.max(0, Math.min(max, v));
-    if (!running) syncDisplayFromInputs();
+/* ──────────────── TABS ──────────────── */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    const name = t.dataset.tab;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
   });
-  inp.addEventListener('input', () => { if (!running) syncDisplayFromInputs(); });
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') toggleTimer(); });
-}
-setupInput(inpH, 23);
-setupInput(inpM, 59);
-setupInput(inpS, 59);
+});
 
-function getInputSecs() {
-  return (parseInt(inpH.value)||0)*3600 + (parseInt(inpM.value)||0)*60 + (parseInt(inpS.value)||0);
-}
-function resetInputs() {
-  inpH.value = 0; inpM.value = 0; inpS.value = 0;
-  syncDisplayFromInputs();
-}
-function syncDisplayFromInputs() {
-  const s = getInputSecs();
-  total = s; remaining = s;
-  setRingTime(s);
-  setRing(1, 'idle');
-  document.getElementById('ringLabel').textContent = 'hazır';
-  document.getElementById('ringLabel').className = 'ring-label';
+/* ──────────────── TOAST ──────────────── */
+let toastTimer;
+function showToast(msg, duration = 2400) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), duration);
 }
 
-// ═══ TIMER STATE ══════════════════════════════════
-let total = 0, remaining = 0, running = false, ticker = null;
-let aCtx = null, alarmIv = null, notifOk = false, activeLabel = '';
-const CIRC = 678.58; // 2π×108
-
-const rfill    = document.getElementById('rfill');
-const ringTime = document.getElementById('ringTime');
-const ringLabel= document.getElementById('ringLabel');
-const playBtn  = document.getElementById('playBtn');
-const sep1     = document.getElementById('sep1');
-const sep2     = document.getElementById('sep2');
-
-function pad(n) { return String(n).padStart(2,'0'); }
-function fmtSec(s) {
-  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sc=s%60;
-  return `${pad(h)}:${pad(m)}:${pad(sc)}`;
+/* ──────────────── MODAL ──────────────── */
+function showModal(title, msg, actions) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  const actEl = document.getElementById('modalActions');
+  actEl.innerHTML = '';
+  actions.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'btn-modal ' + (a.primary ? 'primary' : 'secondary');
+    b.textContent = a.label;
+    b.addEventListener('click', () => { closeModal(); a.fn && a.fn(); });
+    actEl.appendChild(b);
+  });
+  document.getElementById('modalOverlay').classList.add('show');
 }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target === document.getElementById('modalOverlay')) closeModal(); });
 
-function setRingTime(s) {
-  ringTime.textContent = fmtSec(s);
-}
-function setRing(ratio, state) {
-  const offset = CIRC * (1 - Math.max(0, Math.min(1, ratio)));
-  rfill.style.strokeDashoffset = offset;
-  rfill.className = 'rfill ' + state;
-  ringTime.className = 'ring-time' + (state==='danger'?' danger':'') + (state==='done'?' done':'');
-}
-
-function toggleTimer() {
-  initAudio();
-  if (remaining <= 0) {
-    const s = getInputSecs();
-    if (s <= 0) { inpM.focus(); return; }
-    total = s; remaining = s;
-    activeLabel = document.getElementById('labelInp').value.trim();
+/* ──────────────── NOTIFICATION & AUDIO ──────────────── */
+let notifPermission = false;
+(async () => {
+  if ('Notification' in window) {
+    if (Notification.permission === 'granted') notifPermission = true;
+    else if (Notification.permission !== 'denied') {
+      const p = await Notification.requestPermission();
+      notifPermission = p === 'granted';
+    }
   }
-  running ? pauseTimer() : startTimer();
+})();
+
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+let soundEnabled = true;
+const soundBtn = document.getElementById('timerSoundBtn');
+soundBtn.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  soundBtn.textContent = soundEnabled ? '🔔' : '🔕';
+  showToast(soundEnabled ? 'Ses açık' : 'Ses kapalı');
+});
+
+function playAlarm(duration = 1200) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.18);
+      gain.gain.setValueAtTime(0, now + i * 0.18);
+      gain.gain.linearRampToValueAtTime(0.3, now + i * 0.18 + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.18 + 0.32);
+      osc.start(now + i * 0.18);
+      osc.stop(now + i * 0.18 + 0.35);
+    });
+    // Low rumble
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let j = 0; j < data.length; j++) data[j] = (Math.random()*2-1) * 0.05;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.15, now); g2.gain.exponentialRampToValueAtTime(0.001, now+0.4);
+    src.connect(g2); g2.connect(ctx.destination);
+    src.start(now);
+  } catch(e) {}
+}
+
+function sendNotification(title, body) {
+  if (!notifPermission) return;
+  try {
+    new Notification(title, { body, icon: '⏱', badge: '⏱', requireInteraction: false, silent: false });
+  } catch(e) {}
+}
+
+/* ──────────────── PARTICLES ──────────────── */
+function burst(x, y, color = '#6c63ff') {
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.PI * 2 / 18) * i;
+    const dist = 60 + Math.random() * 60;
+    p.style.cssText = `
+      left:${x}px; top:${y}px;
+      background:${color};
+      --tx:${Math.cos(angle)*dist}px;
+      --ty:${Math.sin(angle)*dist}px;
+      animation-delay:${Math.random()*0.1}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1400);
+  }
+}
+
+/* ──────────────── RING HELPER ──────────────── */
+const CIRC = 2 * Math.PI * 46; // ~289
+function setRing(el, pct) {
+  const offset = CIRC * (1 - Math.min(1, Math.max(0, pct)));
+  el.style.strokeDasharray = CIRC;
+  el.style.strokeDashoffset = offset;
+}
+
+/* ──────────────── VISIBILITY (background mode) ──────────────── */
+let timerHiddenAt = null, swHiddenAt = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (timerRunning) timerHiddenAt = Date.now();
+    if (swRunning) swHiddenAt = Date.now();
+  } else {
+    if (timerHiddenAt && timerRunning) {
+      const elapsed = Math.floor((Date.now() - timerHiddenAt) / 1000);
+      timerRemaining = Math.max(0, timerRemaining - elapsed);
+      timerHiddenAt = null;
+      if (timerRemaining === 0) finishTimer();
+      else updateTimerDisplay();
+    }
+    if (swHiddenAt && swRunning) {
+      swElapsed += Date.now() - swHiddenAt;
+      swHiddenAt = null;
+      updateSwDisplay();
+    }
+  }
+});
+
+/* ──────────────────────────────────────────
+   ════════════ TIMER LOGIC ════════════
+   ────────────────────────────────────────── */
+let timerTotal = 300, timerRemaining = 300;
+let timerRunning = false, timerInterval = null;
+
+const timerDisplay = document.getElementById('timerDisplay');
+const timerLabel   = document.getElementById('timerLabel');
+const timerRing    = document.getElementById('timerRing');
+const timerRingWrap = document.getElementById('timerRingWrap');
+const timerStartBtn = document.getElementById('timerStartBtn');
+const timerResetBtn = document.getElementById('timerResetBtn');
+const tHour = document.getElementById('tHour');
+const tMin  = document.getElementById('tMin');
+const tSec  = document.getElementById('tSec');
+
+function getTimerInputSeconds() {
+  return (+tHour.value||0)*3600 + (+tMin.value||0)*60 + (+tSec.value||0);
+}
+function setTimerInputDisabled(v) {
+  [tHour, tMin, tSec].forEach(el => el.disabled = v);
+}
+function formatHMS(s) {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function updateTimerDisplay() {
+  timerDisplay.textContent = formatHMS(timerRemaining);
+  const pct = timerTotal > 0 ? timerRemaining / timerTotal : 0;
+  setRing(timerRing, pct);
+  timerDisplay.className = 'time-display';
+  timerRing.className = 'ring-fg';
+  if (pct <= 0.1) {
+    timerDisplay.classList.add('danger');
+    timerRing.classList.add('danger');
+  } else if (pct <= 0.25) {
+    timerDisplay.classList.add('warning');
+    timerRing.classList.add('warning');
+  }
 }
 
 function startTimer() {
-  if (remaining <= 0) return;
-  running = true;
-  playBtn.textContent = '⏸';
-  playBtn.classList.add('running');
-  sep1.classList.add('pulse'); sep2.classList.add('pulse');
-  activeLabel = document.getElementById('labelInp').value.trim();
-  ringLabel.textContent = activeLabel || 'çalışıyor';
-  ringLabel.className = 'ring-label active';
-  // Lock inputs
-  [inpH, inpM, inpS].forEach(i => i.disabled = true);
-  ticker = setInterval(tick, 1000);
+  timerInterval = setInterval(() => {
+    if (document.hidden) return;
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) finishTimer();
+  }, 1000);
+  timerRunning = true;
+  timerStartBtn.textContent = '⏸';
+  timerStartBtn.classList.add('running');
+  timerLabel.textContent = 'ÇALIŞIYOR';
+  setTimerInputDisabled(true);
+  document.getElementById('timerInputWrap').style.opacity = '0.4';
 }
-
 function pauseTimer() {
-  running = false;
-  clearInterval(ticker); ticker = null;
-  playBtn.textContent = '▶';
-  playBtn.classList.remove('running');
-  sep1.classList.remove('pulse'); sep2.classList.remove('pulse');
-  setRing(total > 0 ? remaining / total : 0, 'paused');
-  ringLabel.textContent = 'duraklatıldı';
-  ringLabel.className = 'ring-label';
-  [inpH, inpM, inpS].forEach(i => i.disabled = false);
+  clearInterval(timerInterval); timerInterval = null;
+  timerRunning = false;
+  timerStartBtn.textContent = '▶';
+  timerStartBtn.classList.remove('running');
+  timerLabel.textContent = 'DURAKLATILDI';
 }
-
 function resetTimer() {
-  pauseTimer();
-  remaining = total;
-  setRingTime(remaining);
-  setRing(1, 'idle');
-  ringLabel.textContent = activeLabel || 'hazır';
-  ringLabel.className = 'ring-label' + (activeLabel ? ' active' : '');
-  [inpH, inpM, inpS].forEach(i => i.disabled = false);
+  clearInterval(timerInterval); timerInterval = null;
+  timerRunning = false;
+  timerRemaining = getTimerInputSeconds();
+  timerTotal = timerRemaining;
+  if (timerTotal === 0) { timerRemaining = 300; timerTotal = 300; }
+  updateTimerDisplay();
+  timerDisplay.className = 'time-display';
+  timerRing.className = 'ring-fg';
+  timerRingWrap.classList.remove('finished');
+  timerStartBtn.textContent = '▶';
+  timerStartBtn.classList.remove('running');
+  timerLabel.textContent = 'HAZIR';
+  setTimerInputDisabled(false);
+  document.getElementById('timerInputWrap').style.opacity = '1';
+}
+function finishTimer() {
+  clearInterval(timerInterval); timerInterval = null;
+  timerRunning = false;
+  timerRemaining = 0;
+  updateTimerDisplay();
+  timerDisplay.className = 'time-display finished';
+  timerRingWrap.classList.add('finished');
+  timerStartBtn.textContent = '▶';
+  timerStartBtn.classList.remove('running');
+  timerLabel.textContent = 'TAMAMLANDI ✓';
+  setTimerInputDisabled(false);
+  document.getElementById('timerInputWrap').style.opacity = '1';
+  playAlarm();
+  sendNotification('⏱ Timer Pro', `Süre doldu! ${formatHMS(timerTotal)} tamamlandı.`);
+  showToast('🎉 Süre doldu!', 3000);
+  // burst
+  const rect = timerRingWrap.getBoundingClientRect();
+  burst(rect.left + rect.width/2, rect.top + rect.height/2, '#6c63ff');
 }
 
-function tick() {
-  remaining--;
-  const ratio = total > 0 ? remaining / total : 0;
-
-  // State
-  let state = 'running';
-  if (remaining <= 0) state = 'done';
-  else if (remaining <= 10) state = 'danger';
-
-  setRingTime(remaining);
-  setRing(ratio, state);
-
-  // Tick flash on ringTime
-  ringTime.classList.remove('tick-flash');
-  void ringTime.offsetWidth;
-  ringTime.classList.add('tick-flash');
-
-  if (remaining <= 10 && remaining > 0) playTick();
-
-  if (remaining <= 0) {
-    clearInterval(ticker); ticker = null;
-    running = false;
-    playBtn.textContent = '▶';
-    playBtn.classList.remove('running');
-    sep1.classList.remove('pulse'); sep2.classList.remove('pulse');
-    [inpH, inpM, inpS].forEach(i => i.disabled = false);
-    // Done burst on ring
-    document.querySelector('.ring-wrap').classList.add('done-burst');
-    setTimeout(() => document.querySelector('.ring-wrap').classList.remove('done-burst'), 600);
-    ringLabel.textContent = activeLabel ? activeLabel + ' ✓' : 'tamamlandı ✓';
-    ringLabel.className = 'ring-label active';
-    fireAlarm();
+timerStartBtn.addEventListener('click', () => {
+  if (timerRunning) { pauseTimer(); return; }
+  // Check stopwatch conflict
+  if (swRunning) {
+    showModal('Kronometre Çalışıyor',
+      'Bir kronometre zaten aktif. Yeni bir geri sayım başlatmak istiyor musunuz?',
+      [
+        { label: 'İptal', primary: false },
+        { label: 'Başlat', primary: true, fn: () => doStartTimer() }
+      ]);
+    return;
   }
+  doStartTimer();
+});
+function doStartTimer() {
+  timerTotal = getTimerInputSeconds();
+  if (timerTotal === 0) { showToast('Lütfen bir süre girin'); return; }
+  timerRemaining = timerTotal;
+  setRing(timerRing, 1);
+  timerDisplay.className = 'time-display';
+  timerRing.className = 'ring-fg';
+  timerRingWrap.classList.remove('finished');
+  startTimer();
 }
+timerResetBtn.addEventListener('click', resetTimer);
+// Input change → reset
+[tHour, tMin, tSec].forEach(el => {
+  el.addEventListener('change', () => { if (!timerRunning) { timerTotal = getTimerInputSeconds(); timerRemaining = timerTotal; updateTimerDisplay(); } });
+});
+// Init
+setRing(timerRing, 1);
 
-// ═══ ALARM ════════════════════════════════════════
-function fireAlarm() {
-  const tagEl = document.getElementById('alarmTag');
-  tagEl.textContent = activeLabel;
-  tagEl.style.display = activeLabel ? '' : 'none';
-  document.getElementById('alarmOv').classList.add('show');
-  playAlarm(); sendNotif(activeLabel);
-  if (navigator.vibrate) navigator.vibrate([400,100,400,100,600]);
-}
-function dismissAlarm() {
-  document.getElementById('alarmOv').classList.remove('show');
-  stopAlarm();
-}
+/* ──────────────── PRESETS ──────────────── */
+let presets = JSON.parse(localStorage.getItem('timerPresets') || '[]');
+if (presets.length === 0) presets = [60, 300, 600, 1800, 3600];
 
-// ═══ PRESETS ══════════════════════════════════════
-const DEFAULTS = [
-  {id:'d1',label:'Kısa Mola', seconds:300,  color:'#c8ff00'},
-  {id:'d2',label:'Pomodoro',  seconds:1500, color:'#ff4a6e'},
-  {id:'d3',label:'Uzun Mola', seconds:900,  color:'#7b52f5'},
-  {id:'d4',label:'1 Saat',    seconds:3600, color:'#ffb300'},
-];
-let presets;
-try { presets = JSON.parse(localStorage.getItem('timerPresets')||'null') || [...DEFAULTS]; }
-catch(e) { presets = [...DEFAULTS]; }
-function saveP() { try { localStorage.setItem('timerPresets', JSON.stringify(presets)); } catch(e){} }
-
+function savePresets() { localStorage.setItem('timerPresets', JSON.stringify(presets)); }
 function renderPresets() {
-  const g = document.getElementById('pgrid'); g.innerHTML = '';
-  presets.forEach(p => {
-    const chip = document.createElement('div'); chip.className = 'chip';
-    chip.innerHTML = `
-      <div class="cdot" style="background:${p.color};box-shadow:0 0 8px ${p.color}88"></div>
-      <div><div class="clabel">${esc(p.label)}</div><div class="ctime">${fmtSec(p.seconds)}</div></div>
-      <div class="cdel" onclick="delPreset(event,'${p.id}')">✕</div>`;
-    chip.addEventListener('click', () => loadPreset(p));
-    g.appendChild(chip);
+  const list = document.getElementById('presetsList');
+  list.innerHTML = '';
+  presets.forEach((s, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'preset-chip';
+    const label = document.createElement('span');
+    label.textContent = formatHMS(s);
+    const del = document.createElement('span');
+    del.className = 'del-preset';
+    del.textContent = '✕';
+    del.title = 'Sil';
+    del.addEventListener('click', e => {
+      e.stopPropagation();
+      presets.splice(i, 1);
+      savePresets(); renderPresets();
+      showToast('Preset silindi');
+    });
+    chip.appendChild(label);
+    chip.appendChild(del);
+    chip.addEventListener('click', () => {
+      if (timerRunning) { showToast('Önce zamanlayıcıyı durdurun'); return; }
+      tHour.value = Math.floor(s/3600);
+      tMin.value  = Math.floor((s%3600)/60);
+      tSec.value  = s % 60;
+      timerTotal = s; timerRemaining = s;
+      updateTimerDisplay();
+      showToast('Süre seçildi: ' + formatHMS(s));
+    });
+    list.appendChild(chip);
   });
 }
 renderPresets();
 
-function loadPreset(p) {
-  if (running) resetTimer();
-  total = p.seconds; remaining = p.seconds;
-  inpH.value = Math.floor(p.seconds/3600);
-  inpM.value = Math.floor((p.seconds%3600)/60);
-  inpS.value = p.seconds%60;
-  document.getElementById('labelInp').value = p.label;
-  activeLabel = p.label;
-  setRingTime(p.seconds);
-  setRing(1,'idle');
-  ringLabel.textContent = p.label;
-  ringLabel.className = 'ring-label active';
-}
-function delPreset(e,id) {
-  e.stopPropagation();
-  presets = presets.filter(p => p.id !== id); saveP(); renderPresets();
-}
-
-// ═══ MODAL ════════════════════════════════════════
-let selColor = '#c8ff00';
-function openModal() {
-  document.getElementById('mlabel').value = document.getElementById('labelInp').value.trim();
-  document.getElementById('mH').value  = parseInt(inpH.value)||0;
-  document.getElementById('mM').value  = parseInt(inpM.value)||0;
-  document.getElementById('mSm').value = parseInt(inpS.value)||0;
-  selColor = '#c8ff00';
-  document.querySelectorAll('.cdot-opt').forEach(d => d.classList.toggle('sel', d.dataset.c === selColor));
-  document.getElementById('modalBg').classList.add('open');
-  setTimeout(() => document.getElementById('mlabel').focus(), 60);
-}
-function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
-function outsideClose(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
-function pickC(el) {
-  selColor = el.dataset.c;
-  document.querySelectorAll('.cdot-opt').forEach(d => d.classList.remove('sel'));
-  el.classList.add('sel');
-}
-function savePreset() {
-  const label = document.getElementById('mlabel').value.trim() || 'Zamanlayıcı';
-  const h = parseInt(document.getElementById('mH').value)||0;
-  const m = parseInt(document.getElementById('mM').value)||0;
-  const s = parseInt(document.getElementById('mSm').value)||0;
-  const secs = h*3600 + m*60 + s;
-  if (secs <= 0) { document.getElementById('mM').focus(); return; }
-  presets.push({id:'u'+Date.now(), label, seconds:secs, color:selColor});
-  saveP(); renderPresets(); closeModal();
-}
-[document.getElementById('mH'),document.getElementById('mM'),
- document.getElementById('mSm'),document.getElementById('mlabel')].forEach(inp => {
-  if (!inp) return;
-  inp.addEventListener('focus', () => setTimeout(() => inp.select(), 10));
-  inp.addEventListener('touchstart', () => { inp.focus(); setTimeout(() => inp.select(), 30); }, {passive:true});
+document.getElementById('addPresetBtn').addEventListener('click', () => {
+  const s = getTimerInputSeconds();
+  if (s === 0) { showToast('Önce bir süre girin'); return; }
+  if (presets.includes(s)) { showToast('Bu süre zaten kayıtlı'); return; }
+  presets.push(s);
+  presets.sort((a,b) => a-b);
+  savePresets(); renderPresets();
+  showToast('Kaydedildi: ' + formatHMS(s));
 });
 
-// ═══ AUDIO ════════════════════════════════════════
-function initAudio() { if (aCtx) return; aCtx = new(window.AudioContext||window.webkitAudioContext)(); }
-function playTick() {
-  if (!aCtx) return; if (aCtx.state==='suspended') aCtx.resume();
-  const len = Math.floor(aCtx.sampleRate*.055);
-  const buf = aCtx.createBuffer(1,len,aCtx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(aCtx.sampleRate*.007));
-  const src=aCtx.createBufferSource(); src.buffer=buf;
-  const lp=aCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=160;
-  const gn=aCtx.createGain(); gn.gain.value=.16;
-  src.connect(lp); lp.connect(gn); gn.connect(aCtx.destination); src.start();
+/* ──────────────────────────────────────────
+   ════════════ STOPWATCH LOGIC ════════════
+   ────────────────────────────────────────── */
+let swElapsed = 0, swRunning = false, swInterval = null;
+let swLapStart = 0, swLaps = [];
+
+const swDisplay = document.getElementById('swDisplay');
+const swMs      = document.getElementById('swMs');
+const swLabel   = document.getElementById('swLabel');
+const swRing    = document.getElementById('swRing');
+const swStartBtn = document.getElementById('swStartBtn');
+const swLapBtn   = document.getElementById('swLapBtn');
+const swResetBtn = document.getElementById('swResetBtn');
+
+function formatMMSS(ms) {
+  const s = Math.floor(ms/1000);
+  const m = Math.floor(s/60);
+  return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
-function playAlarm() {
-  if (!aCtx) return; if (aCtx.state==='suspended') aCtx.resume(); stopAlarm();
-  function burst() {
-    [523,659,784,1047].forEach((f,i) => setTimeout(() => {
-      const o=aCtx.createOscillator(), g=aCtx.createGain();
-      o.connect(g); g.connect(aCtx.destination);
-      o.type='sine'; o.frequency.value=f;
-      g.gain.setValueAtTime(0,aCtx.currentTime);
-      g.gain.linearRampToValueAtTime(.36,aCtx.currentTime+.03);
-      g.gain.exponentialRampToValueAtTime(.001,aCtx.currentTime+.38);
-      o.start(); o.stop(aCtx.currentTime+.4);
-    }, i*115));
+function updateSwDisplay() {
+  swDisplay.textContent = formatMMSS(swElapsed);
+  swMs.textContent = '.' + String(Math.floor((swElapsed%1000)/10)).padStart(2,'0');
+  const pct = (swElapsed % 60000) / 60000;
+  setRing(swRing, pct);
+}
+
+let swLastTick = null;
+function startSw() {
+  swLastTick = Date.now();
+  swInterval = setInterval(() => {
+    if (document.hidden) return;
+    const now = Date.now();
+    swElapsed += now - swLastTick;
+    swLastTick = now;
+    updateSwDisplay();
+  }, 30);
+  swRunning = true;
+  swStartBtn.textContent = '⏸';
+  swStartBtn.classList.add('running');
+  swLabel.textContent = 'ÇALIŞIYOR';
+  swLapBtn.style.opacity = '1';
+}
+function pauseSw() {
+  clearInterval(swInterval); swInterval = null;
+  swRunning = false;
+  swStartBtn.textContent = '▶';
+  swStartBtn.classList.remove('running');
+  swLabel.textContent = 'DURAKLATILDI';
+}
+function resetSw() {
+  clearInterval(swInterval); swInterval = null;
+  swRunning = false; swElapsed = 0; swLapStart = 0; swLaps = [];
+  updateSwDisplay();
+  swDisplay.className = 'time-display';
+  swStartBtn.textContent = '▶';
+  swStartBtn.classList.remove('running');
+  swLabel.textContent = 'HAZIR';
+  swLapBtn.style.opacity = '0.4';
+  document.getElementById('lapsList').innerHTML = '';
+}
+
+swStartBtn.addEventListener('click', () => {
+  if (swRunning) { pauseSw(); return; }
+  // Check timer conflict
+  if (timerRunning) {
+    showModal('Geri Sayım Çalışıyor',
+      'Bir geri sayım zaten aktif. Kronometre başlatmak istiyor musunuz?',
+      [
+        { label: 'İptal', primary: false },
+        { label: 'Başlat', primary: true, fn: () => startSw() }
+      ]);
+    return;
   }
-  burst(); alarmIv = setInterval(burst, 2300);
-}
-function stopAlarm() { if (alarmIv){clearInterval(alarmIv);alarmIv=null;} }
-
-// ═══ NOTIFICATIONS ════════════════════════════════
-const nbanner = document.getElementById('nbanner');
-function checkNotif() {
-  if (!('Notification' in window)) { setStatus('Bu tarayıcı bildirim desteklemiyor','err'); return; }
-  if (Notification.permission==='granted') { notifOk=true; nbanner.classList.remove('show'); setStatus('Bildirimler aktif ✓','ok'); }
-  else if (Notification.permission==='denied') { nbanner.classList.remove('show'); setStatus('Bildirim izni reddedildi','err'); }
-  else nbanner.classList.add('show');
-}
-async function askNotif() {
-  if (!('Notification' in window)) return;
-  const r = await Notification.requestPermission(); notifOk = r==='granted'; checkNotif();
-}
-function sendNotif(label) {
-  if (!notifOk) return;
-  const body = label ? `"${label}" zamanlayıcın tamamlandı.` : 'Zamanlayıcın tamamlandı.';
-  const n = new Notification('⏰ Süre Doldu!',{body,requireInteraction:true,
-    icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%22.9em%22 font-size=%2256%22>⏰</text></svg>'});
-  n.onclick = () => { window.focus(); dismissAlarm(); n.close(); };
-}
-function setStatus(msg,type) {
-  const el = document.getElementById('statusEl');
-  el.textContent = msg; el.className = 'status ' + (type||'');
-}
-
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && aCtx && aCtx.state==='suspended') aCtx.resume();
+  startSw();
 });
 
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleTimer(); }
-  if (e.key === 'r' || e.key === 'R') resetTimer();
+swResetBtn.addEventListener('click', () => {
+  if (swRunning) {
+    showModal('Kronoyu Sıfırla', 'Kronometre sıfırlanacak. Emin misiniz?',
+      [{ label: 'İptal', primary: false }, { label: 'Sıfırla', primary: true, fn: resetSw }]);
+  } else { resetSw(); }
 });
 
-// ═══ BOOT ════════════════════════════════════════
-checkNotif();
+swLapBtn.addEventListener('click', () => {
+  if (!swRunning) return;
+  const lapTime = swElapsed - swLapStart;
+  swLaps.push(lapTime);
+  swLapStart = swElapsed;
+  renderLaps();
+  // mini burst
+  const rect = swRing.getBoundingClientRect();
+  burst(rect.left + rect.width/2, rect.top + rect.height/2, '#43e97b');
+});
+
+function renderLaps() {
+  const list = document.getElementById('lapsList');
+  if (!swLaps.length) { list.innerHTML = ''; return; }
+  const minLap = Math.min(...swLaps), maxLap = Math.max(...swLaps);
+  list.innerHTML = '';
+  [...swLaps].reverse().forEach((lap, ri) => {
+    const i = swLaps.length - 1 - ri;
+    const item = document.createElement('div');
+    item.className = 'lap-item';
+    if (swLaps.length > 1) {
+      if (lap === minLap) item.classList.add('best');
+      if (lap === maxLap) item.classList.add('worst');
+    }
+    item.innerHTML = `
+      <span class="lap-num">Tur ${i+1}</span>
+      <span>${formatMMSS(lap)}.${String(Math.floor((lap%1000)/10)).padStart(2,'0')}</span>
+      <span class="lap-split">${formatMMSS(swLaps.slice(0,i+1).reduce((a,b)=>a+b,0))}</span>`;
+    list.appendChild(item);
+  });
+}
+
+// Init
+swLapBtn.style.opacity = '0.4';
+setRing(swRing, 0);
+updateSwDisplay();
+updateTimerDisplay();
 </script>
 </body>
 </html>
