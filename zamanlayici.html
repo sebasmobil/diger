@@ -2,19 +2,8 @@
 <!--
   Timer Pro 2.0
   Copyright (C) 2026 sebasmobil
-  
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Affero General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License
-  along with this program. If not, see <https://www.gnu.org/licenses/>.
+  Licensed under the GNU Affero General Public License v3.0
+  https://www.gnu.org/licenses/agpl-3.0.html
 -->
 <html lang="tr">
 <head>
@@ -23,1183 +12,773 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Timer Pro 2.0</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ==============================
-     AGPL v3.0 - © sebasmobil 2026
-     ============================== */
+/* AGPL v3.0 — © sebasmobil 2026 */
+:root{
+  --bg:#080810;--s1:#0f0f1c;--s2:#161628;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.12);
+  --a:#7c6fff;--a2:#ff6b9d;--a3:#00e5a0;--a4:#ffc947;
+  --tx:#eeeeff;--tx2:rgba(238,238,255,0.55);--tx3:rgba(238,238,255,0.22);
+  --glow:rgba(124,111,255,0.4);--glow2:rgba(0,229,160,0.35);
+  --bar-bg:rgba(8,8,16,0.9);--bar-bd:rgba(255,255,255,0.05);--bar-tx:rgba(238,238,255,0.45);
+}
+.lm{
+  --bg:#f4f4fc;--s1:#ffffff;--s2:#eceef8;
+  --bd:rgba(0,0,20,0.07);--bd2:rgba(0,0,20,0.14);
+  --a:#5a52e8;--a2:#e8486e;--a3:#00b87d;--a4:#f59e0b;
+  --tx:#18182a;--tx2:rgba(24,24,42,0.5);--tx3:rgba(24,24,42,0.22);
+  --glow:rgba(90,82,232,0.2);--glow2:rgba(0,184,125,0.2);
+  --bar-bg:rgba(244,244,252,0.94);--bar-bd:rgba(0,0,20,0.06);--bar-tx:rgba(24,24,42,0.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);transition:background .5s,color .5s;overflow-x:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
 
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6c63ff;
-    --accent2: #ff6584;
-    --accent3: #43e97b;
-    --text: #f0f0ff;
-    --text2: rgba(240,240,255,0.5);
-    --text3: rgba(240,240,255,0.25);
-    --glow: rgba(108,99,255,0.3);
-    --ring: rgba(108,99,255,0.15);
-    --danger: #ff4757;
-    --warning: #ffa502;
-    --success: #43e97b;
-    --bar-bg: rgba(10,10,15,0.92);
-    --bar-border: rgba(255,255,255,0.06);
-    --bar-text: rgba(240,240,255,0.55);
-  }
-  .light {
-    --bg: #f0f0f8;
-    --surface: #ffffff;
-    --surface2: #e8e8f4;
-    --border: rgba(0,0,0,0.07);
-    --accent: #5a54e8;
-    --accent2: #e84b6a;
-    --accent3: #22c55e;
-    --text: #1a1a2e;
-    --text2: rgba(26,26,46,0.5);
-    --text3: rgba(26,26,46,0.25);
-    --glow: rgba(90,84,232,0.2);
-    --ring: rgba(90,84,232,0.1);
-    --danger: #e8324a;
-    --warning: #f59e0b;
-    --success: #22c55e;
-    --bar-bg: rgba(240,240,248,0.95);
-    --bar-border: rgba(0,0,0,0.06);
-    --bar-text: rgba(26,26,46,0.5);
-  }
+/* BG ORBS */
+#mesh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:drift 12s ease-in-out infinite}
+.lm .orb{opacity:.1}
+.orb1{width:400px;height:400px;background:var(--a);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:300px;height:300px;background:var(--a2);bottom:-80px;right:-80px;animation-delay:-4s}
+.orb3{width:200px;height:200px;background:var(--a3);top:40%;left:50%;animation-delay:-8s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.08)}66%{transform:translate(-20px,30px) scale(.95)}}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:999;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bar-bg);border-bottom:1px solid var(--bar-bd);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);transition:background .5s,border-color .5s}
+#topbar span{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--bar-tx);display:flex;align-items:center;gap:8px;transition:color .5s}
+#topbar .d{opacity:.3}
+#topbar a{color:inherit;text-decoration:none;transition:color .3s}
+#topbar a:hover{color:var(--a)}
 
-  html, body {
-    height: 100%;
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    transition: background 0.4s ease, color 0.4s ease;
-    overflow-x: hidden;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-  }
+/* LAYOUT */
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;padding-top:34px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0}
+.logo{font-size:22px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.theme-btn{width:38px;height:38px;border-radius:50%;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.theme-btn:hover{border-color:var(--a);color:var(--a);transform:rotate(30deg) scale(1.1)}
+.theme-btn:active{transform:rotate(30deg) scale(.92)}
 
-  /* ── TOP BAR ── */
-  #topbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20px;
-    height: 36px;
-    background: var(--bar-bg);
-    border-bottom: 1px solid var(--bar-border);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: background 0.4s ease, border-color 0.4s ease;
-  }
-  #topbar span {
-    font-family: 'DM Mono', monospace;
-    font-size: 10.5px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    color: var(--bar-text);
-    transition: color 0.4s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  #topbar .sep { opacity: 0.35; }
-  #topbar a {
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  #topbar a:hover { color: var(--accent); }
+/* TABS */
+.tabs{display:flex;margin:16px 22px 0;background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:5px;gap:4px;transition:background .5s;position:relative}
+.tab{flex:1;padding:11px;border-radius:13px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--tx2);transition:color .3s ease;position:relative;z-index:1}
+.tab-slider{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 7px);background:var(--a);border-radius:13px;transition:transform .45s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 24px var(--glow)}
+.tab-slider.right{transform:translateX(calc(100% + 4px))}
+.tab.active{color:#fff}
+.tab:not(.active):hover{color:var(--tx)}
 
-  /* ── BG GRADIENT ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse 60% 50% at 30% 20%, rgba(108,99,255,0.08) 0%, transparent 70%),
-                radial-gradient(ellipse 50% 40% at 70% 80%, rgba(255,101,132,0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 0.5s ease;
-  }
-  .light body::before {
-    background: radial-gradient(ellipse 60% 50% at 30% 20%, rgba(90,84,232,0.05) 0%, transparent 70%),
-                radial-gradient(ellipse 50% 40% at 70% 80%, rgba(232,75,106,0.04) 0%, transparent 70%);
-  }
+/* PANELS */
+.panel{display:none;flex:1;flex-direction:column}
+.panel.active{display:flex;animation:panelIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 
-  /* ── MAIN LAYOUT ── */
-  #app {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-top: 36px;
-  }
+/* RING STAGE */
+.clock-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 22px 12px}
+.ring-stage{position:relative;width:min(270px,62vw);height:min(270px,62vw);margin-bottom:20px}
+.ring-glow{position:absolute;inset:-20px;border-radius:50%;opacity:.6;animation:glowPulse 3s ease-in-out infinite}
+.ring-glow.purple{background:radial-gradient(circle,rgba(124,111,255,.45) 0%,transparent 60%)}
+.ring-glow.green{background:radial-gradient(circle,rgba(0,229,160,.4) 0%,transparent 60%)}
+.ring-glow.danger{background:radial-gradient(circle,rgba(255,71,87,.55) 0%,transparent 60%);animation:glowDanger .7s ease-in-out infinite}
+.ring-glow.warn{background:radial-gradient(circle,rgba(255,201,71,.45) 0%,transparent 60%)}
+.lm .ring-glow{opacity:.35}
+@keyframes glowPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes glowDanger{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:.95}}
 
-  /* ── HEADER ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px 0;
-  }
-  .theme-btn {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 18px;
-  }
-  .theme-btn:hover { border-color: var(--accent); color: var(--accent); transform: rotate(20deg); }
+/* SPIN DOTS */
+.spin-dots{position:absolute;inset:0;border-radius:50%;animation:spinDots 8s linear infinite}
+.spin-dots.paused{animation-play-state:paused}
+@keyframes spinDots{to{transform:rotate(360deg)}}
+.spin-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--a);top:2px;left:50%;margin-left:-2.5px;transform-origin:2.5px 133px;opacity:.55}
+.spin-dot.green{background:var(--a3)}
 
-  /* ── TABS ── */
-  .tabs {
-    display: flex;
-    margin: 20px 24px 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 5px;
-    gap: 4px;
-    transition: background 0.4s ease;
-  }
-  .tab {
-    flex: 1;
-    padding: 10px;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    color: var(--text2);
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    position: relative;
-    overflow: hidden;
-  }
-  .tab.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 4px 20px var(--glow);
-    transform: scale(1.02);
-  }
-  .tab:not(.active):hover { color: var(--text); background: var(--surface2); }
+/* SVG RING */
+.ring-svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.r-bg{fill:none;stroke:var(--bd2);stroke-width:2.5}
+.r-track{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:0;stroke-dashoffset:0;transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1),stroke .4s,filter .5s}
 
-  /* ── MAIN PANEL ── */
-  .panel { display: none; flex: 1; flex-direction: column; }
-  .panel.active { display: flex; }
+/* INNER */
+.ring-inner{position:absolute;inset:16px;border-radius:50%;background:var(--s1);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .5s;overflow:hidden}
+.ring-inner::after{content:'';position:absolute;top:0;left:20%;width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
 
-  /* ── CLOCK DISPLAY ── */
-  .clock-wrap {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    position: relative;
-  }
+/* DIGITS */
+.digits{position:relative;z-index:1;display:flex;align-items:baseline;gap:1px}
+.dg{font-family:'DM Mono',monospace;font-size:clamp(28px,8vw,50px);font-weight:300;line-height:1;color:var(--tx);transition:color .4s;position:relative;overflow:hidden;height:1.1em;display:flex;align-items:center;justify-content:center;min-width:1.25em}
+.dg .cur{display:block;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s}
+.dg .old{position:absolute;display:block;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s}
+.dg .old.out{transform:translateY(-115%) scale(.75);opacity:0}
+.dg .cur.in{transform:translateY(115%) scale(.75);opacity:0}
+.dg-sep{font-family:'DM Mono',monospace;font-size:clamp(18px,5vw,34px);font-weight:300;color:var(--tx3);margin:0 1px;padding-bottom:3px;animation:blinkSep 2s step-start infinite}
+.dg-sep.stop{animation:none;opacity:.5}
+@keyframes blinkSep{0%,49%{opacity:1}50%,100%{opacity:.25}}
+.ms-part{font-family:'DM Mono',monospace;font-size:clamp(12px,3vw,19px);color:var(--tx3);padding-bottom:3px;min-width:2.2em}
+.state-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3);margin-top:8px;z-index:1;transition:color .4s}
+.state-lbl.running{color:var(--a);animation:lblPulse 2s ease-in-out infinite}
+.state-lbl.done{color:var(--a3)}
+.state-lbl.warn{color:var(--a4)}
+.state-lbl.danger{color:#ff4757;animation:lblPulse .7s ease-in-out infinite}
+@keyframes lblPulse{0%,100%{opacity:1}50%{opacity:.45}}
 
-  /* Ring */
-  .ring-container {
-    position: relative;
-    width: min(280px, 65vw);
-    height: min(280px, 65vw);
-    margin-bottom: 28px;
-  }
-  .ring-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    transform: rotate(-90deg);
-    filter: drop-shadow(0 0 12px var(--glow));
-  }
-  .ring-bg { fill: none; stroke: var(--ring); stroke-width: 3; }
-  .ring-fg {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-dasharray: 0;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1),
-                stroke 0.4s ease,
-                filter 0.4s ease;
-  }
-  .ring-fg.warning { stroke: var(--warning); filter: drop-shadow(0 0 8px rgba(255,165,2,0.5)); }
-  .ring-fg.danger  { stroke: var(--danger);  filter: drop-shadow(0 0 8px rgba(255,71,87,0.5)); animation: pulsering 0.8s ease-in-out infinite; }
+/* CONTROLS */
+.ctrls{display:flex;align-items:center;justify-content:center;gap:14px;padding:4px 22px 18px}
+.cbtn{border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;outline:none}
+.cbtn:active{transform:scale(.88)!important}
+.cbtn-sm{width:50px;height:50px;border-radius:50%;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);font-size:18px}
+.cbtn-sm:hover{border-color:var(--a);color:var(--a);transform:scale(1.12);box-shadow:0 6px 20px var(--glow)}
+.cbtn-lg{width:74px;height:74px;border-radius:50%;background:var(--a);color:#fff;font-size:22px;box-shadow:0 6px 28px var(--glow)}
+.cbtn-lg:hover{transform:scale(1.1);box-shadow:0 10px 40px var(--glow)}
+.cbtn-lg.go{animation:btnBreath 2.5s ease-in-out infinite}
+@keyframes btnBreath{0%,100%{box-shadow:0 6px 28px var(--glow)}50%{box-shadow:0 6px 28px var(--glow),0 0 0 12px rgba(124,111,255,0)}}
+.cbtn-lg.sw-c{background:var(--a3);box-shadow:0 6px 28px var(--glow2)}
+.cbtn-lg.sw-c:hover{box-shadow:0 10px 40px var(--glow2)}
+.cbtn-lg.sw-c.go{animation:btnBreathG 2.5s ease-in-out infinite}
+@keyframes btnBreathG{0%,100%{box-shadow:0 6px 28px var(--glow2)}50%{box-shadow:0 6px 28px var(--glow2),0 0 0 12px rgba(0,229,160,0)}}
+.rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,.25);transform:scale(0);animation:rplAnim .55s ease-out forwards;pointer-events:none}
+@keyframes rplAnim{to{transform:scale(3);opacity:0}}
 
-  @keyframes pulsering {
-    0%,100% { filter: drop-shadow(0 0 8px rgba(255,71,87,0.5)); }
-    50%      { filter: drop-shadow(0 0 20px rgba(255,71,87,0.9)); }
-  }
+/* TIMER INPUT */
+.t-input{display:flex;align-items:center;justify-content:center;gap:6px;padding:0 22px 14px;transition:opacity .5s}
+.t-unit{display:flex;flex-direction:column;align-items:center;gap:5px}
+.t-unit label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3)}
+.t-spin{width:62px;background:var(--s2);border:1px solid var(--bd);border-radius:14px;color:var(--tx);font-family:'DM Mono',monospace;font-size:20px;font-weight:300;text-align:center;padding:12px 0;outline:none;transition:border-color .3s,box-shadow .3s;-webkit-appearance:none;appearance:none}
+.t-spin:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(124,111,255,.15)}
+.t-spin:disabled{opacity:.3;pointer-events:none}
+.t-col{font-family:'DM Mono',monospace;font-size:20px;color:var(--tx3);padding-bottom:20px}
 
-  .ring-inner {
-    position: absolute;
-    inset: 12px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.4s ease;
-    overflow: hidden;
-  }
-  .ring-inner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(108,99,255,0.05) 0%, transparent 60%);
-  }
+/* PRESETS */
+.pset{padding:0 22px 16px}
+.pset-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pset-hd h3{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx3)}
+.pset-add{font-size:11px;font-weight:700;color:var(--a);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:8px;font-family:'Outfit',sans-serif;transition:background .2s}
+.pset-add:hover{background:rgba(124,111,255,.1)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{display:flex;align-items:center;gap:5px;padding:7px 10px 7px 14px;border-radius:20px;background:var(--s2);border:1px solid var(--bd);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;color:var(--tx2);transition:all .3s cubic-bezier(.34,1.56,.64,1);animation:chipPop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes chipPop{from{opacity:0;transform:scale(.6) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.chip:hover{border-color:var(--a);color:var(--a);transform:translateY(-3px);box-shadow:0 8px 20px var(--glow)}
+.chip:active{transform:translateY(0) scale(.93)}
+.chip .x{width:15px;height:15px;border-radius:50%;background:var(--tx3);color:var(--bg);font-size:9px;display:flex;align-items:center;justify-content:center;transition:background .2s;font-style:normal;flex-shrink:0}
+.chip .x:hover{background:var(--a2)}
 
-  .time-display {
-    font-family: 'DM Mono', monospace;
-    font-size: clamp(34px, 9vw, 56px);
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    color: var(--text);
-    line-height: 1;
-    transition: color 0.3s ease;
-    position: relative;
-    z-index: 1;
-  }
-  .time-display.warning { color: var(--warning); }
-  .time-display.danger  { color: var(--danger); animation: pulsetext 0.8s ease-in-out infinite; }
-  .time-display.finished { color: var(--success); }
+/* LAPS */
+.laps{padding:0 22px;max-height:190px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--a3) transparent}
+.laps::-webkit-scrollbar{width:3px}
+.laps::-webkit-scrollbar-thumb{background:var(--a3);border-radius:4px}
+.lap{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-radius:12px;margin-bottom:5px;background:var(--s2);border:1px solid var(--bd);font-family:'DM Mono',monospace;font-size:12px;animation:lapSlide .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes lapSlide{from{opacity:0;transform:translateX(-16px) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+.lap .ln{color:var(--tx3);font-size:10px}.lap .lt{color:var(--tx)}.lap .ls{color:var(--a3);font-size:11px}
+.lap.best{border-color:rgba(0,229,160,.4);background:rgba(0,229,160,.06)}
+.lap.worst{border-color:rgba(255,71,87,.35);background:rgba(255,71,87,.05)}
 
-  @keyframes pulsetext {
-    0%,100% { opacity: 1; }
-    50%      { opacity: 0.6; }
-  }
+/* CONFETTI */
+#finishFx{position:fixed;inset:0;pointer-events:none;z-index:500}
+.conf{position:absolute;width:7px;height:7px;border-radius:2px;animation:confFly 2s ease-out forwards}
+@keyframes confFly{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--cx),var(--cy)) rotate(var(--cr))}}
 
-  .time-ms {
-    font-family: 'DM Mono', monospace;
-    font-size: clamp(14px, 3.5vw, 22px);
-    font-weight: 300;
-    color: var(--text2);
-    margin-top: 4px;
-    position: relative; z-index: 1;
-  }
-  .time-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    color: var(--text3);
-    text-transform: uppercase;
-    margin-top: 6px;
-    position: relative; z-index: 1;
-  }
+/* ── IN-APP ALERT BANNER (iOS workaround) ── */
+#alertBanner{
+  position:fixed;top:0;left:0;right:0;z-index:1100;
+  transform:translateY(-100%);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+#alertBanner.show{transform:translateY(0);pointer-events:all}
+#alertBanner.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes shake{0%,100%{transform:translateY(0) rotate(0)}20%{transform:translateY(0) rotate(-1.5deg)}40%{transform:translateY(0) rotate(1.5deg)}60%{transform:translateY(0) rotate(-1deg)}80%{transform:translateY(0) rotate(.8deg)}}
+.banner-inner{
+  margin:8px 14px;
+  background:linear-gradient(135deg,rgba(124,111,255,.95),rgba(255,107,157,.95));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 8px 40px rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.15);
+}
+.banner-icon{font-size:28px;flex-shrink:0;animation:iconPop .5s cubic-bezier(.34,1.56,.64,1) .2s both}
+@keyframes iconPop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0deg)}}
+.banner-text{flex:1}
+.banner-title{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+.banner-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+.banner-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.banner-close:hover{background:rgba(255,255,255,.35)}
+/* green variant */
+#alertBanner.green .banner-inner{background:linear-gradient(135deg,rgba(0,229,160,.95),rgba(0,184,125,.95))}
+/* danger variant */
+#alertBanner.danger .banner-inner{background:linear-gradient(135deg,rgba(255,71,87,.95),rgba(255,107,157,.95))}
 
-  /* ── CONTROLS ── */
-  .controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 0 24px 20px;
-  }
-  .btn {
-    border: none;
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    position: relative;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0.15);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-  .btn:active::after { opacity: 1; }
-  .btn:active { transform: scale(0.95) !important; }
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:900;display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;pointer-events:none;transition:opacity .35s}
+.mo.on{opacity:1;pointer-events:all}
+.mo-box{background:var(--s1);border:1px solid var(--bd2);border-radius:28px 28px 0 0;padding:28px 26px 36px;width:100%;max-width:500px;transform:translateY(60px);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.mo.on .mo-box{transform:translateY(0)}
+.mo-box h2{font-size:17px;font-weight:800;margin-bottom:6px}
+.mo-box p{font-size:13px;color:var(--tx2);line-height:1.55;margin-bottom:22px}
+.mo-acts{display:flex;gap:10px}
+.mbtn{flex:1;padding:14px;border-radius:16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;border:1px solid var(--bd);transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.mbtn.pri{background:var(--a);color:#fff;border-color:transparent;box-shadow:0 6px 20px var(--glow)}
+.mbtn.sec{background:var(--s2);color:var(--tx2)}
+.mbtn:hover{transform:translateY(-2px)}
+.mbtn:active{transform:scale(.96)}
 
-  .btn-icon {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .btn-icon:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.08); }
+/* TOAST */
+#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(70px) scale(.88);opacity:0;background:var(--s2);border:1px solid var(--bd2);border-radius:16px;padding:11px 22px;font-size:13px;font-weight:600;color:var(--tx);box-shadow:0 12px 40px rgba(0,0,0,.35);z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .4s;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
+#toast.on{transform:translateX(-50%) translateY(0) scale(1);opacity:1}
 
-  .btn-main {
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 8px 32px var(--glow);
-  }
-  .btn-main:hover { transform: scale(1.1); box-shadow: 0 12px 40px var(--glow); }
-  .btn-main.running {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    animation: mainpulse 2s ease-in-out infinite;
-  }
-  @keyframes mainpulse {
-    0%,100% { box-shadow: 0 8px 32px var(--glow); }
-    50%      { box-shadow: 0 8px 48px rgba(108,99,255,0.5); }
-  }
-
-  /* ── LAPS (stopwatch) ── */
-  .laps-section {
-    padding: 0 24px;
-    max-height: 180px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent) transparent;
-  }
-  .laps-section::-webkit-scrollbar { width: 3px; }
-  .laps-section::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-  .lap-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 14px;
-    border-radius: 10px;
-    margin-bottom: 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    animation: lapIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes lapIn {
-    from { opacity: 0; transform: translateX(-12px) scale(0.96); }
-    to   { opacity: 1; transform: translateX(0) scale(1); }
-  }
-  .lap-num { color: var(--text3); font-size: 11px; }
-  .lap-split { color: var(--accent); font-size: 12px; }
-  .lap-item.best  { border-color: var(--success); }
-  .lap-item.worst { border-color: var(--danger); }
-
-  /* ── TIMER INPUT ── */
-  .timer-input-wrap {
-    padding: 0 24px 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-  }
-  .time-unit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-  .time-unit label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--text3);
-    text-transform: uppercase;
-  }
-  .time-picker {
-    width: 64px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 22px;
-    font-weight: 300;
-    text-align: center;
-    padding: 12px 0;
-    outline: none;
-    transition: all 0.3s ease;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .time-picker:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
-  .time-picker:disabled { opacity: 0.4; }
-  .colon {
-    font-family: 'DM Mono', monospace;
-    font-size: 22px;
-    color: var(--text3);
-    padding-bottom: 20px;
-  }
-
-  /* ── PRESETS ── */
-  .presets-section {
-    padding: 0 24px 20px;
-  }
-  .presets-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .presets-header h3 {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text3);
-  }
-  .btn-add-preset {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background 0.2s;
-    font-family: 'Syne', sans-serif;
-  }
-  .btn-add-preset:hover { background: var(--ring); }
-  .presets-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .preset-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 12px 7px 14px;
-    border-radius: 20px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--text2);
-    transition: all 0.25s ease;
-    animation: chipIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes chipIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-  .preset-chip:hover { border-color: var(--accent); color: var(--accent); }
-  .preset-chip .del-preset {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--text3);
-    color: var(--bg);
-    font-size: 9px;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-  .preset-chip .del-preset:hover { background: var(--danger); }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  .modal-overlay.show { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 28px;
-    width: 100%;
-    max-width: 360px;
-    transform: translateY(20px) scale(0.97);
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .modal-overlay.show .modal { transform: translateY(0) scale(1); }
-  .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-  .modal p  { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
-  .modal-actions { display: flex; gap: 10px; }
-  .btn-modal {
-    flex: 1; padding: 13px;
-    border-radius: 14px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 13px;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    transition: all 0.2s ease;
-  }
-  .btn-modal.primary  { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 16px var(--glow); }
-  .btn-modal.secondary { background: var(--surface2); color: var(--text2); }
-  .btn-modal:hover { transform: translateY(-1px); }
-
-  /* ── TOAST ── */
-  #toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px 22px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    z-index: 1000;
-    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
-    white-space: nowrap;
-    max-width: 85vw;
-    text-align: center;
-    opacity: 0;
-  }
-  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-  /* ── FINISH ANIMATION ── */
-  @keyframes finishPop {
-    0%   { transform: scale(1); }
-    30%  { transform: scale(1.06); }
-    60%  { transform: scale(0.98); }
-    100% { transform: scale(1); }
-  }
-  .ring-container.finished { animation: finishPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-
-  /* ── PARTICLES ── */
-  .particle {
-    position: fixed;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 800;
-    animation: particleFly 1.2s ease-out forwards;
-  }
-  @keyframes particleFly {
-    from { opacity: 1; transform: translate(0,0) scale(1); }
-    to   { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-height: 700px) {
-    .ring-container { width: min(200px, 50vw); height: min(200px, 50vw); margin-bottom: 16px; }
-    .laps-section { max-height: 120px; }
-    .time-display { font-size: clamp(26px, 8vw, 42px); }
-  }
-  @media (max-width: 380px) {
-    header { padding: 14px 16px 0; }
-    .tabs { margin: 14px 16px 0; }
-    .timer-input-wrap, .presets-section, .controls { padding-left: 16px; padding-right: 16px; }
-  }
+@media(max-height:680px){.ring-stage{width:min(210px,52vw);height:min(210px,52vw)}.laps{max-height:120px}}
+@media(max-width:360px){header,.tabs,.t-input,.pset,.ctrls,.laps{padding-left:14px;padding-right:14px}.tabs{margin-left:14px;margin-right:14px}}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
+<div id="mesh">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+</div>
+
+<!-- IN-APP ALERT BANNER -->
+<div id="alertBanner">
+  <div class="banner-inner">
+    <div class="banner-icon" id="bannerIcon">⏱</div>
+    <div class="banner-text">
+      <div class="banner-title" id="bannerTitle">Süre Doldu!</div>
+      <div class="banner-sub" id="bannerSub">Geri sayım tamamlandı.</div>
+    </div>
+    <button class="banner-close" id="bannerClose">✕</button>
+  </div>
+</div>
+
 <div id="topbar">
-  <span>
-    Pro 2.0
-    <span class="sep">|</span>
-    ©sebasmobil 2026
-    <span class="sep">|</span>
-    <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL v3.0</a>
-  </span>
+  <span>Pro 2.0 <span class="d">|</span> ©sebasmobil 2026 <span class="d">|</span> <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL v3.0</a></span>
 </div>
 
 <div id="app">
   <header>
-    <div style="font-size:20px; font-weight:800; letter-spacing:-0.02em;">⏱</div>
-    <button class="theme-btn" id="themeBtn" title="Tema değiştir">🌙</button>
+    <div class="logo">⏱ Timer</div>
+    <button class="theme-btn" id="themeBtn">🌙</button>
   </header>
 
-  <!-- TABS -->
   <div class="tabs">
+    <div class="tab-slider" id="tabSlider"></div>
     <div class="tab active" data-tab="timer">Geri Sayım</div>
     <div class="tab" data-tab="stopwatch">Kronometre</div>
   </div>
 
-  <!-- ═══════════════ TIMER PANEL ═══════════════ -->
+  <!-- TIMER -->
   <div class="panel active" id="panel-timer">
     <div class="clock-wrap">
-      <div class="ring-container" id="timerRingWrap">
+      <div class="ring-stage">
+        <div class="ring-glow purple" id="tGlow"></div>
+        <div class="spin-dots paused" id="tDots">
+          <div class="spin-dot" style="transform-origin:2.5px 133px;transform:rotate(0deg)"></div>
+          <div class="spin-dot" style="transform-origin:2.5px 133px;transform:rotate(72deg)"></div>
+          <div class="spin-dot" style="transform-origin:2.5px 133px;transform:rotate(144deg)"></div>
+          <div class="spin-dot" style="transform-origin:2.5px 133px;transform:rotate(216deg)"></div>
+          <div class="spin-dot" style="transform-origin:2.5px 133px;transform:rotate(288deg)"></div>
+        </div>
         <svg class="ring-svg" viewBox="0 0 100 100">
-          <circle class="ring-bg" cx="50" cy="50" r="46"/>
-          <circle class="ring-fg" id="timerRing" cx="50" cy="50" r="46"/>
+          <circle class="r-bg" cx="50" cy="50" r="44"/>
+          <g id="tTicks"></g>
+          <circle class="r-track" id="tRing" cx="50" cy="50" r="44" stroke="var(--a)"/>
         </svg>
         <div class="ring-inner">
-          <div class="time-display" id="timerDisplay">00:00:00</div>
-          <div class="time-label" id="timerLabel">HAZIR</div>
+          <div class="digits">
+            <div class="dg" id="dH"><span class="cur">00</span></div>
+            <div class="dg-sep" id="sep1">:</div>
+            <div class="dg" id="dM"><span class="cur">05</span></div>
+            <div class="dg-sep" id="sep2">:</div>
+            <div class="dg" id="dS"><span class="cur">00</span></div>
+          </div>
+          <div class="state-lbl" id="tLbl">HAZIR</div>
         </div>
       </div>
     </div>
-
-    <!-- Input row -->
-    <div class="timer-input-wrap" id="timerInputWrap">
-      <div class="time-unit">
-        <label>sa</label>
-        <input class="time-picker" id="tHour" type="number" min="0" max="23" value="0">
-      </div>
-      <div class="colon">:</div>
-      <div class="time-unit">
-        <label>dk</label>
-        <input class="time-picker" id="tMin" type="number" min="0" max="59" value="5">
-      </div>
-      <div class="colon">:</div>
-      <div class="time-unit">
-        <label>sn</label>
-        <input class="time-picker" id="tSec" type="number" min="0" max="59" value="0">
-      </div>
+    <div class="t-input" id="tInputRow">
+      <div class="t-unit"><label>sa</label><input class="t-spin" id="iH" type="number" min="0" max="23" value="0"></div>
+      <div class="t-col">:</div>
+      <div class="t-unit"><label>dk</label><input class="t-spin" id="iM" type="number" min="0" max="59" value="5"></div>
+      <div class="t-col">:</div>
+      <div class="t-unit"><label>sn</label><input class="t-spin" id="iS" type="number" min="0" max="59" value="0"></div>
     </div>
-
-    <!-- Presets -->
-    <div class="presets-section">
-      <div class="presets-header">
-        <h3>Kayıtlı Süreler</h3>
-        <button class="btn-add-preset" id="addPresetBtn">+ Kaydet</button>
-      </div>
-      <div class="presets-list" id="presetsList"></div>
+    <div class="pset">
+      <div class="pset-hd"><h3>Kayıtlı Süreler</h3><button class="pset-add" id="addPreset">+ Kaydet</button></div>
+      <div class="chips" id="chipList"></div>
     </div>
-
-    <!-- Controls -->
-    <div class="controls" style="padding-bottom:32px;">
-      <button class="btn btn-icon" id="timerResetBtn" title="Sıfırla">↺</button>
-      <button class="btn btn-main" id="timerStartBtn">▶</button>
-      <button class="btn btn-icon" id="timerSoundBtn" title="Ses">🔔</button>
+    <div class="ctrls" style="padding-bottom:30px">
+      <button class="cbtn cbtn-sm" id="tReset">↺</button>
+      <button class="cbtn cbtn-lg" id="tPlay">▶</button>
+      <button class="cbtn cbtn-sm" id="tSound">🔔</button>
     </div>
   </div>
 
-  <!-- ═══════════════ STOPWATCH PANEL ═══════════════ -->
+  <!-- STOPWATCH -->
   <div class="panel" id="panel-stopwatch">
     <div class="clock-wrap">
-      <div class="ring-container" id="swRingWrap">
+      <div class="ring-stage">
+        <div class="ring-glow green" id="sGlow"></div>
+        <div class="spin-dots paused" id="sDots">
+          <div class="spin-dot green" style="transform-origin:2.5px 133px;transform:rotate(0deg)"></div>
+          <div class="spin-dot green" style="transform-origin:2.5px 133px;transform:rotate(120deg)"></div>
+          <div class="spin-dot green" style="transform-origin:2.5px 133px;transform:rotate(240deg)"></div>
+        </div>
         <svg class="ring-svg" viewBox="0 0 100 100">
-          <circle class="ring-bg" cx="50" cy="50" r="46"/>
-          <circle class="ring-fg" id="swRing" cx="50" cy="50" r="46"
-            style="stroke:var(--accent3); filter:drop-shadow(0 0 12px rgba(67,233,123,0.3))"/>
+          <circle class="r-bg" cx="50" cy="50" r="44"/>
+          <circle class="r-track" id="sRing" cx="50" cy="50" r="44" stroke="var(--a3)" style="filter:drop-shadow(0 0 4px rgba(0,229,160,.5))"/>
         </svg>
         <div class="ring-inner">
-          <div class="time-display" id="swDisplay">00:00</div>
-          <div class="time-ms" id="swMs">.00</div>
-          <div class="time-label" id="swLabel">HAZIR</div>
+          <div class="digits">
+            <div class="dg" id="dSM"><span class="cur">00</span></div>
+            <div class="dg-sep stop" id="sSep">:</div>
+            <div class="dg" id="dSS"><span class="cur">00</span></div>
+            <div class="ms-part" id="dMs">.00</div>
+          </div>
+          <div class="state-lbl" id="sLbl">HAZIR</div>
         </div>
       </div>
     </div>
-
-    <!-- Laps -->
-    <div class="laps-section" id="lapsList"></div>
-
-    <!-- Controls -->
-    <div class="controls" style="padding-bottom:32px;">
-      <button class="btn btn-icon" id="swLapBtn" title="Tur">◎</button>
-      <button class="btn btn-main" id="swStartBtn" style="background:var(--accent3); box-shadow:0 8px 32px rgba(67,233,123,0.3);">▶</button>
-      <button class="btn btn-icon" id="swResetBtn" title="Sıfırla">↺</button>
+    <div class="laps" id="lapList"></div>
+    <div class="ctrls" style="padding-bottom:30px">
+      <button class="cbtn cbtn-sm" id="sLap" style="opacity:.35">◎</button>
+      <button class="cbtn cbtn-lg sw-c" id="sPlay">▶</button>
+      <button class="cbtn cbtn-sm" id="sReset">↺</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2 id="modalTitle">Uyarı</h2>
-    <p id="modalMsg">Mesaj</p>
-    <div class="modal-actions" id="modalActions"></div>
-  </div>
-</div>
-
-<!-- TOAST -->
+<div id="finishFx"></div>
+<div class="mo" id="modal"><div class="mo-box"><h2 id="moTitle"></h2><p id="moMsg"></p><div class="mo-acts" id="moActs"></div></div></div>
 <div id="toast"></div>
 
 <script>
-/*
- * Timer Pro 2.0 — JavaScript Logic
- * © sebasmobil 2026 — AGPL v3.0
- * https://www.gnu.org/licenses/agpl-3.0.html
- */
+/* Timer Pro 2.0 — © sebasmobil 2026 — AGPL v3.0 */
 
-/* ──────────────── THEME ──────────────── */
-const themeBtn = document.getElementById('themeBtn');
-let isDark = true;
-themeBtn.addEventListener('click', () => {
-  isDark = !isDark;
-  document.body.className = isDark ? '' : 'light';
-  themeBtn.textContent = isDark ? '🌙' : '☀️';
-  localStorage.setItem('timerTheme', isDark ? 'dark' : 'light');
-});
-(function initTheme() {
-  const saved = localStorage.getItem('timerTheme');
-  if (saved === 'light') { isDark = false; document.body.className = 'light'; themeBtn.textContent = '☀️'; }
-})();
-
-/* ──────────────── TABS ──────────────── */
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    const name = t.dataset.tab;
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('panel-' + name).classList.add('active');
-  });
-});
-
-/* ──────────────── TOAST ──────────────── */
-let toastTimer;
-function showToast(msg, duration = 2400) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), duration);
-}
-
-/* ──────────────── MODAL ──────────────── */
-function showModal(title, msg, actions) {
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalMsg').textContent = msg;
-  const actEl = document.getElementById('modalActions');
-  actEl.innerHTML = '';
-  actions.forEach(a => {
-    const b = document.createElement('button');
-    b.className = 'btn-modal ' + (a.primary ? 'primary' : 'secondary');
-    b.textContent = a.label;
-    b.addEventListener('click', () => { closeModal(); a.fn && a.fn(); });
-    actEl.appendChild(b);
-  });
-  document.getElementById('modalOverlay').classList.add('show');
-}
-function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
-document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target === document.getElementById('modalOverlay')) closeModal(); });
-
-/* ──────────────── NOTIFICATION & AUDIO ──────────────── */
-let notifPermission = false;
-(async () => {
-  if ('Notification' in window) {
-    if (Notification.permission === 'granted') notifPermission = true;
-    else if (Notification.permission !== 'denied') {
-      const p = await Notification.requestPermission();
-      notifPermission = p === 'granted';
-    }
+/* ── TICK MARKS ── */
+(function(){
+  const g=document.getElementById('tTicks');
+  for(let i=0;i<60;i++){
+    const a=(i/60)*Math.PI*2-Math.PI/2,r0=i%5===0?40:42.5;
+    const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',50+r0*Math.cos(a));ln.setAttribute('y1',50+r0*Math.sin(a));
+    ln.setAttribute('x2',50+44*Math.cos(a));ln.setAttribute('y2',50+44*Math.sin(a));
+    ln.setAttribute('stroke',i%5===0?'rgba(255,255,255,.15)':'rgba(255,255,255,.06)');
+    ln.setAttribute('stroke-width',i%5===0?'1':'.5');
+    g.appendChild(ln);
   }
 })();
 
-let audioCtx = null;
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const CIRC=2*Math.PI*44;
+
+/* ── THEME ── */
+let dark=true;
+const thBtn=document.getElementById('themeBtn');
+function applyTheme(){document.body.className=dark?'':'lm';thBtn.textContent=dark?'🌙':'☀️';localStorage.setItem('tptheme',dark?'dark':'light');}
+thBtn.addEventListener('click',()=>{dark=!dark;applyTheme();ripple(thBtn);});
+if(localStorage.getItem('tptheme')==='light'){dark=false;applyTheme();}
+
+/* ── RIPPLE ── */
+function ripple(el){
+  const r=document.createElement('div');r.className='rpl';
+  const s=Math.max(el.offsetWidth,el.offsetHeight)*2;
+  r.style.cssText=`width:${s}px;height:${s}px;top:${(el.offsetHeight-s)/2}px;left:${(el.offsetWidth-s)/2}px`;
+  el.appendChild(r);setTimeout(()=>r.remove(),600);
+}
+
+/* ── TABS ── */
+const tabSlider=document.getElementById('tabSlider');
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    tabSlider.classList.toggle('right',t.dataset.tab==='stopwatch');
+  });
+});
+
+/* ── TOAST ── */
+let toTmr;
+function toast(msg,dur=2600){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');
+  clearTimeout(toTmr);toTmr=setTimeout(()=>el.classList.remove('on'),dur);
+}
+
+/* ── MODAL ── */
+function modal(title,msg,acts){
+  document.getElementById('moTitle').textContent=title;
+  document.getElementById('moMsg').textContent=msg;
+  const a=document.getElementById('moActs');a.innerHTML='';
+  acts.forEach(x=>{
+    const b=document.createElement('button');b.className='mbtn '+(x.pri?'pri':'sec');b.textContent=x.label;
+    b.onclick=()=>{closeModal();x.fn&&x.fn();};a.appendChild(b);
+  });
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+/* ═══════════════════════════════════════════
+   AUDIO — iOS uyumlu, önceden unlock edilmiş
+   ═══════════════════════════════════════════ */
+let audioCtx=null;
+let audioUnlocked=false;
+let soundOn=true;
+
+/* iOS'ta AudioContext çalışması için ilk dokunuşta unlock */
+function unlockAudio(){
+  if(audioUnlocked)return;
+  try{
+    if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    /* 0-uzunluklu tampon çal — iOS bunu "kullanıcı etkileşimi" sayar */
+    const buf=audioCtx.createBuffer(1,1,22050);
+    const src=audioCtx.createBufferSource();
+    src.buffer=buf;src.connect(audioCtx.destination);
+    src.start(0);
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    audioUnlocked=true;
+  }catch(e){}
+}
+/* Her dokunuşta unlock dene */
+document.addEventListener('touchstart',unlockAudio,{once:false,passive:true});
+document.addEventListener('click',unlockAudio,{once:false,passive:true});
+
+function getCtx(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
   return audioCtx;
 }
-let soundEnabled = true;
-const soundBtn = document.getElementById('timerSoundBtn');
-soundBtn.addEventListener('click', () => {
-  soundEnabled = !soundEnabled;
-  soundBtn.textContent = soundEnabled ? '🔔' : '🔕';
-  showToast(soundEnabled ? 'Ses açık' : 'Ses kapalı');
-});
 
-function playAlarm(duration = 1200) {
-  if (!soundEnabled) return;
-  try {
-    const ctx = getAudioCtx();
-    const now = ctx.currentTime;
-    const notes = [523.25, 659.25, 783.99, 1046.5];
-    notes.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + i * 0.18);
-      gain.gain.setValueAtTime(0, now + i * 0.18);
-      gain.gain.linearRampToValueAtTime(0.3, now + i * 0.18 + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.18 + 0.32);
-      osc.start(now + i * 0.18);
-      osc.stop(now + i * 0.18 + 0.35);
+/* Alarm: iOS arka planda Web Audio çalar (uygulama kapalıysa çalmaz — bu OS kısıtlaması) */
+function playAlarm(){
+  if(!soundOn)return;
+  try{
+    const c=getCtx(),t=c.currentTime;
+    /* Melodik 5 nota */
+    [[523.25,0],[659.25,.2],[783.99,.4],[1046.5,.6],[1318.51,.8]].forEach(([f,d])=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type='sine';o.frequency.setValueAtTime(f,t+d);
+      g.gain.setValueAtTime(0,t+d);
+      g.gain.linearRampToValueAtTime(.32,t+d+.06);
+      g.gain.exponentialRampToValueAtTime(.001,t+d+.45);
+      o.start(t+d);o.stop(t+d+.5);
     });
-    // Low rumble
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let j = 0; j < data.length; j++) data[j] = (Math.random()*2-1) * 0.05;
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const g2 = ctx.createGain(); g2.gain.setValueAtTime(0.15, now); g2.gain.exponentialRampToValueAtTime(0.001, now+0.4);
-    src.connect(g2); g2.connect(ctx.destination);
-    src.start(now);
-  } catch(e) {}
+    /* İkinci geçiş — bas ton */
+    const o2=getCtx().createOscillator(),g2=getCtx().createGain();
+    o2.connect(g2);g2.connect(getCtx().destination);
+    o2.type='triangle';o2.frequency.value=220;
+    g2.gain.setValueAtTime(.15,t);g2.gain.exponentialRampToValueAtTime(.001,t+1.2);
+    o2.start(t);o2.stop(t+1.3);
+  }catch(e){console.warn('Audio error:',e);}
 }
 
-function sendNotification(title, body) {
-  if (!notifPermission) return;
-  try {
-    new Notification(title, { body, icon: '⏱', badge: '⏱', requireInteraction: false, silent: false });
-  } catch(e) {}
+function playTick(){
+  if(!soundOn)return;
+  try{
+    const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=900;
+    g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.07);
+    o.start();o.stop(c.currentTime+.09);
+  }catch(e){}
 }
 
-/* ──────────────── PARTICLES ──────────────── */
-function burst(x, y, color = '#6c63ff') {
-  for (let i = 0; i < 18; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const angle = (Math.PI * 2 / 18) * i;
-    const dist = 60 + Math.random() * 60;
-    p.style.cssText = `
-      left:${x}px; top:${y}px;
-      background:${color};
-      --tx:${Math.cos(angle)*dist}px;
-      --ty:${Math.sin(angle)*dist}px;
-      animation-delay:${Math.random()*0.1}s;
-    `;
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1400);
+const tSoundBtn=document.getElementById('tSound');
+tSoundBtn.addEventListener('click',()=>{soundOn=!soundOn;tSoundBtn.textContent=soundOn?'🔔':'🔕';toast(soundOn?'Ses açık':'Ses kapalı');ripple(tSoundBtn);});
+
+/* ═══════════════════════════════════════════
+   IN-APP ALERT BANNER
+   (iOS Web Notification API'yi desteklemez;
+    bu banner arka plandan geri dönüldüğünde
+    veya uygulama önde iken gösterilir)
+   ═══════════════════════════════════════════ */
+let bannerTimer=null;
+const alertBanner=document.getElementById('alertBanner');
+document.getElementById('bannerClose').addEventListener('click',hideBanner);
+
+function showBanner(title,sub,variant='purple'){
+  clearTimeout(bannerTimer);
+  document.getElementById('bannerTitle').textContent=title;
+  document.getElementById('bannerSub').textContent=sub;
+  document.getElementById('bannerIcon').textContent=variant==='green'?'✅':'⏰';
+  alertBanner.className=variant==='green'?'green':'';
+  alertBanner.classList.add('show');
+  /* otomatik kapat */
+  bannerTimer=setTimeout(hideBanner,8000);
+  /* shake efekti */
+  void alertBanner.offsetWidth;
+  alertBanner.classList.add('shake');
+  setTimeout(()=>alertBanner.classList.remove('shake'),600);
+}
+function hideBanner(){
+  alertBanner.classList.remove('show');
+  clearTimeout(bannerTimer);
+}
+
+/* Sistem bildirimi (destekleniyorsa) */
+let notifOk=false;
+(async()=>{
+  if('Notification' in window){
+    if(Notification.permission==='granted')notifOk=true;
+    else if(Notification.permission!=='denied'){
+      const p=await Notification.requestPermission();
+      notifOk=p==='granted';
+    }
+  }
+})();
+function notify(title,body){
+  /* Her zaman in-app banner göster */
+  showBanner(title,body,'purple');
+  /* Sistem bildirimi de dene */
+  if(notifOk){
+    try{new Notification(title,{body,silent:false});}catch(e){}
   }
 }
 
-/* ──────────────── RING HELPER ──────────────── */
-const CIRC = 2 * Math.PI * 46; // ~289
-function setRing(el, pct) {
-  const offset = CIRC * (1 - Math.min(1, Math.max(0, pct)));
-  el.style.strokeDasharray = CIRC;
-  el.style.strokeDashoffset = offset;
+/* ── DIGIT FLIP ── */
+function flip(id,val){
+  const el=document.getElementById(id);
+  const cur=el.querySelector('.cur');
+  if(!cur||cur.textContent===val)return;
+  const old=document.createElement('span');old.className='old';old.textContent=cur.textContent;
+  el.appendChild(old);cur.classList.add('in');cur.textContent=val;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{old.classList.add('out');cur.classList.remove('in');}));
+  setTimeout(()=>old.remove(),420);
 }
 
-/* ──────────────── VISIBILITY (background mode) ──────────────── */
-let timerHiddenAt = null, swHiddenAt = null;
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    if (timerRunning) timerHiddenAt = Date.now();
-    if (swRunning) swHiddenAt = Date.now();
+/* ── RING ── */
+function setRing(el,pct){
+  const off=CIRC*(1-Math.min(1,Math.max(0,pct)));
+  el.style.strokeDasharray=CIRC;el.style.strokeDashoffset=off;
+}
+
+/* ── CONFETTI ── */
+const CC=['#7c6fff','#ff6b9d','#00e5a0','#ffc947','#fff','#6ee7f7'];
+function confetti(x,y){
+  const fx=document.getElementById('finishFx');
+  for(let i=0;i<40;i++){
+    const d=document.createElement('div');d.className='conf';
+    const a=(Math.PI*2/40)*i+Math.random()*.25,dist=90+Math.random()*130;
+    d.style.cssText=`left:${x-3}px;top:${y-3}px;background:${CC[i%CC.length]};border-radius:${Math.random()>.5?'50%':'2px'};--cx:${Math.cos(a)*dist}px;--cy:${Math.sin(a)*dist}px;--cr:${Math.random()*720-360}deg;animation-delay:${Math.random()*.15}s;animation-duration:${1.5+Math.random()*.6}s`;
+    fx.appendChild(d);setTimeout(()=>d.remove(),2500);
+  }
+}
+
+/* ── FORMAT ── */
+function f2(n){return String(Math.max(0,n)|0).padStart(2,'0');}
+function fHMS(s){return`${f2(s/3600)}:${f2((s%3600)/60)}:${f2(s%60)}`;}
+
+/* ═══════════════════════════════════════════
+   TIMER — gerçek zamana dayalı (background-safe)
+   ═══════════════════════════════════════════ */
+let tTotal=300,tRem=300,tRunning=false;
+let tEndTime=null;   /* Zamanlayıcı bitişinin epoch ms zamanı */
+let tRafId=null;     /* requestAnimationFrame id */
+
+const tRingEl=document.getElementById('tRing');
+const tGlow=document.getElementById('tGlow');
+const tDots=document.getElementById('tDots');
+const tLbl=document.getElementById('tLbl');
+const tPlay=document.getElementById('tPlay');
+const iH=document.getElementById('iH'),iM=document.getElementById('iM'),iS=document.getElementById('iS');
+const tInputRow=document.getElementById('tInputRow');
+
+function getSec(){return(+iH.value||0)*3600+(+iM.value||0)*60+(+iS.value||0);}
+function setDisabled(v){[iH,iM,iS].forEach(e=>e.disabled=v);}
+
+function updateTimerUI(){
+  flip('dH',f2(tRem/3600));flip('dM',f2((tRem%3600)/60));flip('dS',f2(tRem%60));
+  const pct=tTotal>0?tRem/tTotal:0;setRing(tRingEl,pct);
+  tRingEl.style.stroke='var(--a)';tRingEl.style.filter='none';
+  tGlow.className='ring-glow purple';tLbl.className='state-lbl';
+  if(pct<=.1&&tRunning){
+    tRingEl.style.stroke='#ff4757';tRingEl.style.filter='drop-shadow(0 0 8px rgba(255,71,87,.7))';
+    tGlow.className='ring-glow danger';tLbl.classList.add('danger');
+  } else if(pct<=.25&&tRunning){
+    tRingEl.style.stroke='var(--a4)';tRingEl.style.filter='drop-shadow(0 0 5px rgba(255,201,71,.5))';
+    tGlow.className='ring-glow warn';tLbl.classList.add('warn');
+  }
+}
+
+/* RAF döngüsü — arka planda yavaşlar ama bitiş zamanı sabit */
+function timerLoop(){
+  if(!tRunning)return;
+  const now=Date.now();
+  const remaining=Math.max(0,Math.ceil((tEndTime-now)/1000));
+  if(remaining!==tRem){
+    tRem=remaining;
+    updateTimerUI();
+    tLbl.className='state-lbl running';tLbl.textContent='ÇALIŞIYOR';
+    if(tRem<=5&&tRem>0) playTick();
+  }
+  if(tRem<=0){finishTimer();return;}
+  tRafId=requestAnimationFrame(timerLoop);
+}
+
+/* Arka plandan dönerken kontrol — en kritik kısım */
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){
+    /* Uygulama ön plana geldi */
+    if(tRunning){
+      const now=Date.now();
+      tRem=Math.max(0,Math.ceil((tEndTime-now)/1000));
+      if(tRem<=0){finishTimer();}
+      else{updateTimerUI();tLbl.className='state-lbl running';tLbl.textContent='ÇALIŞIYOR';}
+    }
+    if(sRunning){
+      /* Kronometre: elapsed'ı güncelle */
+      sElapsed+=Date.now()-sHideAt;sHideAt=null;
+    }
   } else {
-    if (timerHiddenAt && timerRunning) {
-      const elapsed = Math.floor((Date.now() - timerHiddenAt) / 1000);
-      timerRemaining = Math.max(0, timerRemaining - elapsed);
-      timerHiddenAt = null;
-      if (timerRemaining === 0) finishTimer();
-      else updateTimerDisplay();
-    }
-    if (swHiddenAt && swRunning) {
-      swElapsed += Date.now() - swHiddenAt;
-      swHiddenAt = null;
-      updateSwDisplay();
-    }
+    /* Arka plana gitti */
+    if(sRunning) sHideAt=Date.now();
   }
 });
 
-/* ──────────────────────────────────────────
-   ════════════ TIMER LOGIC ════════════
-   ────────────────────────────────────────── */
-let timerTotal = 300, timerRemaining = 300;
-let timerRunning = false, timerInterval = null;
-
-const timerDisplay = document.getElementById('timerDisplay');
-const timerLabel   = document.getElementById('timerLabel');
-const timerRing    = document.getElementById('timerRing');
-const timerRingWrap = document.getElementById('timerRingWrap');
-const timerStartBtn = document.getElementById('timerStartBtn');
-const timerResetBtn = document.getElementById('timerResetBtn');
-const tHour = document.getElementById('tHour');
-const tMin  = document.getElementById('tMin');
-const tSec  = document.getElementById('tSec');
-
-function getTimerInputSeconds() {
-  return (+tHour.value||0)*3600 + (+tMin.value||0)*60 + (+tSec.value||0);
+function startTimer(){
+  tEndTime=Date.now()+(tRem*1000);
+  tRunning=true;
+  tPlay.textContent='⏸';tPlay.classList.add('go');
+  tLbl.className='state-lbl running';tLbl.textContent='ÇALIŞIYOR';
+  setDisabled(true);tInputRow.style.opacity='.3';
+  tDots.classList.remove('paused');
+  tRafId=requestAnimationFrame(timerLoop);
 }
-function setTimerInputDisabled(v) {
-  [tHour, tMin, tSec].forEach(el => el.disabled = v);
+function pauseTimer(){
+  tRunning=false;cancelAnimationFrame(tRafId);
+  tPlay.textContent='▶';tPlay.classList.remove('go');
+  tLbl.className='state-lbl';tLbl.textContent='DURAKLADI';
+  tDots.classList.add('paused');
 }
-function formatHMS(s) {
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+function resetTimer(){
+  tRunning=false;cancelAnimationFrame(tRafId);tEndTime=null;
+  tRem=getSec()||300;tTotal=tRem;updateTimerUI();
+  tPlay.textContent='▶';tPlay.classList.remove('go');
+  tLbl.className='state-lbl';tLbl.textContent='HAZIR';
+  setDisabled(false);tInputRow.style.opacity='1';
+  tRingEl.style.stroke='var(--a)';tRingEl.style.filter='none';tGlow.className='ring-glow purple';
+  tDots.classList.add('paused');hideBanner();
 }
-function updateTimerDisplay() {
-  timerDisplay.textContent = formatHMS(timerRemaining);
-  const pct = timerTotal > 0 ? timerRemaining / timerTotal : 0;
-  setRing(timerRing, pct);
-  timerDisplay.className = 'time-display';
-  timerRing.className = 'ring-fg';
-  if (pct <= 0.1) {
-    timerDisplay.classList.add('danger');
-    timerRing.classList.add('danger');
-  } else if (pct <= 0.25) {
-    timerDisplay.classList.add('warning');
-    timerRing.classList.add('warning');
-  }
-}
-
-function startTimer() {
-  timerInterval = setInterval(() => {
-    if (document.hidden) return;
-    timerRemaining--;
-    updateTimerDisplay();
-    if (timerRemaining <= 0) finishTimer();
-  }, 1000);
-  timerRunning = true;
-  timerStartBtn.textContent = '⏸';
-  timerStartBtn.classList.add('running');
-  timerLabel.textContent = 'ÇALIŞIYOR';
-  setTimerInputDisabled(true);
-  document.getElementById('timerInputWrap').style.opacity = '0.4';
-}
-function pauseTimer() {
-  clearInterval(timerInterval); timerInterval = null;
-  timerRunning = false;
-  timerStartBtn.textContent = '▶';
-  timerStartBtn.classList.remove('running');
-  timerLabel.textContent = 'DURAKLATILDI';
-}
-function resetTimer() {
-  clearInterval(timerInterval); timerInterval = null;
-  timerRunning = false;
-  timerRemaining = getTimerInputSeconds();
-  timerTotal = timerRemaining;
-  if (timerTotal === 0) { timerRemaining = 300; timerTotal = 300; }
-  updateTimerDisplay();
-  timerDisplay.className = 'time-display';
-  timerRing.className = 'ring-fg';
-  timerRingWrap.classList.remove('finished');
-  timerStartBtn.textContent = '▶';
-  timerStartBtn.classList.remove('running');
-  timerLabel.textContent = 'HAZIR';
-  setTimerInputDisabled(false);
-  document.getElementById('timerInputWrap').style.opacity = '1';
-}
-function finishTimer() {
-  clearInterval(timerInterval); timerInterval = null;
-  timerRunning = false;
-  timerRemaining = 0;
-  updateTimerDisplay();
-  timerDisplay.className = 'time-display finished';
-  timerRingWrap.classList.add('finished');
-  timerStartBtn.textContent = '▶';
-  timerStartBtn.classList.remove('running');
-  timerLabel.textContent = 'TAMAMLANDI ✓';
-  setTimerInputDisabled(false);
-  document.getElementById('timerInputWrap').style.opacity = '1';
+function finishTimer(){
+  tRunning=false;cancelAnimationFrame(tRafId);tRem=0;updateTimerUI();
+  tPlay.textContent='▶';tPlay.classList.remove('go');
+  tLbl.className='state-lbl done';tLbl.textContent='TAMAMLANDI ✓';
+  tRingEl.style.stroke='var(--a3)';tRingEl.style.filter='drop-shadow(0 0 8px rgba(0,229,160,.7))';
+  tGlow.className='ring-glow green';
+  setDisabled(false);tInputRow.style.opacity='1';tDots.classList.add('paused');
   playAlarm();
-  sendNotification('⏱ Timer Pro', `Süre doldu! ${formatHMS(timerTotal)} tamamlandı.`);
-  showToast('🎉 Süre doldu!', 3000);
-  // burst
-  const rect = timerRingWrap.getBoundingClientRect();
-  burst(rect.left + rect.width/2, rect.top + rect.height/2, '#6c63ff');
+  notify('⏱ Süre Doldu!',fHMS(tTotal)+' tamamlandı.');
+  const r=tRingEl.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2);
+  toast('🎉 Süre doldu!',4000);
 }
 
-timerStartBtn.addEventListener('click', () => {
-  if (timerRunning) { pauseTimer(); return; }
-  // Check stopwatch conflict
-  if (swRunning) {
-    showModal('Kronometre Çalışıyor',
-      'Bir kronometre zaten aktif. Yeni bir geri sayım başlatmak istiyor musunuz?',
-      [
-        { label: 'İptal', primary: false },
-        { label: 'Başlat', primary: true, fn: () => doStartTimer() }
-      ]);
-    return;
-  }
-  doStartTimer();
+tPlay.addEventListener('click',()=>{
+  ripple(tPlay);
+  if(tRunning){pauseTimer();return;}
+  if(sRunning){modal('Kronometre Çalışıyor','Bir kronometre aktif. Yine de geri sayım başlatmak istiyor musunuz?',[{label:'İptal',pri:false},{label:'Başlat',pri:true,fn:doStart}]);return;}
+  doStart();
 });
-function doStartTimer() {
-  timerTotal = getTimerInputSeconds();
-  if (timerTotal === 0) { showToast('Lütfen bir süre girin'); return; }
-  timerRemaining = timerTotal;
-  setRing(timerRing, 1);
-  timerDisplay.className = 'time-display';
-  timerRing.className = 'ring-fg';
-  timerRingWrap.classList.remove('finished');
-  startTimer();
+function doStart(){
+  tTotal=getSec();if(!tTotal){toast('Bir süre girin');return;}
+  tRem=tTotal;setRing(tRingEl,1);tRingEl.style.stroke='var(--a)';tRingEl.style.filter='none';
+  tGlow.className='ring-glow purple';tLbl.className='state-lbl';tLbl.textContent='HAZIR';
+  hideBanner();startTimer();
 }
-timerResetBtn.addEventListener('click', resetTimer);
-// Input change → reset
-[tHour, tMin, tSec].forEach(el => {
-  el.addEventListener('change', () => { if (!timerRunning) { timerTotal = getTimerInputSeconds(); timerRemaining = timerTotal; updateTimerDisplay(); } });
-});
-// Init
-setRing(timerRing, 1);
+document.getElementById('tReset').addEventListener('click',()=>{ripple(document.getElementById('tReset'));resetTimer();});
+[iH,iM,iS].forEach(e=>e.addEventListener('input',()=>{if(!tRunning){tTotal=getSec();tRem=tTotal;updateTimerUI();}}));
+setRing(tRingEl,1);updateTimerUI();
 
-/* ──────────────── PRESETS ──────────────── */
-let presets = JSON.parse(localStorage.getItem('timerPresets') || '[]');
-if (presets.length === 0) presets = [60, 300, 600, 1800, 3600];
-
-function savePresets() { localStorage.setItem('timerPresets', JSON.stringify(presets)); }
-function renderPresets() {
-  const list = document.getElementById('presetsList');
-  list.innerHTML = '';
-  presets.forEach((s, i) => {
-    const chip = document.createElement('div');
-    chip.className = 'preset-chip';
-    const label = document.createElement('span');
-    label.textContent = formatHMS(s);
-    const del = document.createElement('span');
-    del.className = 'del-preset';
-    del.textContent = '✕';
-    del.title = 'Sil';
-    del.addEventListener('click', e => {
-      e.stopPropagation();
-      presets.splice(i, 1);
-      savePresets(); renderPresets();
-      showToast('Preset silindi');
+/* PRESETS */
+let presets=JSON.parse(localStorage.getItem('tp_ps')||'null')||[60,300,600,1800,3600];
+function saveP(){localStorage.setItem('tp_ps',JSON.stringify(presets));}
+function renderChips(){
+  const list=document.getElementById('chipList');list.innerHTML='';
+  presets.forEach((s,i)=>{
+    const c=document.createElement('div');c.className='chip';
+    c.innerHTML=`<span>${fHMS(s)}</span><i class="x">✕</i>`;
+    c.querySelector('.x').addEventListener('click',e=>{
+      e.stopPropagation();c.style.cssText+='transform:scale(0);opacity:0;transition:all .3s';
+      setTimeout(()=>{presets.splice(i,1);saveP();renderChips();},300);toast('Silindi');
     });
-    chip.appendChild(label);
-    chip.appendChild(del);
-    chip.addEventListener('click', () => {
-      if (timerRunning) { showToast('Önce zamanlayıcıyı durdurun'); return; }
-      tHour.value = Math.floor(s/3600);
-      tMin.value  = Math.floor((s%3600)/60);
-      tSec.value  = s % 60;
-      timerTotal = s; timerRemaining = s;
-      updateTimerDisplay();
-      showToast('Süre seçildi: ' + formatHMS(s));
+    c.addEventListener('click',()=>{
+      if(tRunning){toast('Önce durdurun');return;}
+      iH.value=Math.floor(s/3600);iM.value=Math.floor((s%3600)/60);iS.value=s%60;
+      tTotal=s;tRem=s;updateTimerUI();toast('Seçildi: '+fHMS(s));ripple(c);
     });
-    list.appendChild(chip);
+    list.appendChild(c);
   });
 }
-renderPresets();
-
-document.getElementById('addPresetBtn').addEventListener('click', () => {
-  const s = getTimerInputSeconds();
-  if (s === 0) { showToast('Önce bir süre girin'); return; }
-  if (presets.includes(s)) { showToast('Bu süre zaten kayıtlı'); return; }
-  presets.push(s);
-  presets.sort((a,b) => a-b);
-  savePresets(); renderPresets();
-  showToast('Kaydedildi: ' + formatHMS(s));
+renderChips();
+document.getElementById('addPreset').addEventListener('click',()=>{
+  const s=getSec();if(!s){toast('Bir süre girin');return;}
+  if(presets.includes(s)){toast('Zaten kayıtlı');return;}
+  presets.push(s);presets.sort((a,b)=>a-b);saveP();renderChips();toast('Kaydedildi: '+fHMS(s));
 });
 
-/* ──────────────────────────────────────────
-   ════════════ STOPWATCH LOGIC ════════════
-   ────────────────────────────────────────── */
-let swElapsed = 0, swRunning = false, swInterval = null;
-let swLapStart = 0, swLaps = [];
+/* ═══════════════════════════════════════════
+   STOPWATCH
+   ═══════════════════════════════════════════ */
+let sElapsed=0,sRunning=false,sIval=null,sLapStart=0,sLaps=[],sLast=null,sHideAt=null;
+const sRingEl=document.getElementById('sRing');
+const sLbl=document.getElementById('sLbl');
+const sPlay=document.getElementById('sPlay');
+const sLap=document.getElementById('sLap');
+const sDots=document.getElementById('sDots');
 
-const swDisplay = document.getElementById('swDisplay');
-const swMs      = document.getElementById('swMs');
-const swLabel   = document.getElementById('swLabel');
-const swRing    = document.getElementById('swRing');
-const swStartBtn = document.getElementById('swStartBtn');
-const swLapBtn   = document.getElementById('swLapBtn');
-const swResetBtn = document.getElementById('swResetBtn');
-
-function formatMMSS(ms) {
-  const s = Math.floor(ms/1000);
-  const m = Math.floor(s/60);
-  return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+function updateSW(){
+  const ms=sElapsed,s=Math.floor(ms/1000);
+  flip('dSM',f2(s/60));flip('dSS',f2(s%60));
+  document.getElementById('dMs').textContent='.'+String(Math.floor((ms%1000)/10)).padStart(2,'0');
+  setRing(sRingEl,(ms%60000)/60000);
+  document.getElementById('sSep').className='dg-sep'+(sRunning?'':' stop');
 }
-function updateSwDisplay() {
-  swDisplay.textContent = formatMMSS(swElapsed);
-  swMs.textContent = '.' + String(Math.floor((swElapsed%1000)/10)).padStart(2,'0');
-  const pct = (swElapsed % 60000) / 60000;
-  setRing(swRing, pct);
+function startSW(){
+  sLast=Date.now();
+  sIval=setInterval(()=>{
+    const n=Date.now();sElapsed+=n-sLast;sLast=n;updateSW();
+  },33);
+  sRunning=true;sPlay.textContent='⏸';sPlay.classList.add('go');
+  sLbl.className='state-lbl running';sLbl.textContent='ÇALIŞIYOR';
+  sLap.style.opacity='1';sDots.classList.remove('paused');
 }
-
-let swLastTick = null;
-function startSw() {
-  swLastTick = Date.now();
-  swInterval = setInterval(() => {
-    if (document.hidden) return;
-    const now = Date.now();
-    swElapsed += now - swLastTick;
-    swLastTick = now;
-    updateSwDisplay();
-  }, 30);
-  swRunning = true;
-  swStartBtn.textContent = '⏸';
-  swStartBtn.classList.add('running');
-  swLabel.textContent = 'ÇALIŞIYOR';
-  swLapBtn.style.opacity = '1';
+function pauseSW(){
+  clearInterval(sIval);sIval=null;sRunning=false;
+  sPlay.textContent='▶';sPlay.classList.remove('go');
+  sLbl.className='state-lbl';sLbl.textContent='DURAKLADI';sDots.classList.add('paused');
 }
-function pauseSw() {
-  clearInterval(swInterval); swInterval = null;
-  swRunning = false;
-  swStartBtn.textContent = '▶';
-  swStartBtn.classList.remove('running');
-  swLabel.textContent = 'DURAKLATILDI';
+function resetSW(){
+  clearInterval(sIval);sIval=null;sRunning=false;sElapsed=0;sLapStart=0;sLaps=[];
+  updateSW();sPlay.textContent='▶';sPlay.classList.remove('go');
+  sLbl.className='state-lbl';sLbl.textContent='HAZIR';
+  sLap.style.opacity='.35';sDots.classList.add('paused');
+  document.getElementById('lapList').innerHTML='';
 }
-function resetSw() {
-  clearInterval(swInterval); swInterval = null;
-  swRunning = false; swElapsed = 0; swLapStart = 0; swLaps = [];
-  updateSwDisplay();
-  swDisplay.className = 'time-display';
-  swStartBtn.textContent = '▶';
-  swStartBtn.classList.remove('running');
-  swLabel.textContent = 'HAZIR';
-  swLapBtn.style.opacity = '0.4';
-  document.getElementById('lapsList').innerHTML = '';
-}
-
-swStartBtn.addEventListener('click', () => {
-  if (swRunning) { pauseSw(); return; }
-  // Check timer conflict
-  if (timerRunning) {
-    showModal('Geri Sayım Çalışıyor',
-      'Bir geri sayım zaten aktif. Kronometre başlatmak istiyor musunuz?',
-      [
-        { label: 'İptal', primary: false },
-        { label: 'Başlat', primary: true, fn: () => startSw() }
-      ]);
-    return;
-  }
-  startSw();
-});
-
-swResetBtn.addEventListener('click', () => {
-  if (swRunning) {
-    showModal('Kronoyu Sıfırla', 'Kronometre sıfırlanacak. Emin misiniz?',
-      [{ label: 'İptal', primary: false }, { label: 'Sıfırla', primary: true, fn: resetSw }]);
-  } else { resetSw(); }
-});
-
-swLapBtn.addEventListener('click', () => {
-  if (!swRunning) return;
-  const lapTime = swElapsed - swLapStart;
-  swLaps.push(lapTime);
-  swLapStart = swElapsed;
-  renderLaps();
-  // mini burst
-  const rect = swRing.getBoundingClientRect();
-  burst(rect.left + rect.width/2, rect.top + rect.height/2, '#43e97b');
-});
-
-function renderLaps() {
-  const list = document.getElementById('lapsList');
-  if (!swLaps.length) { list.innerHTML = ''; return; }
-  const minLap = Math.min(...swLaps), maxLap = Math.max(...swLaps);
-  list.innerHTML = '';
-  [...swLaps].reverse().forEach((lap, ri) => {
-    const i = swLaps.length - 1 - ri;
-    const item = document.createElement('div');
-    item.className = 'lap-item';
-    if (swLaps.length > 1) {
-      if (lap === minLap) item.classList.add('best');
-      if (lap === maxLap) item.classList.add('worst');
-    }
-    item.innerHTML = `
-      <span class="lap-num">Tur ${i+1}</span>
-      <span>${formatMMSS(lap)}.${String(Math.floor((lap%1000)/10)).padStart(2,'0')}</span>
-      <span class="lap-split">${formatMMSS(swLaps.slice(0,i+1).reduce((a,b)=>a+b,0))}</span>`;
-    list.appendChild(item);
+function renderLaps(){
+  const list=document.getElementById('lapList');if(!sLaps.length){list.innerHTML='';return;}
+  const mn=Math.min(...sLaps),mx=Math.max(...sLaps);
+  list.innerHTML='';
+  [...sLaps].reverse().forEach((l,ri)=>{
+    const i=sLaps.length-1-ri,d=document.createElement('div');
+    d.className='lap'+(sLaps.length>1&&l===mn?' best':sLaps.length>1&&l===mx?' worst':'');
+    const fmt=ms=>{const s=Math.floor(ms/1000);return`${f2(s/60)}:${f2(s%60)}.${String(Math.floor((ms%1000)/10)).padStart(2,'0')}`;};
+    const tot=sLaps.slice(0,i+1).reduce((a,b)=>a+b,0);
+    d.innerHTML=`<span class="ln">Tur ${i+1}</span><span class="lt">${fmt(l)}</span><span class="ls">${fmt(tot)}</span>`;
+    list.appendChild(d);
   });
 }
+sPlay.addEventListener('click',()=>{
+  ripple(sPlay);
+  if(sRunning){pauseSW();return;}
+  if(tRunning){modal('Geri Sayım Çalışıyor','Bir geri sayım aktif. Yine de kronometre başlatmak istiyor musunuz?',[{label:'İptal',pri:false},{label:'Başlat',pri:true,fn:startSW}]);return;}
+  startSW();
+});
+sLap.addEventListener('click',()=>{
+  if(!sRunning)return;ripple(sLap);
+  const l=sElapsed-sLapStart;sLaps.push(l);sLapStart=sElapsed;renderLaps();
+  const r=sRingEl.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2);
+  toast(`Tur ${sLaps.length}: ${f2(Math.floor(l/60000))}:${f2(Math.floor(l/1000)%60)}`);
+});
+document.getElementById('sReset').addEventListener('click',()=>{
+  ripple(document.getElementById('sReset'));
+  if(sRunning){modal('Kronoyu Sıfırla','Sıfırlanacak. Devam?',[{label:'İptal',pri:false},{label:'Sıfırla',pri:true,fn:resetSW}]);}
+  else resetSW();
+});
 
-// Init
-swLapBtn.style.opacity = '0.4';
-setRing(swRing, 0);
-updateSwDisplay();
-updateTimerDisplay();
+setRing(sRingEl,0);updateSW();
 </script>
 </body>
 </html>
