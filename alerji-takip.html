@@ -6,22 +6,22 @@
 <title>Alerji Takip Defteri</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{--bg:#0f0e0c;--card:#1a1814;--card2:#221f1a;--accent:#e8b86d;--accent2:#d4875a;--red:#c0392b;--green:#27ae60;--yellow:#f39c12;--text:#f0ebe3;--muted:#8a8070;--border:#2e2b24;--hbg:rgba(26,24,20,0.93);--b0:#0a2015;--b1:#141f06;--b2:#201a08;--b3:#201208;--b4:#200808;--a0:#0a2015;--a1:#141f06;--a2:#201a08;--a3:#201208;--a4:#200808;--loc:#180f2a;--ftag:#1e1b15;}
-[data-theme="light"]{--bg:#f5f0e8;--card:#fff;--card2:#f0ebe0;--accent:#a06010;--accent2:#b05020;--red:#c0392b;--green:#1e8449;--yellow:#a06800;--text:#1a1510;--muted:#7a6a55;--border:#ddd5c5;--hbg:rgba(245,240,232,0.95);--b0:#d4f4e2;--b1:#e0f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d4f4e2;--a1:#e0f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#f0ebe0;}
+[data-theme="dark"]{--bg:#000000;--card:#2e2e34;--card2:#46464f;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#46464f;}
+[data-theme="light"]{--bg:#f5f0e8;--card:#fff;--card2:#f0ebe0;--accent:#7a4a10;--accent2:#9a4020;--red:#c0392b;--green:#1e8449;--yellow:#a06800;--text:#1a1510;--muted:#7a6a55;--border:#ddd5c5;--hbg:rgba(245,240,232,0.95);--b0:#d4f4e2;--b1:#e0f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d4f4e2;--a1:#e0f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#f0ebe0;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;transition:background .3s,color .3s;}
-header{padding:18px 20px 12px;border-bottom:1px solid var(--border);background:var(--hbg);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;}
-.header-left h1{font-family:'Playfair Display',serif;font-size:21px;color:var(--accent);}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;min-height:100vh;transition:background .3s,color .3s;padding-bottom:env(safe-area-inset-bottom,0);}
+header{padding:env(safe-area-inset-top, 18px) 20px 12px;padding-top:max(18px, env(safe-area-inset-top));border-bottom:1px solid var(--border);background:var(--hbg);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;}
+.header-left h1{font-family:'Playfair Display',serif;font-size:23px;color:var(--accent);}
 .header-left p{color:var(--muted);font-size:11px;margin-top:2px;}
 .theme-btn{background:var(--card2);border:1px solid var(--border);border-radius:22px;padding:6px 13px;cursor:pointer;font-size:17px;display:flex;align-items:center;gap:5px;transition:border-color .2s;font-family:'DM Sans',sans-serif;}
 .theme-btn span{font-size:11px;color:var(--muted);}
 .tabs{display:flex;gap:3px;padding:12px 20px 0;border-bottom:1px solid var(--border);overflow-x:auto;background:var(--bg);}
-.tab{padding:7px 14px;border-radius:10px 10px 0 0;background:transparent;border:1px solid transparent;border-bottom:none;color:var(--muted);cursor:pointer;font-size:13px;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.tab{padding:8px 15px;border-radius:10px 10px 0 0;background:transparent;border:1px solid transparent;border-bottom:none;color:var(--muted);cursor:pointer;font-size:14px;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .tab.active{background:var(--card);border-color:var(--border);color:var(--accent);font-weight:500;}
 .page{display:none;padding:16px 18px;max-width:700px;margin:0 auto;}
 .page.active{display:block;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;transition:background .3s;}
-.card-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);margin-bottom:11px;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--accent);margin-bottom:11px;}
 lbl{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;margin-top:10px;}
 lbl:first-child{margin-top:0;}
 input[type=text],input[type=date],input[type=time],select,textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:8px 11px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s,background .3s;}
@@ -38,7 +38,7 @@ textarea{resize:vertical;min-height:60px;}
 
 /* FOOD QUICK LIST */
 .food-quick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
-.fq-item{padding:6px 12px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;transition:all .18s;user-select:none;display:flex;align-items:center;gap:5px;}
+.fq-item{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .18s;user-select:none;display:flex;align-items:center;gap:5px;}
 .fq-item.sel{border-color:var(--accent);color:var(--accent);background:var(--a1);}
 .fq-item .del-x{display:none;color:var(--red);font-weight:700;font-size:14px;line-height:1;margin-left:2px;}
 .edit-mode .fq-item .del-x{display:inline;}
@@ -51,7 +51,7 @@ textarea{resize:vertical;min-height:60px;}
 
 /* ACNE */
 .acne-rating{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
-.acne-btn{padding:7px 13px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.acne-btn{padding:8px 15px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .acne-btn.sel-0{border-color:var(--green);color:var(--green);background:var(--a0);}
 .acne-btn.sel-1{border-color:#7cb518;color:#7cb518;background:var(--a1);}
 .acne-btn.sel-2{border-color:var(--yellow);color:var(--yellow);background:var(--a2);}
@@ -60,12 +60,12 @@ textarea{resize:vertical;min-height:60px;}
 
 /* LOC */
 .loc-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
-.loc-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:12px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.loc-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:14px;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .loc-btn.active{border-color:#9b72db;color:#9b72db;background:var(--loc);}
 
 /* YES/NO toggle */
 .yn-group{display:flex;gap:8px;margin-top:5px;}
-.yn-btn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:13px;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.yn-btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;font-size:15px;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
 .yn-btn.yes{border-color:var(--green);color:var(--green);background:var(--a0);}
 .yn-btn.no{border-color:var(--red);color:var(--red);background:var(--b4);}
 
@@ -92,7 +92,7 @@ textarea{resize:vertical;min-height:60px;}
 /* STATS */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
 .stat-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px;text-align:center;}
-.stat-num{font-family:'Playfair Display',serif;font-size:25px;color:var(--accent);line-height:1;}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--accent);line-height:1;}
 .stat-label{font-size:11px;color:var(--muted);margin-top:3px;}
 .suspect-row{display:flex;align-items:center;padding:8px 11px;background:var(--card2);border:1px solid var(--border);border-radius:9px;margin-bottom:6px;}
 .suspect-name{font-size:12px;min-width:85px;text-transform:capitalize;}
@@ -134,7 +134,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   <button class="tab active" onclick="showTab('kayit',this)">✏️ Kayıt Ekle</button>
   <button class="tab" onclick="showTab('gecmis',this)">📋 Geçmiş</button>
   <button class="tab" onclick="showTab('analiz',this)">📊 Analiz</button>
-  <button class="tab" onclick="showTab('ayarlar',this)">⚙️ Ayarlar</button>
+  <button class="tab" onclick="showTab('ayarlar',this)" title="Ayarlar">⚙️</button>
 </div>
 
 <!-- KAYIT -->
@@ -142,9 +142,19 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
   <div class="card">
     <div class="card-title">🕐 Zaman</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><lbl>Tarih</lbl><input type="date" id="inp-date"></div>
-      <div><lbl>Saat</lbl><input type="time" id="inp-time"></div>
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Tarih</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="day-label" style="font-size:13px;color:var(--accent);font-weight:600;min-width:28px"></span>
+          <input type="date" id="inp-date" oninput="updateDayLabel()" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text);width:100%">
+        </div>
+      </div>
+      <div style="width:1px;height:36px;background:var(--border)"></div>
+      <div style="flex:0 0 auto">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Saat</div>
+        <input type="time" id="inp-time" style="border:none;background:transparent;padding:0;font-size:15px;font-weight:500;color:var(--text)">
+      </div>
     </div>
   </div>
 
@@ -172,14 +182,16 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
       <button class="acne-btn" data-v="3" onclick="setAcne(3)">😣 Fazla</button>
       <button class="acne-btn" data-v="4" onclick="setAcne(4)">😤 Çok Kötü</button>
     </div>
-    <lbl style="margin-top:10px">📍 Konum</lbl>
-    <div class="loc-group" id="loc-group">
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Kafa derisi">💆 Kafa derisi</button>
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Ense">🔙 Ense</button>
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Alın">😀 Alın</button>
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Yanak">👩 Yanak</button>
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Çene">🫦 Çene</button>
-      <button class="loc-btn" onclick="toggleLoc(this)" data-v="Burun">👃 Burun</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;margin-bottom:5px">
+      <lbl style="margin:0">📍 Konum</lbl>
+      <button class="edit-btn" id="loc-edit-btn" onclick="toggleLocEdit()">✏️ Düzenle</button>
+    </div>
+    <div class="loc-group" id="loc-group"></div>
+    <div id="loc-add-area" style="display:none;margin:5px 0">
+      <div class="fq-add-row">
+        <input type="text" id="loc-new" placeholder="Yeni konum ekle... (ör: Sırt)" onkeydown="if(event.key==='Enter')addLocItem()">
+        <button class="btn btn-ghost btn-sm" onclick="addLocItem()">+ Ekle</button>
+      </div>
     </div>
   </div>
 
@@ -191,21 +203,36 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
       <button class="yn-btn" id="shower-no" onclick="setShower(false)">❌ Hayır</button>
     </div>
     <div id="shower-details" style="display:none">
-      <div class="shampoo-row">
-        <div style="flex:1"><lbl>🧴 Şampuan</lbl><input type="text" id="inp-shampoo" placeholder="Marka / ürün adı..."></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 5px">
+        <lbl style="margin:0">🧴 Şampuan</lbl>
+        <button class="edit-btn" id="shampoo-edit-btn" onclick="toggleShampooEdit()">✏️ Düzenle</button>
       </div>
-      <div class="shampoo-row">
-        <div style="flex:1"><lbl>🧼 Sabun / Duş jeli</lbl><input type="text" id="inp-soap" placeholder="Marka / ürün adı..."></div>
+      <div class="food-quick" id="shampoo-quick"></div>
+      <div id="shampoo-add-area" style="display:none;margin:5px 0">
+        <div class="fq-add-row">
+          <input type="text" id="shampoo-new" placeholder="Yeni şampuan ekle..." onkeydown="if(event.key==='Enter')addShampooItem()">
+          <button class="btn btn-ghost btn-sm" onclick="addShampooItem()">+ Ekle</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 5px">
+        <lbl style="margin:0">🧼 Sabun / Duş jeli</lbl>
+        <button class="edit-btn" id="soap-edit-btn" onclick="toggleSoapEdit()">✏️ Düzenle</button>
+      </div>
+      <div class="food-quick" id="soap-quick"></div>
+      <div id="soap-add-area" style="display:none;margin:5px 0">
+        <div class="fq-add-row">
+          <input type="text" id="soap-new" placeholder="Yeni sabun/duş jeli ekle..." onkeydown="if(event.key==='Enter')addSoapItem()">
+          <button class="btn btn-ghost btn-sm" onclick="addSoapItem()">+ Ekle</button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">🌿 Diğer</div>
-    <lbl>Şey yaptın mı?</lbl>
     <div class="yn-group">
-      <button class="yn-btn" id="sey-yes" onclick="setSey(true)">😏 Evet</button>
-      <button class="yn-btn" id="sey-no" onclick="setSey(false)">🙅 Hayır</button>
+      <button class="yn-btn" id="sey-yes" onclick="setSey(true)">✅ Evet</button>
+      <button class="yn-btn" id="sey-no" onclick="setSey(false)">❌ Hayır</button>
     </div>
   </div>
 
@@ -285,15 +312,21 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
 <!-- AYARLAR -->
 <div id="tab-ayarlar" class="page">
+
   <div class="card">
-    <div class="card-title">🍽️ Gıda Listesini Düzenle</div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Kayıt eklerken çıkan hızlı seçim listesi. Ekle veya sil.</p>
-    <div id="food-list-edit"></div>
-    <div style="display:flex;gap:7px;margin-top:10px">
-      <input type="text" id="new-food-settings" placeholder="Yeni gıda ekle..." onkeydown="if(event.key==='Enter')addFoodToList()">
-      <button class="btn btn-ghost btn-sm" onclick="addFoodToList()">+ Ekle</button>
-    </div>
+    <div class="card-title">💾 Yedekle</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlar, gıda listesi, şampuan, sabun ve konum listelerini bir dosyaya indir.</p>
+    <button class="btn btn-primary" onclick="backupData()" style="width:100%;justify-content:center">📤 Yedeği İndir</button>
   </div>
+
+  <div class="card">
+    <div class="card-title">📂 Geri Yükle</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Daha önce aldığın yedek dosyasını seç. Mevcut veriler <strong>üzerine yazılır</strong>.</p>
+    <label for="restore-file" class="btn btn-ghost" style="width:100%;justify-content:center;cursor:pointer;display:flex">📥 Yedek Dosyası Seç</label>
+    <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(event)">
+    <div id="restore-status" style="font-size:13px;margin-top:10px;text-align:center"></div>
+  </div>
+
   <div class="card" style="border-color:var(--red)">
     <div class="card-title" style="color:var(--red)">⚠️ Veri Sıfırla</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Tüm kayıtları sil. Bu işlem geri alınamaz.</p>
@@ -304,8 +337,12 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 <script>
 // ===== STATE =====
 let logs = JSON.parse(localStorage.getItem('alerji-v3') || '[]');
-let foodList = JSON.parse(localStorage.getItem('alerji-foods') || JSON.stringify(['Süt çikolatası','Golf','Söğüt çikolata','Süt','Yoğurt','Peynir','Şeker/Tatlı','Ekmek','Makarna','Pilav','Et','Tavuk','Meyve','Kahve','Çay','Kola/Gazlı içecek','Fast food','Kuruyemiş','Cips']));
-let acneValue = null, selectedLocs = [], selectedFoods = [], showerVal = null, seyVal = null;
+let foodList = JSON.parse(localStorage.getItem('alerji-foods') || JSON.stringify(['Bal','Çikolata','Ekmek','Peynir','Süt','Şeker','Tereyağı','Yoğurt']));
+let shampooList=JSON.parse(localStorage.getItem('alerji-shampoo')||JSON.stringify(['Clear','Dove','Elseve','Head & Shoulders','Pantene']));
+let soapList=JSON.parse(localStorage.getItem('alerji-soap')||JSON.stringify(['Beyaz sabun','Yeşil sabun']));
+let locList=JSON.parse(localStorage.getItem('alerji-locs')||JSON.stringify(['😀 Alın','👃 Burun','🫦 Çene','🔙 Ense','🫁 Göğüs','💆 Kafa derisi','🔼 Sırt','👩 Yanak']));
+let acneValue = null, selectedLocs = [], selectedFoods = [], selectedShampoo=null, selectedSoap=null, showerVal = null, seyVal = null;
+let shampooEditMode=false, soapEditMode=false, locEditMode=false;
 let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
@@ -333,6 +370,15 @@ function setDateTime(){
   const h=String(now.getHours()).padStart(2,'0');
   const m=String(now.getMinutes()).padStart(2,'0');
   document.getElementById('inp-time').value=h+':'+m;
+  updateDayLabel();
+}
+function updateDayLabel(){
+  const val=document.getElementById('inp-date').value;
+  if(!val)return;
+  const dn=['Paz','Pts','Sal','Çar','Per','Cum','Cmt'];
+  const dt=new Date(val+'T12:00:00');
+  const el=document.getElementById('day-label');
+  if(el) el.textContent=dn[dt.getDay()];
 }
 
 // ===== TABS =====
@@ -407,7 +453,10 @@ function addCustomFood(){
   inp.value='';
 }
 
-function saveFL(){localStorage.setItem('alerji-foods',JSON.stringify(foodList));}
+function saveFL(){
+  foodList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));
+  localStorage.setItem('alerji-foods',JSON.stringify(foodList));
+}
 
 // ===== ACNE =====
 function setAcne(v){
@@ -416,17 +465,113 @@ function setAcne(v){
 }
 
 // ===== LOCATION =====
-function toggleLoc(btn){
-  btn.classList.toggle('active');const v=btn.dataset.v;
-  selectedLocs=selectedLocs.includes(v)?selectedLocs.filter(x=>x!==v):[...selectedLocs,v];
+function renderLocs(){
+  const wrap=document.getElementById('loc-group');
+  if(!wrap)return;
+  if(locEditMode){
+    wrap.innerHTML=locList.map((f,i)=>`
+      <div class="fq-item" style="cursor:default;border-color:var(--red);color:var(--text);background:var(--b4)">
+        <span class="del-x" style="display:inline" onclick="removeLocItem(${i})">✕</span>
+        <span onclick="renameLocItem(${i})">${f}</span>
+        <span style="font-size:11px;opacity:0.5" onclick="renameLocItem(${i})">✏️</span>
+      </div>`).join('');
+  } else {
+    wrap.innerHTML=locList.map(f=>`<button class="loc-btn${selectedLocs.includes(f)?' active':''}" onclick="toggleLoc('${f.replace(/'/g,"\\'")}',this)">${f}</button>`).join('');
+  }
+}
+function toggleLoc(v,btn){
+  if(selectedLocs.includes(v)) selectedLocs=selectedLocs.filter(x=>x!==v);
+  else selectedLocs.push(v);
+  btn.classList.toggle('active');
+}
+function toggleLocEdit(){
+  locEditMode=!locEditMode;
+  const btn=document.getElementById('loc-edit-btn');
+  const addArea=document.getElementById('loc-add-area');
+  btn.classList.toggle('active',locEditMode);
+  btn.textContent=locEditMode?'✅ Bitti':'✏️ Düzenle';
+  addArea.style.display=locEditMode?'block':'none';
+  renderLocs();
+}
+function addLocItem(){
+  const inp=document.getElementById('loc-new');
+  const v=inp.value.trim();if(!v)return;
+  if(!locList.includes(v)){locList.push(v);locList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-locs',JSON.stringify(locList));renderLocs();}
+  inp.value='';
+}
+function removeLocItem(i){
+  const v=locList[i];
+  selectedLocs=selectedLocs.filter(x=>x!==v);
+  locList.splice(i,1);locList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-locs',JSON.stringify(locList));renderLocs();
+}
+function renameLocItem(i){
+  const oldName=locList[i];
+  const newName=prompt('Yeni isim:',oldName);
+  if(newName&&newName.trim()&&newName.trim()!==oldName){
+    const n=newName.trim();
+    if(selectedLocs.includes(oldName)){selectedLocs=selectedLocs.filter(x=>x!==oldName);selectedLocs.push(n);}
+    locList[i]=n;locList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-locs',JSON.stringify(locList));renderLocs();
+  }
 }
 
 // ===== SHOWER =====
+function renderShampooList(){
+  const wrap=document.getElementById('shampoo-quick');if(!wrap)return;
+  if(shampooEditMode){
+    wrap.innerHTML=shampooList.map((f,i)=>`<div class="fq-item" style="cursor:default;border-color:var(--red);color:var(--text);background:var(--b4)"><span class="del-x" style="display:inline" onclick="removeShampoo(${i})">✕</span><span onclick="renameShampoo(${i})">${f}</span><span style="font-size:11px;opacity:0.5" onclick="renameShampoo(${i})">✏️</span></div>`).join('');
+  } else {
+    wrap.innerHTML=shampooList.map(f=>`<div class="fq-item${selectedShampoo===f?' sel':''}" onclick="selectShampoo('${f.replace(/'/g,"\\'")}',this)">${f}</div>`).join('');
+  }
+}
+function selectShampoo(f,el){
+  if(selectedShampoo===f){selectedShampoo=null;}else{selectedShampoo=f;}
+  renderShampooList();
+}
+function toggleShampooEdit(){
+  shampooEditMode=!shampooEditMode;
+  const btn=document.getElementById('shampoo-edit-btn');
+  const addArea=document.getElementById('shampoo-add-area');
+  btn.classList.toggle('active',shampooEditMode);
+  btn.textContent=shampooEditMode?'✅ Bitti':'✏️ Düzenle';
+  addArea.style.display=shampooEditMode?'block':'none';
+  renderShampooList();
+}
+function addShampooItem(){
+  const inp=document.getElementById('shampoo-new');const v=inp.value.trim();if(!v)return;
+  if(!shampooList.includes(v)){shampooList.push(v);shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}
+  inp.value='';
+}
+function removeShampoo(i){if(selectedShampoo===shampooList[i])selectedShampoo=null;shampooList.splice(i,1);shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}
+function renameShampoo(i){const o=shampooList[i];const n=prompt('Yeni isim:',o);if(n&&n.trim()&&n.trim()!==o){if(selectedShampoo===o)selectedShampoo=n.trim();shampooList[i]=n.trim();shampooList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-shampoo',JSON.stringify(shampooList));renderShampooList();}}
+
+function renderSoapList(){
+  const wrap=document.getElementById('soap-quick');if(!wrap)return;
+  if(soapEditMode){
+    wrap.innerHTML=soapList.map((f,i)=>`<div class="fq-item" style="cursor:default;border-color:var(--red);color:var(--text);background:var(--b4)"><span class="del-x" style="display:inline" onclick="removeSoap(${i})">✕</span><span onclick="renameSoap(${i})">${f}</span><span style="font-size:11px;opacity:0.5" onclick="renameSoap(${i})">✏️</span></div>`).join('');
+  } else {
+    wrap.innerHTML=soapList.map(f=>`<div class="fq-item${selectedSoap===f?' sel':''}" onclick="selectSoap('${f.replace(/'/g,"\\'")}',this)">${f}</div>`).join('');
+  }
+}
+function selectSoap(f,el){selectedSoap=selectedSoap===f?null:f;renderSoapList();}
+function toggleSoapEdit(){
+  soapEditMode=!soapEditMode;
+  const btn=document.getElementById('soap-edit-btn');
+  const addArea=document.getElementById('soap-add-area');
+  btn.classList.toggle('active',soapEditMode);
+  btn.textContent=soapEditMode?'✅ Bitti':'✏️ Düzenle';
+  addArea.style.display=soapEditMode?'block':'none';
+  renderSoapList();
+}
+function addSoapItem(){const inp=document.getElementById('soap-new');const v=inp.value.trim();if(!v)return;if(!soapList.includes(v)){soapList.push(v);soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}inp.value='';}
+function removeSoap(i){if(selectedSoap===soapList[i])selectedSoap=null;soapList.splice(i,1);soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}
+function renameSoap(i){const o=soapList[i];const n=prompt('Yeni isim:',o);if(n&&n.trim()&&n.trim()!==o){if(selectedSoap===o)selectedSoap=n.trim();soapList[i]=n.trim();soapList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'}));localStorage.setItem('alerji-soap',JSON.stringify(soapList));renderSoapList();}}
+
 function setShower(v){
   showerVal=v;
   document.getElementById('shower-yes').className='yn-btn'+(v?' yes':'');
   document.getElementById('shower-no').className='yn-btn'+(!v&&v!==null?' no':'');
   document.getElementById('shower-details').style.display=v?'block':'none';
+  if(v){renderShampooList();renderSoapList();}
 }
 
 // ===== SEY =====
@@ -442,8 +587,8 @@ function saveLog(){
   const time=document.getElementById('inp-time').value;
   if(!date||!time)return alert('Lütfen tarih ve saat gir!');
   if(acneValue===null)return alert('Sivilce durumunu seç!');
-  const shampoo=document.getElementById('inp-shampoo').value.trim();
-  const soap=document.getElementById('inp-soap').value.trim();
+  const shampoo=selectedShampoo||'';
+  const soap=selectedSoap||'';
   const notes=document.getElementById('inp-notes').value.trim();
   logs.push({
     id:Date.now(),date,time,
@@ -459,7 +604,7 @@ function saveLog(){
   logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   save();
   // RESET
-  acneValue=null;selectedLocs=[];selectedFoods=[];showerVal=null;seyVal=null;
+  acneValue=null;selectedLocs=[];selectedFoods=[];selectedShampoo=null;selectedSoap=null;showerVal=null;seyVal=null;
   document.querySelectorAll('.acne-btn').forEach(b=>b.className='acne-btn');
   document.querySelectorAll('#loc-group .loc-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('shower-yes').className='yn-btn';
@@ -495,8 +640,8 @@ function renderHistory(){
     const meta=[];
     if(l.shower===true)meta.push('🚿 Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
     else if(l.shower===false)meta.push('🚿 Banyo: Hayır');
-    if(l.sey===true)meta.push('😏 Şey: Evet');
-    else if(l.sey===false)meta.push('🙅 Şey: Hayır');
+    if(l.sey===true)meta.push('✅ Diğer: Evet');
+    else if(l.sey===false)meta.push('❌ Diğer: Hayır');
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
@@ -518,9 +663,9 @@ function deleteLog(id){if(!confirm('Silinsin mi?'))return;logs=logs.filter(l=>l.
 function formatDate(d){
   const[y,m,day]=d.split('-');
   const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-  const dayNames=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const dayNames=['Paz','Pts','Sal','Çar','Per','Cum','Cmt'];
   const dt=new Date(d+'T12:00:00');
-  return parseInt(day)+' '+months[parseInt(m)-1]+' '+y+' — '+dayNames[dt.getDay()];
+  return dayNames[dt.getDay()]+', '+parseInt(day)+' '+months[parseInt(m)-1]+' '+y;
 }
 
 function addDays(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
@@ -630,6 +775,75 @@ function resetAll(){
   if(!confirm('Tüm kayıtlar silinecek. Emin misin?'))return;
   logs=[];save();renderHistory();renderAnalysis();toast('🗑️ Tüm veriler silindi.');
 }
+
+// ===== YEDEKLEME =====
+function backupData(){
+  const backup = {
+    version: 1,
+    date: new Date().toISOString(),
+    logs: logs,
+    foodList: foodList,
+    shampooList: shampooList,
+    soapList: soapList,
+    locList: locList
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toLocaleDateString('tr-TR').replace(/\./g,'-');
+  a.href = url;
+  a.download = 'alerji-yedek-' + dateStr + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ Yedek indirildi!');
+}
+
+function restoreData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('restore-status');
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const backup = JSON.parse(e.target.result);
+      if(!backup.version || !backup.logs){
+        statusEl.style.color='var(--red)';
+        statusEl.textContent='❌ Geçersiz yedek dosyası!';
+        return;
+      }
+      if(!confirm('Mevcut veriler silinip yedek yüklenecek. Emin misin?')){
+        event.target.value='';return;
+      }
+      // Restore
+      logs = backup.logs || [];
+      foodList = backup.foodList || foodList;
+      shampooList = backup.shampooList || shampooList;
+      soapList = backup.soapList || soapList;
+      locList = backup.locList || locList;
+      // Save all
+      save();
+      saveFL();
+      localStorage.setItem('alerji-shampoo', JSON.stringify(shampooList));
+      localStorage.setItem('alerji-soap', JSON.stringify(soapList));
+      localStorage.setItem('alerji-locs', JSON.stringify(locList));
+      // Re-render
+      renderFoodQuick();
+      renderLocs();
+      renderHistory();
+      renderAnalysis();
+      statusEl.style.color='var(--green)';
+      statusEl.textContent='✅ ' + logs.length + ' kayıt başarıyla geri yüklendi!';
+      event.target.value='';
+      toast('✅ Yedek geri yüklendi!');
+    } catch(err) {
+      statusEl.style.color='var(--red)';
+      statusEl.textContent='❌ Dosya okunamadı: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
 </script>
 </body>
 </html>
