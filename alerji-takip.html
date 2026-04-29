@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.10
+  Alerji Takip Defteri - Pro 1.0.11
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.10</span>
+  <span>Pro 1.0.11</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -908,7 +908,7 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
-      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true?'✅ '+(cd.subValues&&Object.keys(cd.subValues).length?Object.values(cd.subValues).flat().filter(Boolean).join(', '):'—'):cd.value===false?'❌ '+(cd.subValues&&Object.keys(cd.subValues).length?Object.values(cd.subValues).flat().filter(Boolean).join(', '):'—'):'—'):cd.value}</span>`).join('')}</div>`:''}
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true||cd.value===false?(cd.value===true?'✅':'❌')+' '+(cd.subValues&&Object.keys(cd.subValues).length?Object.values(cd.subValues).flat().filter(x=>x&&x.trim()).join(', ') || (cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır')):(cd.value===true?(cd.yesLabel||'Evet'):(cd.noLabel||'Hayır'))):'—'):cd.value}</span>`).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
@@ -1392,7 +1392,7 @@ function renderCustomSections(){
         const subs = val === true ? (sec.yesSubs||[]) : val === false ? (sec.noSubs||[]) : [];
         const subVals = customValues[sec.id+'__subs'] || {};
         let subsHtml = subs.map((sub,si) => {
-          const sv = subVals[si] || [];
+          const sv = subVals[String(si)] || [];
           return `<div style="margin-top:10px">
             <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
             <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')">  ${item}</span>`).join('')}</div>
@@ -1454,11 +1454,12 @@ function setStarVal(id, n){
 }
 function toggleYesnoSub(id, subIdx, item){
   const key = id+'__subs';
+  const k = String(subIdx);
   if(!customValues[key]) customValues[key] = {};
-  if(!customValues[key][subIdx]) customValues[key][subIdx] = [];
-  const arr = customValues[key][subIdx];
-  if(arr.includes(item)) customValues[key][subIdx] = arr.filter(x=>x!==item);
-  else customValues[key][subIdx].push(item);
+  if(!customValues[key][k]) customValues[key][k] = [];
+  const arr = customValues[key][k];
+  if(arr.includes(item)) customValues[key][k] = arr.filter(x=>x!==item);
+  else customValues[key][k].push(item);
   renderCustomSections();
 }
 function toggleCustomList(id, item){
@@ -1551,8 +1552,9 @@ function removeYesnoSubItem(id, side, si, ii){
   arr[si].items.splice(ii,1);
   // Seçili değerlerden de çıkar
   const key = id+'__subs';
-  if(customValues[key]&&customValues[key][si])
-    customValues[key][si] = customValues[key][si].filter(x=>x!==removed);
+  const k = String(si);
+  if(customValues[key]&&customValues[key][k])
+    customValues[key][k] = customValues[key][k].filter(x=>x!==removed);
   _saveYesnoSub(id);
 }
 function renameYesnoSubItem(id, side, si, ii){
@@ -1564,8 +1566,8 @@ function renameYesnoSubItem(id, side, si, ii){
   const newName = n.trim();
   // Seçili değerlerde güncelle
   const key = id+'__subs';
-  if(customValues[key]&&customValues[key][si])
-    customValues[key][si] = customValues[key][si].map(x=>x===oldName?newName:x);
+  if(customValues[key]&&customValues[key][String(si)])
+    customValues[key][String(si)] = customValues[key][String(si)].map(x=>x===oldName?newName:x);
   // Geçmiş kayıtlarda güncelle
   logs.forEach(log=>{
     if(log.customData&&log.customData[id]&&log.customData[id].subValues){
@@ -2086,7 +2088,7 @@ function renderEditCustomSections(log){
       const curSubs = editCustomVals[sec.id+'__subs'] !== undefined ? editCustomVals[sec.id+'__subs'] : savedSubs;
       const subs = cur === true ? (sec.yesSubs||[]) : cur === false ? (sec.noSubs||[]) : [];
       let subsHtml = subs.map((sub,si) => {
-        const sv = curSubs[si] || [];
+        const sv = curSubs[String(si)] || [];
         return `<div style="margin-top:10px">
           <div style="font-size:12px;color:var(--muted);margin-bottom:4px">${sub.name}</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px">${[...(sub.items||[])].sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})).map(item=>`<span class="custom-list-item${sv.includes(item)?' sel':''}" onclick="toggleEditYesnoSub('${sec.id}',${si},'${item.replace(/'/g,"\\'")}')"> ${item}</span>`).join('')}</div>
@@ -2121,11 +2123,12 @@ function setEditStarVal(id, n){
 }
 function toggleEditYesnoSub(id, subIdx, item){
   const key = id+'__subs';
+  const k = String(subIdx);
   if(!editCustomVals[key]) editCustomVals[key] = {};
-  if(!editCustomVals[key][subIdx]) editCustomVals[key][subIdx] = [];
-  const arr = editCustomVals[key][subIdx];
-  if(arr.includes(item)) editCustomVals[key][subIdx] = arr.filter(x=>x!==item);
-  else editCustomVals[key][subIdx].push(item);
+  if(!editCustomVals[key][k]) editCustomVals[key][k] = [];
+  const arr = editCustomVals[key][k];
+  if(arr.includes(item)) editCustomVals[key][k] = arr.filter(x=>x!==item);
+  else editCustomVals[key][k].push(item);
   const log = logs.find(l=>l.id===editingLogId);
   renderEditCustomSections(log);
 }
