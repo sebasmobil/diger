@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.09
+  Alerji Takip Defteri - Pro 1.0.10
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.09</span>
+  <span>Pro 1.0.10</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -283,8 +283,11 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">🚿 Banyo</div>
+  <div class="card" id="banyo-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="card-title" style="margin-bottom:0">🚿 Banyo</div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteBanyoCard()">🗑️</button>
+    </div>
     <lbl>Bugün banyo yaptın mı?</lbl>
     <div class="yn-group">
       <button class="yn-btn" id="shower-yes" onclick="setShower(true)">✅ Evet</button>
@@ -316,13 +319,14 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="diger-card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:8px">
         <span>🌿</span>
         <span id="diger-title-text" onclick="editDigerTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span>
         <span onclick="editDigerTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
       </div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteDigerCard()">🗑️</button>
     </div>
     <div class="yn-group">
       <button class="yn-btn" id="sey-yes" onclick="setSey(true)">✅ Evet</button>
@@ -432,6 +436,18 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 <!-- AYARLAR -->
 <div id="tab-ayarlar" class="page">
 
+  <div class="card" id="builtin-restore-card">
+    <div class="card-title">🔧 Gizli Bölümler</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Sildiğin sabit bölümleri buradan geri ekleyebilirsin.</p>
+    <div id="banyo-restore-row" style="display:none;margin-bottom:8px">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreBanyoCard()">🚿 Banyo bölümünü geri ekle</button>
+    </div>
+    <div id="diger-restore-row" style="display:none">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreDigerCard()">🌿 Diğer bölümünü geri ekle</button>
+    </div>
+    <p id="builtin-all-visible" style="font-size:12px;color:var(--muted);text-align:center">Tüm bölümler görünür.</p>
+  </div>
+
   <div class="card">
     <div class="card-title">💾 Yedekle</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlar, gıda listesi, şampuan, sabun ve konum listelerini bir dosyaya indir.</p>
@@ -463,6 +479,52 @@ let locList=JSON.parse(localStorage.getItem('alerji-locs')||JSON.stringify(['�
 let acneValue = null, selectedLocs = [], selectedFoods = [], selectedShampoo=null, selectedSoap=null, showerVal = null, seyVal = null;
 let shampooEditMode=false, soapEditMode=false, locEditMode=false;
 let currentDelay=parseInt(localStorage.getItem('alerji-delay')||'1');
+let banyoHidden = localStorage.getItem('alerji-banyo-hidden')==='1';
+let digerHidden = localStorage.getItem('alerji-diger-hidden')==='1';
+
+function applyBuiltinVisibility(){
+  const bc = document.getElementById('banyo-card');
+  const dc = document.getElementById('diger-card');
+  if(bc) bc.style.display = banyoHidden ? 'none' : '';
+  if(dc) dc.style.display = digerHidden ? 'none' : '';
+  const ebg = document.getElementById('edit-banyo-group');
+  const edg = document.getElementById('edit-diger-group');
+  if(ebg) ebg.style.display = banyoHidden ? 'none' : '';
+  if(edg) edg.style.display = digerHidden ? 'none' : '';
+  // Ayarlar sayfası restore satırları
+  const br = document.getElementById('banyo-restore-row');
+  const dr = document.getElementById('diger-restore-row');
+  const av = document.getElementById('builtin-all-visible');
+  if(br) br.style.display = banyoHidden ? '' : 'none';
+  if(dr) dr.style.display = digerHidden ? '' : 'none';
+  if(av) av.style.display = (banyoHidden||digerHidden) ? 'none' : '';
+}
+function deleteBanyoCard(){
+  if(!confirm('Banyo bölümünü gizlemek istiyor musun? Geçmiş veriler korunur, ayarlardan geri ekleyebilirsin.')) return;
+  banyoHidden = true;
+  localStorage.setItem('alerji-banyo-hidden','1');
+  applyBuiltinVisibility();
+  toast('🚿 Banyo bölümü gizlendi');
+}
+function deleteDigerCard(){
+  if(!confirm(digerTitle+' bölümünü gizlemek istiyor musun? Geçmiş veriler korunur, ayarlardan geri ekleyebilirsin.')) return;
+  digerHidden = true;
+  localStorage.setItem('alerji-diger-hidden','1');
+  applyBuiltinVisibility();
+  toast('🌿 '+digerTitle+' bölümü gizlendi');
+}
+function restoreBanyoCard(){
+  banyoHidden = false;
+  localStorage.removeItem('alerji-banyo-hidden');
+  applyBuiltinVisibility();
+  toast('🚿 Banyo bölümü geri eklendi');
+}
+function restoreDigerCard(){
+  digerHidden = false;
+  localStorage.removeItem('alerji-diger-hidden');
+  applyBuiltinVisibility();
+  toast('🌿 '+digerTitle+' bölümü geri eklendi');
+}
 let digerTitle=localStorage.getItem('alerji-diger-title')||'Diğer';
 let sivilceTitle=localStorage.getItem('alerji-sivilce-title')||'Sivilce Durumu';
 let theme = localStorage.getItem('alerji-theme') || 'dark';
@@ -485,6 +547,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderLocs();
   renderHistory();
   renderAnalysis();
+  applyBuiltinVisibility();
   // Diğer başlıkları yükle
   const dt=document.getElementById('diger-title-text');
   if(dt) dt.textContent=digerTitle;
@@ -2269,6 +2332,7 @@ Ağır" style="min-height:100px"></textarea>
     <lbl>📍 Konum</lbl>
     <div id="edit-loc-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px"></div>
 
+    <div id="edit-banyo-group">
     <lbl>🚿 Banyo</lbl>
     <div class="yn-group" style="margin-bottom:12px">
       <button class="yn-btn" id="edit-shower-yes" onclick="setEditShower(true)">✅ Evet</button>
@@ -2280,11 +2344,14 @@ Ağır" style="min-height:100px"></textarea>
       <lbl>🧼 Sabun</lbl>
       <div id="edit-soap-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px"></div>
     </div>
+    </div>
 
+    <div id="edit-diger-group">
     <lbl>🌿 <span id="edit-diger-lbl">Diğer</span></lbl>
     <div class="yn-group" style="margin-bottom:12px">
       <button class="yn-btn" id="edit-sey-yes" onclick="setEditSey(true)">✅ Evet</button>
       <button class="yn-btn" id="edit-sey-no" onclick="setEditSey(false)">❌ Hayır</button>
+    </div>
     </div>
 
     <lbl>📝 Notlar</lbl>
