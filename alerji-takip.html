@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.08
+  Alerji Takip Defteri - Pro 1.0.09
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -202,7 +202,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.08</span>
+  <span>Pro 1.0.09</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -845,7 +845,7 @@ function renderHistory(){
       ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
-      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true?'✅ '+(cd.subValues?Object.values(cd.subValues).flat().join(', '):''):cd.value===false?'❌ '+(cd.subValues?Object.values(cd.subValues).flat().join(', '):''):'—'):cd.value}</span>`).join('')}</div>`:''}
+      ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.values(l.customData).filter(cd=>cd.value!==null&&cd.value!==undefined).map(cd=>`<span>📌 ${cd.title}: ${Array.isArray(cd.value)?cd.value.join(', '):cd.value===true?'Evet':cd.value===false?'Hayır':cd.type==='percent'?cd.value+'%':cd.type==='scale'?cd.value+'/10':cd.type==='stars'?'⭐'.repeat(cd.value||0):cd.type==='yesno_sub'?(cd.value===true?'✅ '+(cd.subValues&&Object.keys(cd.subValues).length?Object.values(cd.subValues).flat().filter(Boolean).join(', '):'—'):cd.value===false?'❌ '+(cd.subValues&&Object.keys(cd.subValues).length?Object.values(cd.subValues).flat().filter(Boolean).join(', '):'—'):'—'):cd.value}</span>`).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
   }).join('');
@@ -1193,12 +1193,20 @@ function copyAllLogs(){
 
 
 // ===== ÖZEL BÖLÜMLER =====
-let customSections = JSON.parse(localStorage.getItem('alerji-custom-sections') || '[]');
+let customSections = JSON.parse(localStorage.getItem('alerji-custom-sections') || 'null');
+if(customSections === null){
+  // İlk açılışta varsayılan bölümler
+  customSections = [
+    { id:'builtin_stres', title:'Stres', icon:'🧠', type:'percent', yesLabel:'Evet', noLabel:'Hayır', listItems:[], placeholder:'', deletable:true },
+    { id:'builtin_kasinti', title:'Kaşıntı', icon:'🤚', type:'scale', yesLabel:'Evet', noLabel:'Hayır', listItems:[], placeholder:'', deletable:true }
+  ];
+  localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
+}
 // Her oturum için değerler (kayıt sırasında dolar, kayıt sonrası sıfırlanır)
 let customValues = {}; // {sectionId: value}
 let customListEditModes = {}; // {sectionId: bool} - liste bölümleri için düzenleme modu
 let editingSectionId = null;
-let currentSecType = 'yesno';
+let currentSecType = 'yesno_sub';
 
 function saveCustomSections(){
   localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
@@ -1243,12 +1251,12 @@ function renderCustomSections(){
       bodyHtml = `<div class="custom-slider-wrap">
         <div class="custom-slider-val" id="scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
         <div class="custom-slider-track">
-          <input type="range" class="custom-range" min="1" max="10" step="1"
+          <input type="range" class="custom-range" min="0" max="10" step="1"
             value="${val !== null ? val : 5}"
             oninput="setSliderVal('${sec.id}','scale',this.value)"
             ${val === null ? 'style="opacity:0.5"' : ''}>
         </div>
-        <div class="slider-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="slider-labels"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
       </div>`;
     } else if(sec.type === 'percent'){
       const val = customValues[sec.id] !== undefined ? customValues[sec.id] : null;
@@ -1536,7 +1544,7 @@ function removeCustomListItem(id, idx){
 function renameCustomListItem(id, idx){
   const sec = customSections.find(s=>s.id===id); if(!sec) return;
   const oldName = sec.listItems[idx];
-  const newName = prompt('Yeni isim:', oldName);
+  const newName = window.prompt('Yeni isim:', oldName);
   if(newName && newName.trim() && newName.trim()!==oldName){
     const n = newName.trim();
     // Seçili değerlerde de güncelle
@@ -1574,9 +1582,9 @@ function showAddSectionModal(editId=null){
   if(ysa) ysa.innerHTML='';
   if(nsa) nsa.innerHTML='';
   yesSubCount=0; noSubCount=0;
-  currentSecType = 'yesno';
-  document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='yesno'));
-  showSecTypeOptions('yesno');
+  currentSecType = 'yesno_sub';
+  document.querySelectorAll('.sec-type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='yesno_sub'));
+  showSecTypeOptions('yesno_sub');
 
   const typeArea = document.getElementById('sec-type-area');
 
@@ -1595,7 +1603,7 @@ function showAddSectionModal(editId=null){
       document.getElementById('sec-yes-label').value = sec.yesLabel || '';
       document.getElementById('sec-no-label').value = sec.noLabel || '';
       document.getElementById('sec-text-placeholder').value = sec.placeholder || '';
-      currentSecType = sec.type || 'yesno';
+      currentSecType = sec.type || 'yesno_sub';
       // Düzenleme modunda tür seçimini gizle
       if(typeArea) typeArea.style.display = 'none';
       document.querySelectorAll('.sec-type-btn').forEach(b=>{
@@ -1774,8 +1782,8 @@ function saveSectionModal(){
     title,
     icon: document.getElementById('sec-icon').value.trim(),
     type: currentSecType,
-    yesLabel: (currentSecType==='yesno'?document.getElementById('sec-yes-label'):document.getElementById('sec-yes-label2')).value.trim() || 'Evet',
-    noLabel: (currentSecType==='yesno'?document.getElementById('sec-no-label'):document.getElementById('sec-no-label2')).value.trim() || 'Hayır',
+    yesLabel: document.getElementById('sec-yes-label2').value.trim() || 'Evet',
+    noLabel: document.getElementById('sec-no-label2').value.trim() || 'Hayır',
     listItems: document.getElementById('sec-list-items').value.split('\n').map(s=>s.trim()).filter(Boolean),
     placeholder: document.getElementById('sec-text-placeholder').value.trim() || 'Buraya yaz...'
   };
@@ -1836,6 +1844,67 @@ let editingLogId = null;
 let editShowerVal = null;
 let editSeyVal = null;
 let editAcneVal = null;
+let editSelectedFoods = [];
+let editSelectedLocs = [];
+let editSelectedShampoo = null;
+let editSelectedSoap = null;
+
+function renderEditFoods(){
+  const wrap = document.getElementById('edit-food-quick');
+  if(!wrap) return;
+  wrap.innerHTML = foodList.map(f =>
+    `<span class="fq-item${editSelectedFoods.includes(f)?' sel':''}" style="cursor:pointer" onclick="toggleEditFood('${f.replace(/'/g,"\\'")}')">  ${f}</span>`
+  ).join('');
+}
+function toggleEditFood(f){
+  if(editSelectedFoods.includes(f)) editSelectedFoods = editSelectedFoods.filter(x=>x!==f);
+  else editSelectedFoods.push(f);
+  renderEditFoods();
+}
+function editAddFood(){
+  const inp = document.getElementById('edit-inp-foods-new');
+  if(!inp) return;
+  const v = inp.value.trim(); if(!v) return;
+  if(!editSelectedFoods.includes(v)) editSelectedFoods.push(v);
+  // Gıda listesine de ekle
+  if(!foodList.includes(v)){ foodList.push(v); foodList.sort((a,b)=>a.localeCompare(b,'tr',{sensitivity:'base'})); localStorage.setItem('alerji-foods',JSON.stringify(foodList)); renderFoods(); }
+  inp.value='';
+  renderEditFoods();
+}
+function renderEditLocs(){
+  const wrap = document.getElementById('edit-loc-quick');
+  if(!wrap) return;
+  wrap.innerHTML = locList.map(f =>
+    `<span class="fq-item${editSelectedLocs.includes(f)?' sel':''}" style="cursor:pointer" onclick="toggleEditLoc('${f.replace(/'/g,"\\'")}')">  ${f}</span>`
+  ).join('');
+}
+function toggleEditLoc(f){
+  if(editSelectedLocs.includes(f)) editSelectedLocs = editSelectedLocs.filter(x=>x!==f);
+  else editSelectedLocs.push(f);
+  renderEditLocs();
+}
+function renderEditShampoo(){
+  const wrap = document.getElementById('edit-shampoo-quick');
+  if(!wrap) return;
+  wrap.innerHTML = shampooList.map(f =>
+    `<span class="fq-item${editSelectedShampoo===f?' sel':''}" style="cursor:pointer" onclick="selectEditShampoo('${f.replace(/'/g,"\\'")}')">  ${f}</span>`
+  ).join('');
+}
+function selectEditShampoo(f){
+  editSelectedShampoo = editSelectedShampoo===f ? null : f;
+  renderEditShampoo();
+}
+function renderEditSoap(){
+  const wrap = document.getElementById('edit-soap-quick');
+  if(!wrap) return;
+  wrap.innerHTML = soapList.map(f =>
+    `<span class="fq-item${editSelectedSoap===f?' sel':''}" style="cursor:pointer" onclick="selectEditSoap('${f.replace(/'/g,"\\'")}')">  ${f}</span>`
+  ).join('');
+}
+function selectEditSoap(f){
+  editSelectedSoap = editSelectedSoap===f ? null : f;
+  renderEditSoap();
+}
 
 let editCustomVals = {}; // Geçmiş düzenleme modalı için özel değerler
 
@@ -1850,10 +1919,17 @@ function editLog(id){
   document.getElementById('edit-log-date-label').textContent = formatDate(log.date) + ' — ' + log.time;
   document.getElementById('edit-inp-date').value = log.date;
   document.getElementById('edit-inp-time').value = log.time;
-  document.getElementById('edit-inp-foods').value = (log.foods||[]).join(', ');
-  document.getElementById('edit-inp-locs').value = (log.locs||[]).join(', ');
-  document.getElementById('edit-inp-shampoo').value = log.shampoo||'';
-  document.getElementById('edit-inp-soap').value = log.soap||'';
+  // Gıda quick-pick render
+  editSelectedFoods = [...(log.foods||[])];
+  renderEditFoods();
+  // Konum quick-pick render
+  editSelectedLocs = [...(log.locs||[])];
+  renderEditLocs();
+  // Şampuan/Sabun
+  editSelectedShampoo = log.shampoo||null;
+  editSelectedSoap = log.soap||null;
+  renderEditShampoo();
+  renderEditSoap();
   document.getElementById('edit-inp-notes').value = log.notes||'';
   document.getElementById('edit-sivilce-lbl').textContent = sivilceTitle;
   document.getElementById('edit-diger-lbl').textContent = digerTitle;
@@ -1867,6 +1943,7 @@ function editLog(id){
   document.getElementById('edit-shower-yes').className='yn-btn'+(editShowerVal===true?' yes':'');
   document.getElementById('edit-shower-no').className='yn-btn'+(editShowerVal===false?' no':'');
   document.getElementById('edit-shower-details').style.display=editShowerVal===true?'block':'none';
+  if(editShowerVal===true){ renderEditShampoo(); renderEditSoap(); }
   // Sey
   document.getElementById('edit-sey-yes').className='yn-btn'+(editSeyVal===true?' yes':'');
   document.getElementById('edit-sey-no').className='yn-btn'+(editSeyVal===false?' no':'');
@@ -1913,12 +1990,12 @@ function renderEditCustomSections(log){
       bodyHtml = `<div class="custom-slider-wrap">
         <div class="custom-slider-val" id="edit-scale-disp-${sec.id}">${displayVal}<span>${val !== null ? '/10' : ''}</span></div>
         <div class="custom-slider-track">
-          <input type="range" class="custom-range" min="1" max="10" step="1"
+          <input type="range" class="custom-range" min="0" max="10" step="1"
             value="${val !== null ? val : 5}"
             oninput="setEditSliderVal('${sec.id}','scale',this.value)"
             ${val === null ? 'style="opacity:0.5"' : ''}>
         </div>
-        <div class="slider-labels"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="slider-labels"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
       </div>`;
     } else if(sec.type === 'percent'){
       const val = cur !== null && cur !== undefined ? parseInt(cur) : null;
@@ -2023,6 +2100,7 @@ function setEditShower(v){
   document.getElementById('edit-shower-yes').className='yn-btn'+(v?' yes':'');
   document.getElementById('edit-shower-no').className='yn-btn'+(!v&&v!==null?' no':'');
   document.getElementById('edit-shower-details').style.display=v?'block':'none';
+  if(v){ renderEditShampoo(); renderEditSoap(); }
 }
 function setEditSey(v){
   editSeyVal=v;
@@ -2033,8 +2111,8 @@ function saveEditLog(){
   if(editAcneVal===null){alert('Sivilce durumunu seç!');return;}
   const idx=logs.findIndex(l=>l.id===editingLogId);
   if(idx<0) return;
-  const foodsRaw=document.getElementById('edit-inp-foods').value;
-  const locsRaw=document.getElementById('edit-inp-locs').value;
+  const foodsRaw = null; // quick-pick kullanılıyor
+  const locsRaw = null;
 
   // Özel bölüm değerlerini birleştir
   const oldCustomData = logs[idx].customData || {};
@@ -2053,12 +2131,12 @@ function saveEditLog(){
     ...logs[idx],
     date: document.getElementById('edit-inp-date').value,
     time: document.getElementById('edit-inp-time').value,
-    foods: foodsRaw.split(',').map(s=>s.trim()).filter(Boolean),
+    foods: [...editSelectedFoods],
     acne: editAcneVal,
-    locs: locsRaw.split(',').map(s=>s.trim()).filter(Boolean),
+    locs: [...editSelectedLocs],
     shower: editShowerVal,
-    shampoo: document.getElementById('edit-inp-shampoo').value.trim(),
-    soap: document.getElementById('edit-inp-soap').value.trim(),
+    shampoo: editSelectedShampoo||'',
+    soap: editSelectedSoap||'',
     sey: editSeyVal,
     notes: document.getElementById('edit-inp-notes').value.trim(),
     customData: newCustomData
@@ -2087,7 +2165,6 @@ function saveEditLog(){
     <div id="sec-type-area">
     <lbl>Bölüm Türü</lbl>
     <div style="display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap">
-      <button class="sec-type-btn active" data-type="yesno" onclick="selectSecType(this)">✅ Evet/Hayır</button>
       <button class="sec-type-btn" data-type="list" onclick="selectSecType(this)">📋 Liste Seçim</button>
       <button class="sec-type-btn" data-type="scale" onclick="selectSecType(this)">📊 Skala (1-10)</button>
       <button class="sec-type-btn" data-type="percent" onclick="selectSecType(this)">💯 Yüzde (%)</button>
@@ -2173,8 +2250,12 @@ Ağır" style="min-height:100px"></textarea>
       </div>
     </div>
 
-    <lbl>🍽️ Yenilen Gıdalar (virgülle ayır)</lbl>
-    <input type="text" id="edit-inp-foods" placeholder="Et, Ekmek, Süt..." style="margin-bottom:12px">
+    <lbl>🍽️ Yenilen Gıdalar</lbl>
+    <div id="edit-food-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px"></div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <input type="text" id="edit-inp-foods-new" placeholder="Yeni gıda ekle..." style="flex:1">
+      <button class="btn btn-ghost btn-sm" onclick="editAddFood()">+ Ekle</button>
+    </div>
 
     <lbl>🔴 <span id="edit-sivilce-lbl">Sivilce</span> Durumu</lbl>
     <div class="acne-rating" id="edit-acne-rating" style="margin-bottom:12px">
@@ -2185,19 +2266,19 @@ Ağır" style="min-height:100px"></textarea>
       <button class="acne-btn" data-v="4" onclick="setEditAcne(4)">😤 Çok Kötü</button>
     </div>
 
-    <lbl>📍 Konum (virgülle ayır)</lbl>
-    <input type="text" id="edit-inp-locs" placeholder="Alın, Yanak..." style="margin-bottom:12px">
+    <lbl>📍 Konum</lbl>
+    <div id="edit-loc-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px"></div>
 
     <lbl>🚿 Banyo</lbl>
     <div class="yn-group" style="margin-bottom:12px">
       <button class="yn-btn" id="edit-shower-yes" onclick="setEditShower(true)">✅ Evet</button>
       <button class="yn-btn" id="edit-shower-no" onclick="setEditShower(false)">❌ Hayır</button>
     </div>
-    <div id="edit-shower-details">
+    <div id="edit-shower-details" style="display:none">
       <lbl>🧴 Şampuan</lbl>
-      <input type="text" id="edit-inp-shampoo" placeholder="Şampuan..." style="margin-bottom:8px">
+      <div id="edit-shampoo-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px"></div>
       <lbl>🧼 Sabun</lbl>
-      <input type="text" id="edit-inp-soap" placeholder="Sabun..." style="margin-bottom:12px">
+      <div id="edit-soap-quick" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px"></div>
     </div>
 
     <lbl>🌿 <span id="edit-diger-lbl">Diğer</span></lbl>
