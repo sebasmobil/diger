@@ -954,6 +954,8 @@ function refreshBuiltinTitles(){
   set('diger-icon-text',    digerIcon);
   set('uyku-title-text',    uykuluTitle);
   set('uyku-icon-text',     uykuluIcon);
+  // Geçmişi de yenile — ikon/ad değişiklikleri yansısın
+  if(document.getElementById('history-list')) renderHistory();
 }
 function editNeYedinTitle(){ editBuiltinSection('neyedin','neyedin',neYedinTitle,neYedinIcon); }
 let uykuluValue = null;
@@ -1140,19 +1142,23 @@ function renderHistory(){
   if(filtered.length===0){container.innerHTML='<div class="empty-state"><span>📭</span>Henüz kayıt yok. İlk kaydını ekle!</div>';return;}
   container.innerHTML=filtered.map(l=>{
     const meta=[];
-    if(l.shower===true)meta.push('🚿 Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
-    else if(l.shower===false)meta.push('🚿 Banyo: Hayır');
-    if(l.sey===true)meta.push('✅ '+digerTitle+': Evet');
-    else if(l.sey===false)meta.push('❌ '+digerTitle+': Hayır');
+    const _bIcon=banyoIcon||'🚿'; const _bTitle=banyoTitle||'Banyo';
+    const _dIcon=digerIcon||'🌿'; const _dTitle=digerTitle||'Diğer';
+    const _sIcon=sivilceIcon||'🔴'; const _sTitle=sivilceTitle||'Sivilce Durumu';
+    const _nIcon=neYedinIcon||'🍽️'; const _nTitle=neYedinTitle||'Ne yedin?';
+    if(l.shower===true)meta.push(_bIcon+' '+_bTitle+': Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
+    else if(l.shower===false)meta.push(_bIcon+' '+_bTitle+': Hayır');
+    if(l.sey===true)meta.push('✅ '+_dIcon+' '+_dTitle+': Evet');
+    else if(l.sey===false)meta.push('❌ '+_dIcon+' '+_dTitle+': Hayır');
     return `<div class="log-item">
       <div class="log-header">
         <div><div class="log-date">${formatDate(l.date)}</div><div class="log-time">⏰ ${l.time}</div></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="badge ${badgeClass[l.acne]}">${acneLabels[l.acne]}</span>
+          <span class="badge ${badgeClass[l.acne]}" title="${_sTitle}">${_sIcon} ${acneLabels[l.acne]}</span>
           ${l.locs&&l.locs.length?`<span style="font-size:10px;color:var(--muted)">${l.locs.join(', ')}</span>`:''}
         </div>
       </div>
-      ${l.foods&&l.foods.length?`<div class="log-tags">${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
+      ${l.foods&&l.foods.length?`<div class="log-tags"><span class="food-tag" style="opacity:0.6">${_nIcon}</span>${l.foods.map(f=>'<span class="food-tag">'+f+'</span>').join('')}</div>`:''}
       ${meta.length?`<div class="log-meta">${meta.map(m=>'<span>'+m+'</span>').join('')}</div>`:''}
       ${l.notes?`<div class="log-notes">"${l.notes}"</div>`:''}
       ${l.customData&&Object.keys(l.customData).length?`<div class="log-meta">${Object.entries(l.customData).filter(([,cd])=>cd.value!==null&&cd.value!==undefined).map(([sid,cd])=>{
@@ -1192,7 +1198,10 @@ function renderHistory(){
         } else if(cd.type==='scale'){ display=cd.value+'/10';
         } else if(cd.type==='stars'){ display='⭐'.repeat(cd.value||0);
         } else { display=cd.value; }
-        return `<span>📌 ${cd.title}: ${display}</span>`;
+        const secDef=customSections.find(s=>s.id===sid);
+        const secIcon=(secDef&&secDef.icon)||cd.icon||'📌';
+        const secTitle=(secDef&&secDef.title)||cd.title||sid;
+        return `<span>${secIcon} ${secTitle}: ${display}</span>`;
       }).join('')}</div>`:''}
       <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-sm btn-ghost" onclick="editLog(${l.id})" style="font-size:12px">✏️ Düzenle</button><button class="btn btn-sm btn-danger" onclick="deleteLog(${l.id})">🗑️</button></div>
     </div>`;
