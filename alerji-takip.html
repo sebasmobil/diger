@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.39
+  Alerji Takip Defteri - Pro 1.0.40
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -544,7 +544,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
   <div class="card">
     <div class="card-title">💾 Yedekle</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlar, gıda listesi, şampuan, sabun ve konum listelerini bir dosyaya indir.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Tüm kayıtlar, gıda listesi, şampuan, sabun, konum listeleri ve içecek geçmişini bir dosyaya indir.</p>
     <button class="btn btn-primary" onclick="backupData()" style="width:100%;justify-content:center">📤 Yedeği İndir</button>
   </div>
 
@@ -1525,7 +1525,11 @@ function backupData(){
     sivilceTitle: sivilceTitle,
     currentDelay: currentDelay,
     theme: theme,
-    builtinVisibility: { banyo: banyoHidden, diger: digerHidden }
+    builtinVisibility: { banyo: banyoHidden, diger: digerHidden },
+    icecekList: icecekList,
+    icecekGecmisData: icecekGecmisData,
+    icecekBugunTarihVal: localStorage.getItem(ICECEK_TARIH_KEY) || '',
+    icecekGunData: icecekGun
   };
   const json = JSON.stringify(backup, null, 2);
   const blob = new Blob([json], {type:'application/json'});
@@ -1590,6 +1594,22 @@ function restoreData(event){
         if(banyoHidden) localStorage.setItem('alerji-banyo-hidden','1'); else localStorage.removeItem('alerji-banyo-hidden');
         if(digerHidden) localStorage.setItem('alerji-diger-hidden','1'); else localStorage.removeItem('alerji-diger-hidden');
       }
+      // İçecek verilerini geri yükle
+      if(backup.icecekList) {
+        icecekList = backup.icecekList;
+        localStorage.setItem('icecek-list', JSON.stringify(icecekList));
+      }
+      if(backup.icecekGecmisData) {
+        icecekGecmisData = backup.icecekGecmisData;
+        localStorage.setItem('icecek-gecmis', JSON.stringify(icecekGecmisData));
+      }
+      if(backup.icecekBugunTarihVal) {
+        localStorage.setItem(ICECEK_TARIH_KEY, backup.icecekBugunTarihVal);
+      }
+      if(backup.icecekGunData) {
+        icecekGun = backup.icecekGunData;
+        localStorage.setItem(ICECEK_GUN_KEY, JSON.stringify(icecekGun));
+      }
       // Save all
       save();
       saveFL();
@@ -1598,23 +1618,24 @@ function restoreData(event){
       localStorage.setItem('alerji-locs', JSON.stringify(locList));
       localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
       localStorage.setItem('alerji-neyedin-title', neYedinTitle);
-      localStorage.setItem('alerji-banyo-title', banyoTitle);
-      localStorage.setItem('alerji-diger-title', digerTitle);
+      localStorage.setItem('alerji-neyedin-icon',  neYedinIcon);
+      localStorage.setItem('alerji-banyo-title',   banyoTitle);
+      localStorage.setItem('alerji-banyo-icon',    banyoIcon);
+      localStorage.setItem('alerji-diger-title',   digerTitle);
+      localStorage.setItem('alerji-diger-icon',    digerIcon);
       localStorage.setItem('alerji-sivilce-title', sivilceTitle);
+      localStorage.setItem('alerji-sivilce-icon',  sivilceIcon);
+      localStorage.setItem('alerji-uyku-title',    uykuluTitle);
+      localStorage.setItem('alerji-uyku-icon',     uykuluIcon);
       localStorage.setItem('alerji-delay', currentDelay);
       // Re-render
       applyBuiltinVisibility();
+      refreshBuiltinTitles();
       renderFoodQuick();
       renderLocs();
       renderCustomSections();
       renderHistory();
       renderAnalysis();
-      const bt2=document.getElementById('banyo-title-text');
-      if(bt2) bt2.textContent=banyoTitle;
-      const dt=document.getElementById('diger-title-text');
-      if(dt) dt.textContent=digerTitle;
-      const st=document.getElementById('sivilce-title-text');
-      if(st) st.textContent=sivilceTitle;
       document.querySelectorAll('.delay-opt').forEach(b=>{
         b.classList.toggle('active', parseInt(b.dataset.v)===currentDelay);
       });
