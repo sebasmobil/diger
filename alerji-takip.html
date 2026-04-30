@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.19
+  Alerji Takip Defteri - Pro 1.0.23
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.19</span>
+  <span>Pro 1.0.23</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -408,12 +408,15 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   </div>
 
   <div class="card">
-    <div class="card-title">🚿 Banyo Analizi</div>
-    <div id="shower-analysis"></div>
+    <div class="card-title">🚫 Uzak Kalma Analizi</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Bir gıdayı yediğin dönem ile yemediğin dönemdeki sivilce ortalamasını karşılaştırır.</p>
+    <div id="uzak-analysis"></div>
   </div>
+
   <div class="card">
-    <div class="card-title" id="diger-analysis-title">🌿 Diğer Analizi</div>
-    <div id="sey-analysis"></div>
+    <div class="card-title">⚡ Faktör Analizi</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Tüm faktörler şiddet ortalamasına göre karşılaştırılır. En güçlü etkiden zayıfa sıralanır.</p>
+    <div id="faktor-analysis"></div>
   </div>
 
   <div class="card">
@@ -1058,37 +1061,205 @@ function renderAnalysis(){
     sEl.innerHTML=rows.map(r=>'<div class="suspect-row"><span class="suspect-name">'+r.food+'</span><div class="suspect-bar-wrap"><div class="suspect-bar" style="width:'+r.pct+'%"></div></div><span class="suspect-pct">'+r.pct+'% ('+r.acneCount+'/'+r.total+')</span></div>').join('');
   }
 
-  // Banyo analizi
-  const showerEl=document.getElementById('shower-analysis');
-  const showerLogs=logs.filter(l=>l.shower!==null&&l.shower!==undefined);
-  if(showerLogs.length<2){
-    showerEl.innerHTML='<div style="color:var(--muted);font-size:12px">Yeterli kayıt yok. Banyo bilgisi girmeye devam et!</div>';
-  } else {
-    const shYes=showerLogs.filter(l=>l.shower===true);
-    const shNo=showerLogs.filter(l=>l.shower===false);
-    const yesAcneDays=shYes.filter(l=>{const t=addDays(l.date,delay);return dayAcne[t]!==undefined&&dayAcne[t]>0;}).length;
-    const noAcneDays=shNo.filter(l=>{const t=addDays(l.date,delay);return dayAcne[t]!==undefined&&dayAcne[t]>0;}).length;
-    const yesPct=shYes.length>0?Math.round(yesAcneDays/shYes.length*100):'-';
-    const noPct=shNo.length>0?Math.round(noAcneDays/shNo.length*100):'-';
-    showerEl.innerHTML=`
-      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">🚿 Banyo yapılan günler → sivilce oranı: <strong style="color:var(--text)">${yesPct}%</strong> <span style="font-size:11px">(${shYes.length} kayıt)</span></div>
-      <div style="font-size:13px;color:var(--muted)">🚿 Banyo yapılmayan günler → sivilce oranı: <strong style="color:var(--text)">${noPct}%</strong> <span style="font-size:11px">(${shNo.length} kayıt)</span></div>`;
+  // Uzak kalma analizi
+  const uzakEl=document.getElementById('uzak-analysis');
+  if(uzakEl){
+    const today=new Date().toISOString().split('T')[0];
+    // Her gıda için: yediğin günlerin ortalaması vs yemediğin günlerin ortalaması
+    const allDates=[...new Set(logs.map(l=>l.date))].sort();
+    const uzakRows=fList.filter(food=>{
+      const daysAte=new Set(logs.filter(l=>(l.foods||[]).some(f=>f.toLowerCase().includes(food))).map(l=>l.date));
+      const daysNotAte=allDates.filter(d=>!daysAte.has(d));
+      return daysAte.size>=2 && daysNotAte.length>=2;
+    }).map(food=>{
+      const daysAte=[...new Set(logs.filter(l=>(l.foods||[]).some(f=>f.toLowerCase().includes(food))).map(l=>l.date))];
+      const daysNotAte=allDates.filter(d=>!daysAte.includes(d));
+      // Ortalama sivilce şiddeti (acne 0-4)
+      const avgAte=daysAte.reduce((s,d)=>{const v=dayAcne[d];return s+(v!==undefined?v:0);},0)/daysAte.length;
+      const avgNotAte=daysNotAte.reduce((s,d)=>{const v=dayAcne[d];return s+(v!==undefined?v:0);},0)/daysNotAte.length;
+      const diff=avgAte-avgNotAte; // pozitif = yerken daha kötü
+      // Son kaç gündür yemedi
+      const sortedAte=daysAte.slice().sort();
+      const lastAteDate=sortedAte[sortedAte.length-1];
+      const diffDays=Math.floor((new Date(today)-new Date(lastAteDate))/(1000*60*60*24));
+      return{food,avgAte:avgAte.toFixed(2),avgNotAte:avgNotAte.toFixed(2),diff,diffDays,ateCount:daysAte.length,notAteCount:daysNotAte.length};
+    }).sort((a,b)=>b.diff-a.diff);
+
+    if(uzakRows.length===0){
+      uzakEl.innerHTML="<div style=\"color:var(--muted);font-size:12px\">Karşılaştırma için her gıdadan en az 2'şer gün kayıt gerekiyor.</div>";
+    } else {
+      uzakEl.innerHTML=uzakRows.map(r=>{
+        const diffAbs=Math.abs(r.diff);
+        const etkili=diffAbs>=0.5;
+        const iyi=r.diff>0; // yerken daha kötü = uzak kalmak iyi
+        const renkBg=etkili?(iyi?'rgba(39,174,96,0.1)':'rgba(192,57,43,0.08)'):'rgba(128,128,128,0.07)';
+        const renkBorder=etkili?(iyi?'#27ae60':'#c0392b'):'var(--border)';
+        const etiket=!etkili?'<span style="font-size:10px;color:var(--muted)">Belirgin etki yok</span>':
+          iyi?'<span style="font-size:10px;color:#27ae60;font-weight:600">✅ Uzak kalmak işe yarıyor</span>':
+              '<span style="font-size:10px;color:#c0392b;font-weight:600">⚠️ Yemesen de etki değişmiyor</span>';
+        const uzakStr=r.diffDays===0?'<span style="color:#e67e22;font-size:10px">Bugün yedi</span>':
+          r.diffDays===1?'<span style="color:#f39c12;font-size:10px">Dün yedi</span>':
+          '<span style="color:#27ae60;font-size:10px">'+r.diffDays+' gündür yemedi</span>';
+        return '<div style="border:1px solid '+renkBorder+';background:'+renkBg+';border-radius:10px;padding:10px 12px;margin-bottom:8px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+          +'<span style="font-size:14px;font-weight:500;color:var(--text);text-transform:capitalize">'+r.food+'</span>'
+          +uzakStr
+          +'</div>'
+          +'<div style="display:flex;gap:10px;margin-bottom:5px">'
+          +'<div style="flex:1;background:var(--card);border-radius:7px;padding:6px 8px;text-align:center">'
+          +'<div style="font-size:17px;font-weight:700;color:#c0392b">'+r.avgAte+'</div>'
+          +'<div style="font-size:9px;color:var(--muted)">Yediğin günler<br>('+r.ateCount+' gün)</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;color:var(--muted);font-size:18px">→</div>'
+          +'<div style="flex:1;background:var(--card);border-radius:7px;padding:6px 8px;text-align:center">'
+          +'<div style="font-size:17px;font-weight:700;color:#27ae60">'+r.avgNotAte+'</div>'
+          +'<div style="font-size:9px;color:var(--muted)">Yemediğin günler<br>('+r.notAteCount+' gün)</div>'
+          +'</div>'
+          +'</div>'
+          +etiket
+          +'</div>';
+      }).join('');
+    }
   }
-  // Diğer analizi
-  const seyEl=document.getElementById('sey-analysis');
-  const analysisTitleEl=document.getElementById('diger-analysis-title');
-  if(analysisTitleEl) analysisTitleEl.textContent='🌿 '+digerTitle+' Analizi';
-  const seyLogs=logs.filter(l=>l.sey!==null&&l.sey!==undefined);
-  if(seyLogs.length<2){
-    seyEl.innerHTML='<div style="color:var(--muted);font-size:12px">Yeterli kayıt yok. '+digerTitle+' bilgisi girmeye devam et!</div>';
-  } else {
-    const syYes=seyLogs.filter(l=>l.sey===true);
-    const syNo=seyLogs.filter(l=>l.sey===false);
-    const yPct=syYes.length>0?Math.round(syYes.filter(l=>{const t=addDays(l.date,delay);return dayAcne[t]!==undefined&&dayAcne[t]>0;}).length/syYes.length*100):'-';
-    const nPct=syNo.length>0?Math.round(syNo.filter(l=>{const t=addDays(l.date,delay);return dayAcne[t]!==undefined&&dayAcne[t]>0;}).length/syNo.length*100):'-';
-    seyEl.innerHTML=`
-      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">✅ ${digerTitle} yapılan günler → sivilce oranı: <strong style="color:var(--text)">${yPct}%</strong> <span style="font-size:11px">(${syYes.length} kayıt)</span></div>
-      <div style="font-size:13px;color:var(--muted)">❌ ${digerTitle} yapılmayan günler → sivilce oranı: <strong style="color:var(--text)">${nPct}%</strong> <span style="font-size:11px">(${syNo.length} kayıt)</span></div>`;
+
+  // ===== KAPSAMLI FAKTOR ANALİZİ =====
+  const faktorEl=document.getElementById('faktor-analysis');
+  if(faktorEl){
+    const allDates2=[...new Set(logs.map(l=>l.date))].sort();
+    const factors=[]; // {label, icon, acikA, acikB, avgA, avgB, countA, countB}
+
+    // Yardımcı: bir tarih listesinin gecikme sonrası sivilce şiddet ortalaması
+    function avgAcneForDates(dates){
+      if(!dates.length) return null;
+      const vals=dates.map(d=>{const t=addDays(d,delay);return dayAcne[t]!==undefined?dayAcne[t]:null;}).filter(v=>v!==null);
+      return vals.length?vals.reduce((s,v)=>s+v,0)/vals.length:null;
+    }
+
+    // 1. BANYO
+    const shDates=logs.filter(l=>l.shower===true).map(l=>l.date);
+    const noShDates=logs.filter(l=>l.shower===false).map(l=>l.date);
+    if(shDates.length>=2&&noShDates.length>=2){
+      const a=avgAcneForDates(shDates), b=avgAcneForDates(noShDates);
+      if(a!==null&&b!==null) factors.push({label:'Banyo',icon:'🚿',acikA:'Banyo yapılan',acikB:'Banyo yapılmayan',avgA:a,avgB:b,countA:shDates.length,countB:noShDates.length,diff:a-b,yon:'dusuk_iyi'});
+    }
+
+    // 2. ŞAMPUAN (marka bazlı)
+    const shampuanMap={};
+    logs.filter(l=>l.shampoo).forEach(l=>{const k=l.shampoo.trim();if(!shampuanMap[k])shampuanMap[k]=[];shampuanMap[k].push(l.date);});
+    Object.entries(shampuanMap).filter(([,ds])=>ds.length>=2).forEach(([marka,ds])=>{
+      const digDs=allDates2.filter(d=>!ds.includes(d));
+      const a=avgAcneForDates(ds),b=avgAcneForDates(digDs);
+      if(a!==null&&b!==null) factors.push({label:'Şampuan: '+marka,icon:'🧴',acikA:marka+' kullanılan',acikB:'Diğer günler',avgA:a,avgB:b,countA:ds.length,countB:digDs.length,diff:a-b,yon:'dusuk_iyi'});
+    });
+
+    // 3. SABUN (marka bazlı)
+    const sabunMap={};
+    logs.filter(l=>l.soap).forEach(l=>{const k=l.soap.trim();if(!sabunMap[k])sabunMap[k]=[];sabunMap[k].push(l.date);});
+    Object.entries(sabunMap).filter(([,ds])=>ds.length>=2).forEach(([marka,ds])=>{
+      const digDs=allDates2.filter(d=>!ds.includes(d));
+      const a=avgAcneForDates(ds),b=avgAcneForDates(digDs);
+      if(a!==null&&b!==null) factors.push({label:'Sabun: '+marka,icon:'🧼',acikA:marka+' kullanılan',acikB:'Diğer günler',avgA:a,avgB:b,countA:ds.length,countB:digDs.length,diff:a-b,yon:'dusuk_iyi'});
+    });
+
+    // 4. SİVİLCE BÖLGESİ (locs dizisi)
+    const locMap={};
+    logs.filter(l=>l.locs&&l.locs.length).forEach(l=>{l.locs.forEach(k=>{if(!locMap[k])locMap[k]=[];locMap[k].push(l.date);});});
+    Object.entries(locMap).filter(([,ds])=>ds.length>=2).forEach(([loc,ds])=>{
+      const digDs=allDates2.filter(d=>!ds.includes(d));
+      const a=avgAcneForDates(ds),b=avgAcneForDates(digDs);
+      if(a!==null&&b!==null) factors.push({label:'Bölge: '+loc,icon:'📍',acikA:loc+' olan günler',acikB:'Olmadığı günler',avgA:a,avgB:b,countA:ds.length,countB:digDs.length,diff:a-b,yon:'belirsiz'});
+    });
+
+    // 5. DİĞER (sey)
+    const seyYesDates=logs.filter(l=>l.sey===true).map(l=>l.date);
+    const seyNoDates=logs.filter(l=>l.sey===false).map(l=>l.date);
+    if(seyYesDates.length>=2&&seyNoDates.length>=2){
+      const a=avgAcneForDates(seyYesDates),b=avgAcneForDates(seyNoDates);
+      if(a!==null&&b!==null) factors.push({label:digerTitle,icon:'🌿',acikA:digerTitle+' var',acikB:digerTitle+' yok',avgA:a,avgB:b,countA:seyYesDates.length,countB:seyNoDates.length,diff:a-b,yon:'dusuk_iyi'});
+    }
+
+    // 6. GIDALAR (şiddet bazlı, fList'ten)
+    fList.forEach(food=>{
+      const ateDates=[...new Set(logs.filter(l=>(l.foods||[]).some(f=>f.toLowerCase().includes(food))).map(l=>l.date))];
+      const notDates=allDates2.filter(d=>!ateDates.includes(d));
+      if(ateDates.length>=2&&notDates.length>=2){
+        const a=avgAcneForDates(ateDates),b=avgAcneForDates(notDates);
+        if(a!==null&&b!==null) factors.push({label:food.charAt(0).toUpperCase()+food.slice(1),icon:'🍽️',acikA:'Yediğin günler',acikB:'Yemediğin günler',avgA:a,avgB:b,countA:ateDates.length,countB:notDates.length,diff:a-b,yon:'dusuk_iyi'});
+      }
+    });
+
+    // 7. ÖZEL BÖLÜMLER
+    customSections.forEach(sec=>{
+      if(sec.type==='yesno'||sec.type==='yesno_sub'){
+        const yesDates=logs.filter(l=>l.customData&&l.customData[sec.id]&&l.customData[sec.id].value===true).map(l=>l.date);
+        const noDates=logs.filter(l=>l.customData&&l.customData[sec.id]&&l.customData[sec.id].value===false).map(l=>l.date);
+        if(yesDates.length>=2&&noDates.length>=2){
+          const a=avgAcneForDates(yesDates),b=avgAcneForDates(noDates);
+          if(a!==null&&b!==null) factors.push({label:sec.title,icon:'🔖',acikA:'Evet günleri',acikB:'Hayır günleri',avgA:a,avgB:b,countA:yesDates.length,countB:noDates.length,diff:a-b,yon:'belirsiz'});
+        }
+      } else if(sec.type==='scale'||sec.type==='percent'||sec.type==='stars'){
+        const vals=logs.filter(l=>l.customData&&l.customData[sec.id]&&l.customData[sec.id].value!==null&&l.customData[sec.id].value!==undefined);
+        if(vals.length>=4){
+          const sorted=vals.slice().sort((a,b)=>a.customData[sec.id].value-b.customData[sec.id].value);
+          const half=Math.floor(sorted.length/2);
+          const lowDates=sorted.slice(0,half).map(l=>l.date);
+          const highDates=sorted.slice(half).map(l=>l.date);
+          const a=avgAcneForDates(highDates),b=avgAcneForDates(lowDates);
+          if(a!==null&&b!==null) factors.push({label:sec.title,icon:'📊',acikA:'Yüksek değer günleri',acikB:'Düşük değer günleri',avgA:a,avgB:b,countA:highDates.length,countB:lowDates.length,diff:a-b,yon:'belirsiz'});
+        }
+      } else if(sec.type==='multi'){
+        const optMap={};
+        logs.forEach(l=>{if(l.customData&&l.customData[sec.id]&&Array.isArray(l.customData[sec.id].value)){l.customData[sec.id].value.forEach(opt=>{if(!optMap[opt])optMap[opt]=[];optMap[opt].push(l.date);});}});
+        Object.entries(optMap).filter(([,ds])=>ds.length>=2).forEach(([opt,ds])=>{
+          const digDs=allDates2.filter(d=>!ds.includes(d));
+          const a=avgAcneForDates(ds),b=avgAcneForDates(digDs);
+          if(a!==null&&b!==null) factors.push({label:sec.title+': '+opt,icon:'🔖',acikA:opt+' seçili',acikB:'Seçilmediği günler',avgA:a,avgB:b,countA:ds.length,countB:digDs.length,diff:a-b,yon:'belirsiz'});
+        });
+      }
+    });
+
+    // Sırala: mutlak farka göre büyükten küçüğe
+    factors.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff));
+
+    if(!factors.length){
+      faktorEl.innerHTML='<div style="color:var(--muted);font-size:12px">Karşılaştırma için her faktörde en az 2\'şer günlük kayıt gerekiyor. Kayıt tutmaya devam et!</div>';
+    } else {
+      faktorEl.innerHTML=factors.map((f,idx)=>{
+        const absDiff=Math.abs(f.diff);
+        const guclu=absDiff>=0.8;
+        const orta=absDiff>=0.3&&absDiff<0.8;
+        const kucuk=absDiff<0.3;
+        // A mı B mi daha iyi?
+        const aKotu=f.diff>0; // avgA > avgB → A durumunda daha kötü
+        const renkA=aKotu?'#c0392b':'#27ae60';
+        const renkB=aKotu?'#27ae60':'#c0392b';
+        const bordRenk=kucuk?'var(--border)':guclu?'#c0392b':'#f39c12';
+        const bgRenk=kucuk?'transparent':guclu?'rgba(192,57,43,0.07)':'rgba(243,156,18,0.07)';
+        const rozetRenk=guclu?'#c0392b':orta?'#f39c12':'var(--muted)';
+        const rozet=guclu?'🔴 Güçlü etki':orta?'🟡 Orta etki':'⚪ Zayıf etki';
+        const yorum=kucuk?'Belirgin bir fark gözlemlenmiyor.'
+          :aKotu?'"'+f.acikA+'" günlerinde şiddet belirgin yüksek.'
+                :'"'+f.acikA+'" günlerinde şiddet daha düşük.';
+        return '<div style="border:1px solid '+bordRenk+';background:'+bgRenk+';border-radius:11px;padding:11px 13px;margin-bottom:9px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'
+          +'<span style="font-size:14px;font-weight:600;color:var(--text)">'+f.icon+' '+f.label+'</span>'
+          +'<span style="font-size:10px;color:'+rozetRenk+';font-weight:600">'+rozet+'</span>'
+          +'</div>'
+          +'<div style="display:flex;gap:8px;margin-bottom:7px">'
+          +'<div style="flex:1;background:var(--card);border-radius:8px;padding:7px 6px;text-align:center">'
+          +'<div style="font-size:18px;font-weight:700;color:'+renkA+'">'+f.avgA.toFixed(2)+'</div>'
+          +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+f.acikA+'<br>('+f.countA+' gün)</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;font-size:16px;color:var(--muted)">↔</div>'
+          +'<div style="flex:1;background:var(--card);border-radius:8px;padding:7px 6px;text-align:center">'
+          +'<div style="font-size:18px;font-weight:700;color:'+renkB+'">'+f.avgB.toFixed(2)+'</div>'
+          +'<div style="font-size:9px;color:var(--muted);margin-top:2px">'+f.acikB+'<br>('+f.countB+' gün)</div>'
+          +'</div>'
+          +'</div>'
+          +'<div style="font-size:11px;color:var(--muted);font-style:italic">'+yorum+'</div>'
+          +'</div>';
+      }).join('');
+    }
   }
 
   // Haftalık grafik
