@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.27
+  Alerji Takip Defteri - Pro 1.0.31
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -209,7 +209,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.27</span>
+  <span>Pro 1.0.31</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -231,8 +231,11 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 <!-- KAYIT -->
 <div id="tab-kayit" class="page active">
 
-  <div class="card">
-    <div class="card-title">🕐 Zaman</div>
+  <div class="card" id="zaman-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+      <div class="card-title" style="margin-bottom:0">🕐 Zaman</div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteZamanCard()">🗑️</button>
+    </div>
     <div style="background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px">
       <div style="flex:1">
         <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Tarih</div>
@@ -249,8 +252,15 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">🍽️ Ne yedin?</div>
+  <div class="card" id="neyedin-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="neyedin-icon-text" onclick="editNeYedinTitle()" style="cursor:pointer"></span>
+        <span class="card-title" style="margin-bottom:0;cursor:pointer" id="neyedin-title-text" onclick="editNeYedinTitle()" title="Düzenlemek için tıkla"></span>
+        <span onclick="editNeYedinTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+      </div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteNeYedinCard()">🗑️</button>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px">
       <section-label style="margin:0">Hızlı seçim</section-label>
       <button class="edit-btn" id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Düzenle</button>
@@ -264,10 +274,14 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     </div>
   </div>
 
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-      <div class="card-title" style="margin-bottom:0;flex:1">🔴 <span id="sivilce-title-text" onclick="editSivilceTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span></div>
-      <span onclick="editSivilceTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+  <div class="card" id="sivilce-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px;flex:1">
+        <span id="sivilce-icon-text" onclick="editSivilceTitle()" style="cursor:pointer"></span>
+        <span class="card-title" style="margin-bottom:0;cursor:pointer" id="sivilce-title-text" onclick="editSivilceTitle()" title="Düzenlemek için tıkla"></span>
+        <span onclick="editSivilceTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+      </div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red);margin-left:12px" onclick="deleteSivilceCard()">🗑️</button>
     </div>
     <div class="acne-rating">
       <button class="acne-btn" data-v="0" onclick="setAcne(0)">😊 Hiç yok</button>
@@ -293,7 +307,11 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 
   <div class="card" id="banyo-card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div class="card-title" style="margin-bottom:0">🚿 Banyo</div>
+      <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:6px">
+        <span id="banyo-icon-text" onclick="editBanyoTitle()" style="cursor:pointer"></span>
+        <span id="banyo-title-text" onclick="editBanyoTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span>
+        <span onclick="editBanyoTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+      </div>
       <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteBanyoCard()">🗑️</button>
     </div>
     <lbl>Bugün banyo yaptın mı?</lbl>
@@ -330,7 +348,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   <div class="card" id="diger-card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:8px">
-        <span>🌿</span>
+        <span id="diger-icon-text" onclick="editDigerTitle()" style="cursor:pointer"></span>
         <span id="diger-title-text" onclick="editDigerTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span>
         <span onclick="editDigerTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
       </div>
@@ -345,15 +363,31 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   <!-- ÖZEL BÖLÜMLER -->
   <div id="custom-sections-area"></div>
 
+  <div class="card" id="uyku-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:6px">
+        <span id="uyku-icon-text" onclick="editUykuTitle()" style="cursor:pointer"></span>
+        <span id="uyku-title-text" onclick="editUykuTitle()" style="cursor:pointer" title="Düzenlemek için tıkla"></span>
+        <span onclick="editUykuTitle()" style="font-size:11px;opacity:0.5;cursor:pointer">✏️</span>
+      </div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteUykuCard()">🗑️</button>
+    </div>
+    <div id="uyku-stars" style="display:flex;gap:8px;justify-content:center;padding:4px 0"></div>
+    <div id="uyku-label" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px"></div>
+  </div>
+
+  <div class="card" id="notlar-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+      <div class="card-title" style="margin-bottom:0">📝 Notlar</div>
+      <button class="edit-btn" style="color:var(--red);border:1px solid var(--red)" onclick="deleteNotlarCard()">🗑️</button>
+    </div>
+    <textarea id="inp-notes" placeholder="Bugün nasıl hissettirdin, özel bir şey var mı?"></textarea>
+  </div>
+
   <!-- Yeni bölüm ekle butonu -->
   <button class="btn btn-ghost" onclick="showAddSectionModal()" style="width:100%;justify-content:center;margin-bottom:12px;border-style:dashed">
     ＋ Yeni Bölüm Ekle
   </button>
-
-  <div class="card">
-    <div class="card-title">📝 Notlar</div>
-    <textarea id="inp-notes" placeholder="Bugün nasıl hissettirdin, özel bir şey var mı?"></textarea>
-  </div>
 
   <div style="padding-bottom:20px">
     <button class="btn btn-primary" onclick="saveLog()" style="width:100%;justify-content:center;padding:13px">💾 Kaydet</button>
@@ -488,6 +522,22 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
     <div id="diger-restore-row" style="display:none">
       <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreDigerCard()">🌿 Diğer bölümünü geri ekle</button>
     </div>
+    <div id="uyku-restore-row" style="display:none">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreUykuCard()"><span id="uyku-restore-icon">😴</span> <span id="uyku-restore-label">Uyku</span> bolumunu geri ekle</button>
+    </div>
+    <div id="zaman-restore-row" style="display:none;margin-bottom:8px">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreZamanCard()">🕐 Zaman bolumunu geri ekle</button>
+    </div>
+    <div id="neyedin-restore-row" style="display:none;margin-bottom:8px">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreNeYedinCard()">🍽️ Gida bolumunu geri ekle</button>
+    </div>
+    <div id="sivilce-restore-row" style="display:none;margin-bottom:8px">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreSivilceCard()">🔴 Alerji durumu bolumunu geri ekle</button>
+    </div>
+    <div id="notlar-restore-row" style="display:none;margin-bottom:8px">
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="restoreNotlarCard()">📝 Notlar bolumunu geri ekle</button>
+    </div>
+    <div id="hidden-custom-sections-list"></div>
     <p id="builtin-all-visible" style="font-size:12px;color:var(--muted);text-align:center">Tüm bölümler görünür.</p>
   </div>
 
@@ -530,6 +580,16 @@ function applyBuiltinVisibility(){
   const dc = document.getElementById('diger-card');
   if(bc) bc.style.display = banyoHidden ? 'none' : '';
   if(dc) dc.style.display = digerHidden ? 'none' : '';
+  const uc = document.getElementById('uyku-card');
+  if(uc) uc.style.display = uykuluHidden ? 'none' : '';
+  const zc = document.getElementById('zaman-card');
+  if(zc) zc.style.display = zamanHidden ? 'none' : '';
+  const nyc = document.getElementById('neyedin-card');
+  if(nyc) nyc.style.display = neyedinHidden ? 'none' : '';
+  const sc = document.getElementById('sivilce-card');
+  if(sc) sc.style.display = sivilceHidden ? 'none' : '';
+  const nc = document.getElementById('notlar-card');
+  if(nc) nc.style.display = notlarHidden ? 'none' : '';
   const ebg = document.getElementById('edit-banyo-group');
   const edg = document.getElementById('edit-diger-group');
   if(ebg) ebg.style.display = banyoHidden ? 'none' : '';
@@ -537,10 +597,16 @@ function applyBuiltinVisibility(){
   // Ayarlar sayfası restore satırları
   const br = document.getElementById('banyo-restore-row');
   const dr = document.getElementById('diger-restore-row');
+  const ur = document.getElementById('uyku-restore-row');
   const av = document.getElementById('builtin-all-visible');
   if(br) br.style.display = banyoHidden ? '' : 'none';
   if(dr) dr.style.display = digerHidden ? '' : 'none';
-  if(av) av.style.display = (banyoHidden||digerHidden) ? 'none' : '';
+  if(ur) ur.style.display = uykuluHidden ? '' : 'none';
+  const zrr=document.getElementById('zaman-restore-row'); if(zrr) zrr.style.display=zamanHidden?'':'none';
+  const nyrr=document.getElementById('neyedin-restore-row'); if(nyrr) nyrr.style.display=neyedinHidden?'':'none';
+  const srr=document.getElementById('sivilce-restore-row'); if(srr) srr.style.display=sivilceHidden?'':'none';
+  const nrr=document.getElementById('notlar-restore-row'); if(nrr) nrr.style.display=notlarHidden?'':'none';
+  if(av) av.style.display = (banyoHidden||digerHidden||customSections.some(s=>s.hidden)) ? 'none' : '';
 }
 function deleteBanyoCard(){
   if(!confirm('Banyo bölümünü gizlemek istiyor musun? Geçmiş veriler korunur, ayarlardan geri ekleyebilirsin.')) return;
@@ -568,8 +634,21 @@ function restoreDigerCard(){
   applyBuiltinVisibility();
   toast('🌿 '+digerTitle+' bölümü geri eklendi');
 }
-let digerTitle=localStorage.getItem('alerji-diger-title')||'Diğer';
-let sivilceTitle=localStorage.getItem('alerji-sivilce-title')||'Sivilce Durumu';
+let neYedinTitle  = localStorage.getItem('alerji-neyedin-title')  || 'Ne yedin?';
+let neYedinIcon   = localStorage.getItem('alerji-neyedin-icon')   || '🍽️';
+let banyoTitle    = localStorage.getItem('alerji-banyo-title')    || 'Banyo';
+let banyoIcon     = localStorage.getItem('alerji-banyo-icon')     || '🚿';
+let digerTitle    = localStorage.getItem('alerji-diger-title')    || 'Diğer';
+let digerIcon     = localStorage.getItem('alerji-diger-icon')     || '🌿';
+let sivilceTitle  = localStorage.getItem('alerji-sivilce-title')  || 'Sivilce Durumu';
+let sivilceIcon   = localStorage.getItem('alerji-sivilce-icon')   || '🔴';
+let uykuluTitle   = localStorage.getItem('alerji-uyku-title')     || 'Uyku';
+let uykuluIcon    = localStorage.getItem('alerji-uyku-icon')      || '😴';
+let uykuluHidden  = localStorage.getItem('alerji-uyku-hidden')==='1';
+let zamanHidden   = localStorage.getItem('alerji-zaman-hidden')==='1';
+let neyedinHidden = localStorage.getItem('alerji-neyedin-hidden')==='1';
+let sivilceHidden = localStorage.getItem('alerji-sivilce-hidden')==='1';
+let notlarHidden  = localStorage.getItem('alerji-notlar-hidden')==='1';
 let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
@@ -592,12 +671,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   setDelay(currentDelay); // delay butonlarını ve analizi doğru init et
   applyBuiltinVisibility();
   // Diğer başlıkları yükle
-  const dt=document.getElementById('diger-title-text');
-  if(dt) dt.textContent=digerTitle;
-  const st=document.getElementById('sivilce-title-text');
-  if(st) st.textContent=sivilceTitle;
+  refreshBuiltinTitles();
   // Özel bölümler
   renderCustomSections();
+  renderUykuStars();
   icecekCheckReset();
   // Son açık sekmeyi geri yükle
   const lastTab = localStorage.getItem('alerji-last-tab') || 'kayit';
@@ -638,7 +715,7 @@ function showTab(t,btn){
   localStorage.setItem('alerji-last-tab', t);
   if(t==='gecmis')renderHistory();
   if(t==='analiz')renderAnalysis();
-  if(t==='ayarlar')renderFoodListEdit();
+  if(t==='ayarlar'){renderFoodListEdit();renderHiddenCustomSections();}
   if(t==='icecek'){icecekCheckReset();renderIcecekGrid();renderIcecekGecmis();}
   if(t==='kayit'){
     setDateTime();
@@ -844,6 +921,117 @@ function setShower(v){
 }
 
 // ===== SEY =====
+function editBuiltinSection(key, iconKey, titleEl, iconEl){
+  const curTitle = localStorage.getItem('alerji-'+key+'-title') || titleEl;
+  const curIcon  = localStorage.getItem('alerji-'+key+'-icon')  || iconEl;
+  const yeniAd   = prompt('Bölüm adı:', curTitle);
+  if(yeniAd===null) return;
+  const yeniSimge = prompt('Simge (emoji):', curIcon);
+  if(yeniSimge===null) return;
+  if(yeniAd.trim())   localStorage.setItem('alerji-'+key+'-title', yeniAd.trim());
+  if(yeniSimge.trim()) localStorage.setItem('alerji-'+key+'-icon',  yeniSimge.trim());
+  refreshBuiltinTitles();
+}
+function refreshBuiltinTitles(){
+  neYedinTitle  = localStorage.getItem('alerji-neyedin-title')  || 'Ne yedin?';
+  neYedinIcon   = localStorage.getItem('alerji-neyedin-icon')   || '🍽️';
+  banyoTitle    = localStorage.getItem('alerji-banyo-title')    || 'Banyo';
+  banyoIcon     = localStorage.getItem('alerji-banyo-icon')     || '🚿';
+  digerTitle    = localStorage.getItem('alerji-diger-title')    || 'Diğer';
+  digerIcon     = localStorage.getItem('alerji-diger-icon')     || '🌿';
+  sivilceTitle  = localStorage.getItem('alerji-sivilce-title')  || 'Sivilce Durumu';
+  sivilceIcon   = localStorage.getItem('alerji-sivilce-icon')   || '🔴';
+  uykuluTitle   = localStorage.getItem('alerji-uyku-title')     || 'Uyku';
+  uykuluIcon    = localStorage.getItem('alerji-uyku-icon')      || '😴';
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('neyedin-title-text', neYedinTitle);
+  set('neyedin-icon-text',  neYedinIcon);
+  set('sivilce-title-text', sivilceTitle);
+  set('sivilce-icon-text',  sivilceIcon);
+  set('banyo-title-text',   banyoTitle);
+  set('banyo-icon-text',    banyoIcon);
+  set('diger-title-text',   digerTitle);
+  set('diger-icon-text',    digerIcon);
+  set('uyku-title-text',    uykuluTitle);
+  set('uyku-icon-text',     uykuluIcon);
+}
+function editNeYedinTitle(){ editBuiltinSection('neyedin','neyedin',neYedinTitle,neYedinIcon); }
+let uykuluValue = null;
+const uykuluLabels = ['Çok Kötü','Kötü','Orta','İyi','Mükemmel'];
+
+function renderUykuStars(){
+  const el = document.getElementById('uyku-stars');
+  const lbl = document.getElementById('uyku-label');
+  if(!el) return;
+  el.innerHTML = [1,2,3,4,5].map(i=>
+    '<span onclick="setUyku('+i+')" style="font-size:32px;cursor:pointer;transition:transform .1s;display:inline-block" '
+    +'class="uyku-star" data-v="'+i+'">'
+    +(uykuluValue!==null && i<=uykuluValue ? '⭐' : '☆')
+    +'</span>'
+  ).join('');
+  if(lbl) lbl.textContent = uykuluValue!==null ? uykuluLabels[uykuluValue-1] : 'Seçilmedi';
+}
+
+function setUyku(v){
+  uykuluValue = (uykuluValue===v) ? null : v;
+  renderUykuStars();
+}
+
+function editUykuTitle(){ editBuiltinSection('uyku','uyku',uykuluTitle,uykuluIcon); }
+
+function deleteUykuCard(){
+  if(!confirm(uykuluTitle + ' bolumu gizlensin mi?')) return;
+  uykuluHidden = true;
+  localStorage.setItem('alerji-uyku-hidden','1');
+  applyBuiltinVisibility();
+  toast(uykuluTitle + ' gizlendi. Ayarlar - Gizli Bolumlerden geri alabilirsin.');
+}
+
+function deleteZamanCard(){
+  if(!confirm('Zaman bolumu gizlensin mi?')) return;
+  zamanHidden=true; localStorage.setItem('alerji-zaman-hidden','1');
+  applyBuiltinVisibility(); toast('Zaman gizlendi.');
+}
+function restoreZamanCard(){
+  zamanHidden=false; localStorage.removeItem('alerji-zaman-hidden');
+  applyBuiltinVisibility(); toast('Zaman geri eklendi.');
+}
+function deleteNeYedinCard(){
+  if(!confirm(neYedinTitle+' bolumu gizlensin mi?')) return;
+  neyedinHidden=true; localStorage.setItem('alerji-neyedin-hidden','1');
+  applyBuiltinVisibility(); toast(neYedinTitle+' gizlendi.');
+}
+function restoreNeYedinCard(){
+  neyedinHidden=false; localStorage.removeItem('alerji-neyedin-hidden');
+  applyBuiltinVisibility(); toast(neYedinTitle+' geri eklendi.');
+}
+function deleteSivilceCard(){
+  if(!confirm(sivilceTitle+' bolumu gizlensin mi?')) return;
+  sivilceHidden=true; localStorage.setItem('alerji-sivilce-hidden','1');
+  applyBuiltinVisibility(); toast(sivilceTitle+' gizlendi.');
+}
+function restoreSivilceCard(){
+  sivilceHidden=false; localStorage.removeItem('alerji-sivilce-hidden');
+  applyBuiltinVisibility(); toast(sivilceTitle+' geri eklendi.');
+}
+function deleteNotlarCard(){
+  if(!confirm('Notlar bolumu gizlensin mi?')) return;
+  notlarHidden=true; localStorage.setItem('alerji-notlar-hidden','1');
+  applyBuiltinVisibility(); toast('Notlar gizlendi.');
+}
+function restoreNotlarCard(){
+  notlarHidden=false; localStorage.removeItem('alerji-notlar-hidden');
+  applyBuiltinVisibility(); toast('Notlar geri eklendi.');
+}
+function restoreUykuCard(){
+  uykuluHidden = false;
+  localStorage.removeItem('alerji-uyku-hidden');
+  applyBuiltinVisibility();
+  renderUykuStars();
+  toast(uykuluTitle + ' geri eklendi.');
+}
+
+function editBanyoTitle(){ editBuiltinSection('banyo','banyo',banyoTitle,banyoIcon); }
 function editDigerTitle(){
   const newTitle=prompt('Bu bölümün adı ne olsun?', digerTitle);
   if(newTitle&&newTitle.trim()){
@@ -894,12 +1082,13 @@ function saveLog(){
     soap:soap,
     sey:seyVal,
     notes,
+    uykuValue: uykuluValue,
     customData: getCustomValuesForLog()
   });
   logs.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   save();
   // RESET
-  acneValue=null;selectedLocs=[];selectedFoods=[];
+  acneValue=null;selectedLocs=[];selectedFoods=[];uykuluValue=null;renderUykuStars();
   const locSecR=document.getElementById('loc-section');
   if(locSecR) locSecR.style.display='none';selectedShampoo=null;selectedSoap=null;showerVal=null;seyVal=null;
   document.querySelectorAll('.acne-btn').forEach(b=>b.className='acne-btn');
@@ -1317,6 +1506,19 @@ function backupData(){
     soapList: soapList,
     locList: locList,
     customSections: customSections,
+    neYedinTitle: neYedinTitle,
+    neYedinIcon: neYedinIcon,
+    banyoTitle: banyoTitle,
+    banyoIcon: banyoIcon,
+    digerIcon: digerIcon,
+    sivilceIcon: sivilceIcon,
+    uykuluTitle: uykuluTitle,
+    uykuluIcon: uykuluIcon,
+    uykuluHidden: uykuluHidden,
+    zamanHidden: zamanHidden,
+    neyedinHidden: neyedinHidden,
+    sivilceHidden: sivilceHidden,
+    notlarHidden: notlarHidden,
     digerTitle: digerTitle,
     sivilceTitle: sivilceTitle,
     currentDelay: currentDelay,
@@ -1358,6 +1560,23 @@ function restoreData(event){
       soapList = backup.soapList || soapList;
       locList = backup.locList || locList;
       if(backup.customSections) customSections = backup.customSections;
+      if(backup.neYedinTitle) neYedinTitle = backup.neYedinTitle;
+      if(backup.neYedinIcon) neYedinIcon = backup.neYedinIcon;
+      if(backup.banyoTitle) banyoTitle = backup.banyoTitle;
+      if(backup.banyoIcon) banyoIcon = backup.banyoIcon;
+      if(backup.digerIcon) digerIcon = backup.digerIcon;
+      if(backup.sivilceIcon) sivilceIcon = backup.sivilceIcon;
+      if(backup.uykuluTitle) uykuluTitle = backup.uykuluTitle;
+      if(backup.uykuluIcon) uykuluIcon = backup.uykuluIcon;
+      if(backup.uykuluHidden!==undefined){ uykuluHidden=backup.uykuluHidden; if(uykuluHidden) localStorage.setItem('alerji-uyku-hidden','1'); else localStorage.removeItem('alerji-uyku-hidden'); }
+      ['zaman','neyedin','sivilce','notlar'].forEach(k=>{
+        const val=backup[k+'Hidden'];
+        if(val!==undefined){
+          window[k+'Hidden']=val;
+          if(val) localStorage.setItem('alerji-'+k+'-hidden','1');
+          else localStorage.removeItem('alerji-'+k+'-hidden');
+        }
+      });
       if(backup.digerTitle) digerTitle = backup.digerTitle;
       if(backup.sivilceTitle) sivilceTitle = backup.sivilceTitle;
       if(backup.currentDelay !== undefined) currentDelay = backup.currentDelay;
@@ -1376,6 +1595,8 @@ function restoreData(event){
       localStorage.setItem('alerji-soap', JSON.stringify(soapList));
       localStorage.setItem('alerji-locs', JSON.stringify(locList));
       localStorage.setItem('alerji-custom-sections', JSON.stringify(customSections));
+      localStorage.setItem('alerji-neyedin-title', neYedinTitle);
+      localStorage.setItem('alerji-banyo-title', banyoTitle);
       localStorage.setItem('alerji-diger-title', digerTitle);
       localStorage.setItem('alerji-sivilce-title', sivilceTitle);
       localStorage.setItem('alerji-delay', currentDelay);
@@ -1386,6 +1607,8 @@ function restoreData(event){
       renderCustomSections();
       renderHistory();
       renderAnalysis();
+      const bt2=document.getElementById('banyo-title-text');
+      if(bt2) bt2.textContent=banyoTitle;
       const dt=document.getElementById('diger-title-text');
       if(dt) dt.textContent=digerTitle;
       const st=document.getElementById('sivilce-title-text');
@@ -1507,9 +1730,11 @@ function copyAllLogs(){
     lines.push('📅 '+dayName+', '+l.date+' ⏰ '+l.time);
     if(l.foods&&l.foods.length) lines.push('🍽️ Yenilen: '+l.foods.join(', '));
     lines.push('🔴 '+sivilceTitle+': '+acneLabels[l.acne||0]);
+    if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.locs&&l.locs.length) lines.push('📍 Konum: '+l.locs.join(', '));
     lines.push('🚿 Banyo: '+(l.shower===true?'Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''):'Hayır'));
     lines.push('🌿 '+digerTitle+': '+(l.sey===true?'Evet':l.sey===false?'Hayır':'Belirtilmemiş'));
+    if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.customData){Object.entries(l.customData).forEach(([sid,cd])=>{
       if(cd.value===null||cd.value===undefined) return;
       let v='';
@@ -2187,12 +2412,43 @@ function editSection(id){
   }
 }
 function deleteSection(id){
-  if(!confirm('Bu bölümü silmek istiyor musun?')) return;
-  customSections = customSections.filter(s=>s.id!==id);
-  delete customValues[id];
-  delete customListEditModes[id];
+  const sec = customSections.find(s=>s.id===id);
+  if(!sec) return;
+  if(!confirm(sec.title + ' bolumu gizlensin mi? Ayarlardan geri ekleyebilirsin.')) return;
+  sec.hidden = true;
   saveCustomSections();
   renderCustomSections();
+  renderHiddenCustomSections();
+  toast('Bolum gizlendi. Ayarlar - Gizli Bolumler');
+}
+
+function restoreCustomSection(id){
+  const sec = customSections.find(s=>s.id===id);
+  if(!sec) return;
+  sec.hidden = false;
+  saveCustomSections();
+  renderCustomSections();
+  renderHiddenCustomSections();
+  toast(sec.title + ' geri eklendi.');
+}
+
+function renderHiddenCustomSections(){
+  const el = document.getElementById('hidden-custom-sections-list');
+  if(!el) return;
+  const hidden = customSections.filter(s=>s.hidden);
+  el.innerHTML = hidden.map(s=>{
+    const btn = document.createElement('div');
+    btn.style.marginBottom='8px';
+    btn.innerHTML = '<button class="btn btn-ghost" style="width:100%;justify-content:center" data-sid="'+s.id+'">🔁 '+s.title+' bolumunu geri ekle</button>';
+    return btn.outerHTML;
+  }).join('');
+  el.querySelectorAll('[data-sid]').forEach(b=>{
+    b.onclick = ()=>restoreCustomSection(b.dataset.sid);
+  });
+  const allVisible = document.getElementById('builtin-all-visible');
+  const banyoHid = localStorage.getItem('alerji-banyo-hidden')==='1';
+  const digerHid = localStorage.getItem('alerji-diger-hidden')==='1';
+  if(allVisible) allVisible.style.display = (banyoHid||digerHid||uykuluHidden||zamanHidden||neyedinHidden||sivilceHidden||notlarHidden||hidden.length) ? 'none' : '';
 }
 
 // Kayıt sırasında özel değerleri ekle
