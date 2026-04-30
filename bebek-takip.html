@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light" data-gender="girl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bebek Gelişim Takibi</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --ff-display: 'Fredoka One', cursive;
+  --ff-body: 'Nunito', sans-serif;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --transition: 0.25s ease;
+}
+
+/* GIRL THEME */
+[data-gender="girl"] {
+  --p1: #FF6B9D; --p2: #E91E8C; --p3: #C2185B;
+  --p1-l: #FFE0EE; --p1-ll: #FFF5F9;
+  --p-grad: linear-gradient(135deg, #FF6B9D 0%, #E91E8C 100%);
+  --p-grad-soft: linear-gradient(135deg, #FFD6E8 0%, #FFAED2 100%);
+  --accent: #FF6B9D; --accent2: #9C27B0;
+  --icon: '👧';
+}
+
+/* BOY THEME */
+[data-gender="boy"] {
+  --p1: #2196F3; --p2: #1565C0; --p3: #0D47A1;
+  --p1-l: #E3F2FD; --p1-ll: #F0F8FF;
+  --p-grad: linear-gradient(135deg, #42A5F5 0%, #1565C0 100%);
+  --p-grad-soft: linear-gradient(135deg, #BBDEFB 0%, #90CAF9 100%);
+  --accent: #2196F3; --accent2: #00BCD4;
+  --icon: '👦';
+}
+
+/* LIGHT MODE */
+[data-theme="light"] {
+  --bg: #FAFAFA; --bg2: #FFFFFF; --bg3: #F5F5F5;
+  --text: #1A1A2E; --text2: #555; --text3: #999;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --nav-bg: #FFFFFF; --card-bg: #FFFFFF;
+  --input-bg: #F8F8F8;
+  --modal-bg: rgba(0,0,0,0.45);
+}
+
+/* DARK MODE */
+[data-theme="dark"] {
+  --bg: #0F0F1A; --bg2: #1A1A2E; --bg3: #22223A;
+  --text: #F0F0FF; --text2: #AAA; --text3: #666;
+  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+  --shadow: 0 2px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --nav-bg: #1A1A2E; --card-bg: #1E1E32;
+  --input-bg: #252540;
+  --modal-bg: rgba(0,0,0,0.7);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--ff-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== PROFILE SCREEN ===== */
+#profileScreen {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-header {
+  background: var(--p-grad);
+  padding: 40px 20px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ps-header::before {
+  content: '';
+  position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.ps-header::after {
+  content: '';
+  position: absolute; bottom: -40px; left: -30px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+}
+.ps-title {
+  font-family: var(--ff-display);
+  font-size: 28px; color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  position: relative; z-index: 1;
+}
+.ps-sub { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 6px; z-index:1; position:relative; }
+
+.ps-body { padding: 20px; flex: 1; }
+.ps-section-title {
+  font-family: var(--ff-display);
+  font-size: 16px; color: var(--p2);
+  margin: 16px 0 10px;
+}
+
+.profile-list { display: flex; flex-direction: column; gap: 10px; }
+.profile-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition);
+}
+.profile-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--p1); }
+.profile-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--p-grad);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; flex-shrink: 0;
+  border: 3px solid var(--p1-l);
+}
+.profile-info { flex: 1; }
+.profile-name { font-weight: 800; font-size: 16px; color: var(--text); }
+.profile-meta { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.profile-del {
+  background: none; border: none; font-size: 18px; cursor: pointer;
+  opacity: 0.4; transition: opacity 0.2s; padding: 4px;
+}
+.profile-del:hover { opacity: 0.9; }
+.add-profile-btn {
+  background: var(--p-grad);
+  color: white; border: none; border-radius: var(--radius);
+  padding: 14px; font-family: var(--ff-body); font-size: 15px;
+  font-weight: 800; cursor: pointer; width: 100%; margin-top: 14px;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.add-profile-btn:hover { opacity: 0.9; }
+.add-profile-btn:active { transform: scale(0.98); }
+
+/* ===== TOP BAR ===== */
+#appScreen { display: none; flex-direction: column; min-height: 100vh; }
+
+.topbar {
+  background: var(--p-grad);
+  padding: 14px 16px 12px;
+  display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+}
+.tb-back {
+  background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
+  width: 36px; height: 36px; color: white; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.tb-back:hover { background: rgba(255,255,255,0.3); }
+.tb-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; border: 2px solid rgba(255,255,255,0.5);
+  animation: float 3s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+.tb-info { flex: 1; }
+.tb-name { font-family: var(--ff-display); font-size: 18px; color: white; }
+.tb-age { font-size: 11px; color: rgba(255,255,255,0.85); margin-top: 1px; }
+.tb-actions { display: flex; gap: 8px; }
+.tb-btn {
+  background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
+  width: 36px; height: 36px; color: white; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.tb-btn:hover { background: rgba(255,255,255,0.35); }
+
+/* ===== NAV TABS ===== */
+.nav {
+  display: flex; gap: 4px; padding: 10px 12px 0;
+  background: var(--nav-bg); border-bottom: 1px solid var(--border);
+  overflow-x: auto; position: sticky; top: 70px; z-index: 99;
+  box-shadow: var(--shadow);
+}
+.nav::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 12px; border-radius: 30px; font-size: 12px; font-weight: 800;
+  cursor: pointer; white-space: nowrap; border: none;
+  background: transparent; color: var(--text2); transition: all 0.2s;
+  display: flex; align-items: center; gap: 4px; font-family: var(--ff-body);
+}
+.tab.active { background: var(--p1-l); color: var(--p2); }
+.tab:hover:not(.active) { background: var(--bg3); }
+
+/* ===== PAGES ===== */
+.page { display: none; padding: 14px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== SECTION TITLE ===== */
+.sec-title {
+  font-family: var(--ff-display);
+  font-size: 16px; color: var(--p2);
+  margin: 14px 0 8px;
+  display: flex; align-items: center; gap: 7px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+/* ===== GROWTH SUMMARY ===== */
+.growth-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.g-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform 0.2s;
+}
+.g-card:hover { transform: translateY(-2px); }
+.g-card .ico { font-size: 24px; margin-bottom: 4px; }
+.g-card .val { font-family: var(--ff-display); font-size: 20px; color: var(--text); }
+.g-card .unt { font-size: 10px; color: var(--text2); font-weight: 700; }
+.g-card .lbl { font-size: 10px; color: var(--text3); margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.g-card.c1 { border-top: 3px solid var(--p1); }
+.g-card.c2 { border-top: 3px solid #00BCD4; }
+.g-card.c3 { border-top: 3px solid #4CAF50; }
+.g-card.c4 { border-top: 3px solid #FF9800; }
+.g-card.c5 { border-top: 3px solid #9C27B0; }
+
+/* ===== FORM ELEMENTS ===== */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-row.r3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
+.fg label { font-size: 11px; font-weight: 800; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; }
+.fg input, .fg select, .fg textarea {
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-xs);
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: var(--ff-body);
+  background: var(--input-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--p1); }
+.fg textarea { resize: vertical; min-height: 60px; }
+
+.btn-primary {
+  background: var(--p-grad);
+  color: white; border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 18px;
+  font-family: var(--ff-body); font-weight: 800; font-size: 14px;
+  cursor: pointer; width: 100%;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-sm {
+  background: var(--p1-l); color: var(--p2);
+  border: none; border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 800;
+  cursor: pointer; font-family: var(--ff-body);
+  transition: background 0.2s;
+}
+.btn-sm:hover { background: var(--p1); color: white; }
+
+/* ===== HISTORY ITEM ===== */
+.hist-item {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  margin-bottom: 8px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--border);
+  animation: slideIn 0.3s ease;
+  transition: background var(--transition);
+}
+@keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+.hi-icon { font-size: 20px; flex-shrink: 0; }
+.hi-info { flex: 1; min-width: 0; }
+.hi-vals { font-weight: 700; font-size: 13px; color: var(--text); }
+.hi-date { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.del-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: 0.35; transition: opacity 0.2s; padding: 4px; }
+.del-btn:hover { opacity: 0.9; }
+
+/* ===== VACCINE ITEMS ===== */
+.vac-item {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm); padding: 13px 14px;
+  margin-bottom: 7px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.vac-item:hover { transform: translateX(3px); border-color: var(--p1); }
+.vac-check {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.vac-check.done { background: #DCFCE7; color: #15803D; }
+.vac-check.pending { background: var(--bg3); color: var(--text3); border: 2px dashed var(--border2); }
+.vac-check.overdue { background: #FEE2E2; color: #DC2626; }
+.vac-name { font-weight: 800; font-size: 13px; color: var(--text); }
+.vac-detail { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.vac-badge {
+  font-size: 10px; font-weight: 800; padding: 3px 9px;
+  border-radius: 20px; margin-left: auto; white-space: nowrap; flex-shrink: 0;
+}
+.b-done { background: #DCFCE7; color: #15803D; }
+.b-pending { background: #DBEAFE; color: #1D4ED8; }
+.b-overdue { background: #FEE2E2; color: #DC2626; }
+
+/* ===== MILESTONE ===== */
+.mile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.mile-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm); padding: 12px;
+  box-shadow: var(--shadow); cursor: pointer;
+  border: 1.5px solid var(--border);
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.mile-card:hover { transform: translateY(-2px); border-color: var(--p1); }
+.mile-card.done { border-color: #22C55E; }
+.mile-card.done::after {
+  content: '✓'; position: absolute; top: 8px; right: 10px;
+  width: 20px; height: 20px; border-radius: 50%; background: #22C55E;
+  color: white; font-size: 11px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; line-height: 20px; text-align: center;
+}
+.mile-emoji { font-size: 26px; margin-bottom: 5px; display: block; }
+.mile-name { font-weight: 800; font-size: 12px; color: var(--text); line-height: 1.3; }
+.mile-desc { font-size: 10px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+.mile-date { font-size: 10px; color: var(--p1); font-weight: 800; margin-top: 5px; }
+
+/* ===== TEETH ===== */
+.teeth-diagram {
+  background: var(--card-bg);
+  border-radius: var(--radius); padding: 16px;
+  box-shadow: var(--shadow); margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.jaw { display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; }
+.tooth {
+  width: 32px; height: 40px; border-radius: 6px 6px 10px 10px;
+  background: var(--bg3); border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  cursor: pointer; transition: all 0.2s; font-size: 8px; color: var(--text3);
+  font-weight: 800; text-align: center; line-height: 1.1; padding: 2px;
+  position: relative;
+}
+.tooth:hover { border-color: var(--p1); transform: scale(1.1); z-index: 2; }
+.tooth.erupted { background: linear-gradient(135deg, #DCFCE7, #BBF7D0); border-color: #22C55E; color: #15803D; }
+.tooth.fallen { background: linear-gradient(135deg, #FEF9C3, #FDE68A); border-color: #F59E0B; color: #92400E; }
+.tooth.erupted::before { content: '✦'; position: absolute; top: -7px; font-size: 9px; color: #22C55E; }
+.jaw-label { text-align: center; font-size: 10px; font-weight: 800; color: var(--text3); margin: 5px 0 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.gum-sep { border-top: 3px solid #FDA4AF; margin: 5px 16px; border-radius: 2px; }
+.legend { display: flex; gap: 12px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: var(--text2); }
+.leg-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ===== SOLID FOOD ===== */
+.food-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.food-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm); padding: 10px 8px;
+  box-shadow: var(--shadow); text-align: center;
+  cursor: pointer; border: 1.5px solid var(--border);
+  transition: all 0.2s; position: relative;
+}
+.food-card:hover { border-color: var(--p1); transform: translateY(-1px); }
+.food-card.tried { border-color: #22C55E; }
+.food-card.allergic { border-color: #EF4444; background: #FFF1F0; }
+.food-card.intolerant { border-color: #F59E0B; background: #FFFBEB; }
+[data-theme="dark"] .food-card.allergic { background: #2D0A0A; }
+[data-theme="dark"] .food-card.intolerant { background: #2A1F00; }
+.food-emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+.food-name { font-size: 10px; font-weight: 800; color: var(--text); }
+.food-status { font-size: 9px; margin-top: 2px; font-weight: 700; }
+.food-card.tried .food-status { color: #15803D; }
+.food-card.allergic .food-status { color: #DC2626; }
+.food-card.intolerant .food-status { color: #D97706; }
+.food-card .tick {
+  position: absolute; top: 4px; right: 5px;
+  font-size: 11px;
+}
+.food-cat-title {
+  font-size: 12px; font-weight: 800; color: var(--text2);
+  margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* ===== ALLERGY SUMMARY ===== */
+.allergy-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.a-tag {
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; gap: 4px;
+}
+.a-tag.allergic { background: #FEE2E2; color: #DC2626; }
+.a-tag.intolerant { background: #FEF3C7; color: #D97706; }
+.a-tag.safe { background: #DCFCE7; color: #15803D; }
+[data-theme="dark"] .a-tag.allergic { background: #3D0000; color: #F87171; }
+[data-theme="dark"] .a-tag.intolerant { background: #2D1B00; color: #FBBF24; }
+[data-theme="dark"] .a-tag.safe { background: #002D0F; color: #4ADE80; }
+
+/* ===== MEMORIES ===== */
+.memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mem-add-btn {
+  aspect-ratio: 1; border-radius: var(--radius-sm);
+  border: 2px dashed var(--p1); background: var(--p1-ll);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--p1); font-size: 11px; font-weight: 800; gap: 4px;
+  transition: all 0.2s;
+}
+.mem-add-btn:hover { background: var(--p1-l); }
+.mem-add-btn .plus { font-size: 22px; }
+.mem-card {
+  aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden;
+  position: relative; background: var(--p-grad-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; cursor: pointer;
+  border: 1.5px solid transparent; transition: border-color 0.2s;
+}
+.mem-card:hover { border-color: var(--p1); }
+.mem-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.52); color: white;
+  font-size: 8px; padding: 3px 5px; font-weight: 800; line-height: 1.3;
+}
+
+/* ===== PROGRESS BAR ===== */
+.prog-wrap { margin: 12px 0; }
+.prog-lbl { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--text2); margin-bottom: 5px; }
+.prog-bar { height: 9px; border-radius: 10px; background: var(--bg3); overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 10px; background: var(--p-grad); transition: width 0.8s cubic-bezier(.36,.07,.19,.97); }
+
+/* ===== MODAL ===== */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: var(--modal-bg); z-index: 500;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: var(--card-bg); border-radius: 24px; padding: 22px;
+  width: 100%; max-width: 360px;
+  animation: popIn 0.28s cubic-bezier(.36,.07,.19,.97);
+  position: relative; max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+@keyframes popIn { from{transform:scale(0.82);opacity:0} to{transform:scale(1);opacity:1} }
+.modal h3 { font-family: var(--ff-display); font-size: 19px; color: var(--p2); margin-bottom: 14px; padding-right: 30px; }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--bg3); border: none; border-radius: 50%;
+  width: 28px; height: 28px; cursor: pointer; color: var(--text2);
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== THEME PICKER ===== */
+.theme-section { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.theme-btn {
+  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border2);
+  background: var(--bg3); color: var(--text); font-family: var(--ff-body);
+  font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.theme-btn.active { border-color: var(--p1); background: var(--p1-l); color: var(--p2); }
+
+/* ===== EMPTY STATE ===== */
+.empty { text-align: center; padding: 28px 16px; color: var(--text3); }
+.empty .emo { font-size: 40px; margin-bottom: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+.empty p { font-size: 13px; }
+
+/* ===== MINI CHART ===== */
+.chart-wrap { background: var(--card-bg); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--text); color: var(--bg); padding: 11px 20px;
+  border-radius: 30px; font-size: 13px; font-weight: 700; z-index: 600;
+  transition: transform 0.4s cubic-bezier(.36,.07,.19,.97); white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ===== CONFETTI ===== */
+canvas.confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+
+/* ===== CHECKLIST ITEM ===== */
+.check-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: var(--card-bg); border-radius: var(--radius-sm);
+  margin-bottom: 6px; box-shadow: var(--shadow); cursor: pointer;
+  border: 1.5px solid var(--border); transition: all 0.15s;
+}
+.check-item:hover { border-color: var(--p1); }
+.check-box {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 2px solid var(--border2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; font-size: 12px;
+}
+.check-box.checked { background: var(--p-grad); border-color: var(--p1); color: white; }
+.check-label { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+.check-label.checked { text-decoration: line-through; opacity: 0.5; }
+
+/* ===== DIVIDER ===== */
+.divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+/* ===== BADGE ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800;
+}
+.badge.green { background: #DCFCE7; color: #15803D; }
+.badge.red { background: #FEE2E2; color: #DC2626; }
+.badge.yellow { background: #FEF9C3; color: #92400E; }
+.badge.blue { background: #DBEAFE; color: #1D4ED8; }
+[data-theme="dark"] .badge.green { background: #002D0F; color: #4ADE80; }
+[data-theme="dark"] .badge.red { background: #2D0000; color: #F87171; }
+[data-theme="dark"] .badge.yellow { background: #2A1800; color: #FCD34D; }
+[data-theme="dark"] .badge.blue { background: #001A2D; color: #60A5FA; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--p1); border-radius: 4px; opacity: 0.5; }
+</style>
+</head>
+<body>
+
+<!-- ===================== PROFILE SCREEN ===================== -->
+<div id="profileScreen">
+  <div class="ps-header">
+    <div class="ps-title">👶 Bebek Gelişim</div>
+    <div class="ps-sub">Bebeğinizin her anını kaydedin</div>
+  </div>
+  <div class="ps-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="ps-section-title" style="margin:0">Bebekler</div>
+      <div style="display:flex;gap:8px">
+        <button class="theme-btn" id="modeTogglePs" onclick="toggleMode()" style="padding:6px 12px;font-size:12px">🌙 Karanlık</button>
+      </div>
+    </div>
+    <div class="profile-list" id="profileList"></div>
+    <button class="add-profile-btn" onclick="openAddProfileModal()">
+      <span>＋</span> Yeni Bebek Ekle
+    </button>
+  </div>
+</div>
+
+<!-- ===================== APP SCREEN ===================== -->
+<div id="appScreen">
+  <div class="topbar">
+    <button class="tb-back" onclick="goToProfiles()">←</button>
+    <div class="tb-avatar" id="tbAvatar">👶</div>
+    <div class="tb-info">
+      <div class="tb-name" id="tbName">Bebek</div>
+      <div class="tb-age" id="tbAge">Yaş yükleniyor...</div>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn" onclick="toggleMode()" id="modeToggleApp" title="Mod Değiştir">🌙</button>
+      <button class="tb-btn" onclick="showPage('settings')" title="Ayarlar">⚙️</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="tab active" onclick="showPage('growth')" data-tab="growth">📏 Büyüme</button>
+    <button class="tab" onclick="showPage('vaccines')" data-tab="vaccines">💉 Aşılar</button>
+    <button class="tab" onclick="showPage('milestones')" data-tab="milestones">⭐ Gelişim</button>
+    <button class="tab" onclick="showPage('teeth')" data-tab="teeth">🦷 Dişler</button>
+    <button class="tab" onclick="showPage('food')" data-tab="food">🥣 Katı Gıda</button>
+    <button class="tab" onclick="showPage('memories')" data-tab="memories">📸 Anılar</button>
+    <button class="tab" onclick="showPage('settings')" data-tab="settings">⚙️ Ayarlar</button>
+  </div>
+
+  <!-- GROWTH PAGE -->
+  <div class="page active" id="page-growth">
+    <div class="growth-grid">
+      <div class="g-card c1"><div class="ico">📏</div><div class="val" id="lastH">--</div><div class="unt">cm</div><div class="lbl">Boy</div></div>
+      <div class="g-card c2"><div class="ico">⚖️</div><div class="val" id="lastW">--</div><div class="unt">kg</div><div class="lbl">Kilo</div></div>
+      <div class="g-card c3"><div class="ico">🎯</div><div class="val" id="lastHd">--</div><div class="unt">cm</div><div class="lbl">Baş</div></div>
+    </div>
+    <div class="chart-wrap" id="chartWrap">
+      <div class="sec-title" style="margin-top:0">📈 Kilo Grafiği</div>
+      <canvas id="miniChart" height="120" style="width:100%;display:none"></canvas>
+      <div id="noChart" class="empty" style="padding:12px 0"><div class="emo">📊</div><p>Ölçüm ekleyince grafik oluşur</p></div>
+    </div>
+    <div class="card">
+      <div class="sec-title" style="margin-top:0">➕ Yeni Ölçüm</div>
+      <div class="form-row">
+        <div class="fg"><label>Tarih</label><input type="date" id="mDate"></div>
+        <div class="fg"><label>Boy (cm)</label><input type="number" id="mH" placeholder="56"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Kilo (kg)</label><input type="number" id="mW" step="0.01" placeholder="4.2"></div>
+        <div class="fg"><label>Baş (cm)</label><input type="number" id="mHd" placeholder="36"></div>
+      </div>
+      <button class="btn-primary" onclick="addMeasurement()">📏 Ölçümü Kaydet</button>
+    </div>
+    <div class="sec-title">📋 Geçmiş</div>
+    <div id="measureList"></div>
+  </div>
+
+  <!-- VACCINES PAGE -->
+  <div class="page" id="page-vaccines">
+    <div class="prog-wrap">
+      <div class="prog-lbl"><span>Aşı Takvimi</span><span id="vacProg">0 / 0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="vacBar" style="width:0%"></div></div>
+    </div>
+    <div id="vaccineList"></div>
+  </div>
+
+  <!-- MILESTONES PAGE -->
+  <div class="page" id="page-milestones">
+    <div class="prog-wrap">
+      <div class="prog-lbl"><span>Kilometre Taşları</span><span id="mileProg">0 / 0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="mileBar" style="width:0%"></div></div>
+    </div>
+    <div id="mileCats"></div>
+  </div>
+
+  <!-- TEETH PAGE -->
+  <div class="page" id="page-teeth">
+    <div class="sec-title">🦷 Diş Haritası</div>
+    <div class="teeth-diagram">
+      <div class="jaw-label">Üst Çene</div>
+      <div class="jaw" id="upperJaw"></div>
+      <div class="gum-sep"></div>
+      <div style="border-bottom:3px solid #FDA4AF;margin:2px 16px 5px;border-radius:2px"></div>
+      <div class="jaw" id="lowerJaw"></div>
+      <div class="jaw-label">Alt Çene</div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#BBF7D0;border:1.5px solid #22C55E"></div>Çıktı</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#FDE68A;border:1.5px solid #F59E0B"></div>Düştü</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--bg3);border:1.5px solid var(--border2)"></div>Bekleniyor</div>
+      </div>
+    </div>
+    <div class="sec-title">📋 Diş Kayıtları</div>
+    <div id="toothLog"></div>
+  </div>
+
+  <!-- FOOD PAGE -->
+  <div class="page" id="page-food">
+    <div class="prog-wrap">
+      <div class="prog-lbl"><span>Denenen Gıdalar</span><span id="foodProg">0 / 0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="foodBar" style="width:0%"></div></div>
+    </div>
+
+    <!-- Allergy summary -->
+    <div class="card" id="allergySummaryCard">
+      <div class="sec-title" style="margin-top:0">⚠️ Alerji / İntolerans Özeti</div>
+      <div id="allergySummary"><div class="empty" style="padding:8px 0"><p>Henüz kayıt yok</p></div></div>
+    </div>
+
+    <!-- Food list log -->
+    <div class="card">
+      <div class="sec-title" style="margin-top:0">📝 Gıda Günlüğü</div>
+      <button class="btn-primary" onclick="openAddFoodModal()" style="margin-bottom:10px">＋ Gıda Dene / Kaydet</button>
+      <div id="foodLog"></div>
+    </div>
+
+    <div class="sec-title">🛒 Gıda Listesi</div>
+    <div style="margin-bottom:8px">
+      <input type="text" id="foodSearch" placeholder="🔍 Gıda ara..." oninput="renderFoodGrid()" style="width:100%;border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;font-family:var(--ff-body);background:var(--input-bg);color:var(--text);outline:none">
+    </div>
+    <div id="foodGrid"></div>
+  </div>
+
+  <!-- MEMORIES PAGE -->
+  <div class="page" id="page-memories">
+    <div class="sec-title">📸 Özel Anlar</div>
+    <div class="memory-grid">
+      <div class="mem-add-btn" onclick="openMemModal()"><div class="plus">＋</div>Anı Ekle</div>
+      <div id="memoryGrid" style="display:contents"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div class="page" id="page-settings">
+    <div class="sec-title">👶 Bebek Bilgileri</div>
+    <div class="card">
+      <div class="fg" style="margin-bottom:10px"><label>İsim</label><input type="text" id="setName" placeholder="Bebeğin adı"></div>
+      <div class="form-row">
+        <div class="fg"><label>Doğum Tarihi</label><input type="date" id="setBirth"></div>
+        <div class="fg"><label>Cinsiyet</label>
+          <select id="setGender">
+            <option value="girl">👧 Kız</option>
+            <option value="boy">👦 Erkek</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveSettings()">💾 Kaydet</button>
+    </div>
+
+    <div class="sec-title">🎨 Tema</div>
+    <div class="card">
+      <div class="theme-section">
+        <button class="theme-btn" id="lightBtn" onclick="setMode('light')">☀️ Aydınlık</button>
+        <button class="theme-btn" id="darkBtn" onclick="setMode('dark')">🌙 Karanlık</button>
+      </div>
+    </div>
+
+    <div class="sec-title">🗑️ Tehlikeli Bölge</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Bu bebeğe ait tüm veriler silinir. Bu işlem geri alınamaz.</p>
+      <button onclick="deleteCurrentProfile()" style="background:#EF4444;color:white;border:none;border-radius:var(--radius-sm);padding:11px 18px;font-family:var(--ff-body);font-size:14px;font-weight:800;cursor:pointer;width:100%">🗑️ Bu Profili Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- ADD PROFILE MODAL -->
+<div class="modal-bg" id="addProfileModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addProfileModal')">✕</button>
+    <h3>👶 Yeni Bebek Ekle</h3>
+    <div class="fg" style="margin-bottom:10px"><label>İsim</label><input type="text" id="npName" placeholder="Bebeğin adı"></div>
+    <div class="form-row">
+      <div class="fg"><label>Doğum Tarihi</label><input type="date" id="npBirth"></div>
+      <div class="fg"><label>Cinsiyet</label>
+        <select id="npGender">
+          <option value="girl">👧 Kız</option>
+          <option value="boy">👦 Erkek</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="addProfile()">✅ Profil Oluştur</button>
+  </div>
+</div>
+
+<!-- VACCINE MODAL -->
+<div class="modal-bg" id="vacModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('vacModal')">✕</button>
+    <h3 id="vacModalTitle">Aşı</h3>
+    <div id="vacModalBody"></div>
+  </div>
+</div>
+
+<!-- MILESTONE MODAL -->
+<div class="modal-bg" id="mileModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('mileModal')">✕</button>
+    <h3 id="mileModalTitle">Gelişim</h3>
+    <div id="mileModalBody"></div>
+  </div>
+</div>
+
+<!-- TOOTH MODAL -->
+<div class="modal-bg" id="toothModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('toothModal')">✕</button>
+    <h3 id="toothModalTitle">Diş</h3>
+    <div id="toothModalBody"></div>
+  </div>
+</div>
+
+<!-- FOOD MODAL (detail) -->
+<div class="modal-bg" id="foodModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('foodModal')">✕</button>
+    <h3 id="foodModalTitle">Gıda</h3>
+    <div id="foodModalBody"></div>
+  </div>
+</div>
+
+<!-- ADD FOOD MODAL -->
+<div class="modal-bg" id="addFoodModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addFoodModal')">✕</button>
+    <h3>🥣 Gıda Kaydet</h3>
+    <div class="fg" style="margin-bottom:10px"><label>Gıda Adı</label><input type="text" id="afName" placeholder="Havuç, elma, pirinç..."></div>
+    <div class="fg" style="margin-bottom:10px"><label>Emoji</label>
+      <div id="afEmojiPicker" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>İlk Deneme Tarihi</label><input type="date" id="afDate"></div>
+    <div class="fg" style="margin-bottom:10px"><label>Reaksiyon</label>
+      <select id="afReaction">
+        <option value="ok">✅ Normal — Sorunsuz</option>
+        <option value="allergic">🚨 Alerji Reaksiyonu</option>
+        <option value="intolerant">⚠️ İntolerans / Hassasiyet</option>
+        <option value="disliked">😖 Sevmedi</option>
+        <option value="liked">😋 Çok Sevdi</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:14px"><label>Not</label><textarea id="afNote" placeholder="Reaksiyon detayları, miktar, vb..."></textarea></div>
+    <button class="btn-primary" onclick="saveNewFood()">💾 Kaydet</button>
+  </div>
+</div>
+
+<!-- MEMORY MODAL -->
+<div class="modal-bg" id="memModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('memModal')">✕</button>
+    <h3>📸 Anı Ekle</h3>
+    <div class="fg" style="margin-bottom:10px"><label>Başlık</label><input type="text" id="memTitle" placeholder="İlk adım, ilk gülüş..."></div>
+    <div class="fg" style="margin-bottom:10px"><label>Tarih</label><input type="date" id="memDate"></div>
+    <div class="fg" style="margin-bottom:14px"><label>Emoji Seç</label>
+      <div id="memEmojiPicker" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
+    </div>
+    <button class="btn-primary" onclick="saveMemory()">💾 Kaydet</button>
+  </div>
+</div>
+
+<!-- TOAST & CONFETTI -->
+<div class="toast" id="toast"></div>
+<canvas class="confetti" id="confettiCanvas"></canvas>
+
+<script>
+// ========================= DATA =========================
+const VACCINES = [
+  {id:'v1',name:'Hepatit B (1. Doz)',age:'Doğumda',month:0,desc:'Hepatit B virüsüne karşı koruma. Doğumda yapılır.'},
+  {id:'v2',name:'BCG (Verem)',age:'2. ay',month:2,desc:'Tüberküloz hastalığına karşı koruma.'},
+  {id:'v3',name:'Hepatit B (2. Doz)',age:'2. ay',month:2,desc:'2. doz Hepatit B aşısı.'},
+  {id:'v4',name:'DBT-İPA-Hib-HepB (1. Doz)',age:'2. ay',month:2,desc:'Difteri, Boğmaca, Tetanoz, Polio, Hib, Hepatit B kombine.'},
+  {id:'v5',name:'Pnömokok (1. Doz)',age:'2. ay',month:2,desc:'Pnömokok hastalıklarına karşı koruma.'},
+  {id:'v6',name:'DBT-İPA-Hib-HepB (2. Doz)',age:'4. ay',month:4,desc:'2. doz kombine aşı.'},
+  {id:'v7',name:'Pnömokok (2. Doz)',age:'4. ay',month:4,desc:'2. doz Pnömokok aşısı.'},
+  {id:'v8',name:'DBT-İPA-Hib-HepB (3. Doz)',age:'6. ay',month:6,desc:'3. doz kombine aşı.'},
+  {id:'v9',name:'Pnömokok (3. Doz)',age:'6. ay',month:6,desc:'3. doz Pnömokok aşısı.'},
+  {id:'v10',name:'Hepatit B (3. Doz)',age:'6. ay',month:6,desc:'3. doz Hepatit B.'},
+  {id:'v11',name:'Suçiçeği',age:'12. ay',month:12,desc:'Suçiçeği hastalığına karşı koruma.'},
+  {id:'v12',name:'KKK (1. Doz)',age:'12. ay',month:12,desc:'Kızamık, Kızamıkçık, Kabakulak.'},
+  {id:'v13',name:'Hepatit A (1. Doz)',age:'18. ay',month:18,desc:'Hepatit A virüsüne karşı koruma.'},
+  {id:'v14',name:'DBT-İPA Rapel',age:'18. ay',month:18,desc:'Rapel dozu.'},
+  {id:'v15',name:'Hepatit A (2. Doz)',age:'24. ay',month:24,desc:'2. doz Hepatit A aşısı.'},
+  {id:'v16',name:'KKK (2. Doz)',age:'4-6 yaş',month:48,desc:'2. doz KKK aşısı.'},
+];
+
+const MILESTONES = [
+  {cat:'🗣️ Dil & İletişim', items:[
+    {id:'m1',name:'İlk ses çıkarma',emoji:'🔊',desc:'Agulama başlar',target:'1-2 ay'},
+    {id:'m2',name:'İlk gülümseme',emoji:'😊',desc:'Sosyal gülümseme',target:'6-8 hafta'},
+    {id:'m3',name:'Sesli gülme',emoji:'😄',desc:'Güldüğünde ses çıkarır',target:'3-4 ay'},
+    {id:'m4',name:'İsmine dönme',emoji:'👂',desc:'Adı seslenilince döner',target:'5-6 ay'},
+    {id:'m5',name:'İlk hece (ba-ba)',emoji:'💬',desc:'ba-ba, ma-ma heceleri',target:'6-9 ay'},
+    {id:'m6',name:'"Anne" demek',emoji:'👩',desc:'Anne kelimesini söyler',target:'9-12 ay'},
+    {id:'m7',name:'"Baba" demek',emoji:'👨',desc:'Baba kelimesini söyler',target:'9-12 ay'},
+    {id:'m8',name:'3 anlamlı kelime',emoji:'💡',desc:'3 kelime söyler',target:'12-15 ay'},
+    {id:'m9',name:'10 kelime',emoji:'📢',desc:'10+ kelime söyler',target:'18 ay'},
+    {id:'m10',name:'2 kelimelik cümle',emoji:'💬',desc:'İki kelimeyi birleştirir',target:'18-24 ay'},
+  ]},
+  {cat:'🏃 Motor Gelişim', items:[
+    {id:'m11',name:'Baş tutma',emoji:'💪',desc:'Başını dik tutar',target:'3-4 ay'},
+    {id:'m12',name:'Sırtüstü / yüzüstü dönme',emoji:'🔄',desc:'Dönerek yatma',target:'4-6 ay'},
+    {id:'m13',name:'Desteksiz oturma',emoji:'🪑',desc:'Yardımsız oturur',target:'6-8 ay'},
+    {id:'m14',name:'Emekleme',emoji:'🐾',desc:'Emeklemeye başlar',target:'7-10 ay'},
+    {id:'m15',name:'Tutunarak ayakta durma',emoji:'🧍',desc:'Bir yere tutunarak ayakta',target:'8-10 ay'},
+    {id:'m16',name:'İlk adım',emoji:'👣',desc:'İlk adımını atar',target:'9-12 ay'},
+    {id:'m17',name:'Bağımsız yürüme',emoji:'🚶',desc:'Desteksiz yürür',target:'12-15 ay'},
+    {id:'m18',name:'Merdiven çıkma',emoji:'🪜',desc:'Merdiveni tırmanır',target:'18-24 ay'},
+    {id:'m19',name:'Koşma',emoji:'🏃',desc:'Koşmaya başlar',target:'18-24 ay'},
+  ]},
+  {cat:'🧠 Bilişsel Gelişim', items:[
+    {id:'m20',name:'Nesne takibi',emoji:'👀',desc:'Hareket eden nesneyi izler',target:'1-2 ay'},
+    {id:'m21',name:'Yüz tanıma',emoji:'😍',desc:'Anne-babayı tanır',target:'2-3 ay'},
+    {id:'m22',name:'El-ağız koordinasyon',emoji:'✋',desc:'Elini ağzına götürür',target:'3-4 ay'},
+    {id:'m23',name:'Nesne kalıcılığı',emoji:'🎁',desc:'Saklanan nesneyi arar',target:'8-10 ay'},
+    {id:'m24',name:'İşaret etme',emoji:'☝️',desc:'İstediğini parmakla gösterir',target:'10-12 ay'},
+    {id:'m25',name:'Sıralama & kule yapma',emoji:'🧱',desc:'Blokları üst üste koyar',target:'15-18 ay'},
+  ]},
+  {cat:'🤝 Sosyal & Duygusal', items:[
+    {id:'m26',name:'Göz teması',emoji:'👁️',desc:'Gözlere bakarak iletişim',target:'1-2 ay'},
+    {id:'m27',name:'Ayna sevinci',emoji:'🪞',desc:'Aynada kendine güler',target:'4-6 ay'},
+    {id:'m28',name:'Yabancı kaygısı',emoji:'😟',desc:'Yabancılara karşı çekingen',target:'6-9 ay'},
+    {id:'m29',name:'El sallama',emoji:'👋',desc:'Hoşça kal el sallar',target:'9-12 ay'},
+    {id:'m30',name:'Alkış yapma',emoji:'👏',desc:'Ellerini çırpar',target:'9-12 ay'},
+  ]},
+];
+
+const TEETH_DATA = [
+  {id:'u1',abbr:'MK',name:'Üst Orta Kesici',jaw:'upper',eruptAge:'8-12 ay'},
+  {id:'u2',abbr:'YK',name:'Üst Yan Kesici',jaw:'upper',eruptAge:'9-13 ay'},
+  {id:'u3',abbr:'KP',name:'Üst Köpek',jaw:'upper',eruptAge:'16-22 ay'},
+  {id:'u4',abbr:'1A',name:'Üst 1. Azı',jaw:'upper',eruptAge:'13-19 ay'},
+  {id:'u5',abbr:'2A',name:'Üst 2. Azı',jaw:'upper',eruptAge:'25-33 ay'},
+  {id:'u5b',abbr:'2A',name:'Üst 2. Azı',jaw:'upper',eruptAge:'25-33 ay'},
+  {id:'u4b',abbr:'1A',name:'Üst 1. Azı',jaw:'upper',eruptAge:'13-19 ay'},
+  {id:'u3b',abbr:'KP',name:'Üst Köpek',jaw:'upper',eruptAge:'16-22 ay'},
+  {id:'u2b',abbr:'YK',name:'Üst Yan Kesici',jaw:'upper',eruptAge:'9-13 ay'},
+  {id:'u1b',abbr:'MK',name:'Üst Orta Kesici',jaw:'upper',eruptAge:'8-12 ay'},
+  {id:'l1',abbr:'MK',name:'Alt Orta Kesici',jaw:'lower',eruptAge:'6-10 ay'},
+  {id:'l2',abbr:'YK',name:'Alt Yan Kesici',jaw:'lower',eruptAge:'10-16 ay'},
+  {id:'l3',abbr:'KP',name:'Alt Köpek',jaw:'lower',eruptAge:'17-23 ay'},
+  {id:'l4',abbr:'1A',name:'Alt 1. Azı',jaw:'lower',eruptAge:'14-18 ay'},
+  {id:'l5',abbr:'2A',name:'Alt 2. Azı',jaw:'lower',eruptAge:'23-31 ay'},
+  {id:'l5b',abbr:'2A',name:'Alt 2. Azı',jaw:'lower',eruptAge:'23-31 ay'},
+  {id:'l4b',abbr:'1A',name:'Alt 1. Azı',jaw:'lower',eruptAge:'14-18 ay'},
+  {id:'l3b',abbr:'KP',name:'Alt Köpek',jaw:'lower',eruptAge:'17-23 ay'},
+  {id:'l2b',abbr:'YK',name:'Alt Yan Kesici',jaw:'lower',eruptAge:'10-16 ay'},
+  {id:'l1b',abbr:'MK',name:'Alt Orta Kesici',jaw:'lower',eruptAge:'6-10 ay'},
+];
+
+const FOOD_CATEGORIES = [
+  {cat:'🥕 Sebzeler', items:[
+    {id:'f1',name:'Havuç',emoji:'🥕'},{id:'f2',name:'Patates',emoji:'🥔'},{id:'f3',name:'Kabak',emoji:'🥦'},
+    {id:'f4',name:'Bezelye',emoji:'🟢'},{id:'f5',name:'Ispanak',emoji:'🌿'},{id:'f6',name:'Brokoli',emoji:'🥦'},
+    {id:'f7',name:'Tatlı Patates',emoji:'🍠'},{id:'f8',name:'Soğan',emoji:'🧅'},{id:'f9',name:'Domates',emoji:'🍅'},
+    {id:'f10',name:'Salatalık',emoji:'🥒'},
+  ]},
+  {cat:'🍎 Meyveler', items:[
+    {id:'f11',name:'Elma',emoji:'🍎'},{id:'f12',name:'Armut',emoji:'🍐'},{id:'f13',name:'Muz',emoji:'🍌'},
+    {id:'f14',name:'Şeftali',emoji:'🍑'},{id:'f15',name:'Erik',emoji:'🫐'},{id:'f16',name:'Çilek',emoji:'🍓'},
+    {id:'f17',name:'Kivi',emoji:'🥝'},{id:'f18',name:'Kavun',emoji:'🍈'},{id:'f19',name:'Karpuz',emoji:'🍉'},
+    {id:'f20',name:'Üzüm',emoji:'🍇'},
+  ]},
+  {cat:'🌾 Tahıllar & Baklagiller', items:[
+    {id:'f21',name:'Pirinç',emoji:'🍚'},{id:'f22',name:'Yulaf',emoji:'🌾'},{id:'f23',name:'Buğday Unu',emoji:'🍞'},
+    {id:'f24',name:'Makarna',emoji:'🍝'},{id:'f25',name:'Mercimek',emoji:'🟤'},{id:'f26',name:'Nohut',emoji:'🟡'},
+    {id:'f27',name:'Fasulye',emoji:'🫘'},
+  ]},
+  {cat:'🥩 Et & Protein', items:[
+    {id:'f28',name:'Tavuk',emoji:'🍗'},{id:'f29',name:'Kırmızı Et',emoji:'🥩'},{id:'f30',name:'Balık',emoji:'🐟'},
+    {id:'f31',name:'Yumurta (Sarısı)',emoji:'🥚'},{id:'f32',name:'Yumurta (Tamamı)',emoji:'🍳'},
+  ]},
+  {cat:'🥛 Süt Ürünleri', items:[
+    {id:'f33',name:'Yoğurt',emoji:'🥛'},{id:'f34',name:'Peynir',emoji:'🧀'},{id:'f35',name:'Tereyağı',emoji:'🧈'},
+    {id:'f36',name:'İnek Sütü',emoji:'🐄'},
+  ]},
+  {cat:'🥜 Yaygın Alerjenler', items:[
+    {id:'f37',name:'Fıstık',emoji:'🥜'},{id:'f38',name:'Fındık',emoji:'🌰'},{id:'f39',name:'Susam',emoji:'🌱'},
+    {id:'f40',name:'Soya',emoji:'🫘'},{id:'f41',name:'Gluten',emoji:'🌾'},{id:'f42',name:'Kabuklu Deniz Ür.',emoji:'🦐'},
+  ]},
+];
+
+const MEM_EMOJIS = ['🌟','🎉','👣','💕','🎈','🌈','🍼','🦋','🌸','🎂','🎠','🌙','✨','🐣','💫','🎵','🦄','🌺','🥰','🎀','🏆','🎯','💎','🌻'];
+const FOOD_EMOJIS = ['🥣','🍎','🥕','🍌','🥦','🍑','🐟','🥚','🥛','🌾','🥩','🍗','🍠','🫐','🥝'];
+
+// ========================= STATE =========================
+let profiles = [];
+let currentProfileId = null;
+let selectedMemEmoji = '🌟';
+let selectedFoodEmoji = '🥣';
+
+function getCurrentProfile() {
+  return profiles.find(p => p.id === currentProfileId);
+}
+
+function getProfileData(key, def) {
+  const p = getCurrentProfile();
+  if (!p) return def;
+  if (p[key] === undefined) p[key] = def;
+  return p[key];
+}
+
+function setProfileData(key, val) {
+  const p = getCurrentProfile();
+  if (p) { p[key] = val; saveAll(); }
+}
+
+// ========================= STORAGE =========================
+function saveAll() {
+  localStorage.setItem('bgProfiles', JSON.stringify(profiles));
+}
+
+function loadAll() {
+  const saved = localStorage.getItem('bgProfiles');
+  if (saved) {
+    try { profiles = JSON.parse(saved); } catch(e) { profiles = []; }
+  }
+  // Ensure each profile has all needed arrays
+  profiles.forEach(p => {
+    if (!p.measurements) p.measurements = [];
+    if (!p.vaccines) p.vaccines = VACCINES.map(v => ({...v, done:false, date:'', hospital:'', notes:''}));
+    if (!p.milestones) {
+      p.milestones = [];
+      MILESTONES.forEach(c => c.items.forEach(i => p.milestones.push({...i, done:false, date:'', notes:''})));
+    }
+    if (!p.teeth) p.teeth = {};
+    if (!p.foods) p.foods = {};
+    if (!p.memories) p.memories = [];
+  });
+}
+
+// ========================= THEME =========================
+function setMode(mode) {
+  document.documentElement.setAttribute('data-theme', mode);
+  localStorage.setItem('bgTheme', mode);
+  updateModeButtons(mode);
+}
+
+function toggleMode() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setMode(cur === 'dark' ? 'light' : 'dark');
+}
+
+function updateModeButtons(mode) {
+  const isDark = mode === 'dark';
+  const lb = document.getElementById('lightBtn');
+  const db = document.getElementById('darkBtn');
+  const mps = document.getElementById('modeTogglePs');
+  const map = document.getElementById('modeToggleApp');
+  if (lb) lb.classList.toggle('active', !isDark);
+  if (db) db.classList.toggle('active', isDark);
+  if (mps) mps.textContent = isDark ? '☀️ Aydınlık' : '🌙 Karanlık';
+  if (map) map.textContent = isDark ? '☀️' : '🌙';
+}
+
+function applyGender(gender) {
+  document.documentElement.setAttribute('data-gender', gender || 'girl');
+}
+
+// ========================= PROFILES =========================
+function renderProfiles() {
+  const list = document.getElementById('profileList');
+  if (profiles.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="emo">👶</div><p>Henüz bebek profili oluşturulmadı</p></div>';
+    return;
+  }
+  list.innerHTML = profiles.map(p => {
+    const age = calcAge(p.birth);
+    const isGirl = p.gender === 'girl';
+    const emo = isGirl ? '👧' : '👦';
+    return `<div class="profile-card" onclick="openProfile('${p.id}')">
+      <div class="profile-avatar" style="background:${isGirl ? 'linear-gradient(135deg,#FF6B9D,#E91E8C)' : 'linear-gradient(135deg,#42A5F5,#1565C0)'}">${emo}</div>
+      <div class="profile-info">
+        <div class="profile-name">${p.name}</div>
+        <div class="profile-meta">${isGirl ? 'Kız' : 'Erkek'} · ${age}</div>
+      </div>
+      <button class="profile-del" onclick="event.stopPropagation();deleteProfile('${p.id}')">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+function calcAge(birth) {
+  if (!birth) return 'Tarih girilmedi';
+  const b = new Date(birth), now = new Date();
+  let months = (now.getFullYear() - b.getFullYear()) * 12 + now.getMonth() - b.getMonth();
+  if (months < 0) months = 0;
+  const days = Math.floor((now - b) / 86400000);
+  if (days < 0) return 'Tarih hatalı';
+  if (months < 1) return days + ' günlük';
+  if (months < 24) return months + ' aylık';
+  return Math.floor(months/12) + ' yaş ' + (months%12) + ' ay';
+}
+
+function openAddProfileModal() {
+  document.getElementById('npName').value = '';
+  document.getElementById('npBirth').value = '';
+  document.getElementById('npGender').value = 'girl';
+  document.getElementById('addProfileModal').classList.add('show');
+}
+
+function addProfile() {
+  const name = document.getElementById('npName').value.trim();
+  const birth = document.getElementById('npBirth').value;
+  const gender = document.getElementById('npGender').value;
+  if (!name) { showToast('⚠️ İsim girin'); return; }
+  const p = {
+    id: 'p_' + Date.now(),
+    name, birth, gender,
+    measurements: [],
+    vaccines: VACCINES.map(v => ({...v, done:false, date:'', hospital:'', notes:''})),
+    milestones: [],
+    teeth: {}, foods: {}, memories: []
+  };
+  MILESTONES.forEach(c => c.items.forEach(i => p.milestones.push({...i, done:false, date:'', notes:''})));
+  profiles.push(p);
+  saveAll();
+  closeModal('addProfileModal');
+  renderProfiles();
+  showToast('🎉 Profil oluşturuldu!');
+  launchConfetti();
+}
+
+function deleteProfile(id) {
+  if (!confirm('Bu profili silmek istiyor musunuz? Tüm veriler silinir.')) return;
+  profiles = profiles.filter(p => p.id !== id);
+  saveAll();
+  renderProfiles();
+  showToast('🗑️ Profil silindi');
+}
+
+function openProfile(id) {
+  currentProfileId = id;
+  const p = getCurrentProfile();
+  if (!p) return;
+  applyGender(p.gender);
+  document.getElementById('profileScreen').style.display = 'none';
+  const app = document.getElementById('appScreen');
+  app.style.display = 'flex';
+  updateTopBar();
+  showPage('growth');
+}
+
+function goToProfiles() {
+  currentProfileId = null;
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('profileScreen').style.display = 'flex';
+  document.documentElement.setAttribute('data-gender', 'girl');
+  renderProfiles();
+}
+
+function deleteCurrentProfile() {
+  if (!confirm('Bu bebek profilini ve tüm verilerini silmek istiyor musunuz?')) return;
+  profiles = profiles.filter(p => p.id !== currentProfileId);
+  saveAll();
+  goToProfiles();
+  showToast('🗑️ Profil silindi');
+}
+
+function updateTopBar() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  document.getElementById('tbName').textContent = (p.gender === 'girl' ? '🌸 ' : '🚀 ') + p.name;
+  document.getElementById('tbAge').textContent = calcAge(p.birth);
+  document.getElementById('tbAvatar').textContent = p.gender === 'girl' ? '👧' : '👦';
+}
+
+// ========================= NAVIGATION =========================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  const tab = document.querySelector(`[data-tab="${id}"]`);
+  if (tab) tab.classList.add('active');
+  updateTopBar();
+  const renders = {
+    growth: renderMeasurements,
+    vaccines: renderVaccines,
+    milestones: renderMilestones,
+    teeth: renderTeeth,
+    food: renderFoodPage,
+    memories: renderMemories,
+    settings: loadSettings,
+  };
+  if (renders[id]) renders[id]();
+}
+
+// ========================= GROWTH =========================
+function addMeasurement() {
+  const date = document.getElementById('mDate').value;
+  const h = parseFloat(document.getElementById('mH').value);
+  const w = parseFloat(document.getElementById('mW').value);
+  const hd = parseFloat(document.getElementById('mHd').value);
+  if (!date) { showToast('⚠️ Tarih seçin'); return; }
+  if (isNaN(h) && isNaN(w) && isNaN(hd)) { showToast('⚠️ En az bir ölçüm girin'); return; }
+  const p = getCurrentProfile();
+  if (!p) return;
+  p.measurements.push({date, h: isNaN(h)?null:h, w: isNaN(w)?null:w, hd: isNaN(hd)?null:hd});
+  p.measurements.sort((a,b) => a.date < b.date ? -1 : 1);
+  saveAll();
+  renderMeasurements();
+  showToast('✅ Ölçüm kaydedildi!');
+  ['mH','mW','mHd'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderMeasurements() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  const m = p.measurements;
+  if (m.length === 0) {
+    document.getElementById('lastH').textContent = '--';
+    document.getElementById('lastW').textContent = '--';
+    document.getElementById('lastHd').textContent = '--';
+    document.getElementById('noChart').style.display = 'block';
+    document.getElementById('miniChart').style.display = 'none';
+    document.getElementById('measureList').innerHTML = '<div class="empty"><div class="emo">📏</div><p>Henüz ölçüm yok</p></div>';
+    return;
+  }
+  const last = m[m.length - 1];
+  document.getElementById('lastH').textContent = last.h ?? '--';
+  document.getElementById('lastW').textContent = last.w ?? '--';
+  document.getElementById('lastHd').textContent = last.hd ?? '--';
+  document.getElementById('noChart').style.display = 'none';
+  drawChart(m);
+  document.getElementById('measureList').innerHTML = [...m].reverse().map((item, i) => `
+    <div class="hist-item">
+      <div class="hi-icon">📋</div>
+      <div class="hi-info">
+        <div class="hi-vals">${item.h ? '📏 '+item.h+'cm ' : ''}${item.w ? '⚖️ '+item.w+'kg ' : ''}${item.hd ? '🎯 '+item.hd+'cm' : ''}</div>
+        <div class="hi-date">${fmtDate(item.date)}</div>
+      </div>
+      <button class="del-btn" onclick="delMeasurement(${m.length-1-i})">🗑️</button>
+    </div>`).join('');
+}
+
+function delMeasurement(idx) {
+  const p = getCurrentProfile();
+  if (!p) return;
+  p.measurements.splice(idx, 1);
+  saveAll();
+  renderMeasurements();
+  showToast('🗑️ Silindi');
+}
+
+function drawChart(data) {
+  const canvas = document.getElementById('miniChart');
+  const wData = data.filter(d => d.w !== null);
+  if (wData.length < 2) { canvas.style.display = 'none'; return; }
+  canvas.style.display = 'block';
+  const W = canvas.offsetWidth || 300, H = 120;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  const vals = wData.map(d => d.w);
+  const minV = Math.min(...vals), maxV = Math.max(...vals);
+  const pad = 28;
+  const color = document.documentElement.getAttribute('data-gender') === 'boy' ? '#2196F3' : '#FF6B9D';
+  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  wData.forEach((d, i) => {
+    const x = pad + (i/(wData.length-1))*(W-pad*2);
+    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, color.replace(')',',0.18)').replace('rgb','rgba'));
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  // Refill for area
+  ctx.beginPath();
+  wData.forEach((d,i) => {
+    const x = pad + (i/(wData.length-1))*(W-pad*2);
+    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  const lastX = pad + (wData.length-1)/(wData.length-1)*(W-pad*2);
+  ctx.lineTo(lastX, H-pad/2);
+  ctx.lineTo(pad, H-pad/2);
+  ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  wData.forEach((d,i) => {
+    const x = pad + (i/(wData.length-1))*(W-pad*2);
+    const y = H - pad - ((d.w - minV)/(maxV - minV || 1))*(H-pad*2);
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.fillStyle = document.documentElement.getAttribute('data-theme')==='dark'?'#F0F0FF':'#1A1A2E';
+    ctx.font = '9px Nunito'; ctx.textAlign = 'center';
+    ctx.fillText(d.w+'kg', x, y-8);
+  });
+}
+
+// ========================= VACCINES =========================
+function renderVaccines() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  const done = p.vaccines.filter(v => v.done).length;
+  document.getElementById('vacProg').textContent = done+' / '+p.vaccines.length;
+  document.getElementById('vacBar').style.width = Math.round(done/p.vaccines.length*100)+'%';
+  const groups = {};
+  p.vaccines.forEach(v => { if (!groups[v.age]) groups[v.age]=[]; groups[v.age].push(v); });
+  let html = '';
+  Object.entries(groups).forEach(([age, vacs]) => {
+    html += `<div class="sec-title">⏰ ${age}</div>`;
+    vacs.forEach(v => {
+      const s = v.done ? 'done' : 'pending';
+      html += `<div class="vac-item" onclick="openVacModal('${v.id}')">
+        <div class="vac-check ${s}">${v.done ? '✓' : '○'}</div>
+        <div style="flex:1">
+          <div class="vac-name">${v.name}</div>
+          <div class="vac-detail">${v.done ? '📅 '+fmtDate(v.date)+(v.hospital?' · 🏥 '+v.hospital:'') : v.desc}</div>
+        </div>
+        <div class="vac-badge ${v.done?'b-done':'b-pending'}">${v.done?'Yapıldı':'Bekliyor'}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('vaccineList').innerHTML = html;
+}
+
+function openVacModal(id) {
+  const p = getCurrentProfile();
+  const v = p.vaccines.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('vacModalTitle').textContent = '💉 '+v.name;
+  document.getElementById('vacModalBody').innerHTML = `
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">${v.desc}</p>
+    <div class="fg" style="margin-bottom:8px"><label>Yapılma Tarihi</label><input type="date" id="vd" value="${v.date}"></div>
+    <div class="fg" style="margin-bottom:8px"><label>Hastane / Klinik</label><input type="text" id="vh" value="${v.hospital}" placeholder="Nerede yapıldı?"></div>
+    <div class="fg" style="margin-bottom:12px"><label>Notlar</label><input type="text" id="vn" value="${v.notes||''}" placeholder="Herhangi bir not..."></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:14px;color:var(--text)">
+      <input type="checkbox" id="vdone" ${v.done?'checked':''} style="width:18px;height:18px;accent-color:var(--p1)"> Aşı yapıldı ✓
+    </label>
+    <button class="btn-primary" onclick="saveVac('${id}')">💾 Kaydet</button>`;
+  document.getElementById('vacModal').classList.add('show');
+}
+
+function saveVac(id) {
+  const p = getCurrentProfile();
+  const v = p.vaccines.find(x => x.id === id);
+  const wasDone = v.done;
+  v.done = document.getElementById('vdone').checked;
+  v.date = document.getElementById('vd').value;
+  v.hospital = document.getElementById('vh').value;
+  v.notes = document.getElementById('vn').value;
+  saveAll();
+  renderVaccines();
+  closeModal('vacModal');
+  if (v.done && !wasDone) { showToast('🎉 Aşı tamamlandı!'); launchConfetti(); }
+  else showToast('💾 Kaydedildi');
+}
+
+// ========================= MILESTONES =========================
+function renderMilestones() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  const done = p.milestones.filter(m => m.done).length;
+  document.getElementById('mileProg').textContent = done+' / '+p.milestones.length;
+  document.getElementById('mileBar').style.width = Math.round(done/p.milestones.length*100)+'%';
+  let html = '';
+  MILESTONES.forEach(cat => {
+    html += `<div class="sec-title">${cat.cat}</div><div class="mile-grid">`;
+    cat.items.forEach(item => {
+      const ms = p.milestones.find(m => m.id === item.id) || item;
+      html += `<div class="mile-card ${ms.done?'done':''}" onclick="openMileModal('${item.id}')">
+        <span class="mile-emoji">${item.emoji}</span>
+        <div class="mile-name">${item.name}</div>
+        <div class="mile-desc">${item.desc}</div>
+        <div class="mile-date">${ms.done ? '✅ '+fmtDate(ms.date) : '🎯 '+item.target}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('mileCats').innerHTML = html;
+}
+
+function openMileModal(id) {
+  const p = getCurrentProfile();
+  const item = MILESTONES.flatMap(c => c.items).find(i => i.id === id);
+  const ms = p.milestones.find(m => m.id === id) || {};
+  document.getElementById('mileModalTitle').textContent = item.emoji+' '+item.name;
+  document.getElementById('mileModalBody').innerHTML = `
+    <p style="font-size:13px;color:var(--text2);margin-bottom:3px">${item.desc}</p>
+    <p style="font-size:12px;color:var(--p1);font-weight:800;margin-bottom:12px">🎯 Hedef: ${item.target}</p>
+    <div class="fg" style="margin-bottom:8px"><label>Gerçekleşme Tarihi</label><input type="date" id="md" value="${ms.date||''}"></div>
+    <div class="fg" style="margin-bottom:12px"><label>Not</label><input type="text" id="mn" value="${ms.notes||''}" placeholder="O anı tarif edin..."></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:14px;color:var(--text)">
+      <input type="checkbox" id="mdone" ${ms.done?'checked':''} style="width:18px;height:18px;accent-color:var(--p1)"> Bu gelişim gerçekleşti! 🎉
+    </label>
+    <button class="btn-primary" onclick="saveMilestone('${id}')">💾 Kaydet</button>`;
+  document.getElementById('mileModal').classList.add('show');
+}
+
+function saveMilestone(id) {
+  const p = getCurrentProfile();
+  const ms = p.milestones.find(m => m.id === id);
+  const wasDone = ms ? ms.done : false;
+  const nowDone = document.getElementById('mdone').checked;
+  if (ms) {
+    ms.done = nowDone;
+    ms.date = document.getElementById('md').value;
+    ms.notes = document.getElementById('mn').value;
+  }
+  saveAll();
+  renderMilestones();
+  closeModal('mileModal');
+  if (nowDone && !wasDone) { showToast('🎉 Tebrikler! Yeni gelişim!'); launchConfetti(); }
+  else showToast('💾 Kaydedildi');
+}
+
+// ========================= TEETH =========================
+function renderTeeth() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  function renderJaw(arr, cid) {
+    const c = document.getElementById(cid);
+    c.innerHTML = '';
+    arr.forEach(t => {
+      const info = p.teeth[t.id] || {};
+      const cls = info.fallen ? 'fallen' : info.erupted ? 'erupted' : '';
+      const div = document.createElement('div');
+      div.className = 'tooth '+cls;
+      div.innerHTML = `<span>${t.abbr}</span>`;
+      div.title = t.name;
+      div.onclick = () => openToothModal(t.id);
+      c.appendChild(div);
+    });
+  }
+  renderJaw(TEETH_DATA.filter(t => t.jaw==='upper'), 'upperJaw');
+  renderJaw(TEETH_DATA.filter(t => t.jaw==='lower'), 'lowerJaw');
+  renderToothLog();
+}
+
+function renderToothLog() {
+  const p = getCurrentProfile();
+  const entries = Object.entries(p.teeth).filter(([,v]) => v.erupted || v.fallen);
+  const log = document.getElementById('toothLog');
+  if (!entries.length) { log.innerHTML = '<div class="empty"><div class="emo">🦷</div><p>Dişlere tıklayarak kayıt ekleyin</p></div>'; return; }
+  log.innerHTML = entries.map(([id, info]) => {
+    const t = TEETH_DATA.find(x => x.id === id);
+    if (!t) return '';
+    return `<div class="hist-item">
+      <div class="hi-icon">${info.fallen ? '⭐' : '🦷'}</div>
+      <div class="hi-info">
+        <div class="hi-vals">${t.name} — ${info.fallen ? 'Düştü' : 'Çıktı'}</div>
+        <div class="hi-date">${info.eruptDate ? '📅 Çıkma: '+fmtDate(info.eruptDate) : ''} ${info.fallenDate ? '· Düşme: '+fmtDate(info.fallenDate) : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openToothModal(id) {
+  const p = getCurrentProfile();
+  const t = TEETH_DATA.find(x => x.id === id);
+  const info = p.teeth[id] || {};
+  document.getElementById('toothModalTitle').textContent = '🦷 '+t.name;
+  document.getElementById('toothModalBody').innerHTML = `
+    <p style="font-size:12px;color:var(--p1);font-weight:800;margin-bottom:12px">🎯 Beklenen çıkış: ${t.eruptAge}</p>
+    <div class="fg" style="margin-bottom:8px"><label>Diş Çıkma Tarihi</label><input type="date" id="te" value="${info.eruptDate||''}"></div>
+    <div class="fg" style="margin-bottom:8px"><label>Diş Düşme Tarihi</label><input type="date" id="tf" value="${info.fallenDate||''}"></div>
+    <div class="fg" style="margin-bottom:14px"><label>Not</label><input type="text" id="tn" value="${info.notes||''}" placeholder="Not..."></div>
+    <button class="btn-primary" onclick="saveTooth('${id}')">💾 Kaydet</button>`;
+  document.getElementById('toothModal').classList.add('show');
+}
+
+function saveTooth(id) {
+  const p = getCurrentProfile();
+  const eruptDate = document.getElementById('te').value;
+  const fallenDate = document.getElementById('tf').value;
+  p.teeth[id] = { erupted: !!eruptDate, eruptDate, fallen: !!fallenDate, fallenDate, notes: document.getElementById('tn').value };
+  saveAll();
+  renderTeeth();
+  closeModal('toothModal');
+  showToast('🦷 Diş kaydı güncellendi!');
+}
+
+// ========================= FOOD =========================
+function renderFoodPage() {
+  renderFoodSummary();
+  renderFoodLog();
+  renderFoodGrid();
+}
+
+function renderFoodSummary() {
+  const p = getCurrentProfile();
+  const allergic = Object.entries(p.foods).filter(([,v]) => v.reaction === 'allergic').map(([,v]) => v.name);
+  const intolerant = Object.entries(p.foods).filter(([,v]) => v.reaction === 'intolerant').map(([,v]) => v.name);
+  const safe = Object.entries(p.foods).filter(([,v]) => v.reaction === 'ok' || v.reaction === 'liked').map(([,v]) => v.name);
+  const el = document.getElementById('allergySummary');
+  if (!allergic.length && !intolerant.length) {
+    el.innerHTML = '<div class="empty" style="padding:8px 0"><p>Alerji / intolerans kaydı yok — harika! 🎉</p></div>';
+  } else {
+    let html = '';
+    if (allergic.length) html += `<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:#DC2626;margin-bottom:4px">🚨 Alerji (${allergic.length})</div><div class="allergy-tags">${allergic.map(n=>`<span class="a-tag allergic">🚨 ${n}</span>`).join('')}</div></div>`;
+    if (intolerant.length) html += `<div><div style="font-size:11px;font-weight:800;color:#D97706;margin-bottom:4px">⚠️ İntolerans (${intolerant.length})</div><div class="allergy-tags">${intolerant.map(n=>`<span class="a-tag intolerant">⚠️ ${n}</span>`).join('')}</div></div>`;
+    el.innerHTML = html;
+  }
+}
+
+function renderFoodLog() {
+  const p = getCurrentProfile();
+  const entries = Object.entries(p.foods);
+  const log = document.getElementById('foodLog');
+  if (!entries.length) { log.innerHTML = '<div class="empty" style="padding:8px 0"><div class="emo" style="font-size:28px">🥣</div><p>Henüz gıda kaydı yok</p></div>'; return; }
+  const reactionMap = { ok:'✅ Sorunsuz', allergic:'🚨 Alerji', intolerant:'⚠️ İntolerans', disliked:'😖 Sevmedi', liked:'😋 Çok Sevdi' };
+  const reactionClass = { ok:'green', allergic:'red', intolerant:'yellow', disliked:'blue', liked:'green' };
+  log.innerHTML = [...entries].reverse().map(([id, f]) => `
+    <div class="hist-item" onclick="openFoodDetailModal('${id}')">
+      <div class="hi-icon">${f.emoji}</div>
+      <div class="hi-info">
+        <div class="hi-vals" style="display:flex;align-items:center;gap:6px">
+          ${f.name}
+          <span class="badge ${reactionClass[f.reaction]||'blue'}">${reactionMap[f.reaction]||f.reaction}</span>
+        </div>
+        <div class="hi-date">${f.date ? '📅 '+fmtDate(f.date) : ''} ${f.note ? '· '+f.note.substring(0,40)+(f.note.length>40?'...':'') : ''}</div>
+      </div>
+      <button class="del-btn" onclick="event.stopPropagation();delFood('${id}')">🗑️</button>
+    </div>`).join('');
+}
+
+function renderFoodGrid() {
+  const p = getCurrentProfile();
+  const q = (document.getElementById('foodSearch')?.value || '').toLowerCase();
+  const tried = Object.keys(p.foods).length;
+  const total = FOOD_CATEGORIES.reduce((s,c) => s+c.items.length, 0);
+  document.getElementById('foodProg').textContent = tried+' / '+total;
+  document.getElementById('foodBar').style.width = Math.round(tried/total*100)+'%';
+  let html = '';
+  FOOD_CATEGORIES.forEach(cat => {
+    const filtered = cat.items.filter(i => !q || i.name.toLowerCase().includes(q));
+    if (!filtered.length) return;
+    html += `<div class="food-cat-title">${cat.cat}</div><div class="food-grid">`;
+    filtered.forEach(item => {
+      const f = p.foods[item.id];
+      const cls = f ? (f.reaction === 'allergic' ? 'allergic' : f.reaction === 'intolerant' ? 'intolerant' : 'tried') : '';
+      const status = f ? (f.reaction === 'allergic' ? '🚨 Alerji' : f.reaction === 'intolerant' ? '⚠️ İntolerans' : f.reaction === 'disliked' ? '😖 Sevmedi' : f.reaction === 'liked' ? '😋 Sevdi' : '✅ Denendi') : '';
+      const tick = f ? (f.reaction === 'allergic' ? '🚨' : f.reaction === 'intolerant' ? '⚠️' : '✓') : '';
+      html += `<div class="food-card ${cls}" onclick="openFoodModal('${item.id}','${item.name}','${item.emoji}')">
+        ${tick ? `<div class="tick">${tick}</div>` : ''}
+        <span class="food-emoji">${item.emoji}</span>
+        <div class="food-name">${item.name}</div>
+        ${f ? `<div class="food-status">${status}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('foodGrid').innerHTML = html;
+}
+
+function openFoodModal(id, name, emoji) {
+  const p = getCurrentProfile();
+  const f = p.foods[id];
+  if (f) { openFoodDetailModal(id); return; }
+  // Open add modal for new food
+  document.getElementById('afName').value = name;
+  document.getElementById('afDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('afNote').value = '';
+  document.getElementById('afReaction').value = 'ok';
+  selectedFoodEmoji = emoji;
+  buildEmojiPicker('afEmojiPicker', FOOD_EMOJIS, 'selectedFoodEmoji', emoji);
+  // Store food id for saving
+  document.getElementById('addFoodModal').dataset.foodId = id;
+  document.getElementById('addFoodModal').classList.add('show');
+}
+
+function openAddFoodModal() {
+  document.getElementById('afName').value = '';
+  document.getElementById('afDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('afNote').value = '';
+  document.getElementById('afReaction').value = 'ok';
+  selectedFoodEmoji = '🥣';
+  buildEmojiPicker('afEmojiPicker', FOOD_EMOJIS, 'selectedFoodEmoji', '🥣');
+  document.getElementById('addFoodModal').dataset.foodId = 'custom_' + Date.now();
+  document.getElementById('addFoodModal').classList.add('show');
+}
+
+function saveNewFood() {
+  const name = document.getElementById('afName').value.trim();
+  if (!name) { showToast('⚠️ Gıda adı girin'); return; }
+  const p = getCurrentProfile();
+  const id = document.getElementById('addFoodModal').dataset.foodId || 'custom_'+Date.now();
+  const reaction = document.getElementById('afReaction').value;
+  p.foods[id] = {
+    name, emoji: selectedFoodEmoji,
+    date: document.getElementById('afDate').value,
+    reaction, note: document.getElementById('afNote').value
+  };
+  saveAll();
+  renderFoodPage();
+  closeModal('addFoodModal');
+  if (reaction === 'allergic') { showToast('🚨 Alerji kaydedildi! Dikkatli olun.'); }
+  else if (reaction === 'intolerant') { showToast('⚠️ İntolerans kaydedildi.'); }
+  else showToast('✅ Gıda kaydedildi!');
+}
+
+function openFoodDetailModal(id) {
+  const p = getCurrentProfile();
+  const f = p.foods[id];
+  if (!f) return;
+  const reactionMap = { ok:'✅ Sorunsuz', allergic:'🚨 Alerji Reaksiyonu', intolerant:'⚠️ İntolerans / Hassasiyet', disliked:'😖 Sevmedi', liked:'😋 Çok Sevdi' };
+  const reactionClass = { ok:'green', allergic:'red', intolerant:'yellow', disliked:'blue', liked:'green' };
+  document.getElementById('foodModalTitle').textContent = f.emoji+' '+f.name;
+  document.getElementById('foodModalBody').innerHTML = `
+    <div style="text-align:center;margin-bottom:14px">
+      <span style="font-size:48px">${f.emoji}</span>
+      <div style="margin-top:8px"><span class="badge ${reactionClass[f.reaction]||'blue'}" style="font-size:13px;padding:5px 14px">${reactionMap[f.reaction]||f.reaction}</span></div>
+    </div>
+    ${f.date ? `<div class="hist-item" style="margin-bottom:6px"><div class="hi-icon">📅</div><div class="hi-info"><div class="hi-vals">İlk Deneme</div><div class="hi-date">${fmtDate(f.date)}</div></div></div>` : ''}
+    ${f.note ? `<div class="hist-item" style="margin-bottom:14px"><div class="hi-icon">📝</div><div class="hi-info"><div class="hi-vals">Not</div><div class="hi-date">${f.note}</div></div></div>` : ''}
+    ${f.reaction === 'allergic' ? '<div style="background:#FEE2E2;border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#DC2626;font-weight:700">⚠️ Bu gıdada alerji reaksiyonu kaydedilmiştir. Doktor tavsiyesi alın.</div>' : ''}
+    ${f.reaction === 'intolerant' ? '<div style="background:#FEF3C7;border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#D97706;font-weight:700">⚠️ Bu gıdada intolerans / hassasiyet kaydedilmiştir.</div>' : ''}
+    <button class="btn-primary" onclick="delFood('${id}');closeModal('foodModal')">🗑️ Kaydı Sil</button>`;
+  document.getElementById('foodModal').classList.add('show');
+}
+
+function delFood(id) {
+  const p = getCurrentProfile();
+  delete p.foods[id];
+  saveAll();
+  renderFoodPage();
+  showToast('🗑️ Gıda kaydı silindi');
+}
+
+// ========================= MEMORIES =========================
+function renderMemories() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  const grid = document.getElementById('memoryGrid');
+  grid.innerHTML = p.memories.map((m, i) => `
+    <div class="mem-card" onclick="delMemory(${i})">
+      ${m.emoji}
+      <div class="mem-label">${m.title}<br>${m.date ? fmtDate(m.date) : ''}</div>
+    </div>`).join('');
+}
+
+function openMemModal() {
+  document.getElementById('memDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('memTitle').value = '';
+  selectedMemEmoji = '🌟';
+  buildEmojiPicker('memEmojiPicker', MEM_EMOJIS, 'selectedMemEmoji', '🌟');
+  document.getElementById('memModal').classList.add('show');
+}
+
+function saveMemory() {
+  const title = document.getElementById('memTitle').value || 'Özel an';
+  const date = document.getElementById('memDate').value;
+  const p = getCurrentProfile();
+  p.memories.unshift({ title, date, emoji: selectedMemEmoji });
+  saveAll();
+  renderMemories();
+  closeModal('memModal');
+  showToast('📸 Anı kaydedildi! '+selectedMemEmoji);
+  launchConfetti();
+}
+
+function delMemory(i) {
+  if (!confirm('Bu anıyı silmek istiyor musunuz?')) return;
+  const p = getCurrentProfile();
+  p.memories.splice(i, 1);
+  saveAll();
+  renderMemories();
+  showToast('🗑️ Silindi');
+}
+
+// ========================= SETTINGS =========================
+function loadSettings() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  document.getElementById('setName').value = p.name;
+  document.getElementById('setBirth').value = p.birth || '';
+  document.getElementById('setGender').value = p.gender || 'girl';
+  const mode = document.documentElement.getAttribute('data-theme');
+  updateModeButtons(mode);
+}
+
+function saveSettings() {
+  const p = getCurrentProfile();
+  if (!p) return;
+  p.name = document.getElementById('setName').value.trim() || p.name;
+  p.birth = document.getElementById('setBirth').value;
+  p.gender = document.getElementById('setGender').value;
+  saveAll();
+  applyGender(p.gender);
+  updateTopBar();
+  showToast('💾 Bilgiler güncellendi!');
+}
+
+// ========================= HELPERS =========================
+function fmtDate(d) {
+  if (!d) return '';
+  try { return new Date(d+'T00:00:00').toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}); }
+  catch { return d; }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function buildEmojiPicker(containerId, emojis, varName, initial) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = emojis.map(e =>
+    `<span onclick="selectEmoji('${e}','${varName}','${containerId}')" id="ep_${containerId}_${e}"
+      style="font-size:22px;cursor:pointer;padding:4px 5px;border-radius:8px;transition:background 0.15s;${e===initial?'background:var(--p1-l)':''}">${e}</span>`
+  ).join('');
+}
+
+function selectEmoji(emoji, varName, containerId) {
+  if (varName === 'selectedMemEmoji') selectedMemEmoji = emoji;
+  if (varName === 'selectedFoodEmoji') selectedFoodEmoji = emoji;
+  document.querySelectorAll(`[id^="ep_${containerId}_"]`).forEach(el => el.style.background = '');
+  const el = document.getElementById(`ep_${containerId}_${emoji}`);
+  if (el) el.style.background = 'var(--p1-l)';
+}
+
+// ========================= CONFETTI =========================
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = document.documentElement.getAttribute('data-gender') === 'boy'
+    ? ['#2196F3','#00BCD4','#4CAF50','#FFC107','#9C27B0']
+    : ['#FF6B9D','#E91E8C','#9C27B0','#FFC107','#4CAF50'];
+  const pieces = Array.from({length:80}, () => ({
+    x: Math.random()*canvas.width, y: -20,
+    size: Math.random()*8+4,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    vx: (Math.random()-0.5)*4, vy: Math.random()*4+2,
+    rot: Math.random()*360, rots: (Math.random()-0.5)*8,
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rots; p.vy+=0.08;
+    });
+    frame++;
+    if (frame < 130) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+// ========================= INIT =========================
+loadAll();
+const savedTheme = localStorage.getItem('bgTheme') || 'light';
+setMode(savedTheme);
+document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
+renderProfiles();
+</script>
+</body>
+</html>
