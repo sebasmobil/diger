@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.46
+  Alerji Takip Defteri - Pro 1.0.51
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@
 <style>
 [data-theme="dark"]{--bg:#000000;--card:#2e2e34;--card2:#46464f;--accent:#ffe066;--accent2:#ffaa55;--red:#ff5555;--green:#44e066;--yellow:#ffd60a;--text:#ffffff;--muted:#d8d8e0;--border:#6a6a78;--hbg:rgba(0,0,0,0.98);--b0:#0a3822;--b2:#38300a;--b3:#38200a;--b4:#38100a;--b1:#1e420a;--a0:#0a3822;--a1:#1e420a;--a2:#38300a;--a3:#38200a;--a4:#38100a;--loc:#28105a;--ftag:#46464f;--topbar-bg:#1a1a20;--topbar-text:#888890;}
 [data-theme="light"]{--bg:#f5f0e8;--card:#fff;--card2:#f0ebe0;--accent:#7a4a10;--accent2:#9a4020;--red:#c0392b;--green:#1e8449;--yellow:#a06800;--text:#1a1510;--muted:#7a6a55;--border:#ddd5c5;--hbg:rgba(245,240,232,0.95);--b0:#d4f4e2;--b1:#e0f0c0;--b2:#fef3cd;--b3:#fde5d0;--b4:#fdd0ce;--a0:#d4f4e2;--a1:#e0f0c0;--a2:#fef3cd;--a3:#fde5d0;--a4:#fdd0ce;--loc:#ede0ff;--ftag:#f0ebe0;--topbar-bg:#e8e0d0;--topbar-text:#9a8a70;}
+[data-theme="ocean"]{display:none}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;min-height:100vh;transition:background .3s,color .3s;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 68px);}
 header{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:var(--hbg);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;}
@@ -41,7 +42,7 @@ header{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:v
 .bnav-btn .bnav-icon{font-size:22px;line-height:1;transition:transform .15s;}
 .bnav-btn .bnav-label{font-size:10px;white-space:nowrap;letter-spacing:.2px;transition:color .2s;}
 .bnav-btn.active{color:var(--accent);}
-.bnav-btn.active .bnav-inner{background:var(--accent);background:linear-gradient(135deg,rgba(232,184,109,0.18),rgba(232,184,109,0.08));border-radius:14px;border:1px solid rgba(232,184,109,0.25);}
+.bnav-btn.active .bnav-inner{background:var(--bnav-active-bg,rgba(232,184,109,0.13));border-radius:14px;border:1px solid var(--bnav-active-border,rgba(232,184,109,0.25));}
 .bnav-inner{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 14px 4px;border-radius:14px;border:1px solid transparent;transition:background .2s,border-color .2s;}
 .page{display:none;padding:16px 18px;max-width:700px;margin:0 auto;}
 .page.active{display:block;}
@@ -210,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.46</span>
+  <span>Pro 1.0.51</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -525,6 +526,12 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 <!-- AYARLAR -->
 <div id="tab-ayarlar" class="page">
 
+  <div class="card">
+    <div class="card-title">🎨 Renk Teması</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Vurgu rengini seç. Tüm temalarda geçerli olur.</p>
+    <div id="color-palette" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+  </div>
+
   <div class="card" id="builtin-restore-card">
     <div class="card-title">🔧 Gizli Bölümler</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Sildiğin sabit bölümleri buradan geri ekleyebilirsin.</p>
@@ -664,12 +671,81 @@ let notlarHidden  = localStorage.getItem('alerji-notlar-hidden')==='1';
 let theme = localStorage.getItem('alerji-theme') || 'dark';
 
 // ===== THEME =====
-function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('theme-btn').innerHTML=t==='dark'?'☀️ <span>Aydınlık</span>':'🌙 <span>Karanlık</span>';}
-function toggleTheme(){theme=theme==='dark'?'light':'dark';localStorage.setItem('alerji-theme',theme);applyTheme(theme);}
+const COLOR_PALETTES = [
+  { id:'altin',   label:'Altın',   dark:['#ffe066','#ffaa55'], light:['#7a4a10','#9a4020'] },
+  { id:'turkuaz', label:'Turkuaz', dark:['#5ee7d0','#48b8e0'], light:['#0a7a6a','#0a5a8a'] },
+  { id:'mor',     label:'Mor',     dark:['#c084fc','#a855f7'], light:['#6d28d9','#9333ea'] },
+  { id:'pembe',   label:'Pembe',   dark:['#f472b6','#e879f9'], light:['#be185d','#a21caf'] },
+  { id:'yesil',   label:'Yeşil',   dark:['#4ade80','#22d3ee'], light:['#166534','#0e7490'] },
+  { id:'turuncu', label:'Turuncu', dark:['#fb923c','#f87171'], light:['#9a3412','#991b1b'] },
+  { id:'kirmizi', label:'Kırmızı', dark:['#f87171','#fb7185'], light:['#991b1b','#9f1239'] },
+  { id:'mavi',    label:'Mavi',    dark:['#60a5fa','#818cf8'], light:['#1d4ed8','#4338ca'] },
+];
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+let accentColor = localStorage.getItem('alerji-accent') || 'altin';
+
+function applyAccentColor(id){
+  accentColor = id;
+  localStorage.setItem('alerji-accent', id);
+  const pal = COLOR_PALETTES.find(p=>p.id===id);
+  if(!pal) return;
+  const t = theme;
+  const [a1hex, a2hex] = pal[t] || pal['dark'];
+  const el = document.documentElement;
+  el.style.setProperty('--accent', a1hex);
+  el.style.setProperty('--accent2', a2hex);
+  // Arka plan tonları: accent renginin alfa varyantları
+  const isDark = t === 'dark';
+  const [r,g,b] = hexToRgb(a1hex);
+  // a0-a4: sivilce durum buton arka planları (soluktan koyuya)
+  el.style.setProperty('--a0', isDark ? `rgba(${r},${g},${b},0.12)` : `rgba(${r},${g},${b},0.15)`);
+  el.style.setProperty('--a1', isDark ? `rgba(${r},${g},${b},0.18)` : `rgba(${r},${g},${b},0.20)`);
+  el.style.setProperty('--a2', isDark ? `rgba(${r},${g},${b},0.14)` : `rgba(${r},${g},${b},0.18)`);
+  el.style.setProperty('--a3', isDark ? `rgba(${r},${g},${b},0.10)` : `rgba(${r},${g},${b},0.14)`);
+  el.style.setProperty('--a4', isDark ? `rgba(${r},${g},${b},0.08)` : `rgba(${r},${g},${b},0.10)`);
+  // loc: konum etiketi arka planı
+  el.style.setProperty('--loc', isDark ? `rgba(${r},${g},${b},0.20)` : `rgba(${r},${g},${b},0.18)`);
+  // bnav aktif pill rengi
+  el.style.setProperty('--bnav-active-bg', `rgba(${r},${g},${b},0.13)`);
+  el.style.setProperty('--bnav-active-border', `rgba(${r},${g},${b},0.30)`);
+  renderColorPalette();
+}
+
+function renderColorPalette(){
+  const wrap = document.getElementById('color-palette');
+  if(!wrap) return;
+  wrap.innerHTML = COLOR_PALETTES.map(p=>{
+    const t = theme;
+    const [a1] = p[t] || p['dark'];
+    const isActive = accentColor === p.id;
+    return `<button onclick="applyAccentColor('${p.id}')" style="display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:4px">
+      <div style="width:40px;height:40px;border-radius:12px;background:${a1};border:3px solid ${isActive ? 'var(--text)' : 'transparent'};box-shadow:${isActive ? '0 0 0 2px '+a1 : '0 1px 4px rgba(0,0,0,0.2)'};transition:all .2s"></div>
+      <span style="font-size:10px;color:${isActive ? 'var(--text)' : 'var(--muted)'};font-family:DM Sans,sans-serif;font-weight:${isActive ? '600' : '400'}">${p.label}</span>
+    </button>`;
+  }).join('');
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const btn = document.getElementById('theme-btn');
+  if(t==='dark') btn.innerHTML='☀️ <span>Aydınlık</span>';
+  else           btn.innerHTML='🌙 <span>Karanlık</span>';
+  applyAccentColor(accentColor);
+}
+function toggleTheme(){
+  theme = theme==='dark' ? 'light' : 'dark';
+  localStorage.setItem('alerji-theme',theme);
+  applyTheme(theme);
+}
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
   applyTheme(theme);
+  applyAccentColor(accentColor);
   setDateTime();
   // Dakikada bir tarihi güncelle (sekme açık kalırsa)
   setInterval(()=>{
@@ -1153,7 +1229,7 @@ function saveLog(){
   const date=document.getElementById('inp-date').value;
   const time=document.getElementById('inp-time').value;
   if(!date||!time)return alert('Lütfen tarih ve saat gir!');
-  if(acneValue===null)return alert('Sivilce durumunu seç!');
+  if(acneValue===null)return alert('"'+sivilceTitle+'" için bir seçim yap!');
   const shampoo=selectedShampoo||'';
   const soap=selectedSoap||'';
   const notes=document.getElementById('inp-notes').value.trim();
@@ -2974,7 +3050,7 @@ function setEditSey(v){
   document.getElementById('edit-sey-no').className='yn-btn'+(editSeyVal===false?' no':'');
 }
 function saveEditLog(){
-  if(editAcneVal===null){alert('Sivilce durumunu seç!');return;}
+  if(editAcneVal===null){alert('"'+sivilceTitle+'" için bir seçim yap!');return;}
   const idx=logs.findIndex(l=>l.id===editingLogId);
   if(idx<0) return;
   const foodsRaw = null; // quick-pick kullanılıyor
