@@ -1,5 +1,5 @@
 <!--
-  Alerji Takip Defteri - Pro 1.0.45
+  Alerji Takip Defteri - Pro 1.0.46
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -37,11 +37,12 @@ header{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:v
 .tab.active{}
 /* ALT NAVİGASYON BAR */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--hbg);border-top:1px solid var(--border);backdrop-filter:blur(16px);display:flex;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0);}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 6px;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted);transition:color .2s;min-width:0;-webkit-tap-highlight-color:transparent;}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted);transition:color .2s;min-width:0;-webkit-tap-highlight-color:transparent;}
 .bnav-btn .bnav-icon{font-size:22px;line-height:1;transition:transform .15s;}
-.bnav-btn .bnav-label{font-size:10px;white-space:nowrap;letter-spacing:.2px;}
+.bnav-btn .bnav-label{font-size:10px;white-space:nowrap;letter-spacing:.2px;transition:color .2s;}
 .bnav-btn.active{color:var(--accent);}
-.bnav-btn.active .bnav-icon{transform:translateY(-2px);}
+.bnav-btn.active .bnav-inner{background:var(--accent);background:linear-gradient(135deg,rgba(232,184,109,0.18),rgba(232,184,109,0.08));border-radius:14px;border:1px solid rgba(232,184,109,0.25);}
+.bnav-inner{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 14px 4px;border-radius:14px;border:1px solid transparent;transition:background .2s,border-color .2s;}
 .page{display:none;padding:16px 18px;max-width:700px;margin:0 auto;}
 .page.active{display:block;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;transition:background .3s;}
@@ -209,7 +210,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.45</span>
+  <span>Pro 1.0.46</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -869,6 +870,13 @@ function saveFL(){
 
 // ===== ACNE =====
 function setAcne(v){
+  if(acneValue===v){
+    acneValue=null;
+    document.querySelectorAll('.acne-btn').forEach(b=>b.className='acne-btn');
+    const locSec=document.getElementById('loc-section');
+    if(locSec) locSec.style.display='none';
+    return;
+  }
   acneValue=v;
   document.querySelectorAll('.acne-btn').forEach(b=>{b.className='acne-btn';if(parseInt(b.dataset.v)===v)b.classList.add('sel-'+v);});
   const locSec=document.getElementById('loc-section');
@@ -3538,24 +3546,19 @@ Ağır" style="min-height:100px"></textarea>
 
 <nav class="bottom-nav">
   <button class="bnav-btn" id="bnav-icecek" onclick="showTab('icecek',this)">
-    <span class="bnav-icon">💧</span>
-    <span class="bnav-label">İçecek</span>
+    <div class="bnav-inner"><span class="bnav-icon">💧</span><span class="bnav-label">İçecek</span></div>
   </button>
   <button class="bnav-btn active" id="bnav-kayit" onclick="showTab('kayit',this)">
-    <span class="bnav-icon">✏️</span>
-    <span class="bnav-label">Kayıt Ekle</span>
+    <div class="bnav-inner"><span class="bnav-icon">✏️</span><span class="bnav-label">Kayıt Ekle</span></div>
   </button>
   <button class="bnav-btn" id="bnav-gecmis" onclick="showTab('gecmis',this)">
-    <span class="bnav-icon">📋</span>
-    <span class="bnav-label">Geçmiş</span>
+    <div class="bnav-inner"><span class="bnav-icon">📋</span><span class="bnav-label">Geçmiş</span></div>
   </button>
   <button class="bnav-btn" id="bnav-analiz" onclick="showTab('analiz',this)">
-    <span class="bnav-icon">📊</span>
-    <span class="bnav-label">Analiz</span>
+    <div class="bnav-inner"><span class="bnav-icon">📊</span><span class="bnav-label">Analiz</span></div>
   </button>
   <button class="bnav-btn" id="bnav-ayarlar" onclick="showTab('ayarlar',this)">
-    <span class="bnav-icon">⚙️</span>
-    <span class="bnav-label">Ayarlar</span>
+    <div class="bnav-inner"><span class="bnav-icon">⚙️</span><span class="bnav-label">Ayarlar</span></div>
   </button>
 </nav>
 </body>
