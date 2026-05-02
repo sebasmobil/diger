@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.78</span>
+  <span>Pro 1.0.80</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -465,9 +465,15 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
   </div>
 
   <div class="card">
-    <div class="card-title">🔢 Kaç Gündür?</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div class="card-title" style="margin-bottom:0">🔢 Kaç Gündür?</div>
+      <div style="display:flex;gap:6px">
+        <button id="counter-view-grid" onclick="setCounterView('grid')" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--accent);color:#fff;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">⊞</button>
+        <button id="counter-view-list" onclick="setCounterView('list')" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--btn-bg);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">☰</button>
+      </div>
+    </div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Son kayıtlarına göre hesaplanır. Yeşil = uzak kaldın, Kırmızı = bugün/dün yaptın.</p>
-    <div id="counter-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+    <div id="counter-grid"></div>
   </div>
 
   <div class="card">
@@ -2055,79 +2061,78 @@ function daysBetween(dateStr){
   return Math.floor((now-d)/(1000*60*60*24));
 }
 
+let counterView = localStorage.getItem('counter-view') || 'grid';
+
+function setCounterView(v){
+  counterView = v;
+  localStorage.setItem('counter-view', v);
+  const gb = document.getElementById('counter-view-grid');
+  const lb = document.getElementById('counter-view-list');
+  if(gb){ gb.style.background = v==='grid'?'var(--accent)':'var(--btn-bg)'; gb.style.color = v==='grid'?'#fff':'var(--muted)'; }
+  if(lb){ lb.style.background = v==='list'?'var(--accent)':'var(--btn-bg)'; lb.style.color = v==='list'?'#fff':'var(--muted)'; }
+}
+
 function renderCounters(){
   const grid = document.getElementById('counter-grid');
   if(!grid) return;
-  
-  const today = new Date().toISOString().split('T')[0];
-  const items = [];
-  
-  // --- GIDALAR: en çok seçilen 6 gıda için son ne zaman yenildi ---
+
   const foodCount = {};
   logs.forEach(l=>(l.foods||[]).forEach(f=>{
-    const k=f.trim();if(k) foodCount[k]=(foodCount[k]||0)+1;
+    const k=f.trim(); if(k) foodCount[k]=(foodCount[k]||0)+1;
   }));
-  const topFoods = Object.entries(foodCount).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([f])=>f);
-  
-  topFoods.forEach(food=>{
+  const topFoods = Object.entries(foodCount).sort((a,b)=>b[1]-a[1]).slice(0,100).map(([f])=>f);
+  const foodItems = topFoods.map(food=>{
     const logsWithFood = logs.filter(l=>(l.foods||[]).some(f=>f.trim()===food)).sort((a,b)=>b.date.localeCompare(a.date));
-    const lastDate = logsWithFood.length ? logsWithFood[0].date : null;
-    const days = daysBetween(lastDate);
-    items.push({icon:'🍽️', label: food, days, type:'food'});
+    return {icon:'🍽️', label:food, days:daysBetween(logsWithFood[0]?.date||null)};
   });
-  
-  // --- BANYO ---
+
+  const builtinItems = [];
   const showerLogs = logs.filter(l=>l.shower===true).sort((a,b)=>b.date.localeCompare(a.date));
-  const lastShower = showerLogs.length ? showerLogs[0].date : null;
-  items.push({icon:'🚿', label:'Banyo', days: daysBetween(lastShower), type:'shower'});
-  
-  // --- DİĞER ---
+  builtinItems.push({icon:banyoIcon, label:banyoTitle||'Banyo', days:daysBetween(showerLogs[0]?.date||null)});
   const seyLogs = logs.filter(l=>l.sey===true).sort((a,b)=>b.date.localeCompare(a.date));
-  const lastSey = seyLogs.length ? seyLogs[0].date : null;
-  items.push({icon:'🌿', label:'Diğer', days: daysBetween(lastSey), type:'sey'});
+  builtinItems.push({icon:digerIcon, label:digerTitle||'Diğer', days:daysBetween(seyLogs[0]?.date||null)});
 
-  if(items.length === 0){
-    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:16px">Kayıt girdikçe sayaçlar burada görünür.</div>';
-    return;
-  }
+  const customItems = [];
+  customSections.filter(s=>!s.hidden&&(s.type==='yesno'||s.type==='yesno_sub')).forEach(sec=>{
+    const secLogs = logs.filter(l=>l.customData&&l.customData[sec.id]&&l.customData[sec.id].value===true).sort((a,b)=>b.date.localeCompare(a.date));
+    customItems.push({icon:sec.icon||'📌', label:sec.title, days:daysBetween(secLogs[0]?.date||null)});
+  });
 
-  grid.innerHTML = items.map(item=>{
-    if(item.days === null){
-      return `<div class="counter-box neutral">
-        <div class="counter-icon">${item.icon}</div>
-        <div class="counter-num" style="font-size:20px;margin-top:4px">—</div>
-        <div class="counter-label">${item.label}</div>
-        <div class="counter-streak">Henüz kayıt yok</div>
+  function boxHtml(item){
+    const days = item.days;
+    if(counterView==='list'){
+      const color = days===null?'var(--muted)':days<=1?'var(--red)':'var(--green)';
+      const suffix = days===null?'Kayıt yok':days===0?'Bugün':days===1?'Dün':days+' gün önce';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card2);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)">
+        <span style="font-size:18px">${item.icon}</span>
+        <span style="flex:1;font-size:14px;color:var(--text);font-weight:600">${item.label}</span>
+        <span style="font-size:13px;font-weight:700;color:${color}">${days===null?'—':days<=1?suffix:days+' gün'}</span>
+        <span style="font-size:11px;color:var(--muted);min-width:55px;text-align:right">${days!==null&&days>1?suffix:''}</span>
       </div>`;
     }
-    
-    const cls = item.days === 0 ? 'recent' : item.days === 1 ? 'recent' : 'clean';
-    let suffix = '';
-    if(item.days === 0) suffix = 'Bugün yaptın';
-    else if(item.days === 1) suffix = 'Dün yaptın';
-    else suffix = item.days + '. gün';
-    
-    const unitText = item.days <= 1 ? '' : 'gündür';
-    const numDisplay = item.days <= 1 ? (item.days === 0 ? '0' : '1') : item.days.toString();
-    
-    // Renk gradyanı - gün sayısına göre
-    let extraStyle = '';
-    if(item.days >= 7 && cls==='clean'){
-      extraStyle = 'border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,0.15);';
-    } else if(item.days >= 14 && cls==='clean'){
-      extraStyle = 'border-color:#4cd964;box-shadow:0 0 18px rgba(76,217,100,0.2);';
-    }
-    
-    return `<div class="counter-box ${cls}" style="${extraStyle}">
-      <div class="counter-icon">${item.icon}</div>
-      <div class="counter-num">${numDisplay}</div>
-      <div class="counter-unit">${unitText}</div>
-      <div class="counter-label">${item.label}</div>
-      <div class="counter-streak">${suffix}</div>
-    </div>`;
-  }).join('');
-}
+    if(days===null) return `<div class="counter-box neutral"><div class="counter-icon">${item.icon}</div><div class="counter-num" style="font-size:20px;margin-top:4px">—</div><div class="counter-label">${item.label}</div><div class="counter-streak">Henüz kayıt yok</div></div>`;
+    const cls = days<=1?'recent':'clean';
+    const suffix = days===0?'Bugün yaptın':days===1?'Dün yaptın':days+'. gün';
+    let extraStyle='';
+    if(days>=14) extraStyle='border-color:#4cd964;box-shadow:0 0 18px rgba(76,217,100,0.2);';
+    else if(days>=7) extraStyle='border-color:#34c759;box-shadow:0 0 12px rgba(52,199,89,0.15);';
+    return `<div class="counter-box ${cls}" style="${extraStyle}"><div class="counter-icon">${item.icon}</div><div class="counter-num">${days<=1?(days===0?'0':'1'):days}</div><div class="counter-unit">${days<=1?'':'gündür'}</div><div class="counter-label">${item.label}</div><div class="counter-streak">${suffix}</div></div>`;
+  }
 
+  function categoryHtml(title, items){
+    if(!items.length) return '';
+    const wrap = counterView==='grid'?'display:grid;grid-template-columns:1fr 1fr;gap:10px':'';
+    return `<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding-left:2px">${title}</div><div style="${wrap}">${items.map(boxHtml).join('')}</div></div>`;
+  }
+
+  let html = '';
+  if(foodItems.length) html += categoryHtml('🍽️ Gıdalar', foodItems);
+  if(builtinItems.length) html += categoryHtml('🚿 Rutin', builtinItems);
+  if(customItems.length) html += categoryHtml('📋 Özel Bölümler', customItems);
+  if(!html) html = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">Kayıt girdikçe sayaçlar burada görünür.</div>';
+  grid.innerHTML = html;
+  setCounterView(counterView);
+}
 
 function copyAllLogs(){
   if(logs.length===0){
@@ -2978,6 +2983,26 @@ let editingLogId = null;
 let editShowerVal = null;
 let editSeyVal = null;
 let editAcneVal = null;
+let editUykuVal = null;
+
+function renderEditUykuStars(){
+  const area = document.getElementById('edit-uyku-stars');
+  if(!area) return;
+  const labels=['Çok Kötü','Kötü','Orta','İyi','Mükemmel'];
+  area.innerHTML = [1,2,3,4,5].map(i=>{
+    const sel = editUykuVal===i;
+    return `<button onclick="setEditUyku(${i})" style="padding:7px 10px;border-radius:10px;border:1px solid var(--btn-border);background:${sel?'var(--accent)':'var(--btn-bg)'};color:${sel?'#fff':'var(--muted)'};cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;flex:1" title="${labels[i-1]}">${'⭐'.repeat(i)}</button>`;
+  }).join('');
+  // Seçili değer göstergesi
+  if(editUykuVal){
+    area.innerHTML += `<button onclick="setEditUyku(null)" style="padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif" title="Temizle">✕</button>`;
+  }
+}
+
+function setEditUyku(v){
+  editUykuVal = editUykuVal===v ? null : v;
+  renderEditUykuStars();
+}
 let editSelectedFoods = [];
 let editSelectedLocs = [];
 let editSelectedShampoo = null;
@@ -3083,6 +3108,15 @@ function editLog(id){
   document.getElementById('edit-inp-notes').value = log.notes||'';
   document.getElementById('edit-sivilce-lbl').textContent = sivilceTitle;
   document.getElementById('edit-diger-lbl').textContent = digerTitle;
+  // Diğer ikonunu güncelle
+  const digerLblFull = document.getElementById('edit-diger-lbl-full');
+  if(digerLblFull) digerLblFull.innerHTML = digerIcon + ' <span id="edit-diger-lbl">' + digerTitle + '</span>';
+  // Uyku ikonunu ve başlığını güncelle
+  const uykuLblFull = document.getElementById('edit-uyku-lbl-full');
+  if(uykuLblFull) uykuLblFull.innerHTML = uykuluIcon + ' <span id="edit-uyku-lbl">' + uykuluTitle + '</span>';
+  // Uyku yıldızları
+  editUykuVal = log.uykuValue !== undefined ? log.uykuValue : null;
+  renderEditUykuStars();
 
   // Acne butonları
   document.querySelectorAll('#edit-acne-rating .acne-btn').forEach(b=>{
@@ -3326,6 +3360,7 @@ function saveEditLog(){
     shampoo: editSelectedShampoo||'',
     soap: editSelectedSoap||'',
     sey: editSeyVal,
+    uykuValue: editUykuVal,
     notes: document.getElementById('edit-inp-notes').value.trim(),
     customData: newCustomData
   };
@@ -3891,11 +3926,16 @@ Ağır" style="min-height:100px"></textarea>
     </div>
 
     <div id="edit-diger-group">
-    <lbl>🌿 <span id="edit-diger-lbl">Diğer</span></lbl>
+    <lbl id="edit-diger-lbl-full">🌿 <span id="edit-diger-lbl">Diğer</span></lbl>
     <div class="yn-group" style="margin-bottom:12px">
       <button class="yn-btn" id="edit-sey-yes" onclick="setEditSey(true)">✅ Evet</button>
       <button class="yn-btn" id="edit-sey-no" onclick="setEditSey(false)">❌ Hayır</button>
     </div>
+    </div>
+
+    <div id="edit-uyku-group">
+    <lbl id="edit-uyku-lbl-full">😴 <span id="edit-uyku-lbl">Uyku</span></lbl>
+    <div style="display:flex;gap:6px;margin-bottom:12px" id="edit-uyku-stars"></div>
     </div>
 
     <lbl>📝 Notlar</lbl>
