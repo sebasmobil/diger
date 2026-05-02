@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.81</span>
+  <span>Pro 1.0.82</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -2991,21 +2991,19 @@ let editAcneVal = null;
 let editUykuVal = null;
 
 function renderEditUykuStars(){
-  const area = document.getElementById('edit-uyku-stars');
-  if(!area) return;
-  const labels=['Çok Kötü','Kötü','Orta','İyi','Mükemmel'];
-  area.innerHTML = [1,2,3,4,5].map(i=>{
-    const sel = editUykuVal===i;
-    return `<button onclick="setEditUyku(${i})" style="padding:7px 10px;border-radius:10px;border:1px solid var(--btn-border);background:${sel?'var(--accent)':'var(--btn-bg)'};color:${sel?'#fff':'var(--muted)'};cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;flex:1" title="${labels[i-1]}">${'⭐'.repeat(i)}</button>`;
-  }).join('');
-  // Seçili değer göstergesi
-  if(editUykuVal){
-    area.innerHTML += `<button onclick="setEditUyku(null)" style="padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif" title="Temizle">✕</button>`;
-  }
+  const el = document.getElementById('edit-uyku-stars');
+  const lbl = document.getElementById('edit-uyku-label');
+  if(!el) return;
+  el.innerHTML = [1,2,3,4,5].map(i=>
+    '<span onclick="setEditUyku('+i+')" style="font-size:32px;cursor:pointer;transition:transform .1s;display:inline-block">'
+    +(editUykuVal!==null && i<=editUykuVal ? '⭐' : '☆')
+    +'</span>'
+  ).join('');
+  if(lbl) lbl.textContent = editUykuVal!==null ? uykuluLabels[editUykuVal-1] : 'Seçilmedi';
 }
 
 function setEditUyku(v){
-  editUykuVal = editUykuVal===v ? null : v;
+  editUykuVal = (editUykuVal===v) ? null : v;
   renderEditUykuStars();
 }
 let editSelectedFoods = [];
@@ -3940,7 +3938,8 @@ Ağır" style="min-height:100px"></textarea>
 
     <div id="edit-uyku-group">
     <lbl id="edit-uyku-lbl-full">😴 <span id="edit-uyku-lbl">Uyku</span></lbl>
-    <div style="display:flex;gap:6px;margin-bottom:12px" id="edit-uyku-stars"></div>
+    <div id="edit-uyku-stars" style="display:flex;gap:8px;justify-content:center;padding:4px 0;margin-bottom:4px"></div>
+    <div id="edit-uyku-label" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px"></div>
     </div>
 
     <lbl>📝 Notlar</lbl>
