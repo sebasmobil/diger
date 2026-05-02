@@ -211,7 +211,7 @@ section-label{display:block;font-size:11px;font-weight:600;color:var(--muted);le
 </head>
 <body>
 <div id="topbar" style="background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0px) 16px 5px;padding-top:max(env(safe-area-inset-top,0px), 5px);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--topbar-text);font-family:'DM Sans',sans-serif;letter-spacing:0.2px;position:sticky;top:0;z-index:200">
-  <span>Pro 1.0.76</span>
+  <span>Pro 1.0.78</span>
   <span>© sebasmobil 2026</span>
   <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" style="color:var(--topbar-text);text-decoration:none;border:none;outline:none">AGPL v3.0</a>
 </div>
@@ -2146,7 +2146,6 @@ function copyAllLogs(){
     lines.push('📅 '+dayName+', '+l.date+' ⏰ '+l.time);
     if(l.foods&&l.foods.length) lines.push('🍽️ Yenilen: '+l.foods.join(', '));
     lines.push('🔴 '+sivilceTitle+': '+acneLabels[l.acne||0]);
-    if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.locs&&l.locs.length) lines.push(locIcon+' '+locTitle+': '+l.locs.join(', '));
     if(l.shower===true) lines.push(banyoIcon+' Banyo: Evet'+(l.shampoo?' ('+l.shampoo+')'+(l.soap?', '+l.soap:''):''));
     else if(l.shower===false) lines.push(banyoIcon+' Banyo: Hayır');
@@ -2174,8 +2173,11 @@ function copyAllLogs(){
       } else if(cd.value===false){ v='Hayır';
       } else if(Array.isArray(cd.value)){ v=cd.value.join(', ');
       } else { v=String(cd.value); }
-      lines.push('📌 '+cd.title+': '+v);
+      const secDef2=customSections.find(s=>s.id===sid);
+      const cdIcon=cd.icon||(secDef2&&secDef2.icon)||'📌';
+      lines.push(cdIcon+' '+cd.title+': '+v);
     });}
+    if(l.uykuValue!==null&&l.uykuValue!==undefined) lines.push(uykuluIcon+' '+uykuluTitle+': '+'⭐'.repeat(l.uykuValue)+' ('+uykuluLabels[l.uykuValue-1]+')');
     if(l.notes) lines.push('📝 Not: '+l.notes);
     lines.push('---');
   });
