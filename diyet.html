@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.15
+  Version: Pro 1.0.18
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1177,7 +1177,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   width: 46px; text-align: center;
   background: var(--card2); border: 1px solid var(--border);
   border-radius: 6px; padding: 3px 2px;
-  color: var(--text); font-size: 0.75rem; font-weight: 700;
+  color: var(--text); font-size: 16px; font-weight: 700;
 }
 .ipr-g { color: var(--text3); font-size: 0.68rem; flex-shrink:0; }
 
@@ -1215,7 +1215,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.15</span>
+    <span>Pro 1.0.18</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1256,9 +1256,9 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <div class="nav-actions">
       <div class="nav-btn" onclick="openModal('notif')" title="Bildirimler" style="position:relative">
         <span>🔔</span>
-        <span class="badge">3</span>
+        <span class="badge" id="notif-badge" style="display:none">0</span>
       </div>
-      <div class="nav-btn" onclick="switchPage('settings')" title="Ayarlar">⚙️</div>
+      <div class="nav-btn" onclick="toggleSettings()" title="Ayarlar" id="gear-btn">⚙️</div>
     </div>
   </nav>
 
@@ -1876,7 +1876,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
       </div>
       <!-- Öğün chip'leri — daha küçük -->
       <div style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:6px;padding-bottom:2px" id="meal-select">
-        <div class="timing-chip selected" data-meal="kahvalti" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🌅 Kahvaltı</div>
+        <div class="timing-chip" data-meal="kahvalti" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🌅 Kahvaltı</div>
         <div class="timing-chip" data-meal="ogle" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">☀️ Öğle</div>
         <div class="timing-chip" data-meal="aksam" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🌙 Akşam</div>
         <div class="timing-chip" data-meal="atistirma" onclick="selectMeal(this)" style="white-space:nowrap;padding:5px 10px;font-size:0.75rem">🍎 Atıştırma</div>
@@ -1887,7 +1887,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
         <span style="font-size:0.9rem">🔍</span>
         <input type="text" id="food-search" placeholder="Yemek ara..." oninput="filterFoods(this.value)"
           onfocus="onFoodSearchFocus()" onblur="onFoodSearchBlur()"
-          style="border:none;background:none;color:var(--text);font-size:0.82rem;flex:1;outline:none;font-family:var(--font-body)">
+          style="border:none;background:none;color:var(--text);font-size:16px;flex:1;outline:none;font-family:var(--font-body)">
       </div>
       <!-- Kategoriler — ince scroll -->
       <div class="food-categories" id="food-cats" style="margin-bottom:0"></div>
@@ -1972,23 +1972,13 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
 <!-- Notification Modal -->
 <div class="modal-overlay" id="modal-notif">
-  <div class="modal">
+  <div class="modal modal-scrollable" style="padding:20px 20px 36px">
     <div class="modal-handle"></div>
-    <div class="modal-title">🔔 Bildirimler</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div style="padding:14px;background:var(--card2);border-radius:14px;border-left:3px solid var(--accent)">
-        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px">💧 Su içmeyi unutmayın!</div>
-        <div style="font-size:0.75rem;color:var(--text3)">2 saat önce</div>
-      </div>
-      <div style="padding:14px;background:var(--card2);border-radius:14px;border-left:3px solid var(--accent2)">
-        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px">🍽️ Öğle yemeği vakti!</div>
-        <div style="font-size:0.75rem;color:var(--text3)">3 saat önce</div>
-      </div>
-      <div style="padding:14px;background:var(--card2);border-radius:14px;border-left:3px solid var(--accent3)">
-        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px">🏆 Harika! 7 günlük serinizi tamamladınız!</div>
-        <div style="font-size:0.75rem;color:var(--text3)">Dün</div>
-      </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="modal-title" style="margin-bottom:0">🔔 Bildirimler</div>
+      <button onclick="clearAllNotifs()" style="font-size:0.72rem;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px">Tümünü sil</button>
     </div>
+    <div id="notif-list" style="display:flex;flex-direction:column;gap:8px"></div>
     <button class="btn btn-secondary" onclick="closeModal('notif')" style="margin-top:14px">Kapat</button>
   </div>
 </div>
@@ -2358,6 +2348,150 @@ function openAddExercise() {
   setTimeout(() => openModal('addExercise'), 150);
 }
 
+
+// =================== BİLDİRİM SİSTEMİ ===================
+let appNotifs = [];
+
+function generateNotifs() {
+  const log = getTodayLog();
+  const now = new Date();
+  const h = now.getHours();
+  const s = appData.settings;
+  const streak = appData.streak || 0;
+  let newNotifs = [];
+
+  // Su hatırlatıcısı
+  const water = log.water || 0;
+  const waterGoal = s.waterGoal || 2500;
+  if(water < waterGoal * 0.5 && h >= 12) {
+    newNotifs.push({id:'water-'+getTodayKey(), icon:'💧', color:'var(--accent)',
+      msg: water===0 ? 'Bugün hiç su içmediniz!' : `Su hedefinin %${Math.round(water/waterGoal*100)}'ine ulaştınız.`,
+      sub: 'Su hedefi: '+waterGoal+'ml', time: 'Bugün'});
+  }
+
+  // Öğün hatırlatıcısı
+  const totalCal = ['kahvalti','ogle','aksam','atistirma','icecek'].reduce((s,m)=>{
+    return s + (log[m]||[]).reduce((a,i)=>a+(i.cal||0),0);
+  }, 0);
+  if(totalCal === 0 && h >= 10) {
+    newNotifs.push({id:'meal-'+getTodayKey(), icon:'🍽️', color:'var(--accent2)',
+      msg:'Bugün henüz hiç kayıt yapmadınız.', sub:'Kahvaltınızı eklemeyi unutmayın!', time:'Bugün'});
+  } else if(totalCal > (s.calGoal||2000)) {
+    newNotifs.push({id:'overkal-'+getTodayKey(), icon:'⚠️', color:'#FF6B6B',
+      msg:`Günlük kalori hedefini ${totalCal-(s.calGoal||2000)} kal aştınız.`,
+      sub:'Hedef: '+(s.calGoal||2000)+' kal', time:'Bugün'});
+  }
+
+  // Seri bildirimi
+  if(streak >= 3) {
+    newNotifs.push({id:'streak-'+streak, icon:'🔥', color:'#FF8C00',
+      msg:`${streak} günlük seri! Harika gidiyorsunuz!`, sub:'Devam edin!', time:'Bugün'});
+  }
+
+  // Sabah motivasyonu
+  if(h >= 6 && h < 10) {
+    newNotifs.push({id:'morning-'+getTodayKey(), icon:'☀️', color:'#FFD93D',
+      msg:'Günaydın! Sağlıklı bir gün dileriz.', sub:'Kahvaltınızı planladınız mı?', time:'Sabah'});
+  }
+
+  // Kayıtlı bildirimleri yükle
+  const saved = appData.notifications || [];
+  // Yeni bildirimleri ekle (id'si olmayanlar)
+  newNotifs.forEach(n => {
+    if(!saved.find(s=>s.id===n.id)) {
+      n.read = false;
+      saved.unshift(n);
+    }
+  });
+  // Max 20 bildirim
+  appData.notifications = saved.slice(0,20);
+  appNotifs = appData.notifications;
+  saveData();
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  const unread = (appData.notifications||[]).filter(n=>!n.read).length;
+  const badge = document.getElementById('notif-badge');
+  if(badge) {
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? 'flex' : 'none';
+  }
+}
+
+function renderNotifs() {
+  generateNotifs();
+  const list = document.getElementById('notif-list');
+  if(!list) return;
+  const notifs = appData.notifications || [];
+  if(notifs.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);font-size:0.85rem">Bildirim yok 🎉</div>';
+    return;
+  }
+  list.innerHTML = notifs.map((n,i) => `
+    <div style="padding:12px 14px;background:var(--card2);border-radius:12px;border-left:3px solid ${n.color};
+      opacity:${n.read?'0.6':'1'};transition:opacity 0.3s;cursor:pointer"
+      onclick="markRead(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          <div style="font-weight:${n.read?'500':'700'};font-size:0.85rem;margin-bottom:3px">
+            ${n.icon} ${n.msg}
+          </div>
+          <div style="font-size:0.72rem;color:var(--text3)">${n.sub||''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <span style="font-size:0.65rem;color:var(--text3)">${n.time}</span>
+          ${!n.read ? '<span style="width:8px;height:8px;border-radius:50%;background:'+n.color+';display:block"></span>' : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function markAllRead() {
+  setTimeout(() => {
+    (appData.notifications||[]).forEach(n=>n.read=true);
+    saveData();
+    updateNotifBadge();
+  }, 1500); // 1.5 saniye sonra okundu yap
+}
+
+function markRead(idx) {
+  if(appData.notifications && appData.notifications[idx]) {
+    appData.notifications[idx].read = true;
+    saveData();
+    renderNotifs();
+    updateNotifBadge();
+  }
+}
+
+function clearAllNotifs() {
+  appData.notifications = [];
+  saveData();
+  renderNotifs();
+  updateNotifBadge();
+}
+
+// =================== SETTINGS TOGGLE ===================
+let previousPage = 'home';
+
+function toggleSettings() {
+  const pages = document.querySelectorAll('.page');
+  const settingsPage = document.getElementById('page-settings');
+  const isSettingsOpen = settingsPage?.classList.contains('active');
+
+  if(isSettingsOpen) {
+    // Ayarları kapat, önceki sayfaya dön
+    switchPage(previousPage);
+  } else {
+    // Mevcut sayfayı kaydet, ayarlara geç
+    pages.forEach(p => { if(p.classList.contains('active')) {
+      previousPage = p.id.replace('page-','');
+    }});
+    switchPage('settings');
+  }
+}
+
+
 function initApp() {
   safeRun(applyTheme);
   safeRun(updateGreeting);
@@ -2368,6 +2502,7 @@ function initApp() {
   safeRun(buildDateNav);
   safeRun(buildWeekChart);
   safeRun(updateHomeStats);
+  safeRun(generateNotifs);
   safeRun(updateProfileView);
   safeRun(updateWeightHistory);
   safeRun(updateSettings);
@@ -2605,7 +2740,7 @@ function toggleCup(idx) {
 }
 
 // =================== FOOD ===================
-let selectedMeal = 'kahvalti';
+let selectedMeal = null;
 let selectedFood = null;
 let filteredFoods = FOOD_DB;
 let selectedCat = 'Tümü';
@@ -2818,6 +2953,7 @@ function cartSetPortion(idx,val) {
 }
 
 function addMultiFood() {
+  if(!selectedMeal) { showToast('⚠️ Lütfen önce bir öğün seçin!','error'); return; }
   if(foodCart.length===0) { showToast('⚠️ Lütfen en az bir yemek seçin!','error'); return; }
   const log = getTodayLog();
   const now = new Date();
@@ -2853,6 +2989,8 @@ function selectMeal(el) {
   document.querySelectorAll('[data-meal]').forEach(e=>e.classList.remove('selected'));
   el.classList.add('selected');
   selectedMeal = el.dataset.meal;
+  // Öğün seçildi — chip'lerin hata görselini temizle
+  document.getElementById('meal-select')?.style.removeProperty('outline');
 }
 
 function addFood() {
@@ -3530,6 +3668,8 @@ function openModal(id) {
   if(overlay) {
     overlay.classList.add('open');
     // Set today's date for weight modal
+    if(id==='notif') { renderNotifs(); markAllRead(); }
+    if(id==='addFood') { selectedMeal=null; document.querySelectorAll('[data-meal]').forEach(e=>e.classList.remove('selected')); }
     if(id==='addWeight') {
       try { document.getElementById('wt-date').value = getTodayKey(); } catch(e) {}
     }
@@ -3668,5 +3808,17 @@ try {
 } catch(e) {}
 </script>
 
+
+<script>
+// Tüm input/textarea'ya focus'ta içeriği seç
+document.addEventListener('focusin', function(e) {
+  if(e.target.matches('input[type="text"], input[type="number"], input[type="email"], textarea')) {
+    // Kısa gecikme: iOS'ta doğru çalışması için
+    setTimeout(() => {
+      e.target.select();
+    }, 50);
+  }
+});
+</script>
 </body>
 </html>
