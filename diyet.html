@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.11
+  Version: Pro 1.0.13
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -217,23 +217,24 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 }
 .nav-item.active::after { width: 24px; }
 
-/* ADD BUTTON */
-.add-fab {
-  position: fixed;
-  bottom: 80px; right: 20px;
-  width: 58px; height: 58px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 20px;
+/* NAV ADD BUTTON */
+.nav-add-btn {
+  flex: 1;
   display: flex; align-items: center; justify-content: center;
+  padding: 4px 0 0;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0,229,160,0.4);
-  font-size: 1.6rem;
-  z-index: 90;
-  transition: all var(--transition);
-  animation: floatBtn 3s ease-in-out infinite;
 }
-.add-fab:hover { transform: scale(1.1) rotate(5deg); }
-.add-fab:active { transform: scale(0.95); }
+.nav-add-inner {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 16px rgba(0,229,160,0.35);
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+.nav-add-btn:active .nav-add-inner { transform: scale(0.92); }
 
 /* PAGES */
 .page { display: none; padding: 16px 16px 120px; animation: pageIn 0.4s ease; }
@@ -1099,7 +1100,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
 /* RESPONSIVE */
 @media (min-width: 430px) {
-  .bottom-nav, .add-fab { max-width: 430px; }
+  .bottom-nav { max-width: 430px; }
 }
 
 /* PWA safe area */
@@ -1209,7 +1210,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.11</span>
+    <span>Pro 1.0.13</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1821,6 +1822,10 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
       <span class="nav-icon">📝</span>
       <span class="nav-label">Günlük</span>
     </div>
+    <!-- MERKEZ + BUTONU -->
+    <div class="nav-add-btn" onclick="openAddSheet()" id="nav-add">
+      <div class="nav-add-inner">➕</div>
+    </div>
     <div class="nav-item" onclick="switchPage('stats')" id="nav-stats">
       <span class="nav-icon">📊</span>
       <span class="nav-label">İstatistik</span>
@@ -1832,8 +1837,25 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   </nav>
 </div>
 
-<!-- FAB -->
-<div class="add-fab" onclick="openModal('addFood')" title="Yemek Ekle">➕</div>
+<!-- EKLE SEÇİM SHEET -->
+<div class="modal-overlay" id="modal-addSheet">
+  <div class="modal" style="padding:20px 20px 36px;max-height:40vh">
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--font-head);font-size:1rem;font-weight:800;text-align:center;margin-bottom:16px">Ne eklemek istiyorsun?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div onclick="openAddFood()" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">
+        <div style="font-size:2rem;margin-bottom:8px">🍽️</div>
+        <div style="font-weight:700;font-size:0.9rem">Yemek</div>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:3px">Öğün ekle</div>
+      </div>
+      <div onclick="openAddExercise()" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform=''">
+        <div style="font-size:2rem;margin-bottom:8px">🏃</div>
+        <div style="font-weight:700;font-size:0.9rem">Egzersiz</div>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:3px">Kalori yak</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MODALS -->
 
@@ -2015,66 +2037,249 @@ function saveData() {
 
 // =================== FOOD DATABASE ===================
 const FOOD_DB = [
-  // Kahvaltı
-  {id:1, name:'Yumurta (haşlanmış)', emoji:'🥚', cat:'Kahvaltı', cal:155, p:13, c:1, f:11},
-  {id:2, name:'Ekmek (tam buğday)', emoji:'🍞', cat:'Tahıl', cal:265, p:9, c:49, f:3},
-  {id:3, name:'Peynir (beyaz)', emoji:'🧀', cat:'Süt Ürünleri', cal:264, p:18, c:2, f:21},
-  {id:4, name:'Domates', emoji:'🍅', cat:'Sebze', cal:18, p:1, c:4, f:0.2},
-  {id:5, name:'Salatalık', emoji:'🥒', cat:'Sebze', cal:15, p:1, c:4, f:0.1},
-  {id:6, name:'Zeytin (siyah)', emoji:'🫒', cat:'Kahvaltı', cal:115, p:1, c:6, f:11},
-  {id:7, name:'Süt (tam yağlı)', emoji:'🥛', cat:'Süt Ürünleri', cal:61, p:3, c:5, f:3},
-  {id:8, name:'Yoğurt (sade)', emoji:'🥣', cat:'Süt Ürünleri', cal:59, p:3, c:5, f:3},
-  {id:9, name:'Bal', emoji:'🍯', cat:'Diğer', cal:304, p:0, c:82, f:0},
-  {id:10, name:'Tereyağı', emoji:'🧈', cat:'Yağ', cal:717, p:1, c:0, f:81},
-  // Etler
-  {id:11, name:'Tavuk Göğsü (ızgara)', emoji:'🍗', cat:'Et', cal:165, p:31, c:0, f:4},
-  {id:12, name:'Dana Kıyma (%20 yağ)', emoji:'🥩', cat:'Et', cal:254, p:17, c:0, f:20},
-  {id:13, name:'Somon Fileto', emoji:'🐟', cat:'Balık', cal:208, p:20, c:0, f:13},
-  {id:14, name:'Ton Balığı (konserve)', emoji:'🐡', cat:'Balık', cal:116, p:26, c:0, f:1},
-  {id:15, name:'Hindi Göğsü', emoji:'🦃', cat:'Et', cal:135, p:29, c:0, f:1},
-  // Karbonhidrat
-  {id:16, name:'Pirinç (pişmiş)', emoji:'🍚', cat:'Tahıl', cal:130, p:3, c:28, f:0.3},
-  {id:17, name:'Makarna (haşlanmış)', emoji:'🍝', cat:'Tahıl', cal:131, p:5, c:25, f:1},
-  {id:18, name:'Patates (haşlanmış)', emoji:'🥔', cat:'Sebze', cal:87, p:2, c:20, f:0.1},
-  {id:19, name:'Ekmek (beyaz)', emoji:'🍞', cat:'Tahıl', cal:265, p:9, c:49, f:3},
-  {id:20, name:'Yulaf Ezmesi', emoji:'🌾', cat:'Tahıl', cal:389, p:17, c:66, f:7},
-  // Meyveler
-  {id:21, name:'Elma', emoji:'🍎', cat:'Meyve', cal:52, p:0, c:14, f:0.2},
-  {id:22, name:'Muz', emoji:'🍌', cat:'Meyve', cal:89, p:1, c:23, f:0.3},
-  {id:23, name:'Portakal', emoji:'🍊', cat:'Meyve', cal:47, p:1, c:12, f:0.1},
-  {id:24, name:'Çilek', emoji:'🍓', cat:'Meyve', cal:32, p:1, c:8, f:0.3},
-  {id:25, name:'Üzüm', emoji:'🍇', cat:'Meyve', cal:69, p:1, c:18, f:0.2},
-  {id:26, name:'Kavun', emoji:'🍈', cat:'Meyve', cal:34, p:1, c:8, f:0.2},
-  {id:27, name:'Karpuz', emoji:'🍉', cat:'Meyve', cal:30, p:1, c:8, f:0.2},
-  // Sebzeler
-  {id:28, name:'Brokoli', emoji:'🥦', cat:'Sebze', cal:34, p:3, c:7, f:0.4},
-  {id:29, name:'Ispanak', emoji:'🥬', cat:'Sebze', cal:23, p:3, c:4, f:0.4},
-  {id:30, name:'Havuç', emoji:'🥕', cat:'Sebze', cal:41, p:1, c:10, f:0.2},
-  {id:31, name:'Biber (kırmızı)', emoji:'🫑', cat:'Sebze', cal:31, p:1, c:6, f:0.3},
-  {id:32, name:'Mısır', emoji:'🌽', cat:'Sebze', cal:86, p:3, c:19, f:1},
-  // Baklagiller
-  {id:33, name:'Mercimek (pişmiş)', emoji:'🫘', cat:'Baklagil', cal:116, p:9, c:20, f:0.4},
-  {id:34, name:'Nohut (pişmiş)', emoji:'🫛', cat:'Baklagil', cal:164, p:9, c:27, f:3},
-  {id:35, name:'Fasulye (pişmiş)', emoji:'🫘', cat:'Baklagil', cal:127, p:9, c:23, f:0.5},
-  // İçecekler
-  {id:36, name:'Çay (demli)', emoji:'🍵', cat:'İçecek', cal:1, p:0, c:0, f:0},
-  {id:37, name:'Türk Kahvesi', emoji:'☕', cat:'İçecek', cal:2, p:0, c:0, f:0},
-  {id:38, name:'Portakal Suyu (taze)', emoji:'🍊', cat:'İçecek', cal:45, p:1, c:10, f:0.2},
-  {id:39, name:'Ayran', emoji:'🥛', cat:'İçecek', cal:36, p:2, c:3, f:1},
-  {id:40, name:'Kola (light)', emoji:'🥤', cat:'İçecek', cal:1, p:0, c:0, f:0},
-  // Kuruyemiş
-  {id:41, name:'Badem', emoji:'🌰', cat:'Kuruyemiş', cal:579, p:21, c:22, f:50},
-  {id:42, name:'Ceviz', emoji:'🌰', cat:'Kuruyemiş', cal:654, p:15, c:14, f:65},
-  {id:43, name:'Fındık', emoji:'🌰', cat:'Kuruyemiş', cal:628, p:15, c:17, f:61},
-  // Fast food / hazır
-  {id:44, name:'Döner (pita)', emoji:'🌮', cat:'Hazır', cal:350, p:25, c:30, f:14},
-  {id:45, name:'Hamburger', emoji:'🍔', cat:'Hazır', cal:295, p:17, c:24, f:14},
-  {id:46, name:'Pizza dilimi', emoji:'🍕', cat:'Hazır', cal:266, p:11, c:33, f:10},
-  {id:47, name:'Lahmacun', emoji:'🫓', cat:'Hazır', cal:170, p:9, c:20, f:6},
-  // Tatlı
-  {id:48, name:'Çikolata (sütlü)', emoji:'🍫', cat:'Tatlı', cal:535, p:8, c:60, f:30},
-  {id:49, name:'Baklava (1 dilim)', emoji:'🍰', cat:'Tatlı', cal:334, p:4, c:40, f:18},
-  {id:50, name:'Dondurma (vanilyalı)', emoji:'🍦', cat:'Tatlı', cal:207, p:4, c:24, f:11},
+  // ===== KAHVALTILIK =====
+  {id:1,   name:'Yumurta (haşlanmış)',       emoji:'🥚', cat:'Kahvaltı',   cal:155, p:13,  c:1,  f:11},
+  {id:2,   name:'Yumurta (sahanda)',          emoji:'🍳', cat:'Kahvaltı',   cal:185, p:12,  c:1,  f:14},
+  {id:3,   name:'Yumurta (çırpılmış)',        emoji:'🥚', cat:'Kahvaltı',   cal:148, p:10,  c:1,  f:11},
+  {id:4,   name:'Menemen',                    emoji:'🍳', cat:'Kahvaltı',   cal:120, p:7,   c:5,  f:8},
+  {id:5,   name:'Zeytin (siyah)',             emoji:'🫒', cat:'Kahvaltı',   cal:115, p:1,   c:6,  f:11},
+  {id:6,   name:'Zeytin (yeşil)',             emoji:'🫒', cat:'Kahvaltı',   cal:145, p:1,   c:4,  f:15},
+  {id:7,   name:'Bal',                        emoji:'🍯', cat:'Kahvaltı',   cal:304, p:0,   c:82, f:0},
+  {id:8,   name:'Reçel (kayısı)',             emoji:'🍑', cat:'Kahvaltı',   cal:250, p:0,   c:65, f:0},
+  {id:9,   name:'Reçel (çilek)',              emoji:'🍓', cat:'Kahvaltı',   cal:240, p:0,   c:62, f:0},
+  {id:10,  name:'Tereyağı',                   emoji:'🧈', cat:'Kahvaltı',   cal:717, p:1,   c:0,  f:81},
+  {id:11,  name:'Margarin',                   emoji:'🧈', cat:'Kahvaltı',   cal:718, p:0,   c:0,  f:80},
+  {id:12,  name:'Tahin',                      emoji:'🫙', cat:'Kahvaltı',   cal:595, p:17,  c:21, f:54},
+  {id:13,  name:'Tahin-Pekmez',               emoji:'🫙', cat:'Kahvaltı',   cal:310, p:7,   c:45, f:14},
+  {id:14,  name:'Kaymak',                     emoji:'🥛', cat:'Kahvaltı',   cal:345, p:3,   c:2,  f:36},
+  {id:15,  name:'Sucuk (dilim)',               emoji:'🌭', cat:'Kahvaltı',   cal:400, p:22,  c:1,  f:35},
+  {id:16,  name:'Salam',                      emoji:'🥩', cat:'Kahvaltı',   cal:336, p:14,  c:2,  f:30},
+  {id:17,  name:'Pastırma',                   emoji:'🥩', cat:'Kahvaltı',   cal:173, p:30,  c:0,  f:6},
+  {id:18,  name:'Sosis',                      emoji:'🌭', cat:'Kahvaltı',   cal:295, p:13,  c:2,  f:26},
+  {id:19,  name:'Domates',                    emoji:'🍅', cat:'Kahvaltı',   cal:18,  p:1,   c:4,  f:0.2},
+  {id:20,  name:'Salatalık',                  emoji:'🥒', cat:'Kahvaltı',   cal:15,  p:1,   c:4,  f:0.1},
+  {id:21,  name:'Biber (sivri yeşil)',         emoji:'🫑', cat:'Kahvaltı',   cal:27,  p:1,   c:6,  f:0.3},
+  {id:22,  name:'Maydanoz',                   emoji:'🌿', cat:'Kahvaltı',   cal:36,  p:3,   c:6,  f:1},
+  {id:23,  name:'Dereotu',                    emoji:'🌿', cat:'Kahvaltı',   cal:43,  p:3,   c:7,  f:1},
+  // ===== PEYNIRLER =====
+  {id:30,  name:'Peynir (beyaz inek)',         emoji:'🧀', cat:'Süt Ürünleri', cal:264, p:18, c:2, f:21},
+  {id:31,  name:'Peynir (kaşar)',              emoji:'🧀', cat:'Süt Ürünleri', cal:350, p:24, c:2, f:28},
+  {id:32,  name:'Peynir (tulum)',              emoji:'🧀', cat:'Süt Ürünleri', cal:296, p:20, c:0, f:24},
+  {id:33,  name:'Peynir (çökelek)',            emoji:'🧀', cat:'Süt Ürünleri', cal:130, p:15, c:2, f:7},
+  {id:34,  name:'Peynir (lor)',                emoji:'🧀', cat:'Süt Ürünleri', cal:98,  p:12, c:2, f:5},
+  {id:35,  name:'Peynir (labne)',              emoji:'🧀', cat:'Süt Ürünleri', cal:163, p:7,  c:4, f:14},
+  {id:36,  name:'Peynir (ezine)',              emoji:'🧀', cat:'Süt Ürünleri', cal:270, p:19, c:1, f:21},
+  {id:37,  name:'Peynir (dil)',                emoji:'🧀', cat:'Süt Ürünleri', cal:280, p:22, c:2, f:20},
+  {id:38,  name:'Süt (tam yağlı)',             emoji:'🥛', cat:'Süt Ürünleri', cal:61,  p:3,  c:5, f:3},
+  {id:39,  name:'Süt (yarım yağlı)',           emoji:'🥛', cat:'Süt Ürünleri', cal:46,  p:3,  c:5, f:2},
+  {id:40,  name:'Süt (yağsız)',                emoji:'🥛', cat:'Süt Ürünleri', cal:35,  p:3,  c:5, f:0.1},
+  {id:41,  name:'Yoğurt (tam yağlı)',          emoji:'🥣', cat:'Süt Ürünleri', cal:61,  p:3,  c:5, f:3},
+  {id:42,  name:'Yoğurt (yağsız)',             emoji:'🥣', cat:'Süt Ürünleri', cal:39,  p:4,  c:6, f:0.2},
+  {id:43,  name:'Yoğurt (Yunan)',              emoji:'🥣', cat:'Süt Ürünleri', cal:97,  p:9,  c:4, f:5},
+  {id:44,  name:'Kefir',                      emoji:'🥛', cat:'Süt Ürünleri', cal:52,  p:4,  c:5, f:2},
+  {id:45,  name:'Ayran',                      emoji:'🥛', cat:'İçecek',       cal:36,  p:2,  c:3, f:1},
+  // ===== EKMEK / HAMURIŞI =====
+  {id:50,  name:'Ekmek (beyaz)',               emoji:'🍞', cat:'Tahıl',       cal:265, p:9,  c:49, f:3},
+  {id:51,  name:'Ekmek (tam buğday)',           emoji:'🍞', cat:'Tahıl',       cal:247, p:11, c:47, f:3},
+  {id:52,  name:'Ekmek (çavdar)',               emoji:'🍞', cat:'Tahıl',       cal:259, p:8,  c:48, f:3},
+  {id:53,  name:'Simit',                       emoji:'🥯', cat:'Tahıl',       cal:297, p:9,  c:58, f:3},
+  {id:54,  name:'Pide (sade)',                  emoji:'🫓', cat:'Tahıl',       cal:261, p:9,  c:51, f:2},
+  {id:55,  name:'Pide (peynirli)',              emoji:'🫓', cat:'Tahıl',       cal:310, p:14, c:42, f:10},
+  {id:56,  name:'Pogaça (peynirli)',            emoji:'🥐', cat:'Tahıl',       cal:380, p:10, c:40, f:20},
+  {id:57,  name:'Açma',                        emoji:'🥐', cat:'Tahıl',       cal:370, p:8,  c:50, f:16},
+  {id:58,  name:'Tost ekmeği',                  emoji:'🍞', cat:'Tahıl',       cal:315, p:9,  c:56, f:5},
+  {id:59,  name:'Kraker',                      emoji:'🍘', cat:'Tahıl',       cal:420, p:8,  c:70, f:14},
+  {id:60,  name:'Galeta',                      emoji:'🍘', cat:'Tahıl',       cal:388, p:12, c:73, f:5},
+  {id:61,  name:'Yufka',                       emoji:'🫓', cat:'Tahıl',       cal:310, p:9,  c:62, f:3},
+  {id:62,  name:'Börek (peynirli)',             emoji:'🥮', cat:'Tahıl',       cal:335, p:11, c:28, f:21},
+  {id:63,  name:'Börek (ıspanaklı)',            emoji:'🥮', cat:'Tahıl',       cal:270, p:8,  c:25, f:16},
+  {id:64,  name:'Gözleme (peynirli)',           emoji:'🫓', cat:'Tahıl',       cal:285, p:11, c:35, f:13},
+  {id:65,  name:'Lahmacun',                    emoji:'🫓', cat:'Tahıl',       cal:170, p:9,  c:20, f:6},
+  // ===== TAHILLAR =====
+  {id:70,  name:'Pirinç (pişmiş)',              emoji:'🍚', cat:'Tahıl',       cal:130, p:3,  c:28, f:0.3},
+  {id:71,  name:'Bulgur (pişmiş)',              emoji:'🌾', cat:'Tahıl',       cal:83,  p:3,  c:19, f:0.2},
+  {id:72,  name:'Makarna (haşlanmış)',          emoji:'🍝', cat:'Tahıl',       cal:131, p:5,  c:25, f:1},
+  {id:73,  name:'Erişte (pişmiş)',              emoji:'🍜', cat:'Tahıl',       cal:110, p:4,  c:22, f:1},
+  {id:74,  name:'Yulaf ezmesi',                emoji:'🌾', cat:'Tahıl',       cal:389, p:17, c:66, f:7},
+  {id:75,  name:'Mısır gevreği',               emoji:'🌽', cat:'Tahıl',       cal:357, p:8,  c:82, f:1},
+  {id:76,  name:'Kuskus (pişmiş)',              emoji:'🌾', cat:'Tahıl',       cal:112, p:4,  c:23, f:0.2},
+  {id:77,  name:'Arpa (pişmiş)',               emoji:'🌾', cat:'Tahıl',       cal:123, p:2,  c:28, f:0.4},
+  {id:78,  name:'Buğday (haşlanmış)',           emoji:'🌾', cat:'Tahıl',       cal:136, p:5,  c:30, f:1},
+  {id:79,  name:'Mısır unu (polenta)',          emoji:'🌽', cat:'Tahıl',       cal:362, p:8,  c:77, f:4},
+  // ===== ETLER =====
+  {id:90,  name:'Tavuk göğsü (ızgara)',        emoji:'🍗', cat:'Et',          cal:165, p:31, c:0,  f:4},
+  {id:91,  name:'Tavuk but (ızgara)',          emoji:'🍗', cat:'Et',          cal:177, p:25, c:0,  f:8},
+  {id:92,  name:'Tavuk kanat',                 emoji:'🍗', cat:'Et',          cal:222, p:18, c:0,  f:16},
+  {id:93,  name:'Tavuk (haşlanmış)',           emoji:'🍗', cat:'Et',          cal:150, p:28, c:0,  f:4},
+  {id:94,  name:'Hindi göğsü',                emoji:'🦃', cat:'Et',          cal:135, p:29, c:0,  f:1},
+  {id:95,  name:'Dana biftek',                 emoji:'🥩', cat:'Et',          cal:250, p:26, c:0,  f:17},
+  {id:96,  name:'Dana kıyma (%20 yağ)',        emoji:'🥩', cat:'Et',          cal:254, p:17, c:0,  f:20},
+  {id:97,  name:'Dana kıyma (%10 yağ)',        emoji:'🥩', cat:'Et',          cal:195, p:20, c:0,  f:12},
+  {id:98,  name:'Kuzu pirzola',               emoji:'🥩', cat:'Et',          cal:285, p:25, c:0,  f:20},
+  {id:99,  name:'Kuzu kıyma',                 emoji:'🥩', cat:'Et',          cal:267, p:18, c:0,  f:21},
+  {id:100, name:'Köfte (ızgara)',             emoji:'🧆', cat:'Et',          cal:230, p:19, c:6,  f:15},
+  {id:101, name:'Tavuk şiş',                  emoji:'🍢', cat:'Et',          cal:160, p:28, c:2,  f:4},
+  {id:102, name:'Döner (tavuk)',              emoji:'🌯', cat:'Et',          cal:195, p:24, c:3,  f:10},
+  {id:103, name:'Döner (et)',                 emoji:'🌯', cat:'Et',          cal:270, p:22, c:3,  f:19},
+  {id:104, name:'Kavurma',                    emoji:'🍖', cat:'Et',          cal:320, p:24, c:0,  f:25},
+  {id:105, name:'Sucuk',                      emoji:'🌭', cat:'Et',          cal:400, p:22, c:1,  f:35},
+  // ===== BALIK / DENİZ ÜRÜNLERİ =====
+  {id:110, name:'Somon fileto',               emoji:'🐟', cat:'Balık',       cal:208, p:20, c:0,  f:13},
+  {id:111, name:'Ton balığı (konserve)',      emoji:'🐡', cat:'Balık',       cal:116, p:26, c:0,  f:1},
+  {id:112, name:'Hamsi (tava)',               emoji:'🐟', cat:'Balık',       cal:175, p:17, c:6,  f:9},
+  {id:113, name:'Levrek (ızgara)',            emoji:'🐟', cat:'Balık',       cal:124, p:24, c:0,  f:3},
+  {id:114, name:'Çipura (ızgara)',            emoji:'🐟', cat:'Balık',       cal:128, p:26, c:0,  f:3},
+  {id:115, name:'Uskumru',                    emoji:'🐟', cat:'Balık',       cal:205, p:19, c:0,  f:13},
+  {id:116, name:'Sardalya (konserve)',        emoji:'🐟', cat:'Balık',       cal:208, p:25, c:0,  f:11},
+  {id:117, name:'Karides (haşlanmış)',        emoji:'🦐', cat:'Balık',       cal:99,  p:21, c:0,  f:1},
+  {id:118, name:'Ahtapot (haşlanmış)',        emoji:'🐙', cat:'Balık',       cal:82,  p:15, c:2,  f:1},
+  {id:119, name:'Kalamar (ızgara)',           emoji:'🦑', cat:'Balık',       cal:92,  p:16, c:3,  f:1},
+  {id:120, name:'Midye',                      emoji:'🦪', cat:'Balık',       cal:86,  p:12, c:4,  f:2},
+  {id:121, name:'Palamut (ızgara)',           emoji:'🐟', cat:'Balık',       cal:182, p:25, c:0,  f:9},
+  {id:122, name:'Mezgit (haşlanmış)',         emoji:'🐟', cat:'Balık',       cal:105, p:23, c:0,  f:1},
+  // ===== SEBZELER =====
+  {id:130, name:'Patates (haşlanmış)',        emoji:'🥔', cat:'Sebze',       cal:87,  p:2,  c:20, f:0.1},
+  {id:131, name:'Patates (fırın)',            emoji:'🥔', cat:'Sebze',       cal:93,  p:2,  c:21, f:0.1},
+  {id:132, name:'Brokoli',                    emoji:'🥦', cat:'Sebze',       cal:34,  p:3,  c:7,  f:0.4},
+  {id:133, name:'Karnabahar',                 emoji:'🥦', cat:'Sebze',       cal:25,  p:2,  c:5,  f:0.3},
+  {id:134, name:'Ispanak',                    emoji:'🥬', cat:'Sebze',       cal:23,  p:3,  c:4,  f:0.4},
+  {id:135, name:'Marul',                      emoji:'🥬', cat:'Sebze',       cal:15,  p:1,  c:3,  f:0.2},
+  {id:136, name:'Roka',                       emoji:'🥬', cat:'Sebze',       cal:25,  p:3,  c:4,  f:0.7},
+  {id:137, name:'Havuç',                      emoji:'🥕', cat:'Sebze',       cal:41,  p:1,  c:10, f:0.2},
+  {id:138, name:'Soğan (kuru)',               emoji:'🧅', cat:'Sebze',       cal:40,  p:1,  c:9,  f:0.1},
+  {id:139, name:'Sarımsak',                   emoji:'🧄', cat:'Sebze',       cal:149, p:6,  c:33, f:0.5},
+  {id:140, name:'Patlıcan',                   emoji:'🍆', cat:'Sebze',       cal:25,  p:1,  c:6,  f:0.2},
+  {id:141, name:'Kabak (yeşil)',              emoji:'🥒', cat:'Sebze',       cal:17,  p:1,  c:3,  f:0.3},
+  {id:142, name:'Biber (kırmızı dolmalık)',   emoji:'🫑', cat:'Sebze',       cal:31,  p:1,  c:6,  f:0.3},
+  {id:143, name:'Mısır (haşlanmış)',          emoji:'🌽', cat:'Sebze',       cal:86,  p:3,  c:19, f:1},
+  {id:144, name:'Bezelye (haşlanmış)',        emoji:'🫛', cat:'Sebze',       cal:84,  p:5,  c:16, f:0.2},
+  {id:145, name:'Enginar (haşlanmış)',        emoji:'🥦', cat:'Sebze',       cal:53,  p:3,  c:12, f:0.2},
+  {id:146, name:'Kereviz',                    emoji:'🥬', cat:'Sebze',       cal:16,  p:1,  c:3,  f:0.2},
+  {id:147, name:'Turp',                       emoji:'🥕', cat:'Sebze',       cal:16,  p:1,  c:3,  f:0.1},
+  {id:148, name:'Pancar (haşlanmış)',         emoji:'🫀', cat:'Sebze',       cal:44,  p:2,  c:10, f:0.1},
+  {id:149, name:'Taze fasulye (haşlanmış)',   emoji:'🫘', cat:'Sebze',       cal:35,  p:2,  c:8,  f:0.1},
+  {id:150, name:'Semizotu',                   emoji:'🌿', cat:'Sebze',       cal:20,  p:2,  c:4,  f:0.4},
+  {id:151, name:'Bamya (haşlanmış)',          emoji:'🌿', cat:'Sebze',       cal:33,  p:2,  c:7,  f:0.2},
+  {id:152, name:'Pırasa',                     emoji:'🌿', cat:'Sebze',       cal:61,  p:2,  c:14, f:0.3},
+  {id:153, name:'Domates (kurutulmuş)',       emoji:'🍅', cat:'Sebze',       cal:258, p:14, c:56, f:3},
+  // ===== MEYVELER =====
+  {id:160, name:'Elma',                       emoji:'🍎', cat:'Meyve',       cal:52,  p:0,  c:14, f:0.2},
+  {id:161, name:'Armut',                      emoji:'🍐', cat:'Meyve',       cal:57,  p:0,  c:15, f:0.1},
+  {id:162, name:'Muz',                        emoji:'🍌', cat:'Meyve',       cal:89,  p:1,  c:23, f:0.3},
+  {id:163, name:'Portakal',                   emoji:'🍊', cat:'Meyve',       cal:47,  p:1,  c:12, f:0.1},
+  {id:164, name:'Mandalina',                  emoji:'🍊', cat:'Meyve',       cal:53,  p:1,  c:13, f:0.3},
+  {id:165, name:'Çilek',                      emoji:'🍓', cat:'Meyve',       cal:32,  p:1,  c:8,  f:0.3},
+  {id:166, name:'Üzüm',                       emoji:'🍇', cat:'Meyve',       cal:69,  p:1,  c:18, f:0.2},
+  {id:167, name:'Karpuz',                     emoji:'🍉', cat:'Meyve',       cal:30,  p:1,  c:8,  f:0.2},
+  {id:168, name:'Kavun',                      emoji:'🍈', cat:'Meyve',       cal:34,  p:1,  c:8,  f:0.2},
+  {id:169, name:'Kiraz',                      emoji:'🍒', cat:'Meyve',       cal:63,  p:1,  c:16, f:0.2},
+  {id:170, name:'Vişne',                      emoji:'🍒', cat:'Meyve',       cal:50,  p:1,  c:12, f:0.3},
+  {id:171, name:'Şeftali',                    emoji:'🍑', cat:'Meyve',       cal:39,  p:1,  c:10, f:0.3},
+  {id:172, name:'Erik',                       emoji:'🫐', cat:'Meyve',       cal:46,  p:1,  c:11, f:0.3},
+  {id:173, name:'Kayısı',                     emoji:'🍑', cat:'Meyve',       cal:48,  p:1,  c:11, f:0.4},
+  {id:174, name:'İncir (taze)',               emoji:'🫐', cat:'Meyve',       cal:74,  p:1,  c:19, f:0.3},
+  {id:175, name:'İncir (kuru)',               emoji:'🫐', cat:'Meyve',       cal:249, p:3,  c:64, f:1},
+  {id:176, name:'Nar',                        emoji:'🍎', cat:'Meyve',       cal:83,  p:2,  c:19, f:1},
+  {id:177, name:'Avokado',                    emoji:'🥑', cat:'Meyve',       cal:160, p:2,  c:9,  f:15},
+  {id:178, name:'Limon',                      emoji:'🍋', cat:'Meyve',       cal:29,  p:1,  c:9,  f:0.3},
+  {id:179, name:'Greyfurt',                   emoji:'🍊', cat:'Meyve',       cal:42,  p:1,  c:11, f:0.1},
+  {id:180, name:'Kivi',                       emoji:'🥝', cat:'Meyve',       cal:61,  p:1,  c:15, f:0.5},
+  {id:181, name:'Ananas',                     emoji:'🍍', cat:'Meyve',       cal:50,  p:1,  c:13, f:0.1},
+  {id:182, name:'Mango',                      emoji:'🥭', cat:'Meyve',       cal:60,  p:1,  c:15, f:0.4},
+  {id:183, name:'Hurma (kuru)',               emoji:'🌴', cat:'Meyve',       cal:277, p:2,  c:75, f:0.2},
+  // ===== KURUYEMİŞ / TOHUMLAR =====
+  {id:190, name:'Badem',                      emoji:'🌰', cat:'Kuruyemiş',   cal:579, p:21, c:22, f:50},
+  {id:191, name:'Ceviz',                      emoji:'🌰', cat:'Kuruyemiş',   cal:654, p:15, c:14, f:65},
+  {id:192, name:'Fındık',                     emoji:'🌰', cat:'Kuruyemiş',   cal:628, p:15, c:17, f:61},
+  {id:193, name:'Fıstık (yer)',               emoji:'🥜', cat:'Kuruyemiş',   cal:567, p:26, c:16, f:49},
+  {id:194, name:'Fıstık (çam)',               emoji:'🌰', cat:'Kuruyemiş',   cal:673, p:14, c:13, f:68},
+  {id:195, name:'Antep fıstığı',              emoji:'🌰', cat:'Kuruyemiş',   cal:560, p:20, c:28, f:45},
+  {id:196, name:'Kaju',                       emoji:'🌰', cat:'Kuruyemiş',   cal:553, p:18, c:30, f:44},
+  {id:197, name:'Kabak çekirdeği',            emoji:'🎃', cat:'Kuruyemiş',   cal:559, p:30, c:11, f:49},
+  {id:198, name:'Ay çekirdeği',               emoji:'🌻', cat:'Kuruyemiş',   cal:584, p:21, c:20, f:51},
+  {id:199, name:'Susam',                      emoji:'🌾', cat:'Kuruyemiş',   cal:573, p:18, c:23, f:50},
+  {id:200, name:'Keten tohumu',               emoji:'🌾', cat:'Kuruyemiş',   cal:534, p:18, c:29, f:42},
+  {id:201, name:'Chia tohumu',                emoji:'🌾', cat:'Kuruyemiş',   cal:486, p:17, c:42, f:31},
+  {id:202, name:'Kuru üzüm',                  emoji:'🍇', cat:'Kuruyemiş',   cal:299, p:3,  c:79, f:0.5},
+  {id:203, name:'Kuru kayısı',               emoji:'🍑', cat:'Kuruyemiş',   cal:241, p:4,  c:63, f:0.5},
+  {id:204, name:'Kuru erik',                  emoji:'🫐', cat:'Kuruyemiş',   cal:240, p:2,  c:64, f:0.4},
+  {id:205, name:'Kuru incir',                 emoji:'🫐', cat:'Kuruyemiş',   cal:249, p:3,  c:64, f:1},
+  // ===== BAKLAGİLLER =====
+  {id:210, name:'Mercimek kırmızı (pişmiş)',  emoji:'🫘', cat:'Baklagil',    cal:116, p:9,  c:20, f:0.4},
+  {id:211, name:'Mercimek yeşil (pişmiş)',    emoji:'🫘', cat:'Baklagil',    cal:116, p:9,  c:20, f:0.4},
+  {id:212, name:'Nohut (pişmiş)',             emoji:'🫛', cat:'Baklagil',    cal:164, p:9,  c:27, f:3},
+  {id:213, name:'Fasulye kuru (pişmiş)',      emoji:'🫘', cat:'Baklagil',    cal:127, p:9,  c:23, f:0.5},
+  {id:214, name:'Fasulye barbunya (pişmiş)',  emoji:'🫘', cat:'Baklagil',    cal:132, p:9,  c:24, f:0.5},
+  {id:215, name:'Börülce (pişmiş)',           emoji:'🫘', cat:'Baklagil',    cal:116, p:8,  c:21, f:0.5},
+  {id:216, name:'Fava (pişmiş)',              emoji:'🫘', cat:'Baklagil',    cal:110, p:8,  c:20, f:0.5},
+  {id:217, name:'Soya fasulyesi (pişmiş)',    emoji:'🫘', cat:'Baklagil',    cal:173, p:17, c:10, f:9},
+  {id:218, name:'Bezelye kuru (pişmiş)',      emoji:'🫛', cat:'Baklagil',    cal:118, p:8,  c:21, f:0.4},
+  {id:219, name:'Mercimek çorbası',           emoji:'🍲', cat:'Baklagil',    cal:62,  p:4,  c:9,  f:2},
+  // ===== YAĞLAR =====
+  {id:225, name:'Zeytinyağı',                 emoji:'🫒', cat:'Yağ',         cal:884, p:0,  c:0,  f:100},
+  {id:226, name:'Ayçiçek yağı',              emoji:'🌻', cat:'Yağ',         cal:884, p:0,  c:0,  f:100},
+  {id:227, name:'Mısır özü yağı',            emoji:'🌽', cat:'Yağ',         cal:884, p:0,  c:0,  f:100},
+  {id:228, name:'Hindistan cevizi yağı',     emoji:'🥥', cat:'Yağ',         cal:862, p:0,  c:0,  f:100},
+  {id:229, name:'Tereyağı',                   emoji:'🧈', cat:'Yağ',         cal:717, p:1,  c:0,  f:81},
+  // ===== TATLIL / TATLANDIRICIL =====
+  {id:230, name:'Baklava',                    emoji:'🍰', cat:'Tatlı',       cal:334, p:4,  c:40, f:18},
+  {id:231, name:'Kadayıf',                    emoji:'🍰', cat:'Tatlı',       cal:315, p:5,  c:43, f:15},
+  {id:232, name:'Künefe',                     emoji:'🍰', cat:'Tatlı',       cal:380, p:8,  c:45, f:20},
+  {id:233, name:'Sütlaç',                     emoji:'🍮', cat:'Tatlı',       cal:140, p:4,  c:26, f:3},
+  {id:234, name:'Muhallebi',                  emoji:'🍮', cat:'Tatlı',       cal:110, p:3,  c:20, f:2},
+  {id:235, name:'Kazandibi',                  emoji:'🍮', cat:'Tatlı',       cal:170, p:5,  c:30, f:4},
+  {id:236, name:'Lokma',                      emoji:'🍩', cat:'Tatlı',       cal:350, p:4,  c:48, f:16},
+  {id:237, name:'Helva (tahin)',              emoji:'🍬', cat:'Tatlı',       cal:516, p:13, c:55, f:30},
+  {id:238, name:'Helva (irmik)',              emoji:'🍬', cat:'Tatlı',       cal:430, p:5,  c:60, f:20},
+  {id:239, name:'Lokum',                      emoji:'🍬', cat:'Tatlı',       cal:322, p:0,  c:80, f:0},
+  {id:240, name:'Dondurma (vanilyalı)',       emoji:'🍦', cat:'Tatlı',       cal:207, p:4,  c:24, f:11},
+  {id:241, name:'Çikolata (sütlü)',           emoji:'🍫', cat:'Tatlı',       cal:535, p:8,  c:60, f:30},
+  {id:242, name:'Çikolata (bitter)',          emoji:'🍫', cat:'Tatlı',       cal:546, p:5,  c:60, f:31},
+  {id:243, name:'Kek (sade)',                 emoji:'🎂', cat:'Tatlı',       cal:350, p:5,  c:55, f:13},
+  {id:244, name:'Kurabiye',                   emoji:'🍪', cat:'Tatlı',       cal:480, p:6,  c:65, f:23},
+  {id:245, name:'Şeker',                      emoji:'🍬', cat:'Tatlı',       cal:387, p:0,  c:100,f:0},
+  {id:246, name:'Pekmez (üzüm)',              emoji:'🍯', cat:'Tatlı',       cal:273, p:1,  c:70, f:0},
+  {id:247, name:'Revani',                     emoji:'🍰', cat:'Tatlı',       cal:310, p:5,  c:52, f:10},
+  {id:248, name:'Şekerpare',                  emoji:'🍪', cat:'Tatlı',       cal:370, p:4,  c:55, f:16},
+  {id:249, name:'Aşure',                      emoji:'🍲', cat:'Tatlı',       cal:150, p:3,  c:31, f:2},
+  // ===== HAZIR / RESTORAN =====
+  {id:260, name:'Hamburger',                  emoji:'🍔', cat:'Hazır',       cal:295, p:17, c:24, f:14},
+  {id:261, name:'Pizza (dilim)',              emoji:'🍕', cat:'Hazır',       cal:266, p:11, c:33, f:10},
+  {id:262, name:'Döner (pita)',               emoji:'🌮', cat:'Hazır',       cal:350, p:25, c:30, f:14},
+  {id:263, name:'Iskender kebap',             emoji:'🍖', cat:'Hazır',       cal:260, p:18, c:18, f:14},
+  {id:264, name:'Adana kebap',                emoji:'🍢', cat:'Hazır',       cal:280, p:22, c:4,  f:20},
+  {id:265, name:'Patates kızartması',         emoji:'🍟', cat:'Hazır',       cal:312, p:4,  c:41, f:15},
+  {id:266, name:'Çorba (mercimek)',           emoji:'🍲', cat:'Hazır',       cal:62,  p:4,  c:9,  f:2},
+  {id:267, name:'Çorba (domates)',            emoji:'🍲', cat:'Hazır',       cal:45,  p:2,  c:8,  f:1},
+  {id:268, name:'Çorba (yayla)',              emoji:'🍲', cal:80,  p:4,  c:10, f:3,  cat:'Hazır'},
+  {id:269, name:'Pilav (pirinç)',             emoji:'🍚', cat:'Hazır',       cal:130, p:3,  c:28, f:0.3},
+  {id:270, name:'Bulgur pilavı',              emoji:'🌾', cat:'Hazır',       cal:83,  p:3,  c:19, f:0.2},
+  {id:271, name:'Karnıyarık',                 emoji:'🍆', cat:'Hazır',       cal:180, p:8,  c:10, f:13},
+  {id:272, name:'İmam bayıldı',              emoji:'🍆', cat:'Hazır',       cal:150, p:2,  c:12, f:11},
+  {id:273, name:'Dolma (zeytinyağlı)',        emoji:'🌿', cat:'Hazır',       cal:120, p:2,  c:15, f:6},
+  {id:274, name:'Sarma (etli)',               emoji:'🌿', cat:'Hazır',       cal:180, p:8,  c:15, f:10},
+  {id:275, name:'Mücver',                     emoji:'🥒', cat:'Hazır',       cal:200, p:6,  c:18, f:12},
+  {id:276, name:'Falafel',                    emoji:'🧆', cat:'Hazır',       cal:333, p:13, c:32, f:18},
+  {id:277, name:'Humus',                      emoji:'🫙', cat:'Hazır',       cal:166, p:8,  c:14, f:10},
+  // ===== İÇECEKLER =====
+  {id:285, name:'Su',                         emoji:'💧', cat:'İçecek',      cal:0,   p:0,  c:0,  f:0},
+  {id:286, name:'Çay (demli)',                emoji:'🍵', cat:'İçecek',      cal:1,   p:0,  c:0,  f:0},
+  {id:287, name:'Çay (süt ile)',              emoji:'🍵', cat:'İçecek',      cal:25,  p:1,  c:3,  f:1},
+  {id:288, name:'Türk kahvesi (sade)',        emoji:'☕', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
+  {id:289, name:'Türk kahvesi (şekerli)',     emoji:'☕', cat:'İçecek',      cal:35,  p:0,  c:9,  f:0},
+  {id:290, name:'Nescafe (sütlü)',            emoji:'☕', cat:'İçecek',      cal:50,  p:2,  c:7,  f:2},
+  {id:291, name:'Portakal suyu (taze)',       emoji:'🍊', cat:'İçecek',      cal:45,  p:1,  c:10, f:0.2},
+  {id:292, name:'Elma suyu',                 emoji:'🍎', cat:'İçecek',      cal:46,  p:0,  c:11, f:0.1},
+  {id:293, name:'Ayran',                      emoji:'🥛', cat:'İçecek',      cal:36,  p:2,  c:3,  f:1},
+  {id:294, name:'Kefir',                      emoji:'🥛', cat:'İçecek',      cal:52,  p:4,  c:5,  f:2},
+  {id:295, name:'Kola',                       emoji:'🥤', cat:'İçecek',      cal:42,  p:0,  c:11, f:0},
+  {id:296, name:'Kola (light)',               emoji:'🥤', cat:'İçecek',      cal:1,   p:0,  c:0,  f:0},
+  {id:297, name:'Boza',                       emoji:'🥤', cat:'İçecek',      cal:55,  p:1,  c:13, f:0.2},
+  {id:298, name:'Şalgam suyu',               emoji:'🥤', cat:'İçecek',      cal:20,  p:1,  c:4,  f:0},
+  {id:299, name:'Limonata',                   emoji:'🍋', cat:'İçecek',      cal:25,  p:0,  c:7,  f:0},
+  {id:300, name:'Salep',                      emoji:'☕', cat:'İçecek',      cal:130, p:3,  c:28, f:2},
+  {id:301, name:'Meyve suyu (karışık)',       emoji:'🧃', cat:'İçecek',      cal:45,  p:0,  c:11, f:0},
+  {id:302, name:'Protein shake',             emoji:'💪', cat:'İçecek',      cal:150, p:25, c:10, f:3},
 ];
 
 const EXERCISE_DB = [
@@ -2110,6 +2315,19 @@ document.addEventListener('DOMContentLoaded', function() {
   safeRun(loadData);
   safeRun(initApp);
 });
+
+
+function openAddSheet() {
+  openModal('addSheet');
+}
+function openAddFood() {
+  closeModal('addSheet');
+  setTimeout(() => openModal('addFood'), 150);
+}
+function openAddExercise() {
+  closeModal('addSheet');
+  setTimeout(() => openModal('addExercise'), 150);
+}
 
 function initApp() {
   safeRun(applyTheme);
