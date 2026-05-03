@@ -1,5 +1,5 @@
 <!--
-  NutriTrack — Akıllı Diyet ve Beslenme Takip Uygulaması
+  S-Diyet — Akıllı Diyet ve Beslenme Takip Uygulaması
   Copyright (C) 2024-2025 sebasmobil
 
   Bu program özgür yazılımdır; Free Software Foundation tarafından
@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.01
+  Version: Pro 1.0.05
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -30,12 +30,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a1a2e" id="theme-color-meta">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBEMEQxQSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjUxMiIgeTI9IjUxMiI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwRTVBMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGNkI2QiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNDAiIHJ4PSIxNDAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZzEpIi8+PHBhdGggZD0iTTE4MCAyNDUgTDIzMCAyOTUgTDM0MCAxODUiIHN0cm9rZT0iIzBEMEQxQSIgc3Ryb2tlLXdpZHRoPSIzMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+">
+<link rel="apple-touch-icon" sizes="152x152" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBEMEQxQSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjUxMiIgeTI9IjUxMiI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwRTVBMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGNkI2QiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNDAiIHJ4PSIxNDAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZzEpIi8+PHBhdGggZD0iTTE4MCAyNDUgTDIzMCAyOTUgTDM0MCAxODUiIHN0cm9rZT0iIzBEMEQxQSIgc3Ryb2tlLXdpZHRoPSIzMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+">
+<link rel="apple-touch-icon" sizes="167x167" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBEMEQxQSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjUxMiIgeTI9IjUxMiI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwRTVBMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGNkI2QiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNDAiIHJ4PSIxNDAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZzEpIi8+PHBhdGggZD0iTTE4MCAyNDUgTDIzMCAyOTUgTDM0MCAxODUiIHN0cm9rZT0iIzBEMEQxQSIgc3Ryb2tlLXdpZHRoPSIzMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBEMEQxQSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjUxMiIgeTI9IjUxMiI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwRTVBMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGNkI2QiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNDAiIHJ4PSIxNDAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZzEpIi8+PHBhdGggZD0iTTE4MCAyNDUgTDIzMCAyOTUgTDM0MCAxODUiIHN0cm9rZT0iIzBEMEQxQSIgc3Ryb2tlLXdpZHRoPSIzMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBEMEQxQSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjUxMiIgeTI9IjUxMiI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwRTVBMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGNkI2QiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyNDAiIHJ4PSIxNDAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZzEpIi8+PHBhdGggZD0iTTE4MCAyNDUgTDIzMCAyOTUgTDM0MCAxODUiIHN0cm9rZT0iIzBEMEQxQSIgc3Ryb2tlLXdpZHRoPSIzMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NutriTrack">
+<meta name="apple-mobile-web-app-title" content="S-Diyet">
 <meta name="description" content="Akıllı Diyet ve Beslenme Takip Uygulaması">
 
-<title>NutriTrack — Akıllı Beslenme</title>
+<title>S-Diyet — Akıllı Beslenme</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1016,6 +1022,101 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   .bottom-nav { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
   .page { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 }
+
+/* STATS CHARTS */
+#weekCalChart, #waterTrendChart { display:block; }
+.stat-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--card2); border-radius: 8px; padding: 4px 10px;
+  font-size: 0.72rem; font-weight: 600; color: var(--text2);
+}
+
+/* MULTI-SELECT food */
+.food-option.selected {
+  border-color: var(--accent) !important;
+  background: rgba(0,229,160,0.12) !important;
+}
+.food-option .fo-badge {
+  display: none;
+  position: absolute; top: -5px; right: -5px;
+  width: 18px; height: 18px;
+  background: var(--accent); color: #000;
+  border-radius: 50%; font-size: 0.6rem; font-weight: 800;
+  align-items: center; justify-content: center;
+}
+.food-option.selected .fo-badge { display: flex; }
+
+/* compact bottom bar */
+.multi-cart {
+  position: sticky; bottom: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 2px;
+  margin-top: 6px;
+}
+.cart-chips {
+  display: flex; gap: 5px; flex-wrap: wrap;
+  margin-bottom: 6px; max-height: 52px; overflow-y: auto;
+}
+.cart-chip {
+  display: flex; align-items: center; gap: 3px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 2px 6px 2px 5px;
+  font-size: 0.68rem; font-weight: 600; color: var(--text);
+  cursor: pointer; white-space: nowrap;
+}
+.cart-chip:hover { border-color: var(--accent2); }
+.cart-chip .cc-x { color: var(--accent2); margin-left: 1px; font-size: 0.75rem; }
+
+/* inline portion row */
+.ipr {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+.ipr:last-child { border-bottom: none; }
+.ipr-name { flex:1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ipr-btn {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: var(--card2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.9rem; color: var(--text); flex-shrink: 0;
+}
+.ipr-input {
+  width: 46px; text-align: center;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 3px 2px;
+  color: var(--text); font-size: 0.75rem; font-weight: 700;
+}
+.ipr-g { color: var(--text3); font-size: 0.68rem; flex-shrink:0; }
+
+/* macro strip */
+.macro-strip {
+  display: flex; justify-content: space-between;
+  background: var(--card2); border-radius: 10px;
+  padding: 6px 10px; margin: 6px 0;
+  font-size: 0.72rem;
+}
+.macro-strip span { display:flex; flex-direction:column; align-items:center; gap:1px; }
+.macro-strip b { font-family: var(--font-head); font-weight: 800; font-size: 0.85rem; }
+
+/* add bar */
+.add-bar {
+  display: flex; gap: 6px; align-items: center;
+}
+.add-bar .btn-add-all {
+  flex: 1; padding: 10px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #000; font-weight: 800; font-size: 0.85rem;
+  border: none; cursor: pointer; font-family: var(--font-head);
+}
+.add-bar .btn-clear {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--card2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem; flex-shrink: 0;
+}
+
 </style>
 </head>
 <body class="color-emerald">
@@ -1023,7 +1124,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.01</span>
+    <span>Pro 1.0.05</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1044,7 +1145,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
           </linearGradient>
         </defs>
       </svg>
-      NutriTrack
+      S-Diyet
     </div>
     <div class="nav-actions">
       <div class="nav-btn" onclick="openModal('notif')" title="Bildirimler" style="position:relative">
@@ -1283,60 +1384,114 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
   <!-- STATS PAGE -->
   <div class="page" id="page-stats">
-    <h2 style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;margin-bottom:16px">İstatistikler</h2>
+    <h2 style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;margin-bottom:16px">📊 İstatistikler</h2>
 
-    <!-- Weekly chart -->
+    <!-- Stat summary cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="card" style="margin-bottom:0;text-align:center;padding:14px">
+        <div style="font-size:1.4rem;margin-bottom:4px">🏆</div>
+        <div style="font-size:0.62rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">En İyi Gün</div>
+        <div style="font-family:var(--font-head);font-weight:800;color:var(--accent);font-size:0.95rem" id="best-day">-</div>
+      </div>
+      <div class="card" style="margin-bottom:0;text-align:center;padding:14px">
+        <div style="font-size:1.4rem;margin-bottom:4px">📅</div>
+        <div style="font-size:0.62rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Kayıtlı Gün</div>
+        <div style="font-family:var(--font-head);font-weight:800;color:var(--accent2);font-size:0.95rem" id="total-days">0</div>
+      </div>
+      <div class="card" style="margin-bottom:0;text-align:center;padding:14px">
+        <div style="font-size:1.4rem;margin-bottom:4px">📉</div>
+        <div style="font-size:0.62rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Ort. Kalori/Gün</div>
+        <div style="font-family:var(--font-head);font-weight:800;color:var(--accent3);font-size:0.95rem" id="avg-cal">-</div>
+      </div>
+      <div class="card" style="margin-bottom:0;text-align:center;padding:14px">
+        <div style="font-size:1.4rem;margin-bottom:4px">🏃</div>
+        <div style="font-size:0.62rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Toplam Egzersiz</div>
+        <div style="font-family:var(--font-head);font-weight:800;color:var(--accent4);font-size:0.95rem" id="total-exercise-kcal">0 kal</div>
+      </div>
+    </div>
+
+    <!-- Weekly calorie chart -->
     <div class="card">
-      <div class="section-title" style="margin-bottom:16px">📈 Haftalık Kalori</div>
-      <div class="week-chart" id="week-chart"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="section-title">📈 Haftalık Kalori</div>
+        <div style="font-size:0.72rem;color:var(--text3)">Son 7 gün</div>
+      </div>
+      <canvas id="weekCalChart" style="width:100%;max-height:160px;display:block"></canvas>
+    </div>
+
+    <!-- Macro donut -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="section-title">🥗 Makro Dağılımı</div>
+        <div style="font-size:0.72rem;color:var(--text3)" id="macro-date-label">Bugün</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <canvas id="nutrientChart" width="140" height="140" style="flex-shrink:0"></canvas>
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#FF6B6B;display:inline-block"></span>Protein</span>
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text)" id="macro-leg-protein">0g</span>
+            </div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="mbar-protein" style="height:100%;background:linear-gradient(90deg,#FF6B6B,#FF8E8E);border-radius:3px;width:0%;transition:width 0.6s ease"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#FFD93D;display:inline-block"></span>Karbonhidrat</span>
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text)" id="macro-leg-carb">0g</span>
+            </div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="mbar-carb" style="height:100%;background:linear-gradient(90deg,#FFD93D,#FFE878);border-radius:3px;width:0%;transition:width 0.6s ease"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#6BCB77;display:inline-block"></span>Yağ</span>
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text)" id="macro-leg-fat">0g</span>
+            </div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="mbar-fat" style="height:100%;background:linear-gradient(90deg,#6BCB77,#90EE90);border-radius:3px;width:0%;transition:width 0.6s ease"></div></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Goals -->
     <div class="card">
-      <div class="section-title" style="margin-bottom:16px">🎯 Hedef Takibi</div>
+      <div class="section-title" style="margin-bottom:16px">🎯 Bugünkü Hedefler</div>
       <div id="goals-container">
         <div class="goal-item">
-          <div class="goal-header">
-            <span class="goal-name">🔥 Kalori Hedefi</span>
-            <span class="goal-pct" id="goal-pct-cal">0%</span>
-          </div>
+          <div class="goal-header"><span class="goal-name">🔥 Kalori</span><span class="goal-pct" id="goal-pct-cal">0%</span></div>
           <div class="goal-bar-wrap"><div class="goal-bar" id="goal-bar-cal"></div></div>
         </div>
         <div class="goal-item">
-          <div class="goal-header">
-            <span class="goal-name">💧 Su Hedefi</span>
-            <span class="goal-pct" id="goal-pct-water">0%</span>
-          </div>
+          <div class="goal-header"><span class="goal-name">💧 Su</span><span class="goal-pct" id="goal-pct-water">0%</span></div>
           <div class="goal-bar-wrap"><div class="goal-bar" id="goal-bar-water"></div></div>
         </div>
         <div class="goal-item">
-          <div class="goal-header">
-            <span class="goal-name">🥩 Protein Hedefi</span>
-            <span class="goal-pct" id="goal-pct-protein">0%</span>
-          </div>
+          <div class="goal-header"><span class="goal-name">🥩 Protein</span><span class="goal-pct" id="goal-pct-protein">0%</span></div>
           <div class="goal-bar-wrap"><div class="goal-bar" id="goal-bar-protein"></div></div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-header"><span class="goal-name">🌾 Karbonhidrat</span><span class="goal-pct" id="goal-pct-carb">0%</span></div>
+          <div class="goal-bar-wrap"><div class="goal-bar" id="goal-bar-carb" style="background:linear-gradient(90deg,#FFD93D,#FFE878)"></div></div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-header"><span class="goal-name">🥑 Yağ</span><span class="goal-pct" id="goal-pct-fat">0%</span></div>
+          <div class="goal-bar-wrap"><div class="goal-bar" id="goal-bar-fat" style="background:linear-gradient(90deg,#6BCB77,#90EE90)"></div></div>
         </div>
       </div>
     </div>
 
-    <!-- Nutrient breakdown -->
+    <!-- Weekly Report -->
     <div class="card">
-      <div class="section-title" style="margin-bottom:16px">🥗 Besin Dağılımı</div>
-      <canvas id="nutrientChart" style="max-width:100%;display:block;margin:0 auto"></canvas>
+      <div class="section-title" style="margin-bottom:16px">📋 Haftalık Rapor</div>
+      <div id="weekly-report-container">
+        <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Yükleniyor...</div>
+      </div>
     </div>
 
-    <!-- Best & Worst Day -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="card" style="margin-bottom:0;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom:6px">🏆</div>
-        <div style="font-size:0.7rem;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px">En İyi Gün</div>
-        <div style="font-family:var(--font-head);font-weight:700;color:var(--accent)" id="best-day">-</div>
-      </div>
-      <div class="card" style="margin-bottom:0;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom:6px">📉</div>
-        <div style="font-size:0.7rem;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px">Toplam Gün</div>
-        <div style="font-family:var(--font-head);font-weight:700;color:var(--accent2)" id="total-days">0</div>
-      </div>
+    <!-- Water trend -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">💧 Su Tüketimi (7 Gün)</div>
+      <canvas id="waterTrendChart" style="width:100%;max-height:100px;display:block"></canvas>
     </div>
   </div>
 
@@ -1503,6 +1658,14 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
           <label class="input-label">🥩 Protein Hedefi (g)</label>
           <input type="number" class="input-field" id="set-protein-goal" placeholder="150">
         </div>
+        <div class="input-group">
+          <label class="input-label">🌾 Karbonhidrat Hedefi (g)</label>
+          <input type="number" class="input-field" id="set-carb-goal" placeholder="250">
+        </div>
+        <div class="input-group">
+          <label class="input-label">🥑 Yağ Hedefi (g)</label>
+          <input type="number" class="input-field" id="set-fat-goal" placeholder="65">
+        </div>
         <button class="btn btn-primary" onclick="saveGoals()" style="margin-top:8px">💾 Hedefleri Kaydet</button>
       </div>
     </div>
@@ -1544,7 +1707,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     </div>
 
     <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.75rem">
-      NutriTrack • Sağlıklı yaşam için 💚
+      S-Diyet • Sağlıklı yaşam için 💚
     </div>
   </div>
 
@@ -1581,7 +1744,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <div class="modal-title">🍽️ Yemek Ekle</div>
 
     <div class="settings-title" style="margin-bottom:8px">Öğün Seçin</div>
-    <div class="timing-grid" id="meal-select" style="margin-bottom:16px">
+    <div class="timing-grid" id="meal-select" style="margin-bottom:14px">
       <div class="timing-chip selected" data-meal="kahvalti" onclick="selectMeal(this)">🌅 Kahvaltı</div>
       <div class="timing-chip" data-meal="ogle" onclick="selectMeal(this)">☀️ Öğle</div>
       <div class="timing-chip" data-meal="aksam" onclick="selectMeal(this)">🌙 Akşam</div>
@@ -1596,42 +1759,42 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 
     <div class="food-categories" id="food-cats"></div>
 
+    <!-- food grid: tıklayınca sepete ekler, tekrar tıklayınca kaldırır -->
     <div class="food-grid" id="food-grid"></div>
 
-    <div class="input-group" style="margin-top:16px">
-      <label class="input-label">⚖️ Miktar (gram / adet)</label>
-      <div class="portion-input">
-        <button class="portion-btn" onclick="changePortion(-50)">−</button>
-        <input type="number" class="portion-field" id="portion-amount" value="100">
-        <button class="portion-btn" onclick="changePortion(50)">+</button>
+    <!-- Kompakt seçim barı -->
+    <div class="multi-cart" id="multi-cart" style="display:none">
+      <!-- seçilen chip'ler -->
+      <div class="cart-chips" id="cart-items"></div>
+      <!-- inline porsiyon satırları -->
+      <div id="portion-rows"></div>
+      <!-- makro strip -->
+      <div class="macro-strip">
+        <span><b id="cn-cal" style="color:var(--accent)">0</b><span style="color:var(--text3);font-size:0.6rem">kal</span></span>
+        <span><b id="cn-prot" style="color:#FF6B6B">0g</b><span style="color:var(--text3);font-size:0.6rem">protein</span></span>
+        <span><b id="cn-carb" style="color:#FFD93D">0g</b><span style="color:var(--text3);font-size:0.6rem">karb</span></span>
+        <span><b id="cn-fat" style="color:#6BCB77">0g</b><span style="color:var(--text3);font-size:0.6rem">yağ</span></span>
+      </div>
+      <!-- ekle + temizle -->
+      <div class="add-bar">
+        <button class="btn-add-all" onclick="addMultiFood()">✅ Ekle · <span id="cart-count">0</span> ürün · <span id="cart-total-cal">0</span> kal</button>
+        <div class="btn-clear" onclick="clearCart()" title="Temizle">🗑️</div>
       </div>
     </div>
 
-    <!-- Nutrition preview -->
-    <div id="nutrition-preview" style="display:none;background:var(--card2);border-radius:14px;padding:14px;margin-bottom:14px">
-      <div style="font-size:0.75rem;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em">Besin Değerleri</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
-        <div>
-          <div style="font-family:var(--font-head);font-weight:800;color:var(--accent)" id="prev-cal">0</div>
-          <div style="font-size:0.6rem;color:var(--text3)">KAL</div>
-        </div>
-        <div>
-          <div style="font-family:var(--font-head);font-weight:800;color:#FF6B6B" id="prev-prot">0g</div>
-          <div style="font-size:0.6rem;color:var(--text3)">PROTEİN</div>
-        </div>
-        <div>
-          <div style="font-family:var(--font-head);font-weight:800;color:#FFD93D" id="prev-carb">0g</div>
-          <div style="font-size:0.6rem;color:var(--text3)">KARB</div>
-        </div>
-        <div>
-          <div style="font-family:var(--font-head);font-weight:800;color:#6BCB77" id="prev-fat">0g</div>
-          <div style="font-size:0.6rem;color:var(--text3)">YAĞ</div>
-        </div>
-      </div>
-    </div>
+    <!-- hidden compat -->
+    <div id="nutrition-preview" style="display:none"></div>
+    <div id="prev-cal" style="display:none">0</div>
+    <div id="prev-prot" style="display:none">0g</div>
+    <div id="prev-carb" style="display:none">0g</div>
+    <div id="prev-fat" style="display:none">0g</div>
+    <div id="portion-amount" style="display:none">100</div>
+    <div id="portion-editor" style="display:none"></div>
 
-    <button class="btn btn-primary" onclick="addFood()">✅ Ekle</button>
-    <button class="btn btn-secondary" onclick="closeModal('addFood')">İptal</button>
+    <div id="cart-empty-hint" style="text-align:center;padding:8px 0 2px;color:var(--text3);font-size:0.72rem">
+      👆 Birden fazla yemek seçebilirsin
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('addFood')" style="margin-top:6px">İptal</button>
   </div>
 </div>
 
@@ -1706,7 +1869,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 // =================== DATA ===================
 let appData = {
   profile: { name:'', age:25, height:170, weight:70, targetWeight:65, activity:1.55, gender:'male', dietGoal:'lose' },
-  settings: { theme:'dark', color:'emerald', calGoal:2000, waterGoal:2500, proteinGoal:150, notif:true, waterNotif:true },
+  settings: { theme:'dark', color:'emerald', calGoal:2000, waterGoal:2500, proteinGoal:150, carbGoal:250, fatGoal:65, notif:true, waterNotif:true },
   logs: {},
   exercises: {},
   weightHistory: [],
@@ -1717,7 +1880,7 @@ let appData = {
 // Safe storage: localStorage ile çalışır, olmazsa memory fallback kullanır
 const Storage = (() => {
   let _mem = null;
-  const KEY = 'nutritrack_v2';
+  const KEY = 's_diyet_v2';
   const canLS = (() => { try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
   return {
     get() {
@@ -1904,6 +2067,8 @@ function updateSettings() {
   document.getElementById('col-'+s.color)?.classList.add('active');
   if(s.calGoal) document.getElementById('set-cal-goal').value = s.calGoal;
   if(s.waterGoal) document.getElementById('set-water-goal').value = s.waterGoal;
+  if(s.carbGoal) document.getElementById('set-carb-goal').value = s.carbGoal;
+  if(s.fatGoal) document.getElementById('set-fat-goal').value = s.fatGoal;
   if(s.proteinGoal) document.getElementById('set-protein-goal').value = s.proteinGoal;
   document.getElementById('toggle-notif').classList.toggle('on', s.notif!==false);
   document.getElementById('toggle-water').classList.toggle('on', s.waterNotif!==false);
@@ -1923,6 +2088,10 @@ function saveGoals() {
   if(cal>0) appData.settings.calGoal = cal;
   if(water>0) appData.settings.waterGoal = water;
   if(protein>0) appData.settings.proteinGoal = protein;
+  const carb = +document.getElementById('set-carb-goal').value;
+  const fat = +document.getElementById('set-fat-goal').value;
+  if(carb>0) appData.settings.carbGoal = carb;
+  if(fat>0) appData.settings.fatGoal = fat;
   saveData();
   updateHomeStats();
   showToast('🎯 Hedefler kaydedildi!', 'success');
@@ -2106,13 +2275,15 @@ function buildFoodGrid() {
 function renderFoodGrid(foods) {
   const grid = document.getElementById('food-grid');
   if(!grid) return;
-  grid.innerHTML = foods.map(f =>
-    `<div class="food-option" id="fo-${f.id}" onclick="selectFood(${f.id})">
+  grid.innerHTML = foods.map(f => {
+    const inCart = foodCart.some(c=>c.food.id===f.id);
+    return `<div class="food-option${inCart?' selected':''}" id="fo-${f.id}" onclick="selectFood(${f.id})" style="position:relative">
+      <span class="fo-badge" style="${inCart?'display:flex':'display:none'}">✓</span>
       <div class="food-option-emoji">${f.emoji}</div>
       <div class="food-option-name">${f.name}</div>
       <div class="food-option-kcal">${f.cal} kal/100g</div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterCat(cat, el) {
@@ -2131,29 +2302,136 @@ function filterFoods(q) {
   renderFoodGrid(filteredFoods);
 }
 
+// ======= MULTI-SELECT CART =======
+let foodCart = []; // [{food, amount}]
+
 function selectFood(id) {
-  selectedFood = FOOD_DB.find(f=>f.id===id);
-  document.querySelectorAll('.food-option').forEach(el=>el.classList.remove('selected'));
-  document.getElementById('fo-'+id)?.classList.add('selected');
-  updateNutritionPreview();
+  const food = FOOD_DB.find(f=>f.id===id);
+  if(!food) return;
+  const idx = foodCart.findIndex(c=>c.food.id===id);
+  if(idx>=0) {
+    // zaten var → kaldır
+    foodCart.splice(idx,1);
+    document.getElementById('fo-'+id)?.classList.remove('selected');
+    const badge = document.getElementById('fo-'+id)?.querySelector('.fo-badge');
+    if(badge) badge.textContent = '';
+  } else {
+    // ekle
+    foodCart.push({food, amount:100});
+    document.getElementById('fo-'+id)?.classList.add('selected');
+    const badge = document.getElementById('fo-'+id)?.querySelector('.fo-badge');
+    if(badge) badge.textContent = '✓';
+  }
+  renderCart();
 }
 
-function updateNutritionPreview() {
-  if(!selectedFood) return;
-  const amount = +document.getElementById('portion-amount').value || 100;
-  const ratio = amount / 100;
-  document.getElementById('prev-cal').textContent = Math.round(selectedFood.cal * ratio);
-  document.getElementById('prev-prot').textContent = (selectedFood.p * ratio).toFixed(1)+'g';
-  document.getElementById('prev-carb').textContent = (selectedFood.c * ratio).toFixed(1)+'g';
-  document.getElementById('prev-fat').textContent = (selectedFood.f * ratio).toFixed(1)+'g';
-  document.getElementById('nutrition-preview').style.display = 'block';
+function renderCart() {
+  const cart = document.getElementById('multi-cart');
+  const hint = document.getElementById('cart-empty-hint');
+  if(!cart) return;
+
+  if(foodCart.length===0) {
+    cart.style.display='none';
+    if(hint) hint.style.display='block';
+    return;
+  }
+  cart.style.display='block';
+  if(hint) hint.style.display='none';
+
+  // chip satırı
+  const itemsEl = document.getElementById('cart-items');
+  if(itemsEl) itemsEl.innerHTML = foodCart.map(({food},i)=>
+    `<div class="cart-chip" onclick="removeFromCart(${i})">
+      ${food.emoji} ${food.name} <span class="cc-x">✕</span>
+    </div>`
+  ).join('');
+
+  // inline porsiyon satırları (kompakt)
+  const rowsEl = document.getElementById('portion-rows');
+  if(rowsEl) rowsEl.innerHTML = foodCart.map(({food,amount},i)=>
+    `<div class="ipr">
+      <span style="font-size:1rem">${food.emoji}</span>
+      <span class="ipr-name">${food.name}</span>
+      <div class="ipr-btn" onclick="cartChangePortion(${i},-25)">−</div>
+      <input class="ipr-input" type="number" value="${amount}" min="10" step="25"
+        onchange="cartSetPortion(${i},this.value)" oninput="cartSetPortion(${i},this.value)">
+      <span class="ipr-g">g</span>
+      <div class="ipr-btn" onclick="cartChangePortion(${i},25)">+</div>
+    </div>`
+  ).join('');
+
+  // makro toplamları
+  let totCal=0,totP=0,totC=0,totF=0;
+  foodCart.forEach(({food,amount})=>{const r=amount/100;totCal+=food.cal*r;totP+=food.p*r;totC+=food.c*r;totF+=food.f*r;});
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('cn-cal',Math.round(totCal)); s('cn-prot',totP.toFixed(1)+'g');
+  s('cn-carb',totC.toFixed(1)+'g'); s('cn-fat',totF.toFixed(1)+'g');
+  s('cart-total-cal',Math.round(totCal)); s('cart-count',foodCart.length);
 }
 
-function changePortion(delta) {
-  const el = document.getElementById('portion-amount');
-  el.value = Math.max(10, (+el.value||100) + delta);
-  updateNutritionPreview();
+function removeFromCart(idx) {
+  const food = foodCart[idx]?.food;
+  if(food) document.getElementById('fo-'+food.id)?.classList.remove('selected');
+  foodCart.splice(idx,1);
+  renderCart();
 }
+
+function clearCart() {
+  foodCart.forEach(({food})=>document.getElementById('fo-'+food.id)?.classList.remove('selected'));
+  foodCart=[];
+  renderCart();
+}
+
+function cartChangePortion(idx,delta) {
+  if(!foodCart[idx]) return;
+  foodCart[idx].amount = Math.max(10, foodCart[idx].amount+delta);
+  renderCart();
+}
+
+function cartSetPortion(idx,val) {
+  if(!foodCart[idx]) return;
+  const v = Math.max(10, +val||100);
+  foodCart[idx].amount = v;
+  // sadece toplamları güncelle (input'a dokunma)
+  let totCal=0,totP=0,totC=0,totF=0;
+  foodCart.forEach(({food,amount})=>{const r=amount/100;totCal+=food.cal*r;totP+=food.p*r;totC+=food.c*r;totF+=food.f*r;});
+  const s=(id,v2)=>{const el=document.getElementById(id);if(el)el.textContent=v2;};
+  s('cn-cal',Math.round(totCal));s('cn-prot',totP.toFixed(1)+'g');
+  s('cn-carb',totC.toFixed(1)+'g');s('cn-fat',totF.toFixed(1)+'g');
+  s('cart-total-cal',Math.round(totCal));
+}
+
+function addMultiFood() {
+  if(foodCart.length===0) { showToast('⚠️ Lütfen en az bir yemek seçin!','error'); return; }
+  const log = getTodayLog();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  let added = 0;
+  foodCart.forEach(({food,amount})=>{
+    const r = amount/100;
+    const entry = {
+      id: Date.now()+added,
+      foodId: food.id, name: food.name, emoji: food.emoji,
+      amount,
+      cal: Math.round(food.cal*r),
+      protein: +(food.p*r).toFixed(1),
+      carb: +(food.c*r).toFixed(1),
+      fat: +(food.f*r).toFixed(1),
+      time: timeStr, date: getTodayKey()
+    };
+    log[selectedMeal].push(entry);
+    added++;
+  });
+  saveData(); renderMealLogs(); updateHomeStats(); updateStreak();
+  showToast(`✅ ${added} yemek eklendi!`,'success');
+  clearCart();
+  closeModal('addFood');
+}
+
+// Geriye uyum
+function updateNutritionPreview() {}
+function changePortion(delta) {}
+function addFood() { addMultiFood(); }
 
 function selectMeal(el) {
   document.querySelectorAll('[data-meal]').forEach(e=>e.classList.remove('selected'));
@@ -2507,44 +2785,156 @@ function updateStreak() {
 
 // =================== WEEK CHART ===================
 function buildWeekChart() {
-  const chart = document.getElementById('week-chart');
-  if(!chart) return;
+  // ----- collect 7-day data -----
   const days = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  const today = new Date().getDay();
   const goal = appData.settings.calGoal || 2000;
+  const data7 = [];
+  let totalCal = 0, dayCount = 0;
+  let totalExKcal = 0;
 
-  let maxCal = 0;
-  const data = [];
   for(let i=6;i>=0;i--) {
-    const d = new Date();
-    d.setDate(d.getDate()-i);
+    const d = new Date(); d.setDate(d.getDate()-i);
     const k = d.toISOString().split('T')[0];
     const l = appData.logs[k];
     let cal = 0;
-    if(l) ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(l[m]||[]).forEach(item=>cal+=item.cal));
-    data.push({cal, day:days[d.getDay()], isToday:i===0});
-    if(cal>maxCal) maxCal=cal;
+    if(l) ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(l[m]||[]).forEach(item=>cal+=item.cal||0));
+    const ex = appData.exercises[k] || [];
+    const exKcal = ex.reduce((s,e)=>s+(e.kcal||0),0);
+    const water = l ? (l.water||0) : 0;
+    data7.push({cal, exKcal, water, day:days[d.getDay()], isToday:i===0, key:k});
+    if(cal>0){totalCal+=cal;dayCount++;}
+    totalExKcal += exKcal;
   }
 
-  maxCal = Math.max(maxCal, goal);
-  chart.innerHTML = data.map(d => {
-    const h = Math.max(4, (d.cal/maxCal)*60);
-    return `<div class="week-bar-wrap">
-      <div class="week-bar${d.isToday?' today':''}" style="height:${h}px" title="${d.cal} kal"></div>
-      <span class="week-day">${d.day}</span>
-    </div>`;
-  }).join('');
-
-  // Stats page
-  const allCals = data.map(d=>d.cal).filter(c=>c>0);
-  if(allCals.length>0) {
-    const best = Math.max(...allCals);
-    document.getElementById('best-day').textContent = best+' kal';
+  // ----- summary cards -----
+  const allCals = data7.map(d=>d.cal).filter(c=>c>0);
+  if(allCals.length>0){
+    document.getElementById('best-day').textContent = Math.max(...allCals)+' kal';
+    document.getElementById('avg-cal').textContent = Math.round(totalCal/dayCount)+' kal';
   }
   document.getElementById('total-days').textContent = Object.keys(appData.logs).length;
+  document.getElementById('total-exercise-kcal').textContent = totalExKcal+' kal';
 
-  // Nutrient chart (simple)
+  // ----- weekly calorie bar chart (canvas) -----
+  const wc = document.getElementById('weekCalChart');
+  if(wc) {
+    const dpr = window.devicePixelRatio||1;
+    const W = wc.parentElement.clientWidth - 32 || 300;
+    const H = 160;
+    wc.width = W*dpr; wc.height = H*dpr;
+    wc.style.width = W+'px'; wc.style.height = H+'px';
+    const ctx = wc.getContext('2d');
+    ctx.scale(dpr,dpr);
+    ctx.clearRect(0,0,W,H);
+
+    const maxVal = Math.max(...data7.map(d=>d.cal), goal, 100);
+    const barW = Math.floor((W - 16) / 7) - 6;
+    const chartH = H - 28;
+
+    // goal line
+    const goalY = chartH - (goal/maxVal)*chartH + 4;
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle = 'rgba(255,107,107,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(8,goalY); ctx.lineTo(W-8,goalY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    data7.forEach((d,i) => {
+      const x = 8 + i*(barW+6);
+      const barH = Math.max(4, (d.cal/maxVal)*chartH);
+      const y = chartH - barH + 4;
+
+      // bar gradient
+      const grad = ctx.createLinearGradient(0,y,0,chartH+4);
+      if(d.isToday) {
+        grad.addColorStop(0,'#00E5A0');
+        grad.addColorStop(1,'rgba(0,229,160,0.3)');
+      } else {
+        grad.addColorStop(0,'rgba(255,255,255,0.25)');
+        grad.addColorStop(1,'rgba(255,255,255,0.05)');
+      }
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x,y,barW,barH,4) : ctx.rect(x,y,barW,barH);
+      ctx.fill();
+
+      // exercise kcal overlay
+      if(d.exKcal>0) {
+        const exH = Math.max(3,(d.exKcal/maxVal)*chartH);
+        ctx.fillStyle = 'rgba(255,107,107,0.7)';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x,y-exH,barW,exH,3) : ctx.rect(x,y-exH,barW,exH);
+        ctx.fill();
+      }
+
+      // day label
+      ctx.fillStyle = d.isToday ? '#00E5A0' : 'rgba(255,255,255,0.45)';
+      ctx.font = `${d.isToday?'700':'500'} 10px Nunito,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(d.day, x+barW/2, H-6);
+
+      // cal label on top
+      if(d.cal>0) {
+        ctx.fillStyle = d.isToday ? '#00E5A0' : 'rgba(255,255,255,0.55)';
+        ctx.font = '9px Nunito,sans-serif';
+        ctx.fillText(d.cal>999 ? (d.cal/1000).toFixed(1)+'k' : d.cal, x+barW/2, y-4);
+      }
+    });
+
+    // legend
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px Nunito,sans-serif'; ctx.textAlign='left';
+    ctx.fillText('■ Hedef: '+goal+' kal', 8, H-1);
+  }
+
+  // ----- water trend chart -----
+  const wt = document.getElementById('waterTrendChart');
+  if(wt) {
+    const dpr = window.devicePixelRatio||1;
+    const W = wt.parentElement.clientWidth - 32 || 300;
+    const H = 100;
+    wt.width = W*dpr; wt.height = H*dpr;
+    wt.style.width = W+'px'; wt.style.height = H+'px';
+    const ctx2 = wt.getContext('2d');
+    ctx2.scale(dpr,dpr);
+    ctx2.clearRect(0,0,W,H);
+
+    const wGoal = appData.settings.waterGoal || 2500;
+    const wVals = data7.map(d=>d.water);
+    const wMax = Math.max(...wVals, wGoal, 1);
+    const pts = wVals.map((v,i)=>[8 + i*((W-16)/6), (H-24) - (v/wMax)*(H-32) + 4]);
+
+    // fill area
+    const grad2 = ctx2.createLinearGradient(0,0,0,H);
+    grad2.addColorStop(0,'rgba(56,189,248,0.4)');
+    grad2.addColorStop(1,'rgba(56,189,248,0)');
+    ctx2.fillStyle = grad2;
+    ctx2.beginPath();
+    ctx2.moveTo(pts[0][0],H-20);
+    pts.forEach(([x,y])=>ctx2.lineTo(x,y));
+    ctx2.lineTo(pts[pts.length-1][0],H-20);
+    ctx2.closePath(); ctx2.fill();
+
+    // line
+    ctx2.strokeStyle = '#38BDF8'; ctx2.lineWidth = 2;
+    ctx2.lineJoin = 'round'; ctx2.lineCap = 'round';
+    ctx2.beginPath();
+    pts.forEach(([x,y],i)=>i===0?ctx2.moveTo(x,y):ctx2.lineTo(x,y));
+    ctx2.stroke();
+
+    // dots + labels
+    pts.forEach(([x,y],i) => {
+      ctx2.fillStyle = wVals[i]>=wGoal ? '#38BDF8' : 'rgba(56,189,248,0.5)';
+      ctx2.beginPath(); ctx2.arc(x,y,3,0,Math.PI*2); ctx2.fill();
+      ctx2.fillStyle = 'rgba(255,255,255,0.45)'; ctx2.font = '9px Nunito,sans-serif'; ctx2.textAlign='center';
+      ctx2.fillText(data7[i].day, x, H-4);
+    });
+  }
+
+  // ----- nutrient donut -----
   renderNutrientChart();
+
+  // ----- weekly report -----
+  buildWeeklyReport();
 }
 
 function renderNutrientChart() {
@@ -2553,48 +2943,144 @@ function renderNutrientChart() {
   const log = getTodayLog();
   let p=0,c=0,f=0;
   ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(log[m]||[]).forEach(i=>{p+=i.protein||0;c+=i.carb||0;f+=i.fat||0;}));
+
+  // legend bars
+  const pg = appData.settings.proteinGoal||150;
+  const cg = appData.settings.carbGoal||250;
+  const fg = appData.settings.fatGoal||65;
+  const pEl = document.getElementById('macro-leg-protein');
+  const cEl = document.getElementById('macro-leg-carb');
+  const fEl = document.getElementById('macro-leg-fat');
+  if(pEl) pEl.textContent = Math.round(p)+'g / '+pg+'g';
+  if(cEl) cEl.textContent = Math.round(c)+'g / '+cg+'g';
+  if(fEl) fEl.textContent = Math.round(f)+'g / '+fg+'g';
+  const mbP = document.getElementById('mbar-protein');
+  const mbC = document.getElementById('mbar-carb');
+  const mbF = document.getElementById('mbar-fat');
+  if(mbP) mbP.style.width = Math.min(100,Math.round(p/pg*100))+'%';
+  if(mbC) mbC.style.width = Math.min(100,Math.round(c/cg*100))+'%';
+  if(mbF) mbF.style.width = Math.min(100,Math.round(f/fg*100))+'%';
+
   const total = p+c+f || 1;
-  canvas.width = 200; canvas.height = 200;
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = 140*dpr; canvas.height = 140*dpr;
+  canvas.style.width='140px'; canvas.style.height='140px';
   const ctx = canvas.getContext('2d');
-  const segments = [
-    {val:p/total, color:'#FF6B6B', label:'Protein'},
-    {val:c/total, color:'#FFD93D', label:'Karbonhidrat'},
-    {val:f/total, color:'#6BCB77', label:'Yağ'},
-  ];
-  let start = -Math.PI/2;
-  ctx.clearRect(0,0,200,200);
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,140,140);
+
   if(p+c+f===0) {
-    ctx.fillStyle = '#333';
-    ctx.beginPath();
-    ctx.arc(100,100,80,0,Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#888';
-    ctx.font = '14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Veri yok', 100, 105);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 18;
+    ctx.beginPath(); ctx.arc(70,70,50,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = 'bold 12px Nunito,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('Veri yok',70,75);
     return;
   }
+
+  const segments = [
+    {val:p/total,color:'#FF6B6B',label:'P'},
+    {val:c/total,color:'#FFD93D',label:'K'},
+    {val:f/total,color:'#6BCB77',label:'Y'},
+  ];
+  let start = -Math.PI/2;
   segments.forEach(s => {
-    const end = start + s.val * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(100,100);
-    ctx.arc(100,100,80,start,end);
-    ctx.closePath();
-    ctx.fillStyle = s.color;
-    ctx.fill();
-    start = end;
+    const arc = s.val*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(70,70);
+    ctx.arc(70,70,55,start,start+arc); ctx.closePath();
+    ctx.fillStyle=s.color; ctx.fill();
+    start+=arc;
   });
-  // Center hole
-  ctx.beginPath();
-  ctx.arc(100,100,40,0,Math.PI*2);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#1E1E30';
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 12px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${Math.round(p+c+f)}g`, 100, 105);
+  // donut hole
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card').trim()||'#1E1E30';
+  ctx.beginPath(); ctx.arc(70,70,35,0,Math.PI*2); ctx.fillStyle=bgColor; ctx.fill();
+  // center text
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='bold 11px Nunito,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(Math.round(p+c+f)+'g',70,72);
+  ctx.font='9px Nunito,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('toplam',70,83);
 }
 
+function buildWeeklyReport() {
+  const container = document.getElementById('weekly-report-container');
+  if(!container) return;
+
+  const days7 = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const k = d.toISOString().split('T')[0];
+    const l = appData.logs[k];
+    let cal=0,p=0,c=0,f=0,water=0;
+    if(l){
+      ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(l[m]||[]).forEach(item=>{cal+=item.cal||0;p+=item.protein||0;c+=item.carb||0;f+=item.fat||0;}));
+      water=l.water||0;
+    }
+    const ex = (appData.exercises[k]||[]).reduce((s,e)=>s+(e.kcal||0),0);
+    const net = cal - ex;
+    days7.push({label:d.toLocaleDateString('tr-TR',{weekday:'short',day:'numeric'}),cal,net,p,c,f,water,ex,isToday:i===0});
+  }
+
+  const goal = appData.settings.calGoal||2000;
+  const wGoal = appData.settings.waterGoal||2500;
+  const totalCal = days7.reduce((s,d)=>s+d.cal,0);
+  const totalEx = days7.reduce((s,d)=>s+d.ex,0);
+  const daysLogged = days7.filter(d=>d.cal>0).length;
+  const onTarget = days7.filter(d=>d.cal>0 && d.cal<=goal*1.1).length;
+  const waterOk = days7.filter(d=>d.water>=wGoal).length;
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--card2);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:1.2rem">🔥</div>
+        <div style="font-family:var(--font-head);font-weight:800;font-size:1rem;color:var(--accent)">${totalCal.toLocaleString()}</div>
+        <div style="font-size:0.62rem;color:var(--text3);margin-top:2px">Toplam Kal</div>
+      </div>
+      <div style="background:var(--card2);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:1.2rem">🏃</div>
+        <div style="font-family:var(--font-head);font-weight:800;font-size:1rem;color:var(--accent2)">${totalEx}</div>
+        <div style="font-size:0.62rem;color:var(--text3);margin-top:2px">Yak. Kal</div>
+      </div>
+      <div style="background:var(--card2);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:1.2rem">🎯</div>
+        <div style="font-family:var(--font-head);font-weight:800;font-size:1rem;color:var(--accent3)">${onTarget}/${daysLogged}</div>
+        <div style="font-size:0.62rem;color:var(--text3);margin-top:2px">Hedefe Uygun</div>
+      </div>
+    </div>
+    <div style="font-size:0.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Günlük Detay</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${days7.map(d=>{
+        const pct = goal>0 ? Math.min(110,Math.round(d.cal/goal*100)) : 0;
+        const color = pct===0?'var(--text3)':pct>105?'#FF6B6B':pct>90?'#00E5A0':'#FFD93D';
+        const wPct = wGoal>0?Math.min(100,Math.round(d.water/wGoal*100)):0;
+        return `<div style="background:var(--card2);border-radius:10px;padding:10px 12px;${d.isToday?'border:1px solid var(--accent)':''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:0.78rem;font-weight:${d.isToday?'800':'600'};color:${d.isToday?'var(--accent)':'var(--text)'}">${d.label}${d.isToday?' 👈':''}</span>
+            <span style="font-size:0.78rem;font-weight:700;color:${color}">${d.cal>0?d.cal+' kal':'-'}</span>
+          </div>
+          ${d.cal>0?`<div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:6px">
+            <div style="height:100%;width:${pct}%;background:${color};border-radius:2px;transition:width 0.4s ease"></div>
+          </div>
+          <div style="display:flex;gap:12px;font-size:0.68rem;color:var(--text3)">
+            <span>💪 ${Math.round(d.p)}g</span>
+            <span>🌾 ${Math.round(d.c)}g</span>
+            <span>🥑 ${Math.round(d.f)}g</span>
+            ${d.ex>0?`<span style="color:#FF6B6B">🏃 -${d.ex}</span>`:''}
+            ${d.water>0?`<span style="color:#38BDF8">💧 ${d.water>=1000?(d.water/1000).toFixed(1)+'L':d.water+'ml'}${wPct>=100?' ✓':''}</span>`:''}
+          </div>`:'<div style="font-size:0.72rem;color:var(--text3)">Kayıt yok</div>'}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="margin-top:12px;padding:10px 12px;background:var(--card2);border-radius:10px;font-size:0.75rem;color:var(--text2);line-height:1.6">
+      💧 Su hedefine ulaşılan gün: <b style="color:#38BDF8">${waterOk}/7</b> &nbsp;|&nbsp; 
+      Kayıtlı gün: <b style="color:var(--accent)">${daysLogged}/7</b> &nbsp;|&nbsp;
+      Ort. net: <b style="color:var(--accent3)">${daysLogged>0?Math.round((totalCal-totalEx)/daysLogged):0} kal</b>
+    </div>
+  `;
+}
+
+// =================== DATE NAV ===================
 // =================== DATE NAV ===================
 function buildDateNav() {
   const nav = document.getElementById('date-nav');
@@ -2632,7 +3118,15 @@ function openModal(id) {
       try { document.getElementById('wt-date').value = getTodayKey(); } catch(e) {}
     }
     if(id==='addFood') {
-      renderMealLogs(); // Ensure current meal context
+      // Sepeti sıfırla
+      foodCart = [];
+      renderCart();
+      const hint = document.getElementById('cart-empty-hint');
+      if(hint) hint.style.display='block';
+      // search ve kategori sıfırla
+      const fsearch = document.getElementById('food-search');
+      if(fsearch) fsearch.value='';
+      filterFoods('');
     }
   }
 }
@@ -2657,7 +3151,7 @@ function switchPage(page) {
   document.getElementById('nav-'+page)?.classList.add('active');
 
   if(page==='log') { renderMealLogs(); buildDateNav(); }
-  if(page==='stats') { buildWeekChart(); animateGoalBars(); }
+  if(page==='stats') { buildWeekChart(); animateGoalBars(); buildWeeklyReport(); }
   if(page==='profile') updateProfileView();
   if(page==='settings') updateSettings();
 }
@@ -2676,21 +3170,27 @@ function animateRings() {
 function animateGoalBars() {
   setTimeout(() => {
     const log = getTodayLog();
-    let totalCal=0, totalProt=0;
-    ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(log[m]||[]).forEach(i=>{totalCal+=i.cal;totalProt+=i.protein||0;}));
+    let totalCal=0, totalProt=0, totalCarb=0, totalFat=0;
+    ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(log[m]||[]).forEach(i=>{
+      totalCal+=i.cal||0; totalProt+=i.protein||0; totalCarb+=i.carb||0; totalFat+=i.fat||0;
+    }));
     const water = log.water || 0;
     const goal = appData.settings.calGoal||2000;
     const wg = appData.settings.waterGoal||2500;
     const pg = appData.settings.proteinGoal||150;
-    const calPct = Math.min(100,(totalCal/goal)*100);
-    const waterPct = Math.min(100,(water/wg)*100);
-    const protPct = Math.min(100,(totalProt/pg)*100);
-    document.getElementById('goal-bar-cal').style.width = calPct+'%';
-    document.getElementById('goal-bar-water').style.width = waterPct+'%';
-    document.getElementById('goal-bar-protein').style.width = protPct+'%';
-    document.getElementById('goal-pct-cal').textContent = Math.round(calPct)+'%';
-    document.getElementById('goal-pct-water').textContent = Math.round(waterPct)+'%';
-    document.getElementById('goal-pct-protein').textContent = Math.round(protPct)+'%';
+    const cg = appData.settings.carbGoal||250;
+    const fg = appData.settings.fatGoal||65;
+    const set = (id,pct,val,unit) => {
+      const bar = document.getElementById('goal-bar-'+id);
+      const lbl = document.getElementById('goal-pct-'+id);
+      if(bar) bar.style.width = Math.min(100,pct)+'%';
+      if(lbl) lbl.textContent = Math.round(pct)+'%';
+    };
+    set('cal',   (totalCal/goal)*100);
+    set('water', (water/wg)*100);
+    set('protein',(totalProt/pg)*100);
+    set('carb',  (totalCarb/cg)*100);
+    set('fat',   (totalFat/fg)*100);
   }, 300);
 }
 
@@ -2700,9 +3200,11 @@ function animateMacroBars() {
     let totalProt=0, totalCarb=0, totalFat=0;
     ['kahvalti','ogle','aksam','atistirma','icecek'].forEach(m=>(log[m]||[]).forEach(i=>{totalProt+=i.protein||0;totalCarb+=i.carb||0;totalFat+=i.fat||0;}));
     const pg = appData.settings.proteinGoal||150;
+    const cg = appData.settings.carbGoal||250;
+    const fg = appData.settings.fatGoal||65;
     document.getElementById('bar-protein').style.width = Math.min(100,(totalProt/pg)*100)+'%';
-    document.getElementById('bar-carb').style.width = Math.min(100,(totalCarb/200)*100)+'%';
-    document.getElementById('bar-fat').style.width = Math.min(100,(totalFat/65)*100)+'%';
+    document.getElementById('bar-carb').style.width = Math.min(100,(totalCarb/cg)*100)+'%';
+    document.getElementById('bar-fat').style.width = Math.min(100,(totalFat/fg)*100)+'%';
   }, 300);
 }
 
@@ -2728,7 +3230,7 @@ function exportData() {
 
 function clearData() {
   if(confirm('Tüm verileri silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
-    try { localStorage.removeItem('nutritrack_v2'); } catch(e) {}
+    try { localStorage.removeItem('s_diyet_v2'); } catch(e) {}
     location.reload();
   }
 }
