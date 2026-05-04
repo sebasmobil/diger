@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.20
+  Version: Pro 1.0.25
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -130,7 +130,9 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 body.theme-light .version-bar {
-  background: rgba(255,255,255,0.35);
+  background: rgba(240,244,255,0.92);
+  color: #4A4A6A;
+  border-bottom-color: rgba(0,0,0,0.08);
 }
 .version-bar .vb-sep { opacity: 0.4; }
 .version-bar a {
@@ -858,7 +860,13 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   font-weight: 600;
   font-size: 0.85rem;
 }
-.theme-btn.active { border-color: var(--accent); background: rgba(0,229,160,0.05); }
+.theme-btn.active { 
+  border-color: var(--accent) !important; 
+  background: rgba(0,229,160,0.08) !important;
+  box-shadow: 0 0 0 2px var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
 
 .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .color-option {
@@ -870,7 +878,11 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem;
 }
-.color-option.active { border-color: var(--text); transform: scale(1.05); }
+.color-option.active { 
+  border: 3px solid #fff !important; 
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--accent), 0 4px 16px rgba(0,0,0,0.4);
+}
 
 .settings-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -1215,7 +1227,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.20</span>
+    <span>Pro 1.0.25</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1415,7 +1427,10 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     </div>
 
     <!-- Date navigation -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none" id="date-nav"></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;flex:1" id="date-nav"></div>
+      <div onclick="openCalendarPicker()" style="flex-shrink:0;width:34px;height:52px;border-radius:10px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem" title="Takvim">📅</div>
+    </div>
 
     <!-- Meal sections -->
     <div id="meal-log-container">
@@ -1983,6 +1998,29 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
   </div>
 </div>
 
+
+<!-- TAKVİM PICKER -->
+<div class="modal-overlay" id="modal-calendar">
+  <div class="modal" style="padding:20px 20px 36px;max-height:80vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <button onclick="calNavMonth(-1)" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:1.1rem;color:var(--text)">‹</button>
+      <div id="cal-month-label" style="font-family:var(--font-head);font-weight:800;font-size:1rem"></div>
+      <button onclick="calNavMonth(1)" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:1.1rem;color:var(--text)">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:8px">
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Pzt</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Sal</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Çar</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Per</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Cum</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Cmt</div>
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text3);padding:4px">Paz</div>
+    </div>
+    <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
+    <button class="btn btn-secondary" onclick="closeModal('calendar')" style="margin-top:16px">Kapat</button>
+  </div>
+</div>
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -2276,6 +2314,103 @@ const FOOD_DB = [
   {id:300, name:'Salep',                      emoji:'☕', cat:'İçecek',      cal:130, p:3,  c:28, f:2},
   {id:301, name:'Meyve suyu (karışık)',       emoji:'🧃', cat:'İçecek',      cal:45,  p:0,  c:11, f:0},
   {id:302, name:'Protein shake',             emoji:'💪', cat:'İçecek',      cal:150, p:25, c:10, f:3},
+  // ===== KAHVALTILIK EK =====
+  {id:409, name:'Omlet (sade)',               emoji:'🍳', cat:'Kahvaltı',   cal:154, p:11, c:1,  f:12},
+  {id:410, name:'Omlet (peynirli)',            emoji:'🍳', cat:'Kahvaltı',   cal:200, p:14, c:1,  f:16},
+  {id:411, name:'Krep (sade)',                 emoji:'🥞', cat:'Kahvaltı',   cal:210, p:6,  c:28, f:9},
+  {id:412, name:'Krep (peynirli)',             emoji:'🥞', cat:'Kahvaltı',   cal:260, p:12, c:28, f:12},
+  {id:413, name:'Çılbır',                      emoji:'🍳', cat:'Kahvaltı',   cal:180, p:12, c:3,  f:13},
+  {id:414, name:'Hellim peyniri',              emoji:'🧀', cat:'Süt Ürünleri', cal:321, p:21, c:1, f:26},
+  {id:415, name:'Bıldırcın yumurtası',         emoji:'🥚', cat:'Kahvaltı',   cal:158, p:13, c:1,  f:11},
+  {id:416, name:'Karışık kahvaltı tabağı',     emoji:'🍽️', cat:'Kahvaltı',  cal:450, p:22, c:20, f:32},
+
+  // ===== ET EK =====
+  {id:417, name:'Kokoreç',                     emoji:'🍢', cat:'Et',         cal:285, p:18, c:12, f:19},
+  {id:418, name:'Ciğer sarma',                 emoji:'🍖', cat:'Et',         cal:210, p:16, c:5,  f:14},
+  {id:419, name:'Piliç kaburga (ızgara)',      emoji:'🍗', cat:'Et',         cal:240, p:22, c:0,  f:17},
+  {id:420, name:'Hindi dolma',                 emoji:'🦃', cat:'Et',         cal:195, p:20, c:8,  f:9},
+  {id:421, name:'Tandır (kuzu)',               emoji:'🍖', cat:'Et',         cal:270, p:24, c:0,  f:19},
+  {id:422, name:'Çöp şiş',                     emoji:'🍢', cat:'Et',         cal:220, p:20, c:2,  f:15},
+  {id:423, name:'Kanat (Buffalo)',             emoji:'🍗', cat:'Et',         cal:290, p:20, c:4,  f:22},
+
+  // ===== BALIK EK =====
+  {id:424, name:'Çinekop (ızgara)',            emoji:'🐟', cat:'Balık',      cal:155, p:22, c:0,  f:7},
+  {id:425, name:'Kalkan (ızgara)',             emoji:'🐟', cat:'Balık',      cal:111, p:23, c:0,  f:2},
+  {id:426, name:'Kefal (ızgara)',              emoji:'🐟', cat:'Balık',      cal:172, p:20, c:0,  f:10},
+  {id:427, name:'Lagos (ızgara)',              emoji:'🐟', cat:'Balık',      cal:124, p:24, c:0,  f:3},
+  {id:428, name:'Balık çorbası',              emoji:'🍲', cat:'Balık',      cal:65,  p:6,  c:5,  f:3},
+
+  // ===== SEBZE EK =====
+  {id:429, name:'Domates (taze)',              emoji:'🍅', cat:'Sebze',      cal:18,  p:1,  c:4,  f:0.2},
+  {id:430, name:'Ispanak (pişmiş)',            emoji:'🥬', cat:'Sebze',      cal:41,  p:5,  c:7,  f:0.5},
+  {id:431, name:'Karışık yeşil salata',        emoji:'🥗', cat:'Sebze',      cal:20,  p:2,  c:4,  f:0.3},
+  {id:432, name:'Çoban salatası',              emoji:'🥗', cat:'Sebze',      cal:45,  p:2,  c:7,  f:2},
+  {id:433, name:'Mevsim salatası',             emoji:'🥗', cat:'Sebze',      cal:35,  p:2,  c:6,  f:1},
+  {id:434, name:'Roka salatası',               emoji:'🥗', cat:'Sebze',      cal:28,  p:3,  c:4,  f:1},
+
+  // ===== TAHIL EK =====
+  {id:435, name:'Makarna (tam buğday)',        emoji:'🍝', cat:'Tahıl',      cal:124, p:5,  c:24, f:1},
+  {id:436, name:'Şehriye (pişmiş)',            emoji:'🍜', cat:'Tahıl',      cal:115, p:4,  c:22, f:1},
+  {id:437, name:'Tel şehriye (pişmiş)',        emoji:'🍜', cat:'Tahıl',      cal:110, p:4,  c:21, f:1},
+  {id:438, name:'Orzo/arpa şehriye (pişmiş)', emoji:'🍚', cat:'Tahıl',      cal:120, p:4,  c:23, f:1},
+  {id:439, name:'Kinoa (pişmiş)',              emoji:'🌾', cat:'Tahıl',      cal:120, p:4,  c:21, f:2},
+  {id:440, name:'Karabuğday (pişmiş)',         emoji:'🌾', cat:'Tahıl',      cal:155, p:6,  c:34, f:1},
+
+  // ===== ÇORBA KATEGORİSİ =====
+  {id:441, name:'Mercimek çorbası',            emoji:'🍲', cat:'Çorba',      cal:62,  p:4,  c:9,  f:2},
+  {id:442, name:'Tarhana çorbası',             emoji:'🍲', cat:'Çorba',      cal:55,  p:3,  c:9,  f:1},
+  {id:443, name:'Ezogelin çorbası',            emoji:'🍲', cat:'Çorba',      cal:70,  p:4,  c:11, f:2},
+  {id:444, name:'Düğün çorbası',               emoji:'🍲', cat:'Çorba',      cal:95,  p:8,  c:6,  f:4},
+  {id:445, name:'Domates çorbası',             emoji:'🍲', cat:'Çorba',      cal:45,  p:2,  c:8,  f:1},
+  {id:446, name:'Yayla çorbası',               emoji:'🍲', cat:'Çorba',      cal:80,  p:4,  c:10, f:3},
+  {id:447, name:'İşkembe çorbası',             emoji:'🍲', cat:'Çorba',      cal:85,  p:7,  c:4,  f:5},
+  {id:448, name:'Paça çorbası',                emoji:'🍲', cat:'Çorba',      cal:95,  p:9,  c:2,  f:6},
+  {id:449, name:'Doğu çorbası (kelle)',        emoji:'🍲', cat:'Çorba',      cal:110, p:10, c:3,  f:7},
+  {id:450, name:'Şehriyeli tavuk çorbası',     emoji:'🍲', cat:'Çorba',      cal:58,  p:5,  c:6,  f:2},
+  {id:451, name:'Sebze çorbası',               emoji:'🍲', cat:'Çorba',      cal:40,  p:2,  c:7,  f:1},
+  {id:452, name:'Soğan çorbası',               emoji:'🍲', cat:'Çorba',      cal:65,  p:2,  c:9,  f:3},
+  {id:453, name:'Balkabağı çorbası',           emoji:'🍲', cat:'Çorba',      cal:50,  p:1,  c:10, f:1},
+  {id:454, name:'Kremalı mantar çorbası',      emoji:'🍄', cat:'Çorba',      cal:95,  p:3,  c:8,  f:6},
+
+  // ===== TATLIL EK =====
+  {id:455, name:'Sütlü nuriye',                emoji:'🍰', cat:'Tatlı',      cal:290, p:5,  c:42, f:12},
+  {id:456, name:'Kalburabastı',                emoji:'🍪', cat:'Tatlı',      cal:380, p:4,  c:52, f:18},
+  {id:457, name:'Tahin kurabiye',              emoji:'🍪', cat:'Tatlı',      cal:440, p:7,  c:55, f:22},
+  {id:458, name:'Un helvası',                  emoji:'🍬', cat:'Tatlı',      cal:480, p:6,  c:58, f:25},
+  {id:459, name:'Pişmaniye',                   emoji:'🍬', cat:'Tatlı',      cal:410, p:4,  c:68, f:14},
+  {id:460, name:'Dondurma (Maraş)',            emoji:'🍦', cat:'Tatlı',      cal:250, p:4,  c:30, f:13},
+  {id:461, name:'Güllaç',                      emoji:'🍮', cat:'Tatlı',      cal:130, p:4,  c:26, f:2},
+  {id:462, name:'Muhallebili kadayıf',         emoji:'🍰', cat:'Tatlı',      cal:320, p:6,  c:44, f:14},
+
+  // ===== İÇECEK EK =====
+  {id:463, name:'Maden suyu (sade)',           emoji:'💧', cat:'İçecek',     cal:0,   p:0,  c:0,  f:0},
+  {id:464, name:'Soda',                        emoji:'🫧', cat:'İçecek',     cal:0,   p:0,  c:0,  f:0},
+  {id:465, name:'Kombucha',                    emoji:'🧃', cat:'İçecek',     cal:30,  p:0,  c:7,  f:0},
+  {id:466, name:'Detoks suyu (limon-nane)',    emoji:'🍋', cat:'İçecek',     cal:8,   p:0,  c:2,  f:0},
+  {id:467, name:'Süt (sıcak)',                 emoji:'🥛', cat:'İçecek',     cal:61,  p:3,  c:5,  f:3},
+  {id:468, name:'Bitki çayı karışık',          emoji:'🌿', cat:'İçecek',     cal:2,   p:0,  c:0,  f:0},
+  {id:469, name:'Zencefil çayı',              emoji:'🫚', cat:'İçecek',     cal:5,   p:0,  c:1,  f:0},
+  {id:470, name:'Zerdeçal sütü (golden milk)', emoji:'🥛', cat:'İçecek',     cal:80,  p:3,  c:8,  f:4},
+  {id:471, name:'Taze sıkılmış nar suyu',     emoji:'🍎', cat:'İçecek',     cal:60,  p:1,  c:14, f:0.2},
+  {id:472, name:'Smoothie (muz-süt)',          emoji:'🥤', cat:'İçecek',     cal:110, p:4,  c:22, f:2},
+
+  // ===== HAZIR EK =====
+  {id:473, name:'Lahmacun dürüm',              emoji:'🌯', cat:'Hazır',      cal:280, p:12, c:35, f:10},
+  {id:474, name:'Pide kebap',                  emoji:'🫓', cat:'Hazır',      cal:310, p:18, c:30, f:13},
+  {id:475, name:'Çökertme kebabı',             emoji:'🍖', cat:'Hazır',      cal:290, p:22, c:15, f:16},
+  {id:476, name:'Ali nazik kebap',             emoji:'🍆', cat:'Hazır',      cal:280, p:18, c:12, f:18},
+  {id:477, name:'Orman kebabı',                emoji:'🍄', cat:'Hazır',      cal:240, p:16, c:10, f:16},
+  {id:478, name:'Testi kebabı',                emoji:'🏺', cat:'Hazır',      cal:265, p:20, c:8,  f:17},
+  {id:479, name:'Cağ kebabı',                  emoji:'🥩', cat:'Hazır',      cal:310, p:26, c:1,  f:22},
+  {id:480, name:'Paça (yemek)',                emoji:'🍲', cat:'Hazır',      cal:130, p:14, c:2,  f:8},
+  {id:481, name:'Beyin tava',                  emoji:'🍳', cat:'Hazır',      cal:180, p:13, c:3,  f:13},
+  {id:482, name:'Çiğ köfte (top)',             emoji:'🧆', cat:'Hazır',      cal:95,  p:3,  c:18, f:2},
+  {id:483, name:'Mantarlı tavuk sote',         emoji:'🍄', cat:'Hazır',      cal:185, p:22, c:5,  f:9},
+  {id:484, name:'Etli nohut',                  emoji:'🫛', cat:'Hazır',      cal:195, p:14, c:18, f:8},
+  {id:485, name:'Kabak dolması',               emoji:'🥒', cat:'Hazır',      cal:145, p:6,  c:16, f:7},
+  {id:486, name:'Biber dolması (etli)',        emoji:'🫑', cat:'Hazır',      cal:165, p:8,  c:15, f:8},
+  {id:487, name:'Patlıcan kebabı',             emoji:'🍆', cat:'Hazır',      cal:220, p:14, c:10, f:14},
+
   // ===== KAHVALTILIK EK =====
   {id:303, name:'Filtre kahve (sade)',         emoji:'☕', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
   {id:304, name:'Filtre kahve (sütlü)',        emoji:'☕', cat:'İçecek',      cal:40,  p:2,  c:5,  f:2},
@@ -2633,45 +2768,60 @@ function initApp() {
 
 // =================== THEME ===================
 function applyTheme() {
-  document.body.className = '';
-  document.body.classList.add(appData.settings.theme === 'light' ? 'theme-light' : '');
-  document.body.classList.add('color-' + appData.settings.color);
-  // Update theme-color meta
-  const colors = {emerald:'#00E5A0',violet:'#A78BFA',sunset:'#FB923C',ocean:'#38BDF8',rose:'#FB7185',lime:'#A3E635'};
-  document.getElementById('theme-color-meta').content = colors[appData.settings.color] || '#00E5A0';
+  const body = document.body;
+  ['theme-light','theme-dark'].forEach(c => body.classList.remove(c));
+  ['color-emerald','color-violet','color-sunset','color-ocean','color-rose','color-lime'].forEach(c => body.classList.remove(c));
+  const isLight = appData.settings.theme === 'light';
+  if(isLight) body.classList.add('theme-light');
+  body.classList.add('color-' + (appData.settings.color || 'emerald'));
+
+  // theme-color meta: sistem durum çubuğu rengi
+  const themeMeta = document.getElementById('theme-color-meta');
+  if(themeMeta) themeMeta.content = isLight ? '#F0F4FF' : '#1a1a2e';
+
+  // apple-mobile-web-app-status-bar-style
+  const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if(statusMeta) statusMeta.content = isLight ? 'default' : 'black-translucent';
 }
 
 function setTheme(t) {
   appData.settings.theme = t;
-  applyTheme();
   saveData();
-  document.getElementById('btn-dark').classList.toggle('active', t==='dark');
-  document.getElementById('btn-light').classList.toggle('active', t==='light');
+  applyTheme();
+  ['btn-dark','btn-light'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  document.getElementById(t==='dark'?'btn-dark':'btn-light')?.classList.add('active');
   showToast(t==='dark'?'🌙 Karanlık tema aktif':'☀️ Aydınlık tema aktif', 'success');
 }
 
 function setColor(c) {
   appData.settings.color = c;
-  applyTheme();
   saveData();
+  applyTheme();
   document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
   document.getElementById('col-'+c)?.classList.add('active');
   showToast('🎨 Renk teması değiştirildi!', 'success');
 }
 
 function updateSettings() {
-  const s = appData.settings;
-  document.getElementById('btn-dark').classList.toggle('active', s.theme!=='light');
-  document.getElementById('btn-light').classList.toggle('active', s.theme==='light');
-  document.querySelectorAll('.color-option').forEach(el=>el.classList.remove('active'));
-  document.getElementById('col-'+s.color)?.classList.add('active');
-  if(s.calGoal) document.getElementById('set-cal-goal').value = s.calGoal;
-  if(s.waterGoal) document.getElementById('set-water-goal').value = s.waterGoal;
-  if(s.carbGoal) document.getElementById('set-carb-goal').value = s.carbGoal;
-  if(s.fatGoal) document.getElementById('set-fat-goal').value = s.fatGoal;
-  if(s.proteinGoal) document.getElementById('set-protein-goal').value = s.proteinGoal;
-  document.getElementById('toggle-notif').classList.toggle('on', s.notif!==false);
-  document.getElementById('toggle-water').classList.toggle('on', s.waterNotif!==false);
+  try {
+    const s = appData.settings;
+    const g = id => document.getElementById(id);
+    // Tema butonları
+    g('btn-dark')?.classList.toggle('active', s.theme !== 'light');
+    g('btn-light')?.classList.toggle('active', s.theme === 'light');
+    // Renk seçenekleri
+    document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
+    g('col-' + (s.color||'emerald'))?.classList.add('active');
+    // Hedef alanları
+    if(s.calGoal)     { const el=g('set-cal-goal');     if(el) el.value=s.calGoal; }
+    if(s.waterGoal)   { const el=g('set-water-goal');   if(el) el.value=s.waterGoal; }
+    if(s.carbGoal)    { const el=g('set-carb-goal');    if(el) el.value=s.carbGoal; }
+    if(s.fatGoal)     { const el=g('set-fat-goal');     if(el) el.value=s.fatGoal; }
+    if(s.proteinGoal) { const el=g('set-protein-goal'); if(el) el.value=s.proteinGoal; }
+    // Toggle'lar
+    g('toggle-notif')?.classList.toggle('on', s.notif !== false);
+    g('toggle-water')?.classList.toggle('on', s.waterNotif !== false);
+  } catch(e) { /* sessiz */ }
 }
 
 function toggleSetting(key) {
@@ -3760,52 +3910,102 @@ function buildDateNav() {
   if(!nav) return;
   nav.innerHTML = '';
 
-  // Tüm kayıtlı tarihleri + bugünü birleştir
-  const loggedDates = new Set(Object.keys(appData.logs || {}));
-  loggedDates.add(getTodayKey()); // bugün her zaman ekli
-
-  // Son 30 gün + kayıtlı tüm günler
-  const allDates = new Set(loggedDates);
-  for(let i=0;i<30;i++) {
-    const d = new Date(); d.setDate(d.getDate()-i);
-    allDates.add(d.toISOString().split('T')[0]);
-  }
-
-  // Tarihleri sırala (yeniden eskiye)
-  const sorted = Array.from(allDates).sort((a,b)=>b.localeCompare(a));
-
-  sorted.forEach(dateKey => {
-    const d = new Date(dateKey + 'T00:00:00');
-    const isToday = dateKey === getTodayKey();
+  // Son 7 gün (bugün dahil, yeniden eskiye)
+  for(let i=0; i<7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateKey = d.toISOString().split('T')[0];
+    const isToday = i === 0;
     const isSelected = dateKey === currentLogDate;
     const hasLog = appData.logs[dateKey] &&
       ['kahvalti','ogle','aksam','atistirma','icecek'].some(m=>(appData.logs[dateKey][m]||[]).length>0);
 
     const day = d.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase();
     const num = d.getDate();
-    const mon = d.toLocaleDateString('tr-TR',{month:'short'});
 
     const el = document.createElement('div');
     el.dataset.date = dateKey;
-    el.style.cssText = `flex-shrink:0;padding:7px 12px;border-radius:14px;cursor:pointer;text-align:center;
+    el.style.cssText = `padding:6px 2px;border-radius:10px;cursor:pointer;text-align:center;
       border:2px solid ${isSelected?'var(--accent)':hasLog?'var(--accent3)':'var(--border)'};
       background:${isSelected?'var(--accent)':isToday?'var(--card)':'var(--card2)'};
-      color:${isSelected?'#000':'var(--text2)'};transition:all 0.2s;position:relative`;
+      color:${isSelected?'#000':'var(--text2)'};transition:all 0.2s;position:relative;`;
     el.innerHTML = `
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.05em">${day}</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;line-height:1">${num}</div>
-      <div style="font-size:0.58rem;color:${isSelected?'#0008':'var(--text3)'}">${mon}</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.04em">${day}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;line-height:1.2">${num}</div>
       ${hasLog && !isSelected ? '<div style="width:5px;height:5px;border-radius:50%;background:var(--accent3);position:absolute;bottom:3px;left:50%;transform:translateX(-50%)"></div>' : ''}
     `;
     el.onclick = () => selectLogDate(dateKey);
     nav.appendChild(el);
-  });
+  }
+}
 
-  // Seçili tarihe scroll
-  setTimeout(() => {
-    const sel = nav.querySelector(`[data-date="${currentLogDate}"]`);
-    if(sel) sel.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-  }, 100);
+
+// =================== TAKVİM ===================
+let calViewDate = new Date();
+
+function openCalendarPicker() {
+  calViewDate = new Date();
+  renderCalendarGrid();
+  openModal('calendar');
+}
+
+function calNavMonth(dir) {
+  calViewDate.setMonth(calViewDate.getMonth() + dir);
+  renderCalendarGrid();
+}
+
+function renderCalendarGrid() {
+  const today = getTodayKey();
+  const year = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+
+  const label = document.getElementById('cal-month-label');
+  if(label) label.textContent = calViewDate.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
+
+  const grid = document.getElementById('cal-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  const firstDay = new Date(year, month, 1);
+  let startDow = firstDay.getDay();
+  startDow = startDow === 0 ? 6 : startDow - 1;
+
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const todayDate = new Date(); todayDate.setHours(23,59,59,999);
+
+  for(let i=0; i<startDow; i++) {
+    grid.appendChild(Object.assign(document.createElement('div'), {innerHTML:'&nbsp;'}));
+  }
+
+  for(let d=1; d<=daysInMonth; d++) {
+    const dateObj = new Date(year, month, d);
+    const dateKey = dateObj.toISOString().split('T')[0];
+    const isToday = dateKey === today;
+    const isSelected = dateKey === currentLogDate;
+    const isFuture = dateObj > todayDate;
+    const hasLog = appData.logs[dateKey] &&
+      ['kahvalti','ogle','aksam','atistirma','icecek'].some(m=>(appData.logs[dateKey][m]||[]).length>0);
+
+    const cell = document.createElement('div');
+    cell.style.cssText = `height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+      font-size:0.82rem;font-weight:${isToday||isSelected?'800':'500'};
+      background:${isSelected?'var(--accent)':isToday?'rgba(0,229,160,0.15)':'transparent'};
+      color:${isSelected?'#000':isFuture?'var(--text3)':isToday?'var(--accent)':'var(--text)'};
+      cursor:${isFuture?'default':'pointer'};
+      border:1px solid ${isSelected?'var(--accent)':hasLog?'var(--accent3)':'transparent'};
+      position:relative;`;
+    cell.textContent = d;
+
+    if(hasLog && !isSelected) {
+      const dot = document.createElement('div');
+      dot.style.cssText='width:5px;height:5px;border-radius:50%;background:var(--accent);position:absolute;bottom:2px;left:50%;transform:translateX(-50%);box-shadow:0 0 4px var(--accent)';
+      cell.appendChild(dot);
+    }
+    if(!isFuture) {
+      cell.onclick = () => { selectLogDate(dateKey); closeModal('calendar'); };
+    }
+    grid.appendChild(cell);
+  }
 }
 
 function selectLogDate(dateKey) {
