@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.25
+  Version: Pro 1.0.31
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1227,7 +1227,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.25</span>
+    <span>Pro 1.0.31</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1736,6 +1736,36 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
       </div>
       <div class="weight-history" id="weight-history">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Henüz kilo kaydı yok</div>
+      </div>
+    </div>
+
+    <!-- YEDEK & GERİ YÜKLE -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px">💾 Yedek & Geri Yükle</div>
+
+      <div style="font-size:0.78rem;color:var(--text3);margin-bottom:12px;line-height:1.5">
+        Tüm yemek kayıtları, profil, ayarlar ve kilo geçmişi yedeklenir.
+      </div>
+
+      <!-- Yedek bilgisi -->
+      <div id="backup-info" style="background:var(--card2);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:0.78rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:var(--text3)">Son yedek:</span>
+        <span id="last-backup-date" style="font-weight:600;color:var(--text2)">Henüz yedek alınmadı</span>
+      </div>
+
+      <!-- Yedek Al -->
+      <button onclick="createBackup()" class="btn btn-primary" style="margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <span>⬇️</span> Yedek Al (JSON)
+      </button>
+
+      <!-- Geri Yükle -->
+      <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;font-weight:700;font-size:0.9rem;color:var(--text);transition:all 0.2s" onmousedown="this.style.opacity='0.8'" onmouseup="this.style.opacity='1'">
+        <span>⬆️</span> Yedeği Geri Yükle
+        <input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none">
+      </label>
+
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);border-radius:10px;font-size:0.72rem;color:#FF6B6B">
+        ⚠️ Geri yükleme mevcut tüm verilerin üzerine yazar.
       </div>
     </div>
   </div>
@@ -2410,6 +2440,154 @@ const FOOD_DB = [
   {id:485, name:'Kabak dolması',               emoji:'🥒', cat:'Hazır',      cal:145, p:6,  c:16, f:7},
   {id:486, name:'Biber dolması (etli)',        emoji:'🫑', cat:'Hazır',      cal:165, p:8,  c:15, f:8},
   {id:487, name:'Patlıcan kebabı',             emoji:'🍆', cat:'Hazır',      cal:220, p:14, c:10, f:14},
+  // ===== PEYNİRLER EK =====
+  {id:488, name:'Peynir (çeçil)',              emoji:'🧀', cat:'Süt Ürünleri', cal:285, p:22, c:1,  f:22},
+  {id:489, name:'Peynir (mihaliç)',            emoji:'🧀', cat:'Süt Ürünleri', cal:340, p:25, c:1,  f:27},
+  {id:490, name:'Peynir (van otlu)',           emoji:'🧀', cat:'Süt Ürünleri', cal:270, p:18, c:2,  f:21},
+  {id:491, name:'Peynir (küflü/rokfor)',       emoji:'🧀', cat:'Süt Ürünleri', cal:353, p:22, c:2,  f:29},
+  {id:492, name:'Peynir (mozzarella)',         emoji:'🧀', cat:'Süt Ürünleri', cal:280, p:22, c:2,  f:20},
+  {id:493, name:'Peynir (parmesan)',           emoji:'🧀', cat:'Süt Ürünleri', cal:431, p:38, c:4,  f:29},
+  {id:494, name:'Süzme yoğurt',               emoji:'🥣', cat:'Süt Ürünleri', cal:97,  p:9,  c:4,  f:5},
+  {id:495, name:'Crème fraîche',              emoji:'🥛', cat:'Süt Ürünleri', cal:292, p:3,  c:3,  f:30},
+
+  // ===== SEBZE EK =====
+  {id:496, name:'Brüksel lahanası',            emoji:'🥦', cat:'Sebze',       cal:43,  p:3,  c:9,  f:0.3},
+  {id:497, name:'Kıvırcık salata',             emoji:'🥬', cat:'Sebze',       cal:15,  p:1,  c:3,  f:0.2},
+  {id:498, name:'İceberg salata',              emoji:'🥬', cat:'Sebze',       cal:14,  p:1,  c:3,  f:0.1},
+  {id:499, name:'Yer elması (topinampur)',     emoji:'🥔', cat:'Sebze',       cal:73,  p:2,  c:17, f:0.1},
+  {id:500, name:'Kereviz sapı',               emoji:'🌿', cat:'Sebze',       cal:14,  p:1,  c:3,  f:0.2},
+  {id:501, name:'Kırmızı turp',               emoji:'🌹', cat:'Sebze',       cal:16,  p:1,  c:3,  f:0.1},
+  {id:502, name:'Şalgam (sebze)',              emoji:'🟣', cat:'Sebze',       cal:28,  p:1,  c:6,  f:0.1},
+  {id:503, name:'Kabak (sarı/bal kabağı)',     emoji:'🟡', cat:'Sebze',       cal:17,  p:1,  c:4,  f:0.2},
+  {id:504, name:'Brokoli (çiğ)',               emoji:'🥦', cat:'Sebze',       cal:34,  p:3,  c:7,  f:0.4},
+  {id:505, name:'Kırmızı soğan',              emoji:'🧅', cat:'Sebze',       cal:40,  p:1,  c:9,  f:0.1},
+  {id:506, name:'Portobello mantar',           emoji:'🍄', cat:'Sebze',       cal:22,  p:2,  c:4,  f:0.3},
+  {id:507, name:'Zencefil (taze)',             emoji:'🫚', cat:'Sebze',       cal:80,  p:2,  c:18, f:0.8},
+  {id:508, name:'Zerdeçal (taze)',             emoji:'🟡', cat:'Sebze',       cal:354, p:8,  c:65, f:10},
+  {id:509, name:'Biberiye',                    emoji:'🌿', cat:'Sebze',       cal:131, p:3,  c:21, f:5},
+  {id:510, name:'Fesleğen (taze)',             emoji:'🌿', cat:'Sebze',       cal:23,  p:3,  c:3,  f:1},
+  {id:511, name:'Nane (taze)',                 emoji:'🌿', cat:'Sebze',       cal:44,  p:3,  c:8,  f:1},
+
+  // ===== MEYVE EK =====
+  {id:512, name:'Böğürtlen',                   emoji:'🫐', cat:'Meyve',       cal:43,  p:1,  c:10, f:0.5},
+  {id:513, name:'Ahududu',                     emoji:'🍓', cat:'Meyve',       cal:52,  p:1,  c:12, f:0.7},
+  {id:514, name:'Dut (siyah)',                 emoji:'🫐', cat:'Meyve',       cal:43,  p:1,  c:10, f:0.4},
+  {id:515, name:'Dut (beyaz)',                 emoji:'⚪', cat:'Meyve',       cal:43,  p:1,  c:10, f:0.4},
+  {id:516, name:'Muşmula',                     emoji:'🍑', cat:'Meyve',       cal:47,  p:0,  c:12, f:0.2},
+  {id:517, name:'Yenidünya',                   emoji:'🟠', cat:'Meyve',       cal:47,  p:0,  c:12, f:0.2},
+  {id:518, name:'Papaya',                      emoji:'🍈', cat:'Meyve',       cal:43,  p:0,  c:11, f:0.3},
+  {id:519, name:'Hindistan cevizi (et)',       emoji:'🥥', cat:'Meyve',       cal:354, p:3,  c:15, f:33},
+  {id:520, name:'Yaban mersini (blueberry)',   emoji:'🫐', cat:'Meyve',       cal:57,  p:1,  c:14, f:0.3},
+  {id:521, name:'Maracuja (passion fruit)',    emoji:'🍊', cat:'Meyve',       cal:97,  p:2,  c:23, f:0.7},
+  {id:522, name:'Liçi',                        emoji:'🍈', cat:'Meyve',       cal:66,  p:1,  c:17, f:0.4},
+  {id:523, name:'Trabzon hurması (kaki)',      emoji:'🟠', cat:'Meyve',       cal:70,  p:1,  c:19, f:0.2},
+  {id:524, name:'Ayva',                        emoji:'🍐', cat:'Meyve',       cal:57,  p:0,  c:15, f:0.1},
+  {id:525, name:'Demirhindi (tamarind)',       emoji:'🟫', cat:'Meyve',       cal:239, p:3,  c:63, f:0.6},
+
+  // ===== KURUYEMİŞ EK =====
+  {id:526, name:'Macadamia',                   emoji:'🌰', cat:'Kuruyemiş',   cal:718, p:8,  c:14, f:76},
+  {id:527, name:'Pekan cevizi',               emoji:'🌰', cat:'Kuruyemiş',   cal:691, p:9,  c:14, f:72},
+  {id:528, name:'Hindistan cevizi (kuru)',     emoji:'🥥', cat:'Kuruyemiş',   cal:660, p:7,  c:24, f:65},
+  {id:529, name:'Kaju ezmesi',                emoji:'🌰', cat:'Kuruyemiş',   cal:553, p:18, c:30, f:44},
+  {id:530, name:'Muz cipsi',                  emoji:'🍌', cat:'Kuruyemiş',   cal:519, p:2,  c:58, f:34},
+  {id:531, name:'Karışık kuruyemiş',          emoji:'🌰', cat:'Kuruyemiş',   cal:607, p:16, c:22, f:55},
+  {id:532, name:'Cevizli bar',                emoji:'🍫', cat:'Kuruyemiş',   cal:480, p:10, c:52, f:28},
+
+  // ===== BALIK EK =====
+  {id:533, name:'Kılıç balığı (ızgara)',      emoji:'🐟', cat:'Balık',       cal:172, p:23, c:0,  f:9},
+  {id:534, name:'Tuna steak (ızgara)',        emoji:'🐟', cat:'Balık',       cal:184, p:30, c:0,  f:6},
+  {id:535, name:'Tekir (ızgara)',             emoji:'🐟', cat:'Balık',       cal:117, p:20, c:0,  f:4},
+  {id:536, name:'İskorpit (ızgara)',          emoji:'🐟', cat:'Balık',       cal:130, p:22, c:0,  f:5},
+  {id:537, name:'Balık köftesi',              emoji:'🐟', cat:'Balık',       cal:165, p:14, c:8,  f:8},
+  {id:538, name:'Karides güveç',             emoji:'🦐', cat:'Balık',       cal:120, p:16, c:5,  f:5},
+
+  // ===== ET EK =====
+  {id:539, name:'Tavuk nugget',               emoji:'🍗', cat:'Et',          cal:297, p:16, c:18, f:17},
+  {id:540, name:'Tavuk wrap',                 emoji:'🌯', cat:'Et',          cal:250, p:20, c:22, f:8},
+  {id:541, name:'Dana burger köfte',          emoji:'🥩', cat:'Et',          cal:265, p:18, c:1,  f:21},
+  {id:542, name:'Kuzu güveç',                emoji:'🍲', cat:'Et',          cal:230, p:20, c:6,  f:14},
+  {id:543, name:'Tavuk sote',                emoji:'🍳', cat:'Et',          cal:185, p:25, c:3,  f:8},
+  {id:544, name:'Hindi köfte',               emoji:'🦃', cat:'Et',          cal:165, p:22, c:4,  f:7},
+  {id:545, name:'Dana sote',                 emoji:'🥩', cat:'Et',          cal:210, p:22, c:3,  f:13},
+  {id:546, name:'Kavurmalı yumurta',         emoji:'🍳', cat:'Et',          cal:220, p:14, c:1,  f:18},
+
+  // ===== İÇECEK EK =====
+  {id:547, name:'Americano',                  emoji:'☕', cat:'İçecek',      cal:5,   p:0,  c:1,  f:0},
+  {id:548, name:'Flat white',                 emoji:'☕', cat:'İçecek',      cal:95,  p:5,  c:8,  f:5},
+  {id:549, name:'Matcha latte',               emoji:'🍵', cat:'İçecek',      cal:100, p:4,  c:12, f:4},
+  {id:550, name:'Matcha (sade)',              emoji:'🍵', cat:'İçecek',      cal:5,   p:1,  c:1,  f:0},
+  {id:551, name:'Kefir (meyveli)',            emoji:'🥛', cat:'İçecek',      cal:70,  p:3,  c:11, f:2},
+  {id:552, name:'Ayran (köpüklü)',            emoji:'🥛', cat:'İçecek',      cal:36,  p:2,  c:3,  f:1},
+  {id:553, name:'Vişne suyu (taze)',          emoji:'🍒', cat:'İçecek',      cal:50,  p:1,  c:12, f:0},
+  {id:554, name:'Domates suyu',              emoji:'🍅', cat:'İçecek',      cal:17,  p:1,  c:4,  f:0},
+  {id:555, name:'Havuç suyu (taze)',          emoji:'🥕', cat:'İçecek',      cal:40,  p:1,  c:9,  f:0.2},
+  {id:556, name:'Nar ekşisi',               emoji:'🍎', cat:'İçecek',      cal:260, p:1,  c:65, f:0},
+  {id:557, name:'Şeftali suyu',             emoji:'🍑', cat:'İçecek',      cal:42,  p:0,  c:10, f:0.1},
+  {id:558, name:'Üzüm suyu (taze)',         emoji:'🍇', cat:'İçecek',      cal:60,  p:0,  c:15, f:0},
+  {id:559, name:'Smoothie (yeşil)',          emoji:'🥤', cat:'İçecek',      cal:80,  p:3,  c:16, f:1},
+  {id:560, name:'Smoothie (çilekli)',        emoji:'🍓', cat:'İçecek',      cal:95,  p:3,  c:19, f:1},
+  {id:561, name:'Şeker kamışı suyu',        emoji:'🌱', cat:'İçecek',      cal:55,  p:0,  c:14, f:0},
+  {id:562, name:'Hibiskus çayı',            emoji:'🌺', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
+  {id:563, name:'Ekinezya çayı',            emoji:'🌸', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
+  {id:564, name:'Moringa çayı',             emoji:'🌿', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
+  {id:565, name:'Elma sirkesi sulandırılmış',emoji:'🍎', cat:'İçecek',     cal:5,   p:0,  c:1,  f:0},
+  {id:566, name:'Milkshake (çikolata)',      emoji:'🥤', cat:'İçecek',      cal:185, p:5,  c:30, f:6},
+  {id:567, name:'Milkshake (çilek)',         emoji:'🍓', cat:'İçecek',      cal:165, p:5,  c:28, f:5},
+
+  // ===== TATLI EK =====
+  {id:568, name:'Waffle',                    emoji:'🧇', cat:'Tatlı',       cal:290, p:7,  c:38, f:13},
+  {id:569, name:'Waffle (meyveli)',          emoji:'🧇', cat:'Tatlı',       cal:310, p:6,  c:46, f:12},
+  {id:570, name:'Tiramisu',                  emoji:'🍰', cat:'Tatlı',       cal:310, p:7,  c:30, f:19},
+  {id:571, name:'Cheesecake',               emoji:'🎂', cat:'Tatlı',       cal:321, p:5,  c:30, f:21},
+  {id:572, name:'Brownie',                   emoji:'🍫', cat:'Tatlı',       cal:466, p:6,  c:55, f:25},
+  {id:573, name:'Pasta (çikolatalı)',        emoji:'🎂', cat:'Tatlı',       cal:380, p:5,  c:50, f:19},
+  {id:574, name:'Pasta (meyveli)',           emoji:'🎂', cat:'Tatlı',       cal:280, p:4,  c:42, f:11},
+  {id:575, name:'Muffin (çikolatalı)',       emoji:'🧁', cat:'Tatlı',       cal:450, p:6,  c:60, f:22},
+  {id:576, name:'Muffin (meyveli)',          emoji:'🧁', cat:'Tatlı',       cal:380, p:5,  c:55, f:16},
+  {id:577, name:'Churros',                   emoji:'🍩', cat:'Tatlı',       cal:372, p:5,  c:51, f:18},
+  {id:578, name:'Macaron',                   emoji:'🍬', cat:'Tatlı',       cal:450, p:5,  c:70, f:18},
+  {id:579, name:'Dondurmacı dondurması',    emoji:'🍦', cat:'Tatlı',       cal:230, p:4,  c:28, f:12},
+  {id:580, name:'Sütlü kek',               emoji:'🎂', cat:'Tatlı',       cal:330, p:5,  c:48, f:14},
+  {id:581, name:'Krem şanti',              emoji:'🥛', cat:'Tatlı',       cal:340, p:2,  c:15, f:31},
+
+  // ===== ATIŞTIRMALIK EK =====
+  {id:582, name:'Humus + pita',             emoji:'🫙', cat:'Atıştırmalık', cal:210, p:8,  c:28, f:8},
+  {id:583, name:'Mısır patlaması (sade)',   emoji:'🍿', cat:'Atıştırmalık', cal:375, p:12, c:74, f:4},
+  {id:584, name:'Pirinç waferi',            emoji:'🍘', cat:'Atıştırmalık', cal:390, p:8,  c:82, f:2},
+  {id:585, name:'Tahıl bar',               emoji:'🌾', cat:'Atıştırmalık', cal:390, p:7,  c:65, f:12},
+  {id:586, name:'Enerji topu (tarih-fındık)',emoji:'⚡', cat:'Atıştırmalık', cal:380, p:6,  c:55, f:17},
+  {id:587, name:'Peynirli kraker',          emoji:'🧀', cat:'Atıştırmalık', cal:480, p:10, c:55, f:25},
+  {id:588, name:'Tortilla cipsi',           emoji:'🌽', cat:'Atıştırmalık', cal:489, p:8,  c:64, f:23},
+  {id:589, name:'Yoğurt kaplı kuru meyve', emoji:'🫐', cat:'Atıştırmalık', cal:420, p:5,  c:65, f:16},
+  {id:590, name:'Kavrulmuş nohut',         emoji:'🫘', cat:'Atıştırmalık', cal:364, p:19, c:61, f:5},
+  {id:591, name:'Kale cips',               emoji:'🥬', cat:'Atıştırmalık', cal:180, p:9,  c:22, f:8},
+
+  // ===== FAST FOOD KATEGORİSİ =====
+  {id:592, name:'Wrap (tavuk)',             emoji:'🌯', cat:'Fast Food',    cal:310, p:22, c:30, f:12},
+  {id:593, name:'Wrap (et)',                emoji:'🌯', cat:'Fast Food',    cal:360, p:20, c:32, f:16},
+  {id:594, name:'Chicken burger',           emoji:'🍔', cat:'Fast Food',    cal:390, p:25, c:38, f:16},
+  {id:595, name:'Double burger',            emoji:'🍔', cat:'Fast Food',    cal:480, p:30, c:35, f:24},
+  {id:596, name:'Cheeseburger',            emoji:'🍔', cat:'Fast Food',    cal:380, p:22, c:34, f:17},
+  {id:597, name:'Fish burger',             emoji:'🐟', cat:'Fast Food',    cal:340, p:18, c:38, f:13},
+  {id:598, name:'Patates (küçük boy)',     emoji:'🍟', cat:'Fast Food',    cal:230, p:3,  c:30, f:11},
+  {id:599, name:'Patates (büyük boy)',     emoji:'🍟', cat:'Fast Food',    cal:490, p:7,  c:64, f:23},
+  {id:600, name:'Soğan halkası',          emoji:'🧅', cat:'Fast Food',    cal:380, p:5,  c:48, f:19},
+  {id:601, name:'Mozarella stick',         emoji:'🧀', cat:'Fast Food',    cal:330, p:16, c:28, f:18},
+  {id:602, name:'Nugget (6 adet)',         emoji:'🍗', cat:'Fast Food',    cal:280, p:15, c:18, f:16},
+  {id:603, name:'Hot dog',                emoji:'🌭', cat:'Fast Food',    cal:260, p:10, c:24, f:14},
+  {id:604, name:'Club sandwich',          emoji:'🥪', cat:'Fast Food',    cal:430, p:24, c:38, f:19},
+  {id:605, name:'BLT sandwich',           emoji:'🥪', cat:'Fast Food',    cal:390, p:18, c:36, f:18},
+  {id:606, name:'Caesar salata',          emoji:'🥗', cat:'Fast Food',    cal:220, p:10, c:12, f:16},
+
+  // ===== ÇORBA EK =====
+  {id:607, name:'Tavuk çorbası',           emoji:'🍲', cat:'Çorba',       cal:55,  p:5,  c:5,  f:2},
+  {id:608, name:'Doğu çorbası (mercimek)', emoji:'🍲', cat:'Çorba',       cal:75,  p:5,  c:12, f:1},
+  {id:609, name:'Toyga çorbası',           emoji:'🍲', cat:'Çorba',       cal:70,  p:4,  c:10, f:2},
+  {id:610, name:'Haşlama çorbası',         emoji:'🍲', cat:'Çorba',       cal:90,  p:8,  c:5,  f:4},
+  {id:611, name:'Turşu çorbası',           emoji:'🍲', cat:'Çorba',       cal:45,  p:2,  c:7,  f:1},
+  {id:612, name:'Minestrone',              emoji:'🍲', cat:'Çorba',       cal:60,  p:3,  c:10, f:1},
+  {id:613, name:'Tom yum çorbası',         emoji:'🍲', cat:'Çorba',       cal:50,  p:4,  c:5,  f:2},
+
 
   // ===== KAHVALTILIK EK =====
   {id:303, name:'Filtre kahve (sade)',         emoji:'☕', cat:'İçecek',      cal:2,   p:0,  c:0,  f:0},
@@ -2742,6 +2920,82 @@ function toggleSettings() {
 }
 
 
+
+// =================== YEDEK & GERİ YÜKLE ===================
+function createBackup() {
+  const backup = {
+    version: 'S-Diyet Pro 1.0.31',
+    date: new Date().toISOString(),
+    appData: appData
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
+  a.href = url;
+  a.download = `s-diyet-yedek-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Son yedek tarihini kaydet
+  appData.lastBackup = new Date().toISOString();
+  saveData();
+  updateBackupInfo();
+  showToast('✅ Yedek başarıyla indirildi!', 'success');
+}
+
+function restoreBackup(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      // Doğrulama
+      if(!backup.appData) {
+        showToast('❌ Geçersiz yedek dosyası!', 'error');
+        return;
+      }
+      // Onay
+      const logCount = Object.keys(backup.appData.logs || {}).length;
+      const backupDate = backup.date ? new Date(backup.date).toLocaleDateString('tr-TR') : 'Bilinmiyor';
+      if(confirm(`📦 Yedek Bilgisi:\n\nTarih: ${backupDate}\nKayıtlı gün: ${logCount}\nVersiyon: ${backup.version||'?'}\n\nMevcut tüm veriler silinecek.\nDevam etmek istiyor musunuz?`)) {
+        appData = backup.appData;
+        saveData();
+        applyTheme();
+        updateSettings();
+        safeRun(updateHomeStats);
+        safeRun(updateProfileView);
+        safeRun(renderMealLogs);
+        safeRun(buildDateNav);
+        safeRun(updateBackupInfo);
+        showToast('✅ Veriler başarıyla geri yüklendi!', 'success');
+      }
+    } catch(err) {
+      showToast('❌ Dosya okunamadı: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  // Input'u sıfırla (aynı dosya tekrar seçilebilsin)
+  event.target.value = '';
+}
+
+function updateBackupInfo() {
+  const el = document.getElementById('last-backup-date');
+  if(!el) return;
+  if(appData.lastBackup) {
+    const d = new Date(appData.lastBackup);
+    el.textContent = d.toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    el.style.color = 'var(--accent)';
+  } else {
+    el.textContent = 'Henüz yedek alınmadı';
+    el.style.color = 'var(--text3)';
+  }
+}
+
 function initApp() {
   safeRun(applyTheme);
   safeRun(updateGreeting);
@@ -2753,6 +3007,7 @@ function initApp() {
   safeRun(buildWeekChart);
   safeRun(updateHomeStats);
   safeRun(generateNotifs);
+  safeRun(updateBackupInfo);
   safeRun(updateProfileView);
   safeRun(updateWeightHistory);
   safeRun(updateSettings);
@@ -2775,13 +3030,19 @@ function applyTheme() {
   if(isLight) body.classList.add('theme-light');
   body.classList.add('color-' + (appData.settings.color || 'emerald'));
 
-  // theme-color meta: sistem durum çubuğu rengi
+  // theme-color meta (yükleme anında etkili, sonrası iOS kısıtlaması)
   const themeMeta = document.getElementById('theme-color-meta');
   if(themeMeta) themeMeta.content = isLight ? '#F0F4FF' : '#1a1a2e';
 
   // apple-mobile-web-app-status-bar-style
   const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
   if(statusMeta) statusMeta.content = isLight ? 'default' : 'black-translucent';
+
+  // Simüle durum çubuğu rengi: version-bar arka planını güncelle
+  const vbar = document.querySelector('.version-bar');
+  if(vbar) {
+    vbar.style.background = isLight ? 'rgba(240,244,255,0.97)' : 'rgba(13,13,26,0.97)';
+  }
 }
 
 function setTheme(t) {
@@ -2791,6 +3052,7 @@ function setTheme(t) {
   ['btn-dark','btn-light'].forEach(id => document.getElementById(id)?.classList.remove('active'));
   document.getElementById(t==='dark'?'btn-dark':'btn-light')?.classList.add('active');
   showToast(t==='dark'?'🌙 Karanlık tema aktif':'☀️ Aydınlık tema aktif', 'success');
+
 }
 
 function setColor(c) {
@@ -2871,6 +3133,14 @@ function updateGreeting() {
 // =================== TODAY DATA ===================
 function getTodayKey() {
   return new Date().toISOString().split('T')[0];
+}
+
+
+function getActiveLog() {
+  // Günlük sayfasında seçili tarihin logu, ana sayfada bugün
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  if(!appData.logs[dateKey]) appData.logs[dateKey] = {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
+  return appData.logs[dateKey];
 }
 
 function getTodayLog() {
@@ -2962,10 +3232,11 @@ function updateHomeStats() {
 const CUP_ML = 200; // Her bardak 200ml sabit
 
 function buildWaterCups() {
-  const log = getTodayLog();
+  const log = getActiveLog();
   const wg = appData.settings.waterGoal || 2500;
   const cups = Math.ceil(wg / CUP_ML);
   const container = document.getElementById('water-cups');
+  if(!container) return;
   container.innerHTML = '';
   for(let i=0;i<cups;i++) {
     const el = document.createElement('div');
@@ -2995,7 +3266,12 @@ function addWater(ml) {
 }
 
 function toggleCup(idx) {
-  const log = getTodayLog();
+  const isToday = !currentLogDate || currentLogDate === getTodayKey();
+  if(!isToday) {
+    showToast('⚠️ Geçmiş günün su kaydı değiştirilemez', 'error');
+    return;
+  }
+  const log = getActiveLog();
   const current = Math.floor((log.water||0) / CUP_ML);
   if(idx < current) {
     log.water = idx * CUP_ML;
@@ -3222,7 +3498,10 @@ function cartSetPortion(idx,val) {
 function addMultiFood() {
   if(!selectedMeal) { showToast('⚠️ Lütfen önce bir öğün seçin!','error'); return; }
   if(foodCart.length===0) { showToast('⚠️ Lütfen en az bir yemek seçin!','error'); return; }
-  const log = getTodayLog();
+  // Yemek her zaman seçili güne eklenir
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  if(!appData.logs[dateKey]) appData.logs[dateKey] = {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
+  const log = appData.logs[dateKey];
   const now = new Date();
   const timeStr = now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
   let added = 0;
@@ -3296,7 +3575,9 @@ function addFood() {
 
 // =================== MEAL LOG RENDER ===================
 function renderMealLogs() {
-  const log = appData.logs[currentLogDate] || getTodayLog();
+  const dateKey = (typeof currentLogDate !== 'undefined' && currentLogDate) ? currentLogDate : getTodayKey();
+  // Seçili tarihe log yoksa boş obje kullan — bugünü kirletme
+  const log = appData.logs[dateKey] || {kahvalti:[],ogle:[],aksam:[],atistirma:[],icecek:[],water:0};
   const meals = ['kahvalti','ogle','aksam','atistirma','icecek'];
   meals.forEach(meal => {
     const items = log[meal] || [];
@@ -4012,6 +4293,7 @@ function selectLogDate(dateKey) {
   currentLogDate = dateKey;
   buildDateNav();
   renderMealLogs();
+  buildWaterCups();
   // Başlık güncelle
   const d = new Date(dateKey + 'T00:00:00');
   const isToday = dateKey === getTodayKey();
@@ -4076,7 +4358,18 @@ function switchPage(page) {
   document.getElementById('page-'+page)?.classList.add('active');
   document.getElementById('nav-'+page)?.classList.add('active');
 
-  if(page==='log') { renderMealLogs(); buildDateNav(); }
+  if(page==='log') {
+    // Her log sayfasına gelinince bugünü seç (kullanıcı başka günden geliyorsa kalsın)
+    if(!currentLogDate) currentLogDate = getTodayKey();
+    renderMealLogs();
+    buildDateNav();
+    buildWaterCups();
+    // Başlık güncelle
+    const _d = new Date(currentLogDate + 'T00:00:00');
+    const _isToday = currentLogDate === getTodayKey();
+    const _titleEl = document.getElementById('log-date-title');
+    if(_titleEl) _titleEl.textContent = _isToday ? 'Bugün' : _d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  }
   if(page==='stats') { buildWeekChart(); animateGoalBars(); buildWeeklyReport(); }
   if(page==='profile') updateProfileView();
   if(page==='settings') updateSettings();
