@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.36
+  Version: Pro 1.0.38
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1232,7 +1232,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.36</span>
+    <span>Pro 1.0.38</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -2947,7 +2947,7 @@ function toggleSettings() {
 // =================== YEDEK & GERİ YÜKLE ===================
 function createBackup() {
   const backup = {
-    version: 'S-Diyet Pro 1.0.36',
+    version: 'S-Diyet Pro 1.0.38',
     date: new Date().toISOString(),
     appData: appData
   };
@@ -3021,27 +3021,49 @@ function updateBackupInfo() {
 
 
 function showCenterAlert(msg) {
-  let el = document.getElementById('center-alert');
-  if(!el) {
-    el = document.createElement('div');
-    el.id = 'center-alert';
-    el.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-      background:var(--card);border:2px solid var(--accent2);border-radius:18px;
-      padding:20px 28px;z-index:9999;text-align:center;
-      font-family:var(--font-head);font-weight:700;font-size:1rem;
-      color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.4);
-      max-width:80vw;animation:popIn 0.2s ease`;
-    document.body.appendChild(el);
-  }
+  // Varsa eskiyi kaldır
+  const old = document.getElementById('center-alert-wrap');
+  if(old) old.remove();
+
+  // Tam ekran overlay — modal'ın transform'undan etkilenmemek için
+  const wrap = document.createElement('div');
+  wrap.id = 'center-alert-wrap';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;align-items:center;justify-content:center';
+
+  const el = document.createElement('div');
+  el.style.cssText = [
+    'background:var(--card)',
+    'border:2px solid var(--accent2)',
+    'border-radius:18px',
+    'padding:18px 24px',
+    'text-align:center',
+    'font-family:var(--font-head)',
+    'font-weight:700',
+    'font-size:1rem',
+    'color:var(--text)',
+    'box-shadow:0 8px 40px rgba(0,0,0,0.6)',
+    'max-width:72vw',
+    'animation:popIn 0.2s ease'
+  ].join(';');
   el.textContent = msg;
-  el.style.display = 'block';
+  wrap.appendChild(el);
+  document.body.appendChild(wrap);
+
   // Öğün chiplerini titret
   const mealSel = document.getElementById('meal-select');
   if(mealSel) {
-    mealSel.style.animation = 'shake 0.4s ease';
-    setTimeout(()=>mealSel.style.animation='', 400);
+    mealSel.style.animation = 'none';
+    requestAnimationFrame(() => {
+      mealSel.style.animation = 'shake 0.4s ease';
+      setTimeout(() => mealSel.style.animation = '', 450);
+    });
   }
-  setTimeout(() => { if(el) el.style.display='none'; }, 2000);
+
+  setTimeout(() => {
+    wrap.style.transition = 'opacity 0.2s';
+    wrap.style.opacity = '0';
+    setTimeout(() => wrap.remove(), 220);
+  }, 1800);
 }
 
 
