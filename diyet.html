@@ -20,7 +20,7 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-  Version: Pro 1.0.41
+  Version: Pro 1.0.43
   License: AGPL v3.0
   Author: sebasmobil
 -->
@@ -1232,7 +1232,7 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
 <div id="app">
   <!-- VERSION BAR -->
   <div class="version-bar">
-    <span>Pro 1.0.41</span>
+    <span>Pro 1.0.43</span>
     <span class="vb-sep">|</span>
     <span>©sebasmobil</span>
     <span class="vb-sep">|</span>
@@ -1791,7 +1791,12 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <div class="card">
       <div class="log-header">
         <div class="section-title">📈 Kilo Geçmişi</div>
-        <div class="section-action" onclick="openModal('addWeight')">+ Ekle</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="wh-select-all-btn" onclick="toggleSelectAllWeight()" style="display:none;font-size:0.72rem;color:var(--text3);font-weight:600;cursor:pointer;padding:4px 8px;background:var(--card2);border-radius:8px">Tümünü Seç</div>
+          <div id="wh-delete-sel-btn" onclick="deleteSelectedWeights()" style="display:none;font-size:0.72rem;color:#FF6B6B;font-weight:700;cursor:pointer;padding:4px 8px;background:rgba(255,107,107,0.1);border-radius:8px">🗑 Sil</div>
+          <div onclick="toggleWeightSelectMode()" id="wh-manage-btn" style="font-size:0.72rem;color:var(--text3);font-weight:600;cursor:pointer;padding:4px 8px;background:var(--card2);border-radius:8px">Düzenle</div>
+          <button onclick="openModal('addWeight')" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:12px;padding:8px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.2)">⚖️ + Ekle</button>
+        </div>
       </div>
       <div class="weight-history" id="weight-history">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Henüz kilo kaydı yok</div>
@@ -2023,6 +2028,32 @@ body.theme-light .bottom-nav { background: rgba(240,244,255,0.92); }
     <button class="btn btn-secondary" onclick="closeModal('addWeight')">İptal</button>
   </div>
     </div>
+</div>
+
+<!-- Edit Weight Modal -->
+<div class="modal-overlay" id="modal-editWeight">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-scrollable">
+    <div class="modal-title">✏️ Kilo Düzenle</div>
+    <input type="hidden" id="edit-weight-idx">
+    <div class="input-group">
+      <label class="input-label">Kilo (kg)</label>
+      <input type="number" class="input-field" id="edit-wt-value" placeholder="70.5" step="0.1">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Tarih</label>
+      <input type="date" class="input-field" id="edit-wt-date">
+    </div>
+    <div class="input-group">
+      <label class="input-label">📝 Not (opsiyonel)</label>
+      <input type="text" class="input-field" id="edit-wt-note" placeholder="Sabah ölçümü...">
+    </div>
+    <button class="btn btn-primary" onclick="saveEditWeight()">💾 Güncelle</button>
+    <button class="btn" style="background:rgba(255,107,107,0.15);color:#FF6B6B;font-weight:700;" onclick="deleteWeightEntry(+document.getElementById('edit-weight-idx').value)">🗑 Bu Kaydı Sil</button>
+    <button class="btn btn-secondary" onclick="closeModal('editWeight')">İptal</button>
+    </div>
+  </div>
 </div>
 
 <!-- Add Exercise Modal -->
@@ -3070,7 +3101,7 @@ function toggleSettings() {
 // =================== YEDEK & GERİ YÜKLE ===================
 function createBackup() {
   const backup = {
-    version: 'S-Diyet Pro 1.0.41',
+    version: 'S-Diyet Pro 1.0.43',
     date: new Date().toISOString(),
     appData: appData
   };
@@ -3224,6 +3255,19 @@ function initApp() {
   safeRun(updateBackupInfo);
   safeRun(scheduleMidnightReset);
   safeRun(updateProfileView);
+  // Kilo geçmişini temizle: aynı tarih+kilo+not olan tekrar kayıtları sil
+  if(appData.weightHistory && appData.weightHistory.length > 1) {
+    const seen = new Set();
+    appData.weightHistory = appData.weightHistory.filter(e => {
+      const key = e.date + '_' + e.weight + '_' + (e.note||'');
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    // Tarihe göre sırala
+    appData.weightHistory.sort((a,b) => b.date.localeCompare(a.date));
+    saveData();
+  }
   safeRun(updateWeightHistory);
   safeRun(updateSettings);
   safeRun(updateStreak);
@@ -4006,14 +4050,18 @@ function saveProfile() {
   p.gender = document.getElementById('pf-gender').value;
   p.dietGoal = document.getElementById('pf-dietgoal').value;
 
-  // Auto add weight entry
+  // Auto add weight entry — aynı gün aynı kilo tekrar eklenmesin
   if(p.weight) {
-    appData.weightHistory.unshift({
-      date: getTodayKey(),
-      weight: p.weight,
-      note: 'Profil güncellemesi'
-    });
-    if(appData.weightHistory.length > 30) appData.weightHistory = appData.weightHistory.slice(0,30);
+    const todayKey = getTodayKey();
+    const existing = appData.weightHistory.find(e => e.date === todayKey && e.weight === p.weight && e.note === 'Profil güncellemesi');
+    if(!existing) {
+      appData.weightHistory.unshift({
+        date: todayKey,
+        weight: p.weight,
+        note: 'Profil güncellemesi'
+      });
+      if(appData.weightHistory.length > 100) appData.weightHistory = appData.weightHistory.slice(0,100);
+    }
   }
 
   // Calculate BMR & TDEE (Mifflin-St Jeor)
@@ -4151,13 +4199,97 @@ function saveWeight() {
   const note = document.getElementById('wt-note').value;
   if(!val) { showToast('⚠️ Kilo girin!', 'error'); return; }
   appData.weightHistory.unshift({date, weight:val, note});
-  if(appData.weightHistory.length>30) appData.weightHistory=appData.weightHistory.slice(0,30);
+  // Tarihe göre sırala (en yeni üste)
+  appData.weightHistory.sort((a,b) => b.date.localeCompare(a.date));
+  if(appData.weightHistory.length>100) appData.weightHistory=appData.weightHistory.slice(0,100);
   appData.profile.weight = val;
   saveData();
   updateWeightHistory();
   updateProfileView();
   closeModal('addWeight');
   showToast('✅ Kilo kaydedildi!', 'success');
+}
+
+// Kilo geçmişi select mode state
+let weightSelectMode = false;
+let weightSelected = new Set();
+
+function toggleWeightSelectMode() {
+  weightSelectMode = !weightSelectMode;
+  weightSelected.clear();
+  const manageBtn = document.getElementById('wh-manage-btn');
+  const selAllBtn = document.getElementById('wh-select-all-btn');
+  const delSelBtn = document.getElementById('wh-delete-sel-btn');
+  if(manageBtn) manageBtn.textContent = weightSelectMode ? 'Bitti' : 'Düzenle';
+  if(selAllBtn) selAllBtn.style.display = weightSelectMode ? 'block' : 'none';
+  if(delSelBtn) delSelBtn.style.display = 'none';
+  updateWeightHistory();
+}
+
+function toggleSelectAllWeight() {
+  const hist = appData.weightHistory;
+  if(weightSelected.size === hist.length) {
+    weightSelected.clear();
+  } else {
+    hist.forEach((_,i) => weightSelected.add(i));
+  }
+  const delBtn = document.getElementById('wh-delete-sel-btn');
+  if(delBtn) delBtn.style.display = weightSelected.size > 0 ? 'block' : 'none';
+  updateWeightHistory();
+}
+
+function toggleWeightSelect(idx) {
+  if(weightSelected.has(idx)) weightSelected.delete(idx);
+  else weightSelected.add(idx);
+  const delBtn = document.getElementById('wh-delete-sel-btn');
+  if(delBtn) delBtn.style.display = weightSelected.size > 0 ? 'block' : 'none';
+  updateWeightHistory();
+}
+
+function deleteSelectedWeights() {
+  if(weightSelected.size === 0) return;
+  if(!confirm(`${weightSelected.size} kayıt silinecek. Emin misiniz?`)) return;
+  appData.weightHistory = appData.weightHistory.filter((_,i) => !weightSelected.has(i));
+  weightSelected.clear();
+  saveData();
+  const delBtn = document.getElementById('wh-delete-sel-btn');
+  if(delBtn) delBtn.style.display = 'none';
+  updateWeightHistory();
+  showToast('🗑 Kayıtlar silindi!', 'success');
+}
+
+function deleteWeightEntry(idx) {
+  if(!confirm('Bu kilo kaydı silinsin mi?')) return;
+  appData.weightHistory.splice(idx, 1);
+  saveData();
+  closeModal('editWeight');
+  updateWeightHistory();
+  showToast('🗑 Kayıt silindi!', 'success');
+}
+
+function openEditWeight(idx) {
+  const entry = appData.weightHistory[idx];
+  if(!entry) return;
+  document.getElementById('edit-weight-idx').value = idx;
+  document.getElementById('edit-wt-value').value = entry.weight;
+  document.getElementById('edit-wt-date').value = entry.date;
+  document.getElementById('edit-wt-note').value = entry.note || '';
+  openModal('editWeight');
+}
+
+function saveEditWeight() {
+  const idx = +document.getElementById('edit-weight-idx').value;
+  const val = +document.getElementById('edit-wt-value').value;
+  const date = document.getElementById('edit-wt-date').value || getTodayKey();
+  const note = document.getElementById('edit-wt-note').value;
+  if(!val) { showToast('⚠️ Kilo girin!', 'error'); return; }
+  appData.weightHistory[idx] = { date, weight: val, note };
+  // Tarihe göre sırala (en yeni üste)
+  appData.weightHistory.sort((a,b) => b.date.localeCompare(a.date));
+  saveData();
+  closeModal('editWeight');
+  updateWeightHistory();
+  showToast('✅ Kilo güncellendi!', 'success');
 }
 
 function updateWeightHistory() {
@@ -4168,21 +4300,42 @@ function updateWeightHistory() {
     container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:0.85rem">Henüz kilo kaydı yok</div>';
     return;
   }
-  container.innerHTML = hist.slice(0,10).map((entry,i) => {
+  container.innerHTML = hist.map((entry,i) => {
     const prev = hist[i+1];
     const diff = prev ? (entry.weight - prev.weight).toFixed(1) : null;
     const cls = diff ? (diff<0?'down':'up') : '';
     const arrow = diff ? (diff<0?'↓':'↑') : '';
-    return `<div class="weight-item">
-      <div>
-        <div class="weight-date">${new Date(entry.date+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'})}</div>
-        ${entry.note?`<div style="font-size:0.7rem;color:var(--text3)">${entry.note}</div>`:''}
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        ${diff?`<span class="weight-change ${cls}">${arrow}${Math.abs(diff)}kg</span>`:''}
-        <span class="weight-val">${entry.weight} kg</span>
-      </div>
-    </div>`;
+    const isSelected = weightSelected.has(i);
+
+    if(weightSelectMode) {
+      return `<div class="weight-item" onclick="toggleWeightSelect(${i})" style="cursor:pointer;${isSelected?'border:2px solid var(--accent);background:rgba(0,229,160,0.08);':'border:2px solid transparent;'}transition:all 0.2s">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'var(--accent)':'var(--text3)'};background:${isSelected?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            ${isSelected?'<span style="font-size:0.65rem;color:#000;font-weight:900">✓</span>':''}
+          </div>
+          <div>
+            <div class="weight-date">${new Date(entry.date+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'})}</div>
+            ${entry.note?`<div style="font-size:0.7rem;color:var(--text3)">${entry.note}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${diff?`<span class="weight-change ${cls}">${arrow}${Math.abs(diff)}kg</span>`:''}
+          <span class="weight-val">${entry.weight} kg</span>
+        </div>
+      </div>`;
+    } else {
+      return `<div class="weight-item" style="cursor:pointer" onclick="openEditWeight(${i})">
+        <div>
+          <div class="weight-date">${new Date(entry.date+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'})}</div>
+          ${entry.note?`<div style="font-size:0.7rem;color:var(--text3)">${entry.note}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${diff?`<span class="weight-change ${cls}">${arrow}${Math.abs(diff)}kg</span>`:''}
+          <span class="weight-val">${entry.weight} kg</span>
+          <span style="font-size:0.75rem;color:var(--text3)">✏️</span>
+        </div>
+      </div>`;
+    }
   }).join('');
 }
 
