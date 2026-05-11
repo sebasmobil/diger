@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.06
+  Version : Pro 1.0.08
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -131,18 +131,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .notes-count{font-size:0.7rem;color:var(--text3);padding:0 2px 8px}
 
 /* GRID */
-[data-view="grid"] .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px}
+[data-view="grid"] .notes-grid,[data-view="grid"] .group-inner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px}
 @media(max-width:480px){[data-view="grid"] .notes-grid{grid-template-columns:1fr}}
 
 /* MASONRY */
-[data-view="masonry"] .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:start}
-@media(max-width:360px){[data-view="masonry"] .notes-grid{grid-template-columns:1fr}}
+[data-view="masonry"] .notes-grid,[data-view="masonry"] .group-inner-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:start}
+@media(max-width:360px){[data-view="masonry"] .notes-grid,[data-view="masonry"] .group-inner-grid{grid-template-columns:1fr}}
 
 /* LIST */
-[data-view="list"] .notes-grid{display:flex;flex-direction:column;gap:7px}
+[data-view="list"] .notes-grid,[data-view="list"] .group-inner-grid{display:flex;flex-direction:column;gap:7px}
 
 /* COMPACT */
-[data-view="compact"] .notes-grid{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border2)}
+[data-view="compact"] .notes-grid,[data-view="compact"] .group-inner-grid{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border2)}
 
 /* KART */
 .note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.18s,box-shadow 0.18s,border-color 0.18s;animation:cardIn 0.28s ease both;position:relative;break-inside:avoid}
@@ -152,8 +152,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tag-color,transparent)}
 .note-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
 .note-img-ph{width:100%;aspect-ratio:16/9;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--text3)}
-[data-view="masonry"] .note-img{aspect-ratio:auto;max-height:200px}
-[data-view="masonry"] .note-img-ph{aspect-ratio:4/3}
+[data-view="masonry"] .note-img,[data-view="masonry"] .group-inner-grid .note-img{aspect-ratio:auto;max-height:200px}
+[data-view="masonry"] .note-img-ph,[data-view="masonry"] .group-inner-grid .note-img-ph{aspect-ratio:4/3}
 .note-body{padding:13px 14px 9px}
 .note-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
 .note-tag{font-size:0.62rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 8px;border-radius:30px;border:1px solid currentColor;opacity:0.9}
@@ -171,7 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-action-btn.del:hover{background:rgba(224,92,92,0.15);color:var(--red)}
 
 /* LIST GÖRÜNÜM */
-[data-view="list"] .note-card{border-radius:var(--r2);display:flex;align-items:stretch;overflow:hidden}
+[data-view="list"] .note-card,[data-view="list"] .group-inner-grid .note-card{border-radius:var(--r2);display:flex;align-items:stretch;overflow:hidden}
 [data-view="list"] .note-card::before{width:4px;height:100%;right:auto;bottom:0;top:0;border-radius:var(--r2) 0 0 var(--r2)}
 /* Thumbnail wrapper — sabit boyut, taşma yok */
 [data-view="list"] .note-img-wrap{width:82px;min-width:82px;flex-shrink:0;overflow:hidden;border-radius:var(--r2) 0 0 var(--r2);background:var(--surface2);display:flex;align-items:center;justify-content:center}
@@ -184,7 +184,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 [data-view="list"] .note-tags{margin-bottom:4px}
 
 /* COMPACT GÖRÜNÜM */
-[data-view="compact"] .note-card{border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border2);background:transparent;display:flex;align-items:center;padding:10px 13px;gap:0}
+[data-view="compact"] .note-card,[data-view="compact"] .group-inner-grid .note-card{border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border2);background:transparent;display:flex;align-items:center;padding:10px 13px;gap:0}
 [data-view="compact"] .note-card:hover{background:var(--surface2);box-shadow:none;border-color:var(--border2)}
 [data-view="compact"] .note-card::before{display:none}
 [data-view="compact"] .note-img,[data-view="compact"] .note-img-ph{display:none}
@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.06</span>
+  <span>Pro 1.0.08</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -477,10 +477,10 @@ const TE={kişisel:'👤',iş:'💼',alışveriş:'🛒',seyahat:'✈️',finans
 const TYE={metin:'📝',fotograf:'📷',link:'🔗',kart:'💳',diger:'📌'};
 
 function save(){try{localStorage.setItem(SK,JSON.stringify(notes))}catch(e){}}
-function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(PK,JSON.stringify({theme:currentTheme,view:currentView,sort:currentSort,group:currentGroup,filter:currentFilter}))}catch(e){}}
 function load(){
   try{const d=localStorage.getItem(SK);if(d)notes=JSON.parse(d)}catch(e){notes=[]}
-  try{const p=localStorage.getItem(PK);if(p){const j=JSON.parse(p);currentTheme=j.theme||'dark';currentView=j.view||'grid'}}catch(e){}
+  try{const p=localStorage.getItem(PK);if(p){const j=JSON.parse(p);currentTheme=j.theme||'dark';currentView=j.view||'grid';currentSort=j.sort||'newest';currentGroup=j.group||'none';currentFilter=j.filter||'all';}}catch(e){}
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
@@ -523,12 +523,14 @@ function setSort(s,el){
   const lbl=document.getElementById('sortLabel');if(lbl)lbl.textContent=SORT_LABELS[s]||'Sırala';
   const btn=document.getElementById('sortBtn');if(btn)btn.classList.add('has-sort');
   updateSortBtnState();
+  savePrefs();
   renderNotes();
 }
 function setGroup(g,el){
   currentGroup=g;
   document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===g));
   updateSortBtnState();
+  savePrefs();
   renderNotes();
 }
 function updateSortBtnState(){
@@ -546,7 +548,7 @@ function updateSortBtnState(){
     if(icon)icon.textContent='↕';
   }
 }
-function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderNotes()}
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');savePrefs();renderNotes();}
 function setType(t,el){
   currentType=t;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
@@ -820,6 +822,9 @@ function renderNotes(){
   const sorted=sortNotes(filtered);
   const groups=groupNotes(sorted);
   const hasGroups=currentGroup!=='none';
+  // Gruplu modda ana grid her zaman flex column — inner grid kendi stilini alır
+  if(hasGroups) grid.style.cssText='display:flex;flex-direction:column;gap:14px';
+  else grid.style.cssText='';
 
   if(!hasGroups){
     grid.innerHTML=sorted.map((n,i)=>noteCardHtml(n,i)).join('');
@@ -827,25 +832,12 @@ function renderNotes(){
     // Gruplu: her grup için başlık + grid
     grid.innerHTML=groups.map(g=>{
       const cards=g.items.map((n,i)=>noteCardHtml(n,i)).join('');
-      return`<div class="group-block" style="grid-column:1/-1">
+      return`<div class="group-block">
         <div class="group-header"><div class="group-title">${g.label}</div><div class="group-line"></div><div class="group-count">${g.items.length}</div></div>
         <div class="group-inner-grid">${cards}</div>
       </div>`;
     }).join('');
-    // Grup içi grid'leri mevcut görünüme göre stillendir
-    setTimeout(()=>{
-      document.querySelectorAll('.group-inner-grid').forEach(el=>{
-        if(currentView==='grid')         el.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px';
-        else if(currentView==='masonry') el.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:start';
-        else if(currentView==='list')    el.style.cssText='display:flex;flex-direction:column;gap:7px';
-        else if(currentView==='compact') el.style.cssText='display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)';
-      });
-      if(window.innerWidth<=480){
-        document.querySelectorAll('.group-inner-grid').forEach(el=>{
-          if(currentView==='grid'||currentView==='masonry') el.style.gridTemplateColumns='1fr';
-        });
-      }
-    },0);
+    // Stiller CSS data-view selector ile otomatik uygulanır
   }
 }
 
@@ -1001,6 +993,12 @@ document.documentElement.setAttribute('data-view',currentView);
 document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
 document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
 const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');const _vl=document.getElementById('viewLabel');if(_vi)_vi.textContent=_vm.icon;if(_vl)_vl.textContent=_vm.label;
+// Sıralama & grup UI'ı yükle
+document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
+document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
+updateSortBtnState();
+// Filtre UI'ı yükle
+document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
 renderNotes();
 setupPWA();
 </script>
