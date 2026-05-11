@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.02
+  Version : Pro 1.0.04
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -171,10 +171,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-action-btn.del:hover{background:rgba(224,92,92,0.15);color:var(--red)}
 
 /* LIST GÖRÜNÜM */
-[data-view="list"] .note-card{border-radius:var(--r2);display:flex;align-items:stretch}
+[data-view="list"] .note-card{border-radius:var(--r2);display:flex;align-items:stretch;overflow:hidden}
 [data-view="list"] .note-card::before{width:4px;height:100%;right:auto;bottom:0;top:0;border-radius:var(--r2) 0 0 var(--r2)}
-[data-view="list"] .note-img{width:78px;height:78px;aspect-ratio:1;flex-shrink:0;border-radius:var(--r2) 0 0 var(--r2)}
-[data-view="list"] .note-img-ph{width:72px;flex-shrink:0;aspect-ratio:1;border-radius:var(--r2) 0 0 var(--r2);font-size:1.5rem}
+/* Thumbnail wrapper — sabit boyut, taşma yok */
+[data-view="list"] .note-img-wrap{width:82px;min-width:82px;flex-shrink:0;overflow:hidden;border-radius:var(--r2) 0 0 var(--r2);background:var(--surface2);display:flex;align-items:center;justify-content:center}
+[data-view="list"] .note-img{width:82px;height:82px;aspect-ratio:1/1;object-fit:cover;object-position:center;display:block;border-radius:0;flex-shrink:0}
+[data-view="list"] .note-img-ph{width:82px;height:82px;flex-shrink:0;aspect-ratio:unset;border-radius:0;font-size:1.6rem;background:none}
 [data-view="list"] .note-body{padding:10px 12px 8px;flex:1;min-width:0}
 [data-view="list"] .note-title{font-size:0.92rem;-webkit-line-clamp:1}
 [data-view="list"] .note-preview{-webkit-line-clamp:2}
@@ -276,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.02</span>
+  <span>Pro 1.0.04</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -398,7 +400,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="img-upload-area"><input type="file" accept="image/*" id="f-img" onchange="handleImg(event)"><div class="img-hint" id="imgHint">📷 Fotoğraf seç veya ekran görüntüsü yükle</div><img class="img-upload-preview" id="imgPreview"></div>
       </div>
       <div class="field"><label id="textLabel">Not</label><textarea id="f-text" placeholder="Buraya yaz…"></textarea></div>
-      <div class="field" id="field-link" style="display:none"><label>Web Adresi</label><input type="url" id="f-link" placeholder="https://…"></div>
+      <div class="field" id="field-link" style="display:none">
+        <label>Web Adresi</label>
+        <input type="url" id="f-link" placeholder="https://…" oninput="debounceFetchOG()">
+        <div id="og-status" style="font-size:0.7rem;color:var(--text3);margin-top:5px;display:none"></div>
+      </div>
       <div class="field" id="field-card" style="display:none">
         <label>Kart Numarası / Kod</label>
         <input type="text" id="f-card" placeholder="1234 5678 9012 3456" maxlength="60" style="font-family:monospace;letter-spacing:0.1em">
@@ -541,12 +547,75 @@ function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-chip
 function setType(t,el){
   currentType=t;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
-  document.getElementById('field-img').style.display=t==='fotograf'?'':'none';
+  document.getElementById('field-img').style.display=(t==='fotograf'||t==='link')?'':'none';
   document.getElementById('field-link').style.display=t==='link'?'':'none';
   document.getElementById('field-card').style.display=t==='kart'?'':'none';
   document.getElementById('textLabel').textContent=t==='kart'?'Not (opsiyonel)':t==='link'?'Açıklama':t==='fotograf'?'Açıklama':'Not';
+  // Link tipinde fotoğraf alanı label güncelle
+  const imgLabel=document.querySelector('#field-img label');
+  if(imgLabel)imgLabel.textContent=t==='link'?'Bağlantı Görseli (opsiyonel)':'Fotoğraf / Ekran Görüntüsü';
 }
 function setColor(c,el){currentColor=c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color===c))}
+// OG Image fetch
+let ogTimer;
+function debounceFetchOG(){
+  clearTimeout(ogTimer);
+  ogTimer = setTimeout(fetchOGImage, 900);
+}
+async function fetchOGImage(){
+  const url = document.getElementById('f-link').value.trim();
+  const statusEl = document.getElementById('og-status');
+  const preview = document.getElementById('imgPreview');
+  if(!url || !url.startsWith('http')) { if(statusEl) statusEl.style.display='none'; return; }
+  // Zaten elle yüklü görsel varsa dokunma
+  if(preview && preview.style.display!=='none' && preview.src.startsWith('data:')) return;
+  if(statusEl){ statusEl.style.display='block'; statusEl.textContent='🔄 Önizleme yükleniyor…'; }
+  try {
+    // allorigins proxy ile CORS aş
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxy, { signal: AbortSignal.timeout(6000) });
+    const data = await res.json();
+    const html = data.contents || '';
+    // OG image bul
+    const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+                 || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    if(ogMatch && ogMatch[1]) {
+      let imgUrl = ogMatch[1];
+      if(imgUrl.startsWith('//')) imgUrl = 'https:' + imgUrl;
+      // URL'i img olarak yükle
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // Canvas ile data URL'e çevir
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        try {
+          const dataUrl = c.toDataURL('image/jpeg', 0.85);
+          const prev = document.getElementById('imgPreview');
+          prev.src = dataUrl; prev.style.display='block';
+          document.getElementById('imgHint').style.display='none';
+          if(statusEl){ statusEl.textContent='✅ Önizleme yüklendi — istersen değiştirebilirsin'; }
+        } catch(e) {
+          // CORS engeli — direkt URL'i sakla
+          const prev = document.getElementById('imgPreview');
+          prev.src = imgUrl; prev.style.display='block';
+          document.getElementById('imgHint').style.display='none';
+          if(statusEl){ statusEl.textContent='✅ Önizleme yüklendi'; }
+        }
+      };
+      img.onerror = () => {
+        if(statusEl){ statusEl.textContent='⚠️ Görsel yüklenemedi — elle ekleyebilirsin'; }
+      };
+      img.src = imgUrl;
+    } else {
+      if(statusEl){ statusEl.textContent='ℹ️ Bu site için otomatik görsel bulunamadı — elle ekleyebilirsin'; }
+    }
+  } catch(e) {
+    if(statusEl){ statusEl.textContent='ℹ️ Otomatik önizleme alınamadı — elle ekleyebilirsin'; }
+  }
+}
+
 function handleImg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const p=document.getElementById('imgPreview');p.src=ev.target.result;p.style.display='block';document.getElementById('imgHint').style.display='none'};r.readAsDataURL(f)}
 
 function openAdd(){editId=null;document.getElementById('editModalTitle').textContent='Yeni Not';resetForm();openModal('editModal')}
@@ -556,6 +625,7 @@ function resetForm(){
   document.getElementById('imgPreview').style.display='none';
   document.getElementById('imgHint').style.display='';
   document.getElementById('f-img').value='';
+  const ogS=document.getElementById('og-status'); if(ogS)ogS.style.display='none';
   currentType='metin';currentColor='#c8a96e';
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='metin'));
   document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.dataset.color==='#c8a96e'));
@@ -677,7 +747,10 @@ function noteCardHtml(n,i){
   const ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
   const delay=Math.min(i*0.03,0.22);
   let top='';
-  if(!isCompact){if(n.img)top=`<img class="note-img" src="${esc(n.img)}" alt="" loading="lazy">`;else if(n.type==='fotograf')top=`<div class="note-img-ph">${TYE[n.type]}</div>`}
+  if(!isCompact){
+    if(n.img) top=`<div class="note-img-wrap"><img class="note-img" src="${esc(n.img)}" alt="" loading="lazy"></div>`;
+    else if(n.type==='fotograf') top=`<div class="note-img-wrap"><div class="note-img-ph">${TYE[n.type]}</div></div>`;
+  }
   let extras='';
   if(!isCompact){if(n.card)extras+=`<div class="note-card-num">${maskCard(n.card)}</div>`;if(n.link)extras+=`<div class="note-link-chip">🔗<span>${esc(n.link)}</span></div>`}
   const tagHtml=(!isCompact&&n.tag&&currentGroup!=='tag')?`<div class="note-tags"><span class="note-tag" style="color:${tc};border-color:${tc}">${TE[n.tag]||''} ${n.tag}</span></div>`:'';
