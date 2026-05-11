@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.05
+  Version : Pro 1.0.06
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="version-bar">
-  <span>Pro 1.0.05</span>
+  <span>Pro 1.0.06</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -678,7 +678,17 @@ function saveNote(){
   const card=document.getElementById('f-card').value.trim();
   const tag=document.getElementById('f-tag').value;
   const ip=document.getElementById('imgPreview');
-  const img=(ip.style.display!=='none'&&ip.src.startsWith('data:'))?ip.src:(editId?(notes.find(n=>n.id===editId)||{}).img||'':'');
+  // Görsel silindiyse (display:none veya src boş) → img='' yani silinmiş kabul et
+  // Sadece görsel gerçekten görünür durumdaysa sakla
+  let img='';
+  if(ip.style.display!=='none' && ip.src && ip.src.length>10){
+    img=ip.src; // data: veya http: her ikisi de geçerli
+  }
+  // editId varsa ve görsel alanı hiç açılmadıysa (tip fotoğraf/link değil) → eski resmi koru
+  const imgFieldVisible=document.getElementById('field-img').style.display!=='none';
+  if(editId && !imgFieldVisible){
+    img=(notes.find(n=>n.id===editId)||{}).img||'';
+  }
   if(!title&&!text&&!link&&!card&&!img){showToast('⚠️ En az bir alan doldur');return}
   if(editId){const i=notes.findIndex(n=>n.id===editId);if(i>-1)notes[i]={...notes[i],title,text,link,card,tag,img,type:currentType,color:currentColor,updatedAt:Date.now()};showToast('✅ Güncellendi')}
   else{notes.unshift({id:uid(),title,text,link,card,tag,img,type:currentType,color:currentColor,createdAt:Date.now(),updatedAt:Date.now()});showToast('✅ Kaydedildi')}
