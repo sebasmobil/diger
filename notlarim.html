@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.23
+  Version : Pro 1.0.24
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -71,21 +71,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .vb-link{color:var(--text3);text-decoration:none;cursor:pointer;transition:color 0.15s}
 .vb-link:hover{color:var(--accent)}
 
-/* STICKY HEADER — status bar dahil */
+/* STICKY HEADER — fixed, status bar dahil, tema anlık yansır */
 #stickyHeader{
-  position:sticky;
+  position:fixed;
   top:0;
+  left:0;
+  right:0;
   z-index:100;
-  background:var(--topbar-bg);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  background:var(--bg);
   border-bottom:1px solid var(--border);
+  transition:background 0.3s;
   /* iOS status bar alanı */
   padding-top:env(safe-area-inset-top);
 }
 
+/* İçerik header yüksekliği kadar aşağıdan başlar — JS ile ayarlanır */
+#appContent{padding-top:0}
+
 /* TOPBAR */
-.topbar{z-index:100;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;}
+.topbar{padding:0 14px;height:56px;display:flex;align-items:center;gap:10px;}
 .topbar-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
 .search-wrap{flex:1;position:relative}
 .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:8px 14px 8px 34px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none}
@@ -96,8 +100,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .icon-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:1rem;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:var(--trans);flex-shrink:0}
 .icon-btn.accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-size:1.2rem;font-weight:900;box-shadow:0 3px 12px rgba(200,169,110,0.3)}
 
-/* TOOLBAR — stickyHeader'ın altına yapışık, top JS ile ayarlanır */
-.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:99}
+/* TOOLBAR — JS ile fixed konumlandırılır */
+.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);transition:background 0.3s;}
 .filters{flex:1;display:flex;gap:6px;padding:9px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filter-chip{padding:5px 12px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);font-family:'DM Sans',sans-serif;flex-shrink:0}
@@ -348,7 +352,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div id="stickyHeader">
 <div class="version-bar">
-  <span>Pro 1.0.23</span>
+  <span>Pro 1.0.24</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -717,6 +721,7 @@ function setTheme(t){
   const mc=document.querySelector('meta[name="theme-color"]');
   if(mc) mc.setAttribute('content',color);
   savePrefs();
+  setTimeout(fixToolbarTop, 50);
 }
 const VIEW_META={grid:{icon:'⊞',label:'Kart'},masonry:{icon:'⊟',label:'Masonry'},list:{icon:'☰',label:'Liste'},compact:{icon:'≡',label:'Kompakt'}};
 function toggleViewDropdown(){const d=document.getElementById('viewDropdown');d.classList.toggle('open')}
@@ -1934,8 +1939,23 @@ function showInstallBanner(){
 function fixToolbarTop(){
   const header = document.getElementById('stickyHeader');
   const toolbar = document.getElementById('toolbar');
-  if(header && toolbar){
-    toolbar.style.top = header.offsetHeight + 'px';
+  const grid = document.getElementById('notesGrid');
+  if(!header) return;
+  const h = header.offsetHeight;
+  if(toolbar){
+    toolbar.style.position = 'fixed';
+    toolbar.style.top = h + 'px';
+    toolbar.style.left = '0';
+    toolbar.style.right = '0';
+    toolbar.style.zIndex = '99';
+  }
+  // İçeriğin header + toolbar altından başlaması için
+  const tb = toolbar ? toolbar.offsetHeight : 0;
+  const mainContent = document.querySelector('.main-content') || document.getElementById('notesGrid')?.parentElement;
+  // notesGrid'in wrapper'ını bul
+  const wrap = document.getElementById('notesGrid');
+  if(wrap && wrap.parentElement){
+    wrap.parentElement.style.paddingTop = (h + tb + 8) + 'px';
   }
 }
 
