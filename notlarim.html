@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.43
+  Version : Pro 1.0.44
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -23,7 +23,7 @@
 <html lang="tr" data-theme="dark" data-view="grid">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="statusBarStyleMeta">
@@ -59,6 +59,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   background:var(--surface2);
   border-bottom:1px solid var(--border);
   padding:5px 16px;
+  padding-top:calc(5px + env(safe-area-inset-top));
   display:flex;align-items:center;justify-content:center;
   gap:8px;
   font-size:0.62rem;
@@ -367,7 +368,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.43</span>
+  <span>Pro 1.0.44</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1023,9 +1024,9 @@ function setTheme(t){
                 tcDark.setAttribute('name',   isLight ? '_theme-color' : 'theme-color'); }
   if(tcLight) { tcLight.setAttribute('media', isLight ? 'all' : 'not all');
                 tcLight.setAttribute('name',  isLight ? 'theme-color' : '_theme-color'); }
-  // status-bar-style içeriğini sıfırla (bazı iOS için tetikleyici)
+  // status-bar-style — diyet uygulaması gibi her zaman black-translucent (şeffaf)
   var sbm = document.getElementById('statusBarStyleMeta');
-  if(sbm) sbm.setAttribute('content', isLight ? 'default' : 'black-translucent');
+  if(sbm) sbm.setAttribute('content', 'black-translucent');
   savePrefs();
 }
 // Sistem saati — version bar
