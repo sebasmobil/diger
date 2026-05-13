@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.50
+  Version : Pro 1.0.51
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -164,7 +164,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 @keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:none}}
 .note-card:active{transform:scale(0.98)}
 .note-card:hover{border-color:rgba(200,169,110,0.3);box-shadow:var(--shadow)}
-.note-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tag-color,transparent)}
+.note-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--tag-color,transparent);border-radius:var(--r) var(--r) 0 0}
 .note-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
 .note-img-ph{width:100%;aspect-ratio:16/9;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--text3)}
 [data-view="masonry"] .note-img,[data-view="masonry"] .group-inner-grid .note-img{aspect-ratio:auto;max-height:200px}
@@ -187,7 +187,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* LIST GÖRÜNÜM */
 [data-view="list"] .note-card,[data-view="list"] .group-inner-grid .note-card{border-radius:var(--r2);display:flex;align-items:stretch;overflow:hidden}
-[data-view="list"] .note-card::before{width:4px;height:100%;right:auto;bottom:0;top:0;border-radius:var(--r2) 0 0 var(--r2)}
+[data-view="list"] .note-card::before{width:100%;height:5px;right:0;bottom:auto;top:0;border-radius:var(--r2) var(--r2) 0 0}
 /* Thumbnail wrapper — sabit boyut, taşma yok */
 [data-view="list"] .note-img-wrap{width:82px;min-width:82px;flex-shrink:0;overflow:hidden;border-radius:var(--r2) 0 0 var(--r2);background:var(--surface2);display:flex;align-items:center;justify-content:center}
 [data-view="list"] .note-img{width:82px;height:82px;aspect-ratio:1/1;object-fit:cover;object-position:center;display:block;border-radius:0;flex-shrink:0}
@@ -382,7 +382,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.50</span>
+  <span>Pro 1.0.51</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1509,7 +1509,8 @@ async function openDetail(id){
     const _r=parseInt(_hx.slice(1,3),16),_g=parseInt(_hx.slice(3,5),16),_b=parseInt(_hx.slice(5,7),16);
     const _dk=document.documentElement.getAttribute('data-theme')==='dark';
     const alpha = _dk ? 0.18 : 0.13;
-    detailModal.style.borderLeft = '5px solid '+detailColor;
+    detailModal.style.borderLeft = 'none';
+    detailModal.style.borderTop = '6px solid '+detailColor;
     detailModal.style.borderRadius = '';
     detailModal.style.background = 'linear-gradient(to right, rgba('+_r+','+_g+','+_b+','+alpha+') 0%, rgba('+_r+','+_g+','+_b+',0.04) 60%), var(--surface)';
   } else {
