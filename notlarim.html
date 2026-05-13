@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.54
+  Version : Pro 1.0.56
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -104,7 +104,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .icon-btn.accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;font-size:1.2rem;font-weight:900;box-shadow:0 3px 12px rgba(200,169,110,0.3)}
 
 /* TOOLBAR — stickyHeader'ın altına yapışık, top JS ile ayarlanır */
-.toolbar{display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:99}
+.toolbar{display:flex;flex-direction:column;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:99}
+.toolbar-row1{display:flex;align-items:center;width:100%}
 .filters{flex:1;display:flex;gap:6px;padding:9px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filter-chip{padding:5px 12px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);font-family:'DM Sans',sans-serif;flex-shrink:0}
@@ -384,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.54</span>
+  <span>Pro 1.0.56</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -407,15 +408,16 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 </div><!-- /stickyHeader -->
 
 <div class="toolbar" id="toolbar">
-  <div class="filters">
-    <button class="filter-chip active" data-filter="all"      onclick="setFilter('all',this)">Tümü</button>
-    <button class="filter-chip" data-filter="metin"    onclick="setFilter('metin',this)">📝 Metin</button>
-    <button class="filter-chip" data-filter="fotograf" onclick="setFilter('fotograf',this)">📷 Fotoğraf</button>
-    <button class="filter-chip" data-filter="link"     onclick="setFilter('link',this)">🔗 Link</button>
-    <button class="filter-chip" data-filter="kart"     onclick="setFilter('kart',this)">💳 Kart</button>
-    <button class="filter-chip" data-filter="diger"    onclick="setFilter('diger',this)">📌 Diğer</button>
-  </div>
-  <div class="sort-wrap">
+  <div class="toolbar-row1">
+    <div class="filters">
+      <button class="filter-chip active" data-filter="all"      onclick="setFilter('all',this)">Tümü</button>
+      <button class="filter-chip" data-filter="metin"    onclick="setFilter('metin',this)">📝 Metin</button>
+      <button class="filter-chip" data-filter="fotograf" onclick="setFilter('fotograf',this)">📷 Fotoğraf</button>
+      <button class="filter-chip" data-filter="link"     onclick="setFilter('link',this)">🔗 Link</button>
+      <button class="filter-chip" data-filter="kart"     onclick="setFilter('kart',this)">💳 Kart</button>
+      <button class="filter-chip" data-filter="diger"    onclick="setFilter('diger',this)">📌 Diğer</button>
+    </div>
+    <div class="sort-wrap">
     <button class="sort-btn" id="sortBtn" onclick="toggleSortDropdown()" title="Sırala / Grupla">
       <span id="sortIcon">↕</span>
       <span style="font-size:0.6rem;opacity:0.6">▾</span>
@@ -447,7 +449,8 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
       <button class="view-drop-item"        data-view="compact" onclick="setView('compact',this)"><span class="vdi-icon">≡</span>Kompakt</button>
     </div>
   </div>
-</div>
+  </div><!-- /toolbar-row1 -->
+</div><!-- /toolbar -->
 
 <div class="notes-container">
   <div class="notes-count" id="notesCount"></div>
@@ -1730,7 +1733,14 @@ function renderNotes(){
   const q=trLower(raw);
   const grid=document.getElementById('notesGrid');
   let filtered=notes.filter(n=>{
-    if(currentFilter!=='all'&&n.type!==currentFilter)return false;
+    if(currentFilter!=='all'){
+      const mainTypes=['metin','fotograf','link','kart'];
+      if(currentFilter==='diger'){
+        if(mainTypes.includes(n.type)) return false;
+      } else {
+        if(n.type!==currentFilter) return false;
+      }
+    }
     if(!q)return true;
     return trLower(n.title).includes(q)||trLower(n.text).includes(q)||trLower(n.link).includes(q)||trLower(n.tag).includes(q)||trLower(n.card).includes(q);
   });
