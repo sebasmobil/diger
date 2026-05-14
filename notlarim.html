@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.65
+  Version : Pro 1.0.66
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.65</span>
+  <span>Pro 1.0.66</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -871,6 +871,71 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 </div>
 
 <script>
+// ── KALICI DEPOLAMA ŞİMİ ──
+// Claude.ai artifact ortamında localStorage çalışmaz.
+// window.storage API'si (kalıcı) ile localStorage'ı taklit ediyoruz.
+(function(){
+  const MEM={};
+  const _get=k=>{try{return window._lsCache&&window._lsCache[k]!==undefined?window._lsCache[k]:null;}catch(e){return null;}};
+  const _set=(k,v)=>{if(!window._lsCache)window._lsCache={};window._lsCache[k]=v;};
+  const _del=k=>{if(window._lsCache)delete window._lsCache[k];};
+
+  // Gerçek localStorage erişimini test et
+  let _hasLS=false;
+  try{localStorage.setItem('__t','1');localStorage.removeItem('__t');_hasLS=true;}catch(e){}
+
+  if(!_hasLS){
+    // localStorage yoksa window.storage ile destekli hafıza kullan
+    if(!window._lsCache) window._lsCache={};
+    Object.defineProperty(window,'localStorage',{
+      configurable:true,
+      get:()=>({
+        getItem:k=>window._lsCache[k]!==undefined?window._lsCache[k]:null,
+        setItem:(k,v)=>{
+          window._lsCache[k]=String(v);
+          // Arka planda kalıcı storage'a yaz (notlar ve tercihler için)
+          if(window.storage){
+            window.storage.set('ls:'+k,String(v)).catch(()=>{});
+          }
+        },
+        removeItem:k=>{
+          delete window._lsCache[k];
+          if(window.storage) window.storage.delete('ls:'+k).catch(()=>{});
+        },
+        clear:()=>{
+          Object.keys(window._lsCache).forEach(k=>delete window._lsCache[k]);
+          if(window.storage) window.storage.list('ls:').then(r=>{
+            if(r&&r.keys) r.keys.forEach(k=>window.storage.delete(k).catch(()=>{}));
+          }).catch(()=>{});
+        },
+        key:i=>Object.keys(window._lsCache)[i]||null,
+        get length(){return Object.keys(window._lsCache).length;}
+      })
+    });
+  }
+})();
+
+// ── BAŞLANGIÇTA KALICI STORAGE'DAN YÜKLEMEYİ BEKLE ──
+// window.storage varsa önce tüm ls: anahtarlarını yükle, sonra uygulamayı başlat
+window._storageReady = (async function(){
+  if(!window.storage) return;
+  try{
+    const keys = await window.storage.list('ls:');
+    if(keys && keys.keys && keys.keys.length){
+      for(const k of keys.keys){
+        try{
+          const r = await window.storage.get(k);
+          if(r && r.value !== undefined){
+            const localKey = k.replace(/^ls:/,'');
+            if(!window._lsCache) window._lsCache={};
+            window._lsCache[localKey] = r.value;
+          }
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+})();
+
 let notes=[],editId=null,detailId=null,currentFilter='all',currentType='metin',currentColor='#c8a96e',currentTheme='dark',currentView='grid',showCardDetail=false;
 const SK='notlarim_v3',PK='notlarim_prefs';
 const TC={kişisel:'#c8a96e',iş:'#5ca0e0',alışveriş:'#5ce07a',seyahat:'#a06ce0',finans:'#e05c5c',fikir:'#e07a5c',önemli:'#e8c98e'};
@@ -2771,49 +2836,50 @@ function fixToolbarTop(){
   }
 }
 
-// INIT
-load();
-// Sistem teması yoksa kayıtlı temayı kullan; kayıt yoksa sistemi takip et
-if(!localStorage.getItem(PK)){
-  currentTheme=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
-}
-// Sistem teması değişince otomatik güncelle (kullanıcı el ile değiştirmediyse)
-window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){
-  // Kullanıcı manuel seçmediyse sistemi takip et
-  try{const p=localStorage.getItem(PK);if(!p)setTheme(e.matches?'dark':'light');}catch(ex){}
+// INIT — kalıcı storage yüklendikten sonra başlat
+(window._storageReady || Promise.resolve()).then(function(){
+  load();
+  // Sistem teması yoksa kayıtlı temayı kullan; kayıt yoksa sistemi takip et
+  if(!localStorage.getItem(PK)){
+    currentTheme=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  }
+  // Sistem teması değişince otomatik güncelle (kullanıcı el ile değiştirmediyse)
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){
+    try{const p=localStorage.getItem(PK);if(!p)setTheme(e.matches?'dark':'light');}catch(ex){}
+  });
+  document.documentElement.setAttribute('data-theme',currentTheme);
+  document.documentElement.setAttribute('data-view',currentView);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
+  updateThemeIcon();
+  applyFontSize(currentFontSize);
+  // Kart detay toggle durumunu yükle
+  (function(){
+    const t=document.getElementById('cardDetailToggle');
+    const k=document.getElementById('cardDetailKnob');
+    const s=document.getElementById('cardDetailSlider');
+    if(t) t.checked=showCardDetail;
+    if(k) k.style.left=showCardDetail?'22px':'2px';
+    if(s) s.style.background=showCardDetail?'var(--accent)':'var(--surface3)';
+  })();
+  initAppLock();
+  document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+  const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');if(_vi)_vi.textContent=_vm.icon;
+  // Sıralama & grup UI'ı yükle
+  document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
+  document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
+  updateSortBtnState();
+  // Filtre UI'ı yükle
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
+  renderNotes();
+  fixToolbarTop();
+  window.addEventListener('resize', fixToolbarTop);
+  setupPWA();
+  // Kayıtlı hatırlatıcıları planla
+  notes.forEach(n=>{ if(n.reminder) scheduleReminder(n); });
+  // Hatırlatıcı alanı değişince izin iste
+  const remEl=document.getElementById('f-reminder');
+  if(remEl) remEl.addEventListener('change',()=>{ if(remEl.value) requestNotifPerm(); });
 });
-document.documentElement.setAttribute('data-theme',currentTheme);
-document.documentElement.setAttribute('data-view',currentView);
-document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
-updateThemeIcon();
-applyFontSize(currentFontSize);
-// Kart detay toggle durumunu yükle
-(function(){
-  const t=document.getElementById('cardDetailToggle');
-  const k=document.getElementById('cardDetailKnob');
-  const s=document.getElementById('cardDetailSlider');
-  if(t) t.checked=showCardDetail;
-  if(k) k.style.left=showCardDetail?'22px':'2px';
-  if(s) s.style.background=showCardDetail?'var(--accent)':'var(--surface3)';
-})();
-initAppLock();
-document.querySelectorAll('.view-drop-item,.view-option-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
-const _vm=VIEW_META[currentView]||{icon:'⊞',label:'Kart'};const _vi=document.getElementById('viewIcon');if(_vi)_vi.textContent=_vm.icon;
-// Sıralama & grup UI'ı yükle
-document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===currentSort));
-document.querySelectorAll('[data-group]').forEach(b=>b.classList.toggle('active',b.dataset.group===currentGroup));
-updateSortBtnState();
-// Filtre UI'ı yükle
-document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
-renderNotes();
-fixToolbarTop();
-window.addEventListener('resize', fixToolbarTop);
-setupPWA();
-// Kayıtlı hatırlatıcıları planla
-notes.forEach(n=>{ if(n.reminder) scheduleReminder(n); });
-// Hatırlatıcı alanı değişince izin iste
-const remEl=document.getElementById('f-reminder');
-if(remEl) remEl.addEventListener('change',()=>{ if(remEl.value) requestNotifPerm(); });
 function updateDatePlaceholder(){const el=document.getElementById('f-reminder-date');if(!el)return;const v=el.value;const ph=document.getElementById('date-ph');if(ph)ph.style.display=v?'none':'flex';el.classList.toggle('has-value',!!v);}
 function updateTimePlaceholder(){const el=document.getElementById('f-reminder-time');if(!el)return;const v=el.value;const ph=document.getElementById('time-ph');if(ph)ph.style.display=v?'none':'flex';el.classList.toggle('has-value',!!v);}
 function syncReminder(){
