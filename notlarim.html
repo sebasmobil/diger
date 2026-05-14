@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.70
+  Version : Pro 1.0.72
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.70</span>
+  <span>Pro 1.0.72</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -899,42 +899,130 @@ if(!_hasRealLS){
 
 // ── window.storage kalıcı kayıt fonksiyonları ──
 // Notları not-başına-anahtar olarak kaydeder: note:ID
+// ── window.storage yardımcıları ──
+// Güvenli get: hata yerine null döner
+async function _wsGet(key){
+  try{ const r = await window.storage.get(key); return (r && r.value !== undefined) ? r.value : null; }
+  catch(e){ return null; }
+}
+// Güvenli set: başarı/başarısızlık döner
+async function _wsSet(key, value){
+  try{ await window.storage.set(key, value); return true; }
+  catch(e){ return false; }
+}
+
+// Notları kaydet: büyük base64 verileri ayrı anahtarda, not metadata'sı ayrı
+// Anahtar formatı: "n_ID" not, "b_ID_imgN" resim blob, "b_ID_sesN" ses blob
 async function _wsWriteNotes(notesArr){
   if(!window.storage) return;
-  try{
-    // Metadata (ID listesi + sayısı) kaydet
-    const ids = notesArr.map(n=>n.id);
-    await window.storage.set('notes_index', JSON.stringify(ids));
-    // Her notu ayrı ayrı kaydet
-    for(const n of notesArr){
-      try{ await window.storage.set('note:'+n.id, JSON.stringify(n)); }catch(e){}
+  for(const n of notesArr){
+    // Büyük base64 verileri not objesinden çıkar, ayrı kaydet
+    const noteCopy = Object.assign({}, n);
+
+    // Resimler
+    if(noteCopy.images && noteCopy.images.length){
+      for(let i=0;i<noteCopy.images.length;i++){
+        if(noteCopy.images[i] && noteCopy.images[i].startsWith('data:')){
+          await _wsSet('b_'+n.id+'_img'+i, noteCopy.images[i]);
+          noteCopy.images[i] = '__blob__img'+i; // referans
+        }
+      }
     }
-    // Silinen notları temizle: önceki index varsa farkı bul
-  }catch(e){}
+    if(noteCopy.img && noteCopy.img.startsWith('data:')){
+      await _wsSet('b_'+n.id+'_img', noteCopy.img);
+      noteCopy.img = '__blob__img';
+    }
+
+    // Ses kayıtları
+    if(noteCopy.sesList && noteCopy.sesList.length){
+      for(let i=0;i<noteCopy.sesList.length;i++){
+        const s = noteCopy.sesList[i];
+        if(s && s.dataUrl && s.dataUrl.startsWith('data:')){
+          await _wsSet('b_'+n.id+'_ses'+i, s.dataUrl);
+          noteCopy.sesList[i] = Object.assign({}, s, {dataUrl:'__blob__ses'+i});
+        }
+      }
+    }
+    if(noteCopy.sesData && noteCopy.sesData.startsWith('data:')){
+      await _wsSet('b_'+n.id+'_ses', noteCopy.sesData);
+      noteCopy.sesData = '__blob__ses';
+    }
+
+    // Dosyalar
+    if(noteCopy.dosyalar && noteCopy.dosyalar.length){
+      for(let i=0;i<noteCopy.dosyalar.length;i++){
+        const d = noteCopy.dosyalar[i];
+        if(d && d.data && d.data.startsWith('data:')){
+          await _wsSet('b_'+n.id+'_doc'+i, d.data);
+          noteCopy.dosyalar[i] = Object.assign({}, d, {data:'__blob__doc'+i});
+        }
+      }
+    }
+
+    await _wsSet('n_'+n.id, JSON.stringify(noteCopy));
+  }
+  // Index en son yaz
+  await _wsSet('nidx', JSON.stringify(notesArr.map(n=>n.id)));
 }
+
 async function _wsReadNotes(){
   if(!window.storage) return null;
-  try{
-    const idxR = await window.storage.get('notes_index');
-    if(!idxR || !idxR.value) return null;
-    const ids = JSON.parse(idxR.value);
-    const result = [];
-    for(const id of ids){
-      try{
-        const r = await window.storage.get('note:'+id);
-        if(r && r.value) result.push(JSON.parse(r.value));
-      }catch(e){}
+  const idxVal = await _wsGet('nidx');
+  if(!idxVal) return null;
+  let ids;
+  try{ ids = JSON.parse(idxVal); }catch(e){ return null; }
+  if(!Array.isArray(ids) || ids.length === 0) return null;
+  const result = [];
+  for(const id of ids){
+    const val = await _wsGet('n_'+id);
+    if(!val) continue;
+    let n;
+    try{ n = JSON.parse(val); }catch(e){ continue; }
+
+    // Blob referanslarını geri yükle
+    if(n.images){
+      for(let i=0;i<n.images.length;i++){
+        if(n.images[i]==='__blob__img'+i){
+          const b=await _wsGet('b_'+id+'_img'+i); if(b) n.images[i]=b;
+        }
+      }
     }
-    return result;
-  }catch(e){ return null; }
+    if(n.img==='__blob__img'){
+      const b=await _wsGet('b_'+id+'_img'); if(b) n.img=b;
+    }
+    if(n.sesList){
+      for(let i=0;i<n.sesList.length;i++){
+        if(n.sesList[i]&&n.sesList[i].dataUrl==='__blob__ses'+i){
+          const b=await _wsGet('b_'+id+'_ses'+i); if(b) n.sesList[i]=Object.assign({},n.sesList[i],{dataUrl:b});
+        }
+      }
+    }
+    if(n.sesData==='__blob__ses'){
+      const b=await _wsGet('b_'+id+'_ses'); if(b) n.sesData=b;
+    }
+    if(n.dosyalar){
+      for(let i=0;i<n.dosyalar.length;i++){
+        if(n.dosyalar[i]&&n.dosyalar[i].data==='__blob__doc'+i){
+          const b=await _wsGet('b_'+id+'_doc'+i); if(b) n.dosyalar[i]=Object.assign({},n.dosyalar[i],{data:b});
+        }
+      }
+    }
+
+    result.push(n);
+  }
+  return result.length > 0 ? result : null;
 }
+
 async function _wsWritePrefs(key, val){
   if(!window.storage) return;
-  try{ await window.storage.set('pref:'+key, val); }catch(e){}
+  // Tercihleri güvenli anahtar adıyla kaydet
+  const safeKey = 'p_' + key.replace(/[^a-z0-9_]/gi, '_');
+  await _wsSet(safeKey, val);
 }
 async function _wsReadPref(key){
   if(!window.storage) return null;
-  try{ const r = await window.storage.get('pref:'+key); return (r&&r.value!==undefined)?r.value:null; }catch(e){ return null; }
+  const safeKey = 'p_' + key.replace(/[^a-z0-9_]/gi, '_');
+  return await _wsGet(safeKey);
 }
 
 // ── BAŞLANGIÇTA KALICI STORAGE'DAN YÜKLE ──
@@ -942,26 +1030,16 @@ window._storageReady = (async function(){
   if(_hasRealLS) return; // gerçek localStorage var, direkt kullan
   if(!window.storage) return;
 
-  // Notları yükle (note başına anahtar)
+  // Notları yükle
   const loadedNotes = await _wsReadNotes();
   if(loadedNotes && loadedNotes.length > 0){
     window._memCache['notlarim_v3'] = JSON.stringify(loadedNotes);
-  } else {
-    // Eski tek-blob formatını dene (geriye dönük uyumluluk)
-    try{
-      const r = await window.storage.get('app:notlarim_v3');
-      if(r && r.value) window._memCache['notlarim_v3'] = r.value;
-    }catch(e){}
   }
 
   // Tercihleri yükle
   for(const k of ['notlarim_prefs','notlarim_custom_tags','notlarim_applock']){
     const v = await _wsReadPref(k);
     if(v !== null) window._memCache[k] = v;
-    else {
-      // Eski format fallback
-      try{ const r = await window.storage.get('app:'+k); if(r&&r.value) window._memCache[k]=r.value; }catch(e){}
-    }
   }
 })();
 
@@ -1441,40 +1519,41 @@ async function previewOTP(){
   await tick();otpInterval=setInterval(tick,1000);
 }
 
-// ── PDF / DOSYA ──
+// ── PDF / DOSYA İNDİR ──
 async function downloadFile(id, idx){
   const n=notes.find(n=>n.id===id);if(!n)return;
   const files=n.dosyalar&&n.dosyalar.length?n.dosyalar:(n.pdfData?[{name:n.pdfName||'dosya',data:n.pdfData}]:[]);
   const file=files[idx||0];
   if(!file||!file.data){showToast('⚠️ Dosya verisi bulunamadı');return;}
-  showToast('⏳ Kaydediliyor...');
-  try{
-    // showSaveFilePicker — kullanıcı nereye kaydedeceğini seçer
-    if(window.showSaveFilePicker){
-      const ext=file.name.includes('.')?file.name.split('.').pop():'bin';
+  const ext=file.name&&file.name.includes('.')?file.name.split('.').pop().toLowerCase():'bin';
+  const fname=file.name||('dosya.'+ext);
+  if(window.showSaveFilePicker){
+    try{
       const handle=await window.showSaveFilePicker({
-        suggestedName:file.name,
+        suggestedName:fname,
         types:[{description:'Dosya',accept:{'application/octet-stream':['.'+ext]}}]
       });
       const writable=await handle.createWritable();
-      // base64'ü binary'e çevir
-      const base64=file.data.split(',')[1]||file.data;
+      const base64=file.data.includes(',')?(file.data.split(',')[1]):file.data;
       const binary=atob(base64);
       const bytes=new Uint8Array(binary.length);
       for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
       await writable.write(bytes);
       await writable.close();
-      showToast('✅ '+file.name+' kaydedildi!');
-    } else {
-      // Fallback: normal indirme
-      const a=document.createElement('a');
-      a.href=file.data;a.download=file.name;
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-      setTimeout(()=>showToast('✅ '+file.name+' indirildi!'),600);
+      showToast('✅ '+fname+' kaydedildi!');
+    }catch(e){
+      if(e.name==='AbortError'){showToast('İptal edildi');}
+      else{
+        // Fallback: normal indirme
+        const a=document.createElement('a');a.href=file.data;a.download=fname;
+        document.body.appendChild(a);a.click();document.body.removeChild(a);
+        showToast('✅ '+fname+' indiriliyor');
+      }
     }
-  }catch(e){
-    if(e.name==='AbortError'){showToast('İptal edildi');}
-    else{showToast('❌ Hata: '+e.message);}
+  } else {
+    const a=document.createElement('a');a.href=file.data;a.download=fname;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>showToast('✅ '+fname+' indirildi!'),600);
   }
 }
 // ── RESİM İNDİR ──
