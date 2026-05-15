@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.72
+  Version : Pro 1.0.73
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -385,7 +385,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.72</span>
+  <span>Pro 1.0.73</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1448,22 +1448,29 @@ function renderSesList(){
 }
 async function downloadSes(i){
   const s=sesList[i];if(!s)return;
-  const ext=s.dataUrl.includes('audio/mp4')||s.dataUrl.includes('audio/m4a')?'m4a':s.dataUrl.includes('audio/ogg')?'ogg':'webm';
-  const fname=(s.name||('ses-kaydi-'+(i+1)))+'.'+ext;
-  if(window.showSaveFilePicker){
-    try{
-      const handle=await window.showSaveFilePicker({suggestedName:fname,types:[{description:'Ses Dosyası',accept:{'audio/*':['.'+ext]}}]});
-      const writable=await handle.createWritable();
-      const base64=s.dataUrl.split(',')[1];
-      const binary=atob(base64);const bytes=new Uint8Array(binary.length);
-      for(let j=0;j<binary.length;j++)bytes[j]=binary.charCodeAt(j);
-      await writable.write(bytes);await writable.close();
-      showToast('✅ '+fname+' kaydedildi!');
-    }catch(e){if(e.name==='AbortError')showToast('İptal edildi');else{const a=document.createElement('a');a.href=s.dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);}}
-  } else {
-    const a=document.createElement('a');a.href=s.dataUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
-    showToast('✅ '+fname+' indiriliyor');
-  }
+  _doSesDownload(s.dataUrl, s.name||('ses-kaydi-'+(i+1)));
+}
+// ── SES İNDİR (detay modalından) ──
+async function downloadSesDetail(noteId, idx){
+  const n=notes.find(n=>n.id===noteId);if(!n)return;
+  const _slist=n.sesList&&n.sesList.length?n.sesList:(n.sesData?[{dataUrl:n.sesData,name:'Kayıt 1',dur:''}]:[]);
+  const s=_slist[idx];if(!s)return;
+  _doSesDownload(s.dataUrl||s, s.name||('ses-kaydi-'+(idx+1)));
+}
+function _doSesDownload(dataUrl, name){
+  const ext=dataUrl.includes('audio/mp4')||dataUrl.includes('audio/m4a')?'m4a':dataUrl.includes('audio/ogg')?'ogg':'webm';
+  const fname=(name||'ses-kaydi')+'.'+ext;
+  const mimeMatch=dataUrl.match(/^data:([^;]+);/);
+  const mime=mimeMatch?mimeMatch[1]:'audio/webm';
+  const base64=dataUrl.split(',')[1];
+  const binary=atob(base64);const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  const blob=new Blob([bytes],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=fname;a.style.display='none';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
+  showToast('📤 '+fname);
 }
 async function handleSesUpload(e){
   const files=Array.from(e.target.files);
@@ -1527,34 +1534,22 @@ async function downloadFile(id, idx){
   if(!file||!file.data){showToast('⚠️ Dosya verisi bulunamadı');return;}
   const ext=file.name&&file.name.includes('.')?file.name.split('.').pop().toLowerCase():'bin';
   const fname=file.name||('dosya.'+ext);
-  if(window.showSaveFilePicker){
-    try{
-      const handle=await window.showSaveFilePicker({
-        suggestedName:fname,
-        types:[{description:'Dosya',accept:{'application/octet-stream':['.'+ext]}}]
-      });
-      const writable=await handle.createWritable();
-      const base64=file.data.includes(',')?(file.data.split(',')[1]):file.data;
-      const binary=atob(base64);
-      const bytes=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-      await writable.write(bytes);
-      await writable.close();
-      showToast('✅ '+fname+' kaydedildi!');
-    }catch(e){
-      if(e.name==='AbortError'){showToast('İptal edildi');}
-      else{
-        // Fallback: normal indirme
-        const a=document.createElement('a');a.href=file.data;a.download=fname;
-        document.body.appendChild(a);a.click();document.body.removeChild(a);
-        showToast('✅ '+fname+' indiriliyor');
-      }
-    }
-  } else {
-    const a=document.createElement('a');a.href=file.data;a.download=fname;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>showToast('✅ '+fname+' indirildi!'),600);
-  }
+  // base64'ü Blob'a çevir — iOS Share Sheet için gerekli
+  const base64=file.data.includes(',')?(file.data.split(',')[1]):file.data;
+  const mimeMatch=file.data.match(/^data:([^;]+);/);
+  const mime=mimeMatch?mimeMatch[1]:'application/octet-stream';
+  const binary=atob(base64);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  const blob=new Blob([bytes],{type:mime});
+  // iOS Safari: blob URL + <a download> → Share Sheet açılır
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=fname;a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
+  showToast('📤 '+fname);
 }
 // ── RESİM İNDİR ──
 async function downloadImgAt(id, idx){
@@ -1563,25 +1558,22 @@ async function downloadImgAt(id, idx){
   const src=imgs[idx];if(!src){showToast('⚠️ Resim bulunamadı');return;}
   const ext=src.startsWith('data:image/png')?'png':src.startsWith('data:image/webp')?'webp':'jpg';
   const fname=(n.title||'resim')+'-'+(idx+1)+'.'+ext;
-  if(window.showSaveFilePicker){
-    try{
-      const handle=await window.showSaveFilePicker({suggestedName:fname,types:[{description:'Resim',accept:{'image/*':['.'+ext]}}]});
-      const writable=await handle.createWritable();
-      if(src.startsWith('data:')){
-        const base64=src.split(',')[1];
-        const binary=atob(base64);const bytes=new Uint8Array(binary.length);
-        for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-        await writable.write(bytes);
-      } else {
-        const res=await fetch(src);const buf=await res.arrayBuffer();
-        await writable.write(buf);
-      }
-      await writable.close();showToast('✅ '+fname+' kaydedildi!');
-    }catch(e){if(e.name==='AbortError')showToast('İptal edildi');else{const a=document.createElement('a');a.href=src;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);}}
+  const mimeMatch=src.match(/^data:([^;]+);/);
+  const mime=mimeMatch?mimeMatch[1]:('image/'+ext);
+  if(src.startsWith('data:')){
+    const base64=src.split(',')[1];
+    const binary=atob(base64);const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    const blob=new Blob([bytes],{type:mime});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=fname;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
   } else {
-    const a=document.createElement('a');a.href=src;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
-    showToast('✅ '+fname+' indiriliyor');
+    const a=document.createElement('a');a.href=src;a.download=fname;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
   }
+  showToast('📤 '+fname);
 }
 // ── SES İNDİR (detay modalından) ──
 async function downloadSesDetail(noteId, idx){
