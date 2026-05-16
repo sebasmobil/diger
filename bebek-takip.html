@@ -32,37 +32,11 @@
 <meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.01">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
-<title>Bebek Takip Pro v1.0.06</title>
+<title>Bebek Takip Pro v1.0.11</title>
 <style>
-/* ===== TOP INFO BAR ===== */
+/* ===== TOP INFO BAR — gizli (sistem saatiyle çakışıyor) ===== */
 .top-bar {
-  position: relative;
-  top: auto; left: auto; right: auto;
-  height: 26px;
-  background: var(--top-bar-bg);
-  color: var(--top-bar-text);
-  font-size: 11px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  letter-spacing: 0.3px;
-  z-index: 9999;
-  user-select: none;
-  border-bottom: 1px solid var(--top-bar-border);
-  flex-shrink: 0;
-}
-.top-bar-sep {
-  opacity: 0.3;
-  font-size: 9px;
-}
-.top-bar a {
-  color: inherit;
-  text-decoration: none;
-}
-.top-bar a:hover {
-  color: var(--top-bar-hover);
+  display: none;
 }
 
 :root {
@@ -218,103 +192,186 @@ button, a, [onclick] {
   overflow-x: hidden;
 }
 
-/* ===== BOTTOM NAV BAR — Kaydırmalı ===== */
-.bottom-nav {
+/* ===== SIDE NAV DRAWER ===== */
+.side-nav-overlay {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
-  height: 62px;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(3px);
+}
+.side-nav-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.side-nav {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 270px;
   background: var(--card);
-  border-top: 1px solid var(--border);
-  z-index: 100;
-  box-shadow: 0 -4px 24px var(--shadow);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  width: 100%;
-  max-width: 100vw;
+  z-index: 201;
+  box-shadow: 6px 0 32px var(--shadow-md);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
-.nav-scroll {
-  display: flex;
-  align-items: stretch;
-  height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-snap-type: x proximity;
-  padding: 0 4px;
+.side-nav.open {
+  transform: translateX(0);
 }
-.nav-scroll::-webkit-scrollbar { display: none; }
+
+.side-nav-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 20px 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+}
+.side-nav-logo {
+  width: 42px; height: 42px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  animation: heartbeat 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.side-nav-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: white;
+  line-height: 1.1;
+}
+.side-nav-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+
+.side-nav-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0;
+  scrollbar-width: none;
+}
+.side-nav-body::-webkit-scrollbar { display: none; }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 20px 4px;
+}
 
 .nav-item {
-  flex: 0 0 auto;
-  min-width: 72px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text2);
+  font-weight: 700;
+  font-size: 18px;
+  position: relative;
+  user-select: none;
+  touch-action: manipulation;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover {
+  color: var(--primary);
+  background: rgba(76,175,80,0.06);
+  border-left-color: rgba(76,175,80,0.3);
+}
+.nav-item.active {
+  color: var(--primary);
+  background: rgba(76,175,80,0.09);
+  border-left-color: var(--primary);
+}
+.nav-item .nav-icon {
+  font-size: 22px;
+  line-height: 1;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+  position: relative;
+}
+.nav-item .nav-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+}
+.nav-count {
+  background: var(--accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.nav-item.active .nav-count { background: var(--primary-dark); }
+
+.side-nav-footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.side-nav-footer .btn { flex: 1; justify-content: center; font-size: 12px; }
+
+/* Hamburger menu button in header */
+.menu-btn {
+  width: 42px; height: 42px;
+  border: none;
+  background: var(--primary);
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 5px;
   cursor: pointer;
+  box-shadow: 0 3px 10px rgba(76,175,80,0.4);
   transition: var(--transition);
-  color: var(--text3);
-  font-weight: 700;
-  position: relative;
-  user-select: none;
-  padding: 5px 6px;
-  border-top: 2.5px solid transparent;
-  scroll-snap-align: start;
+  flex-shrink: 0;
   touch-action: manipulation;
+  padding: 0;
 }
-.nav-item:hover { color: var(--primary); background: rgba(76,175,80,0.04); }
-.nav-item.active {
-  color: var(--primary);
-  border-top-color: var(--primary);
-  background: rgba(76,175,80,0.06);
+.menu-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+.menu-btn:active { transform: scale(0.97); }
+.menu-btn .hb-line {
+  width: 20px;
+  height: 2.5px;
+  background: white;
+  border-radius: 2px;
+  transition: var(--transition);
 }
-.nav-item .nav-icon {
-  font-size: 21px;
-  line-height: 1;
-  position: relative;
-}
-.nav-item .nav-label {
-  font-size: 9.5px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.nav-count {
-  position: absolute;
-  top: 3px;
-  right: calc(50% - 20px);
-  background: var(--accent);
-  color: white;
-  font-size: 8px;
-  font-weight: 800;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 3px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-.nav-item.active .nav-count { background: var(--primary-dark); }
-
-/* Kaydırma ipucu — sağ kenar fade */
-.nav-fade-right {
-  position: absolute;
-  right: 0; top: 0;
-  width: 32px;
-  height: 62px;
-  background: linear-gradient(to right, transparent, var(--card) 80%);
-  pointer-events: none;
-  z-index: 3;
-  transition: opacity 0.3s;
-}
-.nav-fade-right.hidden { opacity: 0; }
+.menu-btn .hb-line.short { width: 14px; align-self: flex-start; margin-left: 11px; }
 
 /* Nav separator - compat */
 .nav-sep { display: none; }
+/* Hide legacy bottom nav elements */
+.bottom-nav { display: none !important; }
+.nav-fade-right { display: none; }
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
@@ -327,7 +384,7 @@ button, a, [onclick] {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   transition: var(--transition);
 }
 
@@ -342,6 +399,7 @@ button, a, [onclick] {
   transition: background 0.3s, border-color 0.3s;
   width: 100%;
   max-width: 100vw;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 /* Üst satır: logo + butonlar */
 .header-row1 {
@@ -354,6 +412,16 @@ button, a, [onclick] {
 /* Alt satır: arama */
 .header-row2 {
   padding: 0 12px 8px;
+}
+.header-subtitle-bar {
+  margin-top: 6px;
+  padding: 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .header-logo {
   display: flex;
@@ -479,7 +547,7 @@ button, a, [onclick] {
 .drawer-section { display: none; }
 .drawer-section.active { display: block; }
 
-/* ===== MOBILE MENU BTN - hidden now ===== */
+/* ===== MOBILE MENU BTN ===== */
 .mobile-menu-btn { display: none; }
 .sidebar-overlay { display: none !important; }
 
@@ -535,7 +603,7 @@ button, a, [onclick] {
 
 /* ===== PAGE CONTENT ===== */
 .page-content {
-  padding: 28px;
+  padding: 14px 14px 28px;
   flex: 1;
   width: 100%;
   max-width: 100%;
@@ -573,6 +641,33 @@ button, a, [onclick] {
   color: var(--text3);
   font-size: 14px;
   pointer-events: none;
+}
+
+/* ===== HOME BACK BUTTON ===== */
+.home-back-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text2);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 14px;
+  touch-action: manipulation;
+}
+.home-back-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(76,175,80,0.06);
+}
+.home-back-btn.visible {
+  display: inline-flex;
 }
 
 /* ===== STATS CARDS ===== */
@@ -891,7 +986,7 @@ canvas { max-width: 100%; }
 /* ===== QUICK ACTIONS ===== */
 .quick-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 .quick-action {
@@ -899,17 +994,18 @@ canvas { max-width: 100%; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 10px;
+  gap: 6px;
+  padding: 14px 8px 12px;
   background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text2);
   text-align: center;
+  position: relative;
 }
 .quick-action:hover {
   border-color: var(--primary);
@@ -917,7 +1013,39 @@ canvas { max-width: 100%; }
   color: var(--primary);
   transform: scale(1.03);
 }
-.quick-action .qa-icon { font-size: 24px; }
+.quick-action .qa-icon {
+  font-size: 28px;
+  line-height: 1;
+  position: relative;
+}
+.qa-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--accent);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+.qa-label {
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.qa-sub {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 600;
+}
 
 /* ===== GROWTH CHART ===== */
 .growth-info {
@@ -1077,12 +1205,10 @@ canvas { max-width: 100%; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .nav-item .nav-label { font-size: 8px; }
   .header-search-center { min-width: 60px; }
 }
 @media (max-width: 360px) {
   .header-logo .logo-sub { display: none; }
-  .nav-item .nav-label { font-size: 7.5px; }
 }
 
 /* ===== LANDSCAPE MOBILE ===== */
@@ -1096,8 +1222,6 @@ canvas { max-width: 100%; }
   .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
   .stat-card { padding: 12px; }
   .dashboard-grid { grid-template-columns: 2fr 1fr; }
-  .nav-item .nav-label { font-size: 8px; }
-  .nav-item .nav-icon { font-size: 16px; }
 }
 
 /* ===== LANDSCAPE TABLET ===== */
@@ -1465,7 +1589,7 @@ canvas { max-width: 100%; }
 
 <!-- TOP INFO BAR -->
 <div class="top-bar">
-  <span>Pro 1.0.06</span>
+  <span>Pro 1.0.08</span>
   <span class="top-bar-sep">◆</span>
   <span>© sebasmobil 2026</span>
   <span class="top-bar-sep">◆</span>
@@ -1475,52 +1599,71 @@ canvas { max-width: 100%; }
 <!-- Sidebar Overlay for mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- BOTTOM NAV BAR -->
-<nav class="bottom-nav" id="bottomNav">
-  <div class="nav-fade-right" id="navFadeRight"></div>
-  <div class="nav-scroll" id="navScroll">
-    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+<!-- SIDE NAV OVERLAY -->
+<div class="side-nav-overlay" id="sideNavOverlay" onclick="closeSideNav()"></div>
+
+<!-- SIDE NAV DRAWER -->
+<nav class="side-nav" id="sideNav">
+  <div class="side-nav-header">
+    <div class="side-nav-logo">👶</div>
+    <div>
+      <div class="side-nav-title">Bebek Takip</div>
+      <div class="side-nav-sub" id="sideNavSubtitle">Pro v1.0.07</div>
+    </div>
+  </div>
+
+  <div class="side-nav-body">
+    <div class="nav-section-label">Ana Menü</div>
+    <div class="nav-item active" onclick="showPage('dashboard');closeSideNav()" id="nav-dashboard">
       <div class="nav-icon">🏠</div>
       <div class="nav-label">Ana Sayfa</div>
     </div>
-    <div class="nav-item" onclick="showPage('olay')" id="nav-olay">
-      <div class="nav-icon">⚡
-        <span class="nav-count" id="count-olay" style="display:none">0</span>
-      </div>
+    <div class="nav-item" onclick="showPage('olay');closeSideNav()" id="nav-olay">
+      <div class="nav-icon">⚡</div>
       <div class="nav-label">Olaylar</div>
+      <span class="nav-count" id="count-olay" style="display:none">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('gelisim')" id="nav-gelisim">
-      <div class="nav-icon">📈
-        <span class="nav-count" id="count-gelisim" style="display:none">0</span>
-      </div>
+    <div class="nav-item" onclick="showPage('gelisim');closeSideNav()" id="nav-gelisim">
+      <div class="nav-icon">📈</div>
       <div class="nav-label">Gelişim</div>
+      <span class="nav-count" id="count-gelisim" style="display:none">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('kontrol')" id="nav-kontrol">
-      <div class="nav-icon">🏥
-        <span class="nav-count" id="count-kontrol" style="display:none">0</span>
-      </div>
-      <div class="nav-label">Kontrol</div>
+    <div class="nav-item" onclick="showPage('kontrol');closeSideNav()" id="nav-kontrol">
+      <div class="nav-icon">🏥</div>
+      <div class="nav-label">Doktor Kontrolleri</div>
+      <span class="nav-count" id="count-kontrol" style="display:none">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('gida')" id="nav-gida">
-      <div class="nav-icon">🍼
-        <span class="nav-count" id="count-gida" style="display:none">0</span>
-      </div>
-      <div class="nav-label">Gıda</div>
+    <div class="nav-item" onclick="showPage('gida');closeSideNav()" id="nav-gida">
+      <div class="nav-icon">🍼</div>
+      <div class="nav-label">Gıda Takibi</div>
+      <span class="nav-count" id="count-gida" style="display:none">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('gunluk')" id="nav-gunluk">
-      <div class="nav-icon">📔
-        <span class="nav-count" id="count-gunluk" style="display:none">0</span>
-      </div>
+    <div class="nav-item" onclick="showPage('gunluk');closeSideNav()" id="nav-gunluk">
+      <div class="nav-icon">📔</div>
       <div class="nav-label">Günlük</div>
+      <span class="nav-count" id="count-gunluk" style="display:none">0</span>
     </div>
-    <div class="nav-item" onclick="showPage('dis')" id="nav-dis">
+
+    <div class="nav-section-label" style="margin-top:4px">Sağlık</div>
+    <div class="nav-item" onclick="showPage('dis');closeSideNav()" id="nav-dis">
       <div class="nav-icon">🦷</div>
-      <div class="nav-label">Diş</div>
+      <div class="nav-label">Diş Takibi</div>
     </div>
-    <div class="nav-item" onclick="showPage('asi')" id="nav-asi">
+    <div class="nav-item" onclick="showPage('asi');closeSideNav()" id="nav-asi">
       <div class="nav-icon">💉</div>
-      <div class="nav-label">Aşı</div>
+      <div class="nav-label">Aşı Takvimi</div>
     </div>
+
+    <div class="nav-section-label" style="margin-top:4px">Profiller</div>
+    <div class="nav-item" onclick="showPage('bebekler');closeSideNav()" id="nav-bebekler">
+      <div class="nav-icon">👨‍👩‍👧</div>
+      <div class="nav-label">Bebek Profilleri</div>
+    </div>
+  </div>
+
+  <div class="side-nav-footer">
+    <button class="btn btn-secondary btn-sm" onclick="toggleTheme();closeSideNav()" id="themeBtnSide">🌙 Tema</button>
+    <button class="btn btn-secondary btn-sm" onclick="openSettingsDrawer();closeSideNav()">⚙️ Ayarlar</button>
   </div>
 </nav>
 
@@ -1594,10 +1737,14 @@ canvas { max-width: 100%; }
   <div class="header">
     <!-- Satır 1: Logo + Aksiyon butonları -->
     <div class="header-row1">
+      <button class="menu-btn" onclick="openSideNav()" title="Menü" aria-label="Menüyü aç">
+        <div class="hb-line"></div>
+        <div class="hb-line short"></div>
+        <div class="hb-line"></div>
+      </button>
       <div class="header-logo">
         <div>
           <div class="logo-text">Bebek Takip</div>
-          <div class="logo-sub" id="headerSubtitle">Hoş geldiniz 👶</div>
         </div>
       </div>
       <div class="header-actions">
@@ -1617,24 +1764,34 @@ canvas { max-width: 100%; }
           </div>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" title="Tema" id="themeBtn">🌙</button>
-        <button class="btn btn-secondary btn-sm btn-icon" onclick="openSettingsDrawer()" title="Ayarlar" style="font-size:15px">⚙️</button>
         <button class="btn btn-primary btn-sm" id="addBtn" onclick="openAddModal()">+ Ekle</button>
       </div>
     </div>
-    <!-- Satır 2: Arama -->
+    <!-- Satır 2: Arama + Alt bilgi -->
     <div class="header-row2">
       <div class="search-wrapper" id="globalSearchWrapper">
         <input class="search-input" type="search" placeholder="Tüm kayıtlarda ara..." id="globalSearch" oninput="globalSearchFn(this.value)" />
         <span class="search-icon">🔍</span>
+      </div>
+      <div class="header-subtitle-bar" id="headerSubtitleBar">
+        <span id="headerSubtitle">Hoş geldiniz 👶</span>
       </div>
     </div>
   </div>
 
   <!-- PAGES -->
   <div class="page-content">
+    <!-- ANA SAYFA GERİ BUTONU -->
+    <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')">🏠 Ana Sayfa</button>
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="stats-grid" id="statsGrid"></div>
+      <!-- HIZLI EKLE (üstte, sayılarla) -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
+        <div class="card-body">
+          <div class="quick-actions" id="quickActionsGrid"></div>
+        </div>
+      </div>
       <div class="dashboard-grid">
         <div>
           <div class="card">
@@ -1665,31 +1822,6 @@ canvas { max-width: 100%; }
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="card">
-            <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
-            <div class="card-body">
-              <div class="quick-actions">
-                <div class="quick-action" onclick="showPage('olay');openAddModal()">
-                  <div class="qa-icon">⚡</div>Olay
-                </div>
-                <div class="quick-action" onclick="showPage('gelisim');openAddModal()">
-                  <div class="qa-icon">📈</div>Gelişim
-                </div>
-                <div class="quick-action" onclick="showPage('kontrol');openAddModal()">
-                  <div class="qa-icon">🏥</div>Kontrol
-                </div>
-                <div class="quick-action" onclick="showPage('gida');openAddModal()">
-                  <div class="qa-icon">🍼</div>Gıda
-                </div>
-                <div class="quick-action" onclick="showPage('gunluk');openAddModal()">
-                  <div class="qa-icon">📔</div>Günlük
-                </div>
-                <div class="quick-action" onclick="showPage('dis')">
-                  <div class="qa-icon">🦷</div>Diş
-                </div>
-              </div>
-            </div>
-          </div>
           <div class="card">
             <div class="card-header"><span class="card-title">📋 Son Kontrol</span></div>
             <div class="card-body" id="lastControlInfo">
@@ -2157,7 +2289,7 @@ function updateHeaderBaby() {
   if (nameEl)   nameEl.textContent = data.settings?.babyName || 'Bebek';
   if (avatarEl) { avatarEl.className = `hb-avatar avatar-${color}`; avatarEl.textContent = emoji; }
   const sub = document.getElementById('headerSubtitle');
-  if (sub) sub.textContent = (data.settings?.babyName || 'Bebeğim') + ' · Hoş geldiniz 👶';
+  if (sub) sub.textContent = '👶 ' + (data.settings?.babyName || 'Bebeğim');
 }
 
 /* ── Profil dropdown toggle ── */
@@ -2338,6 +2470,8 @@ function setTheme(theme) {
   data.settings.theme = theme;
   saveData();
   document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const sideBtn = document.getElementById('themeBtnSide');
+  if (sideBtn) sideBtn.textContent = (theme === 'dark' ? '☀️' : '🌙') + ' Tema';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
   // Update meta theme-color
@@ -2374,12 +2508,19 @@ function showPage(page) {
   if (nav) nav.classList.add('active');
   scrollNavToActive();
 
+  // Show/hide home back button
+  const homeBtn = document.getElementById('homeBackBtn');
+  if (homeBtn) homeBtn.classList.toggle('visible', page !== 'dashboard');
+
   currentPage = page;
   const meta = pageMeta[page] || { title: page, sub: '', icon: '' };
 
   // Update header subtitle
   const sub = document.getElementById('headerSubtitle');
-  if (sub) sub.textContent = (data.settings?.babyName || 'Bebeğim') + ' · ' + meta.sub;
+  const babyName = data.settings?.babyName || 'Bebeğim';
+  if (sub) sub.textContent = page === 'dashboard'
+    ? '👶 ' + babyName
+    : '👶 ' + babyName + '  ›  ' + (meta.title || '');
 
   // Update add button
   const addBtn = document.getElementById('addBtn');
@@ -2420,30 +2561,27 @@ function switchDrawerTab(tab) {
   if (tab === 'ayarlar') loadSettings();
 }
 
-// ===== SIDEBAR MOBILE (stub — no sidebar anymore) =====
-function toggleSidebar() {}
+// ===== SIDEBAR MOBILE (side nav now handles this) =====
+function toggleSidebar() { openSideNav(); }
 
-// ===== NAV SCROLL FADE HINT =====
+// ===== SIDE NAV =====
+function openSideNav() {
+  document.getElementById('sideNav').classList.add('open');
+  document.getElementById('sideNavOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSideNav() {
+  document.getElementById('sideNav').classList.remove('open');
+  document.getElementById('sideNavOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function initNavScroll() {
-  const scroll = document.getElementById('navScroll');
-  const fade   = document.getElementById('navFadeRight');
-  if (!scroll || !fade) return;
-  function update() {
-    const atEnd = scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 4;
-    fade.classList.toggle('hidden', atEnd);
-  }
-  scroll.addEventListener('scroll', update, { passive: true });
-  update();
+  // No longer needed for bottom nav — side nav doesn't scroll
 }
 
 function scrollNavToActive() {
-  const scroll = document.getElementById('navScroll');
-  const active = scroll?.querySelector('.nav-item.active');
-  if (!scroll || !active) return;
-  const itemLeft = active.offsetLeft;
-  const itemW    = active.offsetWidth;
-  const scrollW  = scroll.clientWidth;
-  scroll.scrollTo({ left: itemLeft - (scrollW / 2) + (itemW / 2), behavior: 'smooth' });
+  // No scrolling needed for side nav
 }
 
 // ===== TOAST =====
@@ -2935,34 +3073,47 @@ function renderDisGrid(containerId, posFilter) {
 
 // ===== DASHBOARD =====
 function renderDashboard() {
-  updateStats();
+  renderQuickActions();
   renderRecentActivities();
   updateLastControl();
   updateNextVaccine();
   setTimeout(renderGrowthChart, 100);
 }
 
-function updateStats() {
-  const grid = document.getElementById('statsGrid');
-  const stats = [
-    { icon: '⚡', label: 'Olaylar', value: data.olay.length, bg: 'color-green', page: 'olay' },
-    { icon: '📈', label: 'Geli\u015fim', value: data.gelisim.length, bg: 'color-blue', page: 'gelisim' },
-    { icon: '🏥', label: 'Kontroller', value: data.kontrol.length, bg: 'color-purple', page: 'kontrol' },
-    { icon: '🍼', label: 'G\u0131da', value: data.gida.length, bg: 'color-orange', page: 'gida' },
-    { icon: '📔', label: 'G\u00fcnl\u00fckler', value: data.gunluk.length, bg: 'color-pink', page: 'gunluk' },
-    { icon: '🦷', label: 'Di\u015fler', value: data.dis.length, bg: 'color-teal', page: 'dis' },
-    { icon: '💉', label: 'A\u015f\u0131lar', value: data.asi.length, bg: 'color-red', page: 'asi' },
+function renderQuickActions() {
+  const grid = document.getElementById('quickActionsGrid');
+  if (!grid) return;
+  const items = [
+    { icon: '⚡', label: 'Olay',    page: 'olay',    count: data.olay.length,    add: true  },
+    { icon: '📈', label: 'Gelişim', page: 'gelisim', count: data.gelisim.length, add: true  },
+    { icon: '🏥', label: 'Kontrol', page: 'kontrol', count: data.kontrol.length, add: true  },
+    { icon: '🍼', label: 'Gıda',    page: 'gida',    count: data.gida.length,    add: true  },
+    { icon: '📔', label: 'Günlük',  page: 'gunluk',  count: data.gunluk.length,  add: true  },
+    { icon: '🦷', label: 'Diş',     page: 'dis',     count: data.dis.length,     add: false },
+    { icon: '💉', label: 'Aşı',     page: 'asi',     count: data.asi.length,     add: true  },
   ];
-
-  grid.innerHTML = stats.map((s,i) => `
-    <div class="stat-card" onclick="showPage('${s.page}')" style="animation-delay:${i*0.07}s">
-      <div class="stat-icon ${s.bg}" style="color:white">${s.icon}</div>
-      <div class="stat-info">
-        <div class="stat-value">${s.value}</div>
-        <div class="stat-label">${s.label}</div>
+  grid.innerHTML = items.map((item, i) => `
+    <div class="quick-action" onclick="showPage('${item.page}')${item.add ? ';openAddModal()' : ''}" style="animation-delay:${i*0.05}s">
+      <div class="qa-icon">
+        ${item.icon}
+        ${item.count > 0 ? `<span class="qa-count">${item.count}</span>` : ''}
       </div>
+      <div class="qa-label">${item.label}</div>
     </div>
   `).join('');
+}
+
+function updateCounts() {
+  // Yan menüdeki badge'leri güncelle
+  ['olay','gelisim','kontrol','gida','gunluk'].forEach(s => {
+    const el = document.getElementById('count-' + s);
+    if (!el) return;
+    const n = data[s].length;
+    el.textContent = n;
+    el.style.display = n > 0 ? 'flex' : 'none';
+  });
+  // Dashboard hızlı ekle sayılarını da güncelle
+  if (currentPage === 'dashboard') renderQuickActions();
 }
 
 function renderRecentActivities() {
@@ -3091,17 +3242,6 @@ function renderGrowthChart(metric = 'weight') {
         y: { grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Nunito', size: 11 } } }
       }
     }
-  });
-}
-
-// ===== COUNT BADGES =====
-function updateCounts() {
-  ['olay','gelisim','kontrol','gida','gunluk'].forEach(s => {
-    const el = document.getElementById('count-' + s);
-    if (!el) return;
-    const n = data[s].length;
-    el.textContent = n;
-    el.style.display = n > 0 ? 'flex' : 'none';
   });
 }
 
