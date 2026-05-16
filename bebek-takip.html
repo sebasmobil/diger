@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.32
+  Bebek Takip Pro v1.0.38
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.32">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.38">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.32</title>
+<title>Bebek Takip Pro v1.0.38</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -697,11 +697,18 @@ button, a, [onclick] {
 
 /* ===== PAGE CONTENT ===== */
 .page-content {
-  padding: 14px 14px 28px;
+  padding: 14px 14px 80px 14px;
   flex: 1;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  box-sizing: border-box;
+}
+.page-content *,
+.page-content *::before,
+.page-content *::after {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* ===== SEARCH BAR ===== */
@@ -752,21 +759,27 @@ button, a, [onclick] {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: 1.5px solid var(--border);
   background: var(--card);
   color: var(--text2);
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
   transition: var(--transition);
   touch-action: manipulation;
-  flex-shrink: 0;
+  position: fixed;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  opacity: 0.45;
+  box-shadow: 0 3px 14px var(--shadow);
 }
 .home-back-btn:hover {
   border-color: var(--primary);
   background: rgba(76,175,80,0.08);
+  opacity: 1;
 }
 .home-back-btn.visible {
   display: inline-flex;
@@ -822,26 +835,38 @@ button, a, [onclick] {
   box-shadow: 0 2px 12px var(--shadow);
   overflow: hidden;
   transition: var(--transition);
+  width: 100%;
+  box-sizing: border-box;
 }
 .card:hover {
   box-shadow: 0 6px 22px var(--shadow-md);
 }
 .card-header {
-  padding: 18px 22px;
+  padding: 18px 18px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.card-body {
+  padding: 16px 18px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+canvas {
+  max-width: 100% !important;
+  width: 100% !important;
+  display: block;
 }
 .card-title {
   font-family: var(--font);
   font-size: 17px;
   font-weight: 800;
   color: var(--text);
-}
-.card-body {
-  padding: 18px 22px;
 }
 
 /* ===== RECORD CARDS ===== */
@@ -1126,9 +1151,11 @@ td {
 /* ===== DASHBOARD ===== */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  margin-top: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .recent-list { display: flex; flex-direction: column; gap: 0; }
 .recent-item {
@@ -1485,7 +1512,7 @@ mark.hl {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .dashboard-grid { gap: 12px; }
   .form-grid-2 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .page-content { padding: 12px; }
@@ -1510,7 +1537,7 @@ mark.hl {
   .page-content { padding: 8px 12px; }
   .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
   .stat-card { padding: 12px; }
-  .dashboard-grid { grid-template-columns: 2fr 1fr; }
+  .page-content { padding: 8px 12px 80px; }
 }
 
 /* ===== LANDSCAPE TABLET ===== */
@@ -2104,7 +2131,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.32</span>
+  <span>Pro 1.0.38</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2157,14 +2184,15 @@ mark.hl {
 
       </div><!-- /sağa dayalı grup -->
 
-      <!-- Ana Sayfa & Ekle -->
-      <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
+      <!-- Ekle -->
       <button class="btn btn-primary btn-sm" id="addBtn" onclick="openAddModal()" style="display:none">+ Ekle</button>
     </div>
   </div>
 
   <!-- PAGES -->
   <div class="page-content">
+    <!-- ANA SAYFA BUTONU (sabit, sağ üst) -->
+    <button class="home-back-btn" id="homeBackBtn" onclick="showPage('dashboard')" title="Ana Sayfa">🏠</button>
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <!-- HIZLI EKLE (üstte, sayılarla) -->
