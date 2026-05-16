@@ -1,11 +1,82 @@
+<!--
+  Bebek Takip Pro v1.0.01
+  Copyright (C) 2026 sebasmobil
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published
+  by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bebek Takip Uygulaması</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bebek Takip">
+<meta name="application-name" content="Bebek Takip">
+<meta name="theme-color" content="#4CAF50" id="metaThemeColor">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.01">
+<link rel="apple-touch-icon" id="appleTouchIcon">
+<link rel="icon" type="image/png" id="faviconLink">
+<title>Bebek Takip Pro v1.0.01</title>
 <style>
+/* ===== TOP INFO BAR ===== */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 26px;
+  background: var(--top-bar-bg, #1a2332);
+  color: var(--top-bar-text, rgba(255,255,255,0.65));
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  letter-spacing: 0.3px;
+  z-index: 200;
+  user-select: none;
+  border-bottom: 1px solid var(--top-bar-border, rgba(255,255,255,0.07));
+}
+.top-bar-sep {
+  opacity: 0.3;
+  font-size: 9px;
+}
+.top-bar a {
+  color: inherit;
+  text-decoration: none;
+}
+.top-bar a:hover {
+  color: var(--top-bar-hover, rgba(255,255,255,0.9));
+}
+
+:root {
+  --top-bar-bg: #1E2A3A;
+  --top-bar-text: rgba(255,255,255,0.6);
+  --top-bar-border: rgba(255,255,255,0.07);
+  --top-bar-hover: rgba(255,255,255,0.9);
+}
+[data-theme="dark"] {
+  --top-bar-bg: #0a0f1a;
+  --top-bar-text: rgba(255,255,255,0.45);
+  --top-bar-border: rgba(255,255,255,0.05);
+  --top-bar-hover: rgba(255,255,255,0.75);
+}
+
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Fredoka+One&display=swap');
 
@@ -124,143 +195,97 @@ body {
 /* ===== LAYOUT ===== */
 .app-container {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-  width: 240px;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
+/* ===== BOTTOM NAV BAR ===== */
+.bottom-nav {
   position: fixed;
-  top: 0; left: 0;
-  height: 100vh;
-  z-index: 100;
-  transition: var(--transition);
-  box-shadow: 2px 0 20px var(--shadow);
-}
-.sidebar-logo {
-  padding: 24px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.sidebar-logo .logo-icon {
-  width: 44px; height: 44px;
-  background: linear-gradient(135deg, var(--primary), var(--accent2));
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  animation: heartbeat 2.5s ease-in-out infinite;
-  flex-shrink: 0;
-}
-.sidebar-logo .logo-text {
-  font-family: var(--font-display);
-  font-size: 16px;
-  color: var(--primary);
-  line-height: 1.2;
-}
-.sidebar-logo .logo-sub {
-  font-size: 11px;
-  color: var(--text3);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 12px 10px;
-  overflow-y: auto;
-}
-.nav-section-title {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 10px 10px 4px;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition);
-  margin-bottom: 2px;
-  color: var(--text2);
-  font-weight: 600;
-  font-size: 14px;
-  user-select: none;
-}
-.nav-item:hover {
-  background: var(--bg);
-  color: var(--text);
-}
-.nav-item.active {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 14px rgba(76,175,80,0.35);
-}
-.nav-item .nav-icon {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  background: rgba(0,0,0,0.05);
-  flex-shrink: 0;
-}
-.nav-item.active .nav-icon {
-  background: rgba(255,255,255,0.2);
-}
-.nav-count {
-  margin-left: auto;
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  font-size: 11px;
-  font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 20px;
-}
-.nav-item.active .nav-count {
-  background: rgba(255,255,255,0.3);
-  color: white;
-}
-
-.sidebar-footer {
-  padding: 12px 10px;
+  bottom: 0; left: 0; right: 0;
+  height: 62px;
+  background: var(--card);
   border-top: 1px solid var(--border);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: stretch;
+  z-index: 100;
+  box-shadow: 0 -4px 24px var(--shadow);
 }
-.sidebar-footer-btn {
+
+.nav-item {
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
+  justify-content: center;
+  gap: 3px;
   cursor: pointer;
   transition: var(--transition);
-  color: var(--text2);
-  font-weight: 600;
-  font-size: 13px;
+  color: var(--text3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  position: relative;
   user-select: none;
+  padding: 6px 2px;
+  border-top: 2.5px solid transparent;
 }
-.sidebar-footer-btn:hover { background: var(--bg); color: var(--text); }
+.nav-item:hover {
+  color: var(--primary);
+  background: rgba(76,175,80,0.04);
+}
+.nav-item.active {
+  color: var(--primary);
+  border-top-color: var(--primary);
+  background: rgba(76,175,80,0.06);
+}
+.nav-item .nav-icon {
+  font-size: 20px;
+  line-height: 1;
+  position: relative;
+}
+.nav-item .nav-label {
+  font-size: 9.5px;
+  font-weight: 700;
+}
+.nav-count {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 18px);
+  background: var(--accent);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.nav-item.active .nav-count {
+  background: var(--primary-dark);
+}
+
+/* Nav separator */
+.nav-sep {
+  width: 1px;
+  background: var(--border);
+  margin: 10px 0;
+  flex-shrink: 0;
+}
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
-  margin-left: 240px;
+  margin-left: 0;
+  margin-top: 26px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - 26px);
+  padding-bottom: 62px; /* bottom nav height */
   transition: var(--transition);
 }
 
@@ -268,8 +293,8 @@ body {
 .header {
   background: var(--header-bg);
   border-bottom: 1px solid var(--border);
-  padding: 0 28px;
-  height: 64px;
+  padding: 0 20px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -281,23 +306,132 @@ body {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+/* Logo in header */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  animation: heartbeat 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.header-logo .logo-text {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--primary);
+  line-height: 1.1;
+}
+.header-logo .logo-sub {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 600;
 }
 .header-title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 18px;
   color: var(--text);
 }
 .header-subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text3);
   font-weight: 600;
 }
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
+
+/* ===== SETTINGS PANEL (slide-up drawer) ===== */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay);
+  z-index: 400;
+  display: none;
+  animation: fadeIn 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+.settings-overlay.open { display: block; }
+.settings-drawer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px var(--shadow-md);
+  z-index: 401;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.settings-drawer.open {
+  transform: translateY(0);
+}
+.settings-drawer-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.settings-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: var(--card);
+  z-index: 5;
+}
+.settings-drawer-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+}
+.settings-drawer-body {
+  padding: 20px 22px 32px;
+}
+/* Tab switcher inside drawer */
+.drawer-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.drawer-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text3);
+  transition: var(--transition);
+  user-select: none;
+}
+.drawer-tab.active {
+  background: var(--card);
+  color: var(--primary);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.drawer-section { display: none; }
+.drawer-section.active { display: block; }
+
+/* ===== MOBILE MENU BTN - hidden now ===== */
+.mobile-menu-btn { display: none; }
+.sidebar-overlay { display: none !important; }
 
 /* ===== BUTTONS ===== */
 .btn {
@@ -852,7 +986,7 @@ canvas { max-width: 100%; }
 .sidebar-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 26px; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
   z-index: 99;
 }
@@ -873,24 +1007,15 @@ canvas { max-width: 100%; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .sidebar {
-    transform: translateX(-100%);
-    width: 260px;
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .sidebar-overlay.visible { display: block; }
-  .main-content { margin-left: 0; }
-  .mobile-menu-btn { display: flex; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .form-grid-2 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .page-content { padding: 16px; }
+  .page-content { padding: 14px; }
+  .header { padding: 0 14px; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .header { padding: 0 14px; }
+  .nav-item .nav-label { font-size: 8.5px; }
 }
 
 /* ===== PAGE TRANSITIONS ===== */
@@ -1043,6 +1168,14 @@ canvas { max-width: 100%; }
 .avatar-orange { background: linear-gradient(135deg,#FFA726,#E65100); color: white; }
 .avatar-purple { background: linear-gradient(135deg,#AB47BC,#6A1B9A); color: white; }
 .avatar-teal   { background: linear-gradient(135deg,#26A69A,#00695C); color: white; }
+
+/* color-option in modal inherits avatar-* background */
+.color-option.avatar-green  { background: linear-gradient(135deg,#4CAF50,#2E7D32); }
+.color-option.avatar-blue   { background: linear-gradient(135deg,#42A5F5,#1565C0); }
+.color-option.avatar-pink   { background: linear-gradient(135deg,#EC407A,#880E4F); }
+.color-option.avatar-orange { background: linear-gradient(135deg,#FFA726,#E65100); }
+.color-option.avatar-purple { background: linear-gradient(135deg,#AB47BC,#6A1B9A); }
+.color-option.avatar-teal   { background: linear-gradient(135deg,#26A69A,#00695C); }
 
 /* Profile switcher modal / dropdown */
 .profile-dropdown {
@@ -1243,84 +1376,130 @@ canvas { max-width: 100%; }
 </head>
 <body>
 
+<!-- TOP INFO BAR -->
+<div class="top-bar">
+  <span>Pro 1.0.01</span>
+  <span class="top-bar-sep">◆</span>
+  <span>© sebasmobil 2026</span>
+  <span class="top-bar-sep">◆</span>
+  <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3.0</a>
+</div>
+
 <!-- Sidebar Overlay for mobile -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">👶</div>
-    <div>
-      <div class="logo-text">Bebek Takip</div>
-      <div class="logo-sub">Sağlık Günlüğü</div>
-    </div>
+<!-- BOTTOM NAV BAR -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Ana Sayfa</div>
   </div>
-
-  
-  <!-- BABY SWITCHER in sidebar -->
-  <div class="baby-switcher">
-    <div class="baby-switcher-label">Bebekler</div>
-    <div class="baby-list" id="sidebarBabyList"></div>
-    <div class="baby-add-btn" onclick="openAddBabyModal()">
-      <span>➕</span> Bebek Ekle
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPage('olay')" id="nav-olay">
+    <div class="nav-icon">⚡
+      <span class="nav-count" id="count-olay" style="display:none">0</span>
     </div>
+    <div class="nav-label">Olaylar</div>
   </div>
+  <div class="nav-item" onclick="showPage('gelisim')" id="nav-gelisim">
+    <div class="nav-icon">📈
+      <span class="nav-count" id="count-gelisim" style="display:none">0</span>
+    </div>
+    <div class="nav-label">Gelişim</div>
+  </div>
+  <div class="nav-item" onclick="showPage('kontrol')" id="nav-kontrol">
+    <div class="nav-icon">🏥
+      <span class="nav-count" id="count-kontrol" style="display:none">0</span>
+    </div>
+    <div class="nav-label">Kontrol</div>
+  </div>
+  <div class="nav-item" onclick="showPage('gida')" id="nav-gida">
+    <div class="nav-icon">🍼
+      <span class="nav-count" id="count-gida" style="display:none">0</span>
+    </div>
+    <div class="nav-label">Gıda</div>
+  </div>
+  <div class="nav-item" onclick="showPage('gunluk')" id="nav-gunluk">
+    <div class="nav-icon">📔
+      <span class="nav-count" id="count-gunluk" style="display:none">0</span>
+    </div>
+    <div class="nav-label">Günlük</div>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPage('dis')" id="nav-dis">
+    <div class="nav-icon">🦷</div>
+    <div class="nav-label">Diş</div>
+  </div>
+  <div class="nav-item" onclick="showPage('asi')" id="nav-asi">
+    <div class="nav-icon">💉</div>
+    <div class="nav-label">Aşı</div>
+  </div>
+  <div class="nav-item" onclick="showPage('bebekler')" id="nav-bebekler">
+    <div class="nav-icon">👨‍👩‍👧</div>
+    <div class="nav-label">Bebekler</div>
+  </div>
+</nav>
 
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">Ana Menü</div>
-    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
-      <div class="nav-icon">🏠</div>
-      <span>Ana Sayfa</span>
+<!-- SETTINGS / BACKUP DRAWER -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsDrawer()"></div>
+<div class="settings-drawer" id="settingsDrawer">
+  <div class="settings-drawer-handle"></div>
+  <div class="settings-drawer-header">
+    <div class="settings-drawer-title">⚙️ Ayarlar & Yedek</div>
+    <button class="btn btn-secondary btn-sm" onclick="closeSettingsDrawer()">✕</button>
+  </div>
+  <div class="settings-drawer-body">
+    <div class="drawer-tabs">
+      <div class="drawer-tab active" onclick="switchDrawerTab('ayarlar')">⚙️ Ayarlar</div>
+      <div class="drawer-tab" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
     </div>
 
-    <div class="nav-item" onclick="showPage('bebekler')" id="nav-bebekler">
-      <div class="nav-icon">👨‍👩‍👧</div>
-      <span>Bebekler</span>
-    </div>
-    <div class="nav-section-title" style="margin-top:10px">Takip</div>
-    <div class="nav-item" onclick="showPage('olay')" id="nav-olay">
-      <div class="nav-icon">⚡</div>
-      <span>Olaylar</span>
-      <span class="nav-count" id="count-olay">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('gelisim')" id="nav-gelisim">
-      <div class="nav-icon">📈</div>
-      <span>Gelişim</span>
-      <span class="nav-count" id="count-gelisim">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('kontrol')" id="nav-kontrol">
-      <div class="nav-icon">🏥</div>
-      <span>Kontroller</span>
-      <span class="nav-count" id="count-kontrol">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('gida')" id="nav-gida">
-      <div class="nav-icon">🍼</div>
-      <span>Gıda</span>
-      <span class="nav-count" id="count-gida">0</span>
-    </div>
-    <div class="nav-item" onclick="showPage('gunluk')" id="nav-gunluk">
-      <div class="nav-icon">📔</div>
-      <span>Günlük</span>
-      <span class="nav-count" id="count-gunluk">0</span>
+    <!-- Ayarlar Tab -->
+    <div class="drawer-section active" id="drawer-ayarlar">
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">👶 Bebek Adı</label>
+        <input class="form-input" type="text" id="babyNameInput" placeholder="Bebeğin adını girin" />
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">🎂 Doğum Tarihi</label>
+        <input class="form-input" type="date" id="babyBirthInput" />
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label class="form-label">🎨 Tema</label>
+        <select class="form-select" onchange="setTheme(this.value)" id="themeSelect">
+          <option value="light">☀️ Açık Tema</option>
+          <option value="dark">🌙 Karanlık Tema</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Kaydet</button>
     </div>
 
-    <div class="nav-section-title" style="margin-top:10px">Sağlık</div>
-    <div class="nav-item" onclick="showPage('dis')" id="nav-dis">
-      <div class="nav-icon">🦷</div>
-      <span>Diş Takibi</span>
-    </div>
-    <div class="nav-item" onclick="showPage('asi')" id="nav-asi">
-      <div class="nav-icon">💉</div>
-      <span>Aşı Takvimi</span>
-    </div>
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="sidebar-footer-btn" onclick="showPage('yedek')">
-      <span>💾</span> Yedek & Geri Yükle
-    </div>
-    <div class="sidebar-footer-btn" onclick="showPage('ayarlar')">
-      <span>⚙️</span> Ayarlar
+    <!-- Yedek Tab -->
+    <div class="drawer-section" id="drawer-yedek">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div class="backup-card">
+          <div class="backup-icon" style="font-size:36px">💾</div>
+          <div style="font-family:var(--font-display);font-size:16px">Yedek Al</div>
+          <div style="font-size:13px;color:var(--text3)">Tüm verilerinizi JSON olarak indirin</div>
+          <button class="btn btn-primary btn-sm" onclick="exportData()">⬇️ İndir</button>
+        </div>
+        <div class="backup-card">
+          <div class="backup-icon" style="font-size:36px">📂</div>
+          <div style="font-family:var(--font-display);font-size:16px">Geri Yükle</div>
+          <div style="font-size:13px;color:var(--text3)">Aldığınız yedeği yükleyin</div>
+          <label class="btn btn-secondary btn-sm" style="cursor:pointer">
+            ⬆️ Dosya Seç
+            <input type="file" accept=".json" style="display:none" onchange="importData(this)" />
+          </label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">⚠️ Veri Sil</span></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Aktif bebeğin tüm kayıtlarını kalıcı olarak siler. Bu işlem geri alınamaz!</p>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Tüm Verileri Sil</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1330,33 +1509,36 @@ canvas { max-width: 100%; }
   <!-- HEADER -->
   <div class="header">
     <div class="header-left">
-      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-      <div>
-        <div class="header-title" id="headerTitle">Ana Sayfa</div>
-        <div class="header-subtitle" id="headerSubtitle">Hoş geldiniz 👶</div>
+      <div class="header-logo">
+        <div class="logo-icon">👶</div>
+        <div>
+          <div class="logo-text">Bebek Takip</div>
+          <div class="logo-sub" id="headerSubtitle">Hoş geldiniz 👶</div>
+        </div>
       </div>
     </div>
     <div class="header-right">
-      <div class="search-wrapper" id="globalSearchWrapper">
+      <div class="search-wrapper" id="globalSearchWrapper" style="max-width:220px">
         <input class="search-input" type="search" placeholder="Ara..." id="globalSearch" oninput="globalSearchFn(this.value)" />
         <span class="search-icon">🔍</span>
       </div>
       <div style="position:relative">
-      <button class="header-baby-btn" id="headerBabyBtn" onclick="toggleProfileDropdown()">
-        <div class="hb-avatar avatar-green" id="headerBabyAvatar">👶</div>
-        <span id="headerBabyName">Bebek</span>
-        <span class="hb-chevron">▼</span>
-      </button>
-      <div class="profile-dropdown" id="profileDropdown" style="display:none">
-        <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
-        <div id="dropdownBabyList"></div>
-        <div class="profile-dropdown-footer">
-          <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
-          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
+        <button class="header-baby-btn" id="headerBabyBtn" onclick="toggleProfileDropdown()">
+          <div class="hb-avatar avatar-green" id="headerBabyAvatar">👶</div>
+          <span id="headerBabyName">Bebek</span>
+          <span class="hb-chevron">▼</span>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown" style="display:none">
+          <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
+          <div id="dropdownBabyList"></div>
+          <div class="profile-dropdown-footer">
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
+          </div>
         </div>
       </div>
-    </div>
       <button class="theme-toggle" onclick="toggleTheme()" title="Tema Değiştir" id="themeBtn">🌙</button>
+      <button class="btn btn-secondary btn-sm btn-icon" onclick="openSettingsDrawer()" title="Ayarlar & Yedek" style="font-size:16px">⚙️</button>
       <button class="btn btn-primary btn-sm" id="addBtn" onclick="openAddModal()">+ Ekle</button>
     </div>
   </div>
@@ -1699,58 +1881,6 @@ canvas { max-width: 100%; }
       </div>
     </div>
 
-    <!-- YEDEK PAGE -->
-    <div class="page" id="page-yedek">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px">
-        <div class="backup-card">
-          <div class="backup-icon">💾</div>
-          <div style="font-family:var(--font-display);font-size:20px">Yedek Al</div>
-          <div style="font-size:14px;color:var(--text3)">Tüm verilerinizi JSON dosyası olarak indirin</div>
-          <button class="btn btn-primary" onclick="exportData()">⬇️ Yedek İndir</button>
-        </div>
-        <div class="backup-card">
-          <div class="backup-icon">📂</div>
-          <div style="font-family:var(--font-display);font-size:20px">Geri Yükle</div>
-          <div style="font-size:14px;color:var(--text3)">Daha önce aldığınız yedeği yükleyin</div>
-          <label class="btn btn-secondary" style="cursor:pointer">
-            ⬆️ Dosya Seç
-            <input type="file" accept=".json" style="display:none" onchange="importData(this)" />
-          </label>
-        </div>
-      </div>
-      <div class="card" style="max-width:700px;margin-top:20px">
-        <div class="card-header"><span class="card-title">⚠️ Veri Sil</span></div>
-        <div class="card-body">
-          <p style="font-size:14px;color:var(--text2);margin-bottom:14px">Tüm kayıtları kalıcı olarak silmek için aşağıdaki butonu kullanın. Bu işlem geri alınamaz!</p>
-          <button class="btn btn-danger" onclick="clearAllData()">🗑️ Tüm Verileri Sil</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- AYARLAR PAGE -->
-    <div class="page" id="page-ayarlar">
-      <div class="card" style="max-width:500px">
-        <div class="card-header"><span class="card-title">⚙️ Ayarlar</span></div>
-        <div class="card-body">
-          <div class="form-group" style="margin-bottom:16px">
-            <label class="form-label">👶 Bebek Adı</label>
-            <input class="form-input" type="text" id="babyNameInput" placeholder="Bebeğin adını girin" />
-          </div>
-          <div class="form-group" style="margin-bottom:16px">
-            <label class="form-label">🎂 Doğum Tarihi</label>
-            <input class="form-input" type="date" id="babyBirthInput" />
-          </div>
-          <div class="form-group" style="margin-bottom:20px">
-            <label class="form-label">🎨 Tema</label>
-            <select class="form-select" onchange="setTheme(this.value)" id="themeSelect">
-              <option value="light">☀️ Açık Tema</option>
-              <option value="dark">🌙 Karanlık Tema</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="saveSettings()">💾 Kaydet</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1773,34 +1903,310 @@ canvas { max-width: 100%; }
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ===== DATA LAYER =====
-const STORAGE_KEY = 'bebekTakipData_v3';
+// ===== MULTI-BABY DATA LAYER =====
+const PROFILES_KEY = 'bebekTakipProfiles_v1';
+const ACTIVE_KEY   = 'bebekTakipActiveId_v1';
 
-let data = {
-  settings: { babyName: 'Bebe\u011fim', birthDate: '', theme: 'light' },
-  olay: [],
-  gelisim: [],
-  kontrol: [],
-  gida: [],
-  gunluk: [],
-  dis: [],
-  asi: []
-};
+// Avatar renk seçenekleri
+const AVATAR_COLORS = ['green','blue','pink','orange','purple','teal'];
+const BABY_EMOJIS   = ['👶','🍼','🌸','⭐','🐣','🦋','🌈','🐥'];
 
-function loadData() {
+function emptyBabyData(settings) {
+  return {
+    settings: settings || { babyName: 'Bebeğim', birthDate: '', theme: 'light', avatarColor: 'green', avatarEmoji: '👶' },
+    olay: [], gelisim: [], kontrol: [], gida: [], gunluk: [], dis: [], asi: []
+  };
+}
+
+// profiles: { [id]: { id, ...emptyBabyData() } }
+let profiles = {};
+let activeId  = null;
+let data      = emptyBabyData();   // shortcut → profiles[activeId]
+
+/* ── Load / Save ── */
+function loadProfiles() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      data = { ...data, ...parsed };
-    }
-  } catch(e) { console.error('Veri y\u00fckleme hatas\u0131:', e); }
+    const raw = localStorage.getItem(PROFILES_KEY);
+    if (raw) profiles = JSON.parse(raw);
+  } catch(e) { profiles = {}; }
+
+  activeId = localStorage.getItem(ACTIVE_KEY);
+
+  // İlk kullanım: tek profil oluştur
+  if (Object.keys(profiles).length === 0) {
+    const id = genIdStatic();
+    profiles[id] = { id, ...emptyBabyData({ babyName: 'Bebeğim', birthDate: '', theme: 'light', avatarColor: 'green', avatarEmoji: '👶' }) };
+    saveProfiles();
+  }
+
+  // Aktif profil yoksa ilkini seç
+  if (!activeId || !profiles[activeId]) {
+    activeId = Object.keys(profiles)[0];
+    localStorage.setItem(ACTIVE_KEY, activeId);
+  }
+
+  data = profiles[activeId];
+}
+
+function saveProfiles() {
+  try { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); }
+  catch(e) { showToast('Kaydetme hatası!', 'error'); }
 }
 
 function saveData() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch(e) { showToast('Kaydetme hatas\u0131!', 'error'); }
+  profiles[activeId] = data;
+  saveProfiles();
+}
+
+/* ── Aktif bebek değiştir ── */
+function switchBaby(id) {
+  if (!profiles[id]) return;
+  activeId = id;
+  localStorage.setItem(ACTIVE_KEY, id);
+  data = profiles[id];
+  // Temayı yeni bebeğe göre yükle
+  loadTheme();
+  updateCounts();
+  renderDashboard();
+  renderSidebarBabyList();
+  renderDropdownBabyList();
+  updateHeaderBaby();
+  showPage('dashboard');
+  closeDropdown();
+  showToast('👶 ' + (data.settings.babyName || 'Bebek') + ' profiline geçildi!');
+}
+
+/* ── Bebek ekle ── */
+function addBaby(name, birthDate, avatarColor, avatarEmoji) {
+  const id = genIdStatic();
+  profiles[id] = {
+    id,
+    ...emptyBabyData({ babyName: name || 'Bebek', birthDate: birthDate || '', theme: data.settings.theme || 'light', avatarColor: avatarColor || 'green', avatarEmoji: avatarEmoji || '👶' })
+  };
+  saveProfiles();
+  switchBaby(id);
+}
+
+/* ── Bebek sil ── */
+function deleteBaby(id) {
+  if (Object.keys(profiles).length <= 1) { showToast('En az 1 profil olmalı!', 'error'); return; }
+  if (!confirm('Bu bebek profilini ve tüm verilerini kalıcı olarak silmek istiyor musunuz?')) return;
+  delete profiles[id];
+  saveProfiles();
+  if (activeId === id) {
+    activeId = Object.keys(profiles)[0];
+    localStorage.setItem(ACTIVE_KEY, activeId);
+    data = profiles[activeId];
+    loadTheme();
+    updateCounts();
+    renderDashboard();
+  }
+  renderSidebarBabyList();
+  renderDropdownBabyList();
+  renderBabiesGrid();
+  updateHeaderBaby();
+  showToast('Profil silindi!', 'info');
+}
+
+/* ── Bebek düzenle ── */
+function updateBaby(id, name, birthDate, avatarColor, avatarEmoji) {
+  if (!profiles[id]) return;
+  profiles[id].settings.babyName  = name || profiles[id].settings.babyName;
+  profiles[id].settings.birthDate = birthDate;
+  profiles[id].settings.avatarColor = avatarColor || profiles[id].settings.avatarColor;
+  profiles[id].settings.avatarEmoji = avatarEmoji || profiles[id].settings.avatarEmoji;
+  if (id === activeId) data = profiles[id];
+  saveProfiles();
+  renderSidebarBabyList();
+  renderDropdownBabyList();
+  renderBabiesGrid();
+  updateHeaderBaby();
+  showToast('Profil güncellendi! ✨');
+}
+
+/* ── Yaş hesapla ── */
+function calcAge(birthDate) {
+  if (!birthDate) return '';
+  const birth = new Date(birthDate);
+  const now   = new Date();
+  const months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+  if (months < 1)  return Math.max(0, Math.floor((now - birth) / 86400000)) + ' günlük';
+  if (months < 24) return months + ' aylık';
+  return Math.floor(months / 12) + ' yaşında';
+}
+
+/* ── Avatar HTML ── */
+function avatarHtml(p, size = 36, fontSize = 18) {
+  const color = p.settings?.avatarColor || 'green';
+  const emoji = p.settings?.avatarEmoji || '👶';
+  return `<div class="baby-avatar avatar-${color}" style="width:${size}px;height:${size}px;font-size:${fontSize}px">${emoji}</div>`;
+}
+
+/* ── Sidebar bebek listesi (kaldırıldı — artık bottom nav var) ── */
+function renderSidebarBabyList() { /* no-op */ }
+
+/* ── Header dropdown bebek listesi ── */
+function renderDropdownBabyList() {
+  const list = document.getElementById('dropdownBabyList');
+  if (!list) return;
+  list.innerHTML = Object.values(profiles).map(p => `
+    <div class="profile-dropdown-item ${p.id === activeId ? 'active-profile' : ''}" onclick="switchBaby('${p.id}')">
+      ${avatarHtml(p, 32, 16)}
+      <div>
+        <div class="pd-name">${escHtml(p.settings.babyName || 'Bebek')}</div>
+        <div class="pd-age">${calcAge(p.settings.birthDate) || 'Doğum tarihi girilmedi'}</div>
+      </div>
+      ${p.id === activeId ? '<span style="margin-left:auto;color:var(--primary);font-size:16px">✓</span>' : ''}
+    </div>
+  `).join('');
+}
+
+/* ── Header bebek butonu ── */
+function updateHeaderBaby() {
+  const color = data.settings?.avatarColor || 'green';
+  const emoji = data.settings?.avatarEmoji || '👶';
+  const nameEl = document.getElementById('headerBabyName');
+  const avatarEl = document.getElementById('headerBabyAvatar');
+  if (nameEl)   nameEl.textContent = data.settings?.babyName || 'Bebek';
+  if (avatarEl) { avatarEl.className = `hb-avatar avatar-${color}`; avatarEl.textContent = emoji; }
+  const sub = document.getElementById('headerSubtitle');
+  if (sub) sub.textContent = (data.settings?.babyName || 'Bebeğim') + ' · Hoş geldiniz 👶';
+}
+
+/* ── Profil dropdown toggle ── */
+function toggleProfileDropdown() {
+  const dd  = document.getElementById('profileDropdown');
+  const btn = document.getElementById('headerBabyBtn');
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+  if (!isOpen) renderDropdownBabyList();
+}
+
+function closeDropdown() {
+  const dd  = document.getElementById('profileDropdown');
+  const btn = document.getElementById('headerBabyBtn');
+  if (dd) dd.style.display = 'none';
+  if (btn) btn.classList.remove('open');
+}
+
+// Dışarı tıklayınca kapat
+document.addEventListener('click', e => {
+  const wrapper = document.getElementById('headerBabyBtn')?.closest('[style]') || document.getElementById('headerBabyBtn')?.parentElement;
+  if (wrapper && !wrapper.contains(e.target)) closeDropdown();
+});
+
+/* ── Bebek Ekle / Düzenle Modal ── */
+let editingBabyId = null;
+
+function openAddBabyModal(editId) {
+  editingBabyId = editId || null;
+  const p = editId ? profiles[editId] : null;
+  const color = p?.settings?.avatarColor || 'green';
+  const emoji = p?.settings?.avatarEmoji || '👶';
+
+  document.getElementById('modalTitle').innerHTML = editId ? '✏️ Profil Düzenle' : '👶 Yeni Bebek Ekle';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">👶 Bebek Adı *</label>
+        <input class="form-input" type="text" id="bf_name" value="${escHtml(p?.settings?.babyName || '')}" placeholder="Bebeğin adını girin" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎂 Doğum Tarihi</label>
+        <input class="form-input" type="date" id="bf_birth" value="${p?.settings?.birthDate || ''}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎨 Avatar Rengi</label>
+        <div class="color-picker" id="bf_colorPicker">
+          ${AVATAR_COLORS.map(c => `
+            <div class="color-option avatar-${c} ${c === color ? 'selected' : ''}"
+                 style="background:var(--avatar-${c}, '')"
+                 onclick="selectAvatarColor('${c}')" data-color="${c}" title="${c}">
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">😊 Avatar Emoji</label>
+        <div class="emoji-picker" id="bf_emojiPicker">
+          ${BABY_EMOJIS.map(em => `
+            <div class="emoji-option ${em === emoji ? 'selected' : ''}"
+                 onclick="selectAvatarEmoji('${em}')">${em}</div>
+          `).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+    <button class="btn btn-primary" onclick="saveBabyProfile()">💾 Kaydet</button>
+  `;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function selectAvatarColor(c) {
+  document.querySelectorAll('#bf_colorPicker .color-option').forEach(el => el.classList.toggle('selected', el.dataset.color === c));
+}
+
+function selectAvatarEmoji(em) {
+  document.querySelectorAll('#bf_emojiPicker .emoji-option').forEach(el => el.classList.toggle('selected', el.textContent === em));
+}
+
+function getSelectedColor() {
+  return document.querySelector('#bf_colorPicker .color-option.selected')?.dataset.color || 'green';
+}
+
+function getSelectedEmoji() {
+  return document.querySelector('#bf_emojiPicker .emoji-option.selected')?.textContent || '👶';
+}
+
+function saveBabyProfile() {
+  const name  = document.getElementById('bf_name')?.value.trim();
+  const birth = document.getElementById('bf_birth')?.value;
+  const color = getSelectedColor();
+  const emoji = getSelectedEmoji();
+  if (!name) { showToast('Bebek adı zorunlu!', 'error'); return; }
+
+  if (editingBabyId) {
+    updateBaby(editingBabyId, name, birth, color, emoji);
+  } else {
+    addBaby(name, birth, color, emoji);
+  }
+  closeModal();
+  if (currentPage === 'bebekler') renderBabiesGrid();
+}
+
+/* ── Bebekler Grid Sayfası ── */
+function renderBabiesGrid() {
+  const grid = document.getElementById('babiesGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.values(profiles).map(p => `
+    <div class="baby-card ${p.id === activeId ? 'active-baby-card' : ''}" onclick="switchBaby('${p.id}')">
+      ${p.id === activeId ? '<div class="baby-card-active-badge">✓ Aktif</div>' : ''}
+      <div class="baby-card-actions">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="event.stopPropagation();openAddBabyModal('${p.id}')" title="Düzenle">✏️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();deleteBaby('${p.id}')" title="Sil">🗑️</button>
+      </div>
+      <div class="baby-card-avatar avatar-${p.settings?.avatarColor || 'green'}" style="font-size:36px">${p.settings?.avatarEmoji || '👶'}</div>
+      <div class="baby-card-name">${escHtml(p.settings?.babyName || 'Bebek')}</div>
+      <div class="baby-card-age">${calcAge(p.settings?.birthDate) || 'Doğum tarihi girilmedi'}</div>
+      <div class="baby-card-stats">
+        <span>⚡ ${(p.olay||[]).length}</span>
+        <span>📈 ${(p.gelisim||[]).length}</span>
+        <span>💉 ${(p.asi||[]).length}</span>
+      </div>
+    </div>
+  `).join('') + `
+    <div class="add-baby-card" onclick="openAddBabyModal()">
+      <div class="add-icon">➕</div>
+      <div>Yeni Bebek Ekle</div>
+    </div>`;
+}
+
+// Static genId (no dependency on data)
+function genIdStatic() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
 // ===== TURKISH SEARCH =====
@@ -1818,9 +2224,7 @@ function trSearch(text, query) {
 }
 
 // ===== ID GENERATION =====
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
+function genId() { return genIdStatic(); }
 
 // ===== CURRENT PAGE =====
 let currentPage = 'dashboard';
@@ -1854,6 +2258,7 @@ function setTheme(theme) {
 // ===== NAVIGATION =====
 const pageMeta = {
   dashboard: { title: 'Ana Sayfa', sub: 'Genel bak\u0131\u015f', icon: '🏠' },
+  bebekler:  { title: 'Bebek Profilleri', sub: 'T\u00fcm bebekler', icon: '👨‍👩‍👧' },
   olay: { title: 'Olaylar', sub: 'Sa\u011fl\u0131k ve geli\u015fim olaylar\u0131', icon: '⚡' },
   gelisim: { title: 'Geli\u015fim', sub: 'Boy, kilo ve ba\u015f \u00e7evresi', icon: '📈' },
   kontrol: { title: 'Doktor Kontrolleri', sub: 'Hastane ve poliklinik ziyaretleri', icon: '🏥' },
@@ -1878,13 +2283,15 @@ function showPage(page) {
 
   currentPage = page;
   const meta = pageMeta[page] || { title: page, sub: '', icon: '' };
-  document.getElementById('headerTitle').textContent = meta.icon + ' ' + meta.title;
-  document.getElementById('headerSubtitle').textContent = data.settings.babyName ? data.settings.babyName + ' · ' + meta.sub : meta.sub;
+
+  // Update header subtitle
+  const sub = document.getElementById('headerSubtitle');
+  if (sub) sub.textContent = (data.settings?.babyName || 'Bebeğim') + ' · ' + meta.sub;
 
   // Update add button
   const addBtn = document.getElementById('addBtn');
-  const noAddPages = ['dashboard', 'yedek', 'ayarlar'];
-  addBtn.style.display = noAddPages.includes(page) ? 'none' : '';
+  const noAddPages = ['dashboard', 'yedek', 'ayarlar', 'bebekler'];
+  if (addBtn) addBtn.style.display = noAddPages.includes(page) ? 'none' : '';
 
   // Render page
   if (page === 'dashboard') renderDashboard();
@@ -1895,22 +2302,33 @@ function showPage(page) {
   else if (page === 'gunluk') renderTable('gunluk');
   else if (page === 'dis') renderDisPage();
   else if (page === 'asi') renderTable('asi');
-  else if (page === 'ayarlar') loadSettings();
-
-  // Mobile: close sidebar
-  if (window.innerWidth < 900) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.remove('visible');
-  }
+  else if (page === 'ayarlar') openSettingsDrawer();
+  else if (page === 'bebekler') renderBabiesGrid();
 }
 
-// ===== SIDEBAR MOBILE =====
-function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const ov = document.getElementById('sidebarOverlay');
-  sb.classList.toggle('open');
-  ov.classList.toggle('visible');
+// ===== SETTINGS DRAWER =====
+function openSettingsDrawer() {
+  loadSettings();
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.getElementById('settingsDrawer').classList.add('open');
 }
+function closeSettingsDrawer() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.getElementById('settingsDrawer').classList.remove('open');
+}
+function switchDrawerTab(tab) {
+  document.querySelectorAll('.drawer-tab').forEach((el, i) => {
+    const tabs = ['ayarlar','yedek'];
+    el.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.drawer-section').forEach(el => el.classList.remove('active'));
+  const sec = document.getElementById('drawer-' + tab);
+  if (sec) sec.classList.add('active');
+  if (tab === 'ayarlar') loadSettings();
+}
+
+// ===== SIDEBAR MOBILE (stub — no sidebar anymore) =====
+function toggleSidebar() {}
 
 // ===== TOAST =====
 function showToast(msg, type = 'success') {
@@ -2564,7 +2982,10 @@ function renderGrowthChart(metric = 'weight') {
 function updateCounts() {
   ['olay','gelisim','kontrol','gida','gunluk'].forEach(s => {
     const el = document.getElementById('count-' + s);
-    if (el) el.textContent = data[s].length;
+    if (!el) return;
+    const n = data[s].length;
+    el.textContent = n;
+    el.style.display = n > 0 ? 'flex' : 'none';
   });
 }
 
@@ -2583,14 +3004,14 @@ function globalSearchFn(query) {
 
 // ===== BACKUP & RESTORE =====
 function exportData() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ profiles, activeId }, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = `bebek-takip-yedek-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Yedek ba\u015far\u0131yla indirildi! 💾');
+  showToast('Yedek başarıyla indirildi! 💾');
 }
 
 function importData(input) {
@@ -2600,80 +3021,217 @@ function importData(input) {
   reader.onload = e => {
     try {
       const imported = JSON.parse(e.target.result);
-      if (!confirm('Mevcut veriler silinecek ve yedek y\u00fcklenecek. Onayl\u0131yor musunuz?')) return;
-      data = { ...data, ...imported };
-      saveData();
-      updateCounts();
-      renderDashboard();
-      showToast('Veriler ba\u015far\u0131yla geri y\u00fcklendi! 🎉');
-    } catch { showToast('Ge\u00e7ersiz dosya format\u0131!', 'error'); }
+      if (!confirm('Mevcut veriler silinecek ve yedek yüklenecek. Onaylıyor musunuz?')) return;
+      if (imported.profiles) {
+        profiles = imported.profiles;
+        activeId = imported.activeId || Object.keys(profiles)[0];
+      } else {
+        // Eski format (tek bebek)
+        const id = genIdStatic();
+        profiles = { [id]: { id, ...imported } };
+        activeId = id;
+      }
+      localStorage.setItem(ACTIVE_KEY, activeId);
+      saveProfiles();
+      data = profiles[activeId];
+      loadTheme(); updateCounts(); renderDashboard();
+      renderSidebarBabyList(); renderDropdownBabyList(); updateHeaderBaby();
+      showToast('Veriler başarıyla geri yüklendi! 🎉');
+    } catch { showToast('Geçersiz dosya formatı!', 'error'); }
     input.value = '';
   };
   reader.readAsText(file);
 }
 
 function clearAllData() {
-  if (!confirm('T\u00dcM verileri kal\u0131c\u0131 olarak silmek istedi\u011finizden emin misiniz?\nBu i\u015flem geri al\u0131namaz!')) return;
+  if (!confirm('Aktif bebeğin TÜM verilerini kalıcı olarak silmek istediğinizden emin misiniz?\nBu işlem geri alınamaz!')) return;
   const settings = { ...data.settings };
-  data = { settings, olay: [], gelisim: [], kontrol: [], gida: [], gunluk: [], dis: [], asi: [] };
-  saveData();
+  data = { ...emptyBabyData(settings) };
+  profiles[activeId] = data;
+  saveProfiles();
   updateCounts();
   renderDashboard();
-  showToast('T\u00fcm veriler silindi!', 'info');
+  showToast('Tüm veriler silindi!', 'info');
 }
 
 // ===== SETTINGS =====
 function loadSettings() {
-  const nameInput = document.getElementById('babyNameInput');
+  const nameInput  = document.getElementById('babyNameInput');
   const birthInput = document.getElementById('babyBirthInput');
-  if (nameInput) nameInput.value = data.settings.babyName || '';
+  const themeSelect = document.getElementById('themeSelect');
+  if (nameInput)  nameInput.value  = data.settings.babyName  || '';
   if (birthInput) birthInput.value = data.settings.birthDate || '';
+  if (themeSelect) themeSelect.value = data.settings.theme || 'light';
 }
 
 function saveSettings() {
-  data.settings.babyName = document.getElementById('babyNameInput')?.value || data.settings.babyName;
+  data.settings.babyName  = document.getElementById('babyNameInput')?.value  || data.settings.babyName;
   data.settings.birthDate = document.getElementById('babyBirthInput')?.value || data.settings.birthDate;
   saveData();
+  updateHeaderBaby();
+  renderSidebarBabyList();
+  renderDropdownBabyList();
   showToast('Ayarlar kaydedildi! ✨');
 }
 
 // ===== SAMPLE DATA =====
 function loadSampleData() {
   if (data.olay.length > 0 || data.gelisim.length > 0) return;
-  // Add sample data from the images
-  data.olay.push({ id: genId(), tarih: '2019-07-23', saat: '20:00', olay: 'Titreme', not: 'Saat 20:00 5-7 saniye \u0130lk 2 g\u00fcn emmeden \u00f6nce 37-37.1 emip terliyor, 5 6 sn titredikten sonra 36.3 ate\u015f.' });
+  data.olay.push({ id: genId(), tarih: '2019-07-23', saat: '20:00', olay: 'Titreme', not: 'Saat 20:00 5-7 saniye İlk 2 gün emmeden önce 37-37.1 emip terliyor, 5 6 sn titredikten sonra 36.3 ateş.' });
   data.gelisim.push({ id: genId(), tarih: '2018-12-12', boy: '', agirlik: '0.830', bas: '', notlar: '' });
-  data.kontrol.push({ id: genId(), tarih: '2018-12-19', hastane: 'Sultan Hastanesi', doktor: '\u00d6zg\u00fcr \u00d6zkul', teshis: 'Kan uyu\u015fmazl\u0131\u011f\u0131', tedavi: 'Kan uyu\u015fmazl\u0131\u011f\u0131 i\u011fnesi yap\u0131ld\u0131', ilac: 'RHOGAM ANT\u0130 RH IMMUN 1 FLOKAN', tetkik: '', not: 'Saat 17 civar\u0131', doktorPuan: 5, hastanePuan: 2 });
-  data.gida.push({ id: genId(), tarih: '2019-08-24', saat: '13:10', tur: 'Sebze', adi: 'Sebze kar\u0131\u015f\u0131m\u0131 \u00e7orba', icerik: 'Kabak patates su', miktar: '1,5 tatl\u0131 ka\u015f\u0131\u011f\u0131', alerji: '', not: '\u0130lk yemek 10 dk s\u00fcrd\u00fc. Sevdi' });
-  data.gunluk.push({ id: genId(), tarih: '2018-12-28', baslik: 'Babam ile ilk oyunumu oynad\u0131m', not: 'Babam\u0131n sesleni\u015fine Annemin karn\u0131nda tepki vererek oyun oynad\u0131k 😊' });
-  data.asi.push({ id: genId(), tarih: '2019-03-07', donem: 'Do\u011fumda', asi: 'Hep B (Hepatit B)', durum: 'Uyguland\u0131', aciklama: 'Do\u011fumda uyguland\u0131' });
-  data.asi.push({ id: genId(), tarih: '2019-04-06', donem: '1. Ay\u0131n Sonu', asi: 'Hep B (Hepatit B)', durum: 'Uyguland\u0131', aciklama: '' });
-  data.asi.push({ id: genId(), tarih: '2019-05-06', donem: '2. Ay\u0131n Sonu', asi: 'BCG', durum: 'Uyguland\u0131', aciklama: '' });
-  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sa\u011f', cikma: '2019-08-28', not: '' });
-  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sol', cikma: '2019-09-03', not: '' });
-  saveData();
+  data.kontrol.push({ id: genId(), tarih: '2018-12-19', hastane: 'Sultan Hastanesi', doktor: 'Özgür Özkul', teshis: 'Kan uyuşmazlığı', tedavi: 'Kan uyuşmazlığı iğnesi yapıldı', ilac: 'RHOGAM ANTİ RH IMMUN 1 FLOKAN', tetkik: '', not: 'Saat 17 civarı', doktorPuan: 5, hastanePuan: 2 });
+  data.gida.push({ id: genId(), tarih: '2019-08-24', saat: '13:10', tur: 'Sebze', adi: 'Sebze karışımı çorba', icerik: 'Kabak patates su', miktar: '1,5 tatlı kaşığı', alerji: '', not: 'İlk yemek 10 dk sürdü. Sevdi' });
+  data.gunluk.push({ id: genId(), tarih: '2018-12-28', baslik: 'Babam ile ilk oyunumu oynadım', not: 'Babamın seslenişine Annemin karnında tepki vererek oyun oynadık 😊' });
+  data.asi.push({ id: genId(), tarih: '2019-03-07', donem: 'Doğumda', asi: 'Hep B (Hepatit B)', durum: 'Uygulandı', aciklama: 'Doğumda uygulandı' });
+  data.asi.push({ id: genId(), tarih: '2019-04-06', donem: '1. Ayın Sonu', asi: 'Hep B (Hepatit B)', durum: 'Uygulandı', aciklama: '' });
+  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sağ', cikma: '2019-08-28', not: '' });
+  profiles[activeId] = data;
+  saveProfiles();
 }
 
 // ===== INIT =====
 function init() {
-  loadData();
+  loadProfiles();
   loadSampleData();
   loadTheme();
   updateCounts();
   renderDashboard();
+  renderSidebarBabyList();
+  renderDropdownBabyList();
+  updateHeaderBaby();
 
   // Load Chart.js dynamically
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
   script.onload = () => setTimeout(renderGrowthChart, 200);
   document.head.appendChild(script);
-
-  // Update header subtitle with baby name
-  const sub = document.getElementById('headerSubtitle');
-  if (sub) sub.textContent = (data.settings.babyName || 'Bebe\u011fim') + ' · Ho\u015f geldiniz 👶';
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ===== PWA SETUP =====
+(function setupPWA() {
+
+  /* ── İkon üret (canvas ile) ── */
+  function makeIcon(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    const r = size * 0.18; // köşe yarıçapı
+
+    // Arka plan — yeşil gradient
+    const grd = ctx.createLinearGradient(0, 0, size, size);
+    grd.addColorStop(0, '#66BB6A');
+    grd.addColorStop(1, '#2E7D32');
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(size - r, 0);
+    ctx.quadraticCurveTo(size, 0, size, r);
+    ctx.lineTo(size, size - r);
+    ctx.quadraticCurveTo(size, size, size - r, size);
+    ctx.lineTo(r, size);
+    ctx.quadraticCurveTo(0, size, 0, size - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // İç beyaz daire
+    const cx = size / 2, cy = size / 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, size * 0.32, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fill();
+
+    // Emoji 👶
+    const em = size * 0.48;
+    ctx.font = `${em}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // Hafif gölge
+    ctx.shadowColor = 'rgba(0,0,0,0.25)';
+    ctx.shadowBlur = size * 0.04;
+    ctx.fillText('👶', cx, cy + size * 0.03);
+
+    return c.toDataURL('image/png');
+  }
+
+  // İkon boyutları: 192 ve 512 manifest için; 180 apple-touch-icon için
+  const icon192  = makeIcon(192);
+  const icon512  = makeIcon(512);
+  const icon180  = makeIcon(180);
+  const icon32   = makeIcon(32);
+
+  // Apple touch icon
+  const atEl = document.getElementById('appleTouchIcon');
+  if (atEl) atEl.href = icon180;
+
+  // Favicon
+  const favEl = document.getElementById('faviconLink');
+  if (favEl) favEl.href = icon32;
+
+  /* ── Web App Manifest (blob URL) ── */
+  const manifest = {
+    name: 'Bebek Takip Pro',
+    short_name: 'Bebek Takip',
+    description: 'Bebeğinizin sağlık ve gelişim günlüğü',
+    start_url: '.',
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    background_color: '#F0F4F8',
+    theme_color: '#4CAF50',
+    lang: 'tr',
+    categories: ['health', 'lifestyle'],
+    icons: [
+      { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ]
+  };
+
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestURL  = URL.createObjectURL(manifestBlob);
+  const linkEl = document.createElement('link');
+  linkEl.rel  = 'manifest';
+  linkEl.href = manifestURL;
+  document.head.appendChild(linkEl);
+
+  /* ── Service Worker (offline cache) ── */
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'bebek-takip-v1';
+const ASSETS = [self.location.href.replace('/sw-inline.js','')];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(()=>{}));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }).catch(() => cached))
+  );
+});
+`;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swURL  = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL, { scope: './' })
+      .catch(() => {}); // blob SW bazı tarayıcılarda scope kısıtlaması olabilir
+  }
+
+})();
 </script>
 </body>
 </html>
