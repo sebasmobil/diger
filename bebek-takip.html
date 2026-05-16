@@ -2,732 +2,2678 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bebek Takip Uygulaması</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f6fa;--bg2:#fff;--bg3:#eef0f5;--text:#1a1a2e;--text2:#444;--text3:#888;
-  --border:#e0e4ef;--accent:#7C6FDE;--accent2:#5CB8B2;--accent3:#F4845F;--accent4:#E8A838;
-  --card:#fff;--nav:#fff;--navborder:#e8eaf5;--shadow:0 2px 12px rgba(0,0,0,.07);
+/* ===== FONTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Fredoka+One&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --primary: #4CAF50;
+  --primary-dark: #388E3C;
+  --primary-light: #A5D6A7;
+  --accent: #FF7043;
+  --accent2: #42A5F5;
+  --accent3: #AB47BC;
+  --accent4: #FFA726;
+
+  --bg: #F0F4F8;
+  --card: #FFFFFF;
+  --card2: #F8FAFC;
+  --text: #1A2332;
+  --text2: #4A5568;
+  --text3: #8896A0;
+  --border: #E2E8F0;
+  --shadow: rgba(0,0,0,0.08);
+  --shadow-md: rgba(0,0,0,0.14);
+
+  --sidebar-bg: #FFFFFF;
+  --header-bg: #FFFFFF;
+  --input-bg: #F7FAFC;
+  --input-border: #CBD5E0;
+  --modal-overlay: rgba(0,0,0,0.5);
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: 'Nunito', Arial, sans-serif;
+  --font-display: 'Fredoka One', Arial, sans-serif;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.dark{
-  --bg:#0f1117;--bg2:#171a24;--bg3:#1e2130;--text:#e8eaf5;--text2:#aab;--text3:#778;
-  --border:#2a2d3e;--card:#1a1d2a;--nav:#141620;--navborder:#252840;--shadow:0 2px 12px rgba(0,0,0,.3);
+
+[data-theme="dark"] {
+  --bg: #0F172A;
+  --card: #1E293B;
+  --card2: #162032;
+  --text: #F1F5F9;
+  --text2: #CBD5E0;
+  --text3: #64748B;
+  --border: #334155;
+  --shadow: rgba(0,0,0,0.3);
+  --shadow-md: rgba(0,0,0,0.5);
+  --sidebar-bg: #1E293B;
+  --header-bg: #1E293B;
+  --input-bg: #0F172A;
+  --input-border: #334155;
+  --modal-overlay: rgba(0,0,0,0.7);
 }
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;font-size:14px}
-.app{display:flex;flex-direction:column;min-height:100vh}
-.header{background:var(--nav);border-bottom:1px solid var(--navborder);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:300;box-shadow:var(--shadow);gap:10px}
-.logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0}
-.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 3px 10px rgba(124,111,222,.35)}
-.profile-bar{display:flex;align-items:center;gap:6px;flex:1;overflow-x:auto;scrollbar-width:none;min-width:0}
-.profile-bar::-webkit-scrollbar{display:none}
-.profile-chip{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 7px;border-radius:30px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .2s;white-space:nowrap;font-size:13px;font-weight:600;color:var(--text2);flex-shrink:0;user-select:none}
-.profile-chip:hover{border-color:var(--accent);background:var(--bg2)}
-.profile-chip.active{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(124,111,222,.4)}
-.chip-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.add-profile-btn{width:32px;height:32px;border-radius:50%;border:2px dashed var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text3);transition:all .2s;flex-shrink:0}
-.add-profile-btn:hover{border-color:var(--accent);color:var(--accent)}
-.header-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.theme-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 11px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .2s;font-weight:500;white-space:nowrap}
-.theme-btn:hover{background:var(--border)}
-.import-btn{background:var(--accent);border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font-size:12px;color:#fff;font-weight:600;transition:all .2s;box-shadow:0 3px 10px rgba(124,111,222,.35);white-space:nowrap}
-.import-btn:hover{opacity:.9}
-.profile-banner{padding:10px 20px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.banner-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.banner-name{font-size:15px;font-weight:700;color:var(--text)}
-.banner-sub{font-size:12px;color:var(--text3);margin-top:1px}
-.banner-actions{display:flex;gap:7px;margin-left:auto}
-.banner-btn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 11px;cursor:pointer;font-size:12px;color:var(--text2);font-weight:500;transition:all .2s}
-.banner-btn:hover{border-color:var(--accent);color:var(--accent)}
-.banner-btn.danger:hover{border-color:#ef4444;color:#ef4444}
-.nav{background:var(--nav);border-bottom:1px solid var(--navborder);padding:0 16px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav-item{padding:13px 14px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;user-select:none}
-.nav-item:hover{color:var(--text2)}
-.nav-item.active{color:var(--accent);border-bottom-color:var(--accent)}
-.main{flex:1;padding:20px;max-width:1140px;margin:0 auto;width:100%}
-.section{display:none;animation:fadeIn .25s ease}
-.section.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:900px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:box-shadow .2s}
-.card:hover{box-shadow:var(--shadow)}
-.stat-card{padding:15px 17px}
-.stat-card .label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
-.stat-card .value{font-size:30px;font-weight:700;line-height:1}
-.stat-card .sub{font-size:12px;color:var(--text3);margin-top:5px}
-.section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px}
-.chart-wrap{position:relative;width:100%;height:280px}
-.chart-sm{position:relative;width:100%;height:210px}
-.list-item{padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
-.list-item:last-child{border-bottom:none}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.badge-purple{background:#ede9fc;color:#5b21b6}.dark .badge-purple{background:#312e81;color:#c4b5fd}
-.badge-teal{background:#d1fae5;color:#065f46}.dark .badge-teal{background:#064e3b;color:#6ee7b7}
-.badge-orange{background:#fff7ed;color:#c2410c}.dark .badge-orange{background:#431407;color:#fdba74}
-.badge-blue{background:#eff6ff;color:#1d4ed8}.dark .badge-blue{background:#1e3a5f;color:#93c5fd}
-.badge-pink{background:#fdf2f8;color:#9d174d}.dark .badge-pink{background:#4a0428;color:#f9a8d4}
-.badge-green{background:#d1fae5;color:#065f46}.dark .badge-green{background:#064e3b;color:#6ee7b7}
-.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.progress-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:8px}
-.progress-fill{height:100%;border-radius:4px;transition:width 1s ease}
-.tooth-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:6px 0}
-.tooth{width:100%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:transform .2s;cursor:default}
-.tooth:hover{transform:scale(1.1)}
-.tooth.out{background:#d1fae5;color:#065f46;border:1.5px solid #6ee7b7}
-.dark .tooth.out{background:#064e3b;color:#6ee7b7;border-color:#065f46}
-.tooth.fell{background:#ffe4e6;color:#be123c;border:1.5px solid #fca5a5}
-.dark .tooth.fell{background:#4c0519;color:#fda4af;border-color:#be123c}
-.tooth.empty{background:var(--bg2);color:var(--text3);border:1.5px dashed var(--border)}
-.tabs{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg3);color:var(--text2);border:1px solid var(--border);transition:all .2s;font-weight:500}
-.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 3px 8px rgba(124,111,222,.3)}
-.mini-table{width:100%;font-size:13px;border-collapse:collapse}
-.mini-table th{text-align:left;color:var(--text3);font-weight:600;font-size:11px;padding:9px 7px;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.4px}
-.mini-table td{padding:10px 7px;border-bottom:1px solid var(--border);color:var(--text2)}
-.mini-table tr:last-child td{border-bottom:none}
-.mini-table tr:hover td{background:var(--bg3)}
-.mini-table .val{font-weight:700;color:var(--text)}
-.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
-.empty-icon{font-size:42px;margin-bottom:12px;opacity:.7}
-.form-group{margin-bottom:14px}
-.form-label{font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px}
-.form-input,.form-select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font-size:14px;outline:none;transition:border .2s;font-family:inherit}
-.form-input:focus,.form-select:focus{border-color:var(--accent);background:var(--card)}
-textarea.form-input{resize:vertical;min-height:70px}
-.submit-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:all .2s;box-shadow:0 4px 12px rgba(124,111,222,.3);font-family:inherit}
-.submit-btn:hover{opacity:.9;transform:translateY(-1px)}
-.log-item{padding:9px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.log-item:last-child{border-bottom:none}
-.color-strip{width:4px;height:32px;border-radius:2px;flex-shrink:0}
-.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.page-header h2{font-size:18px;font-weight:700;color:var(--text)}
-/* NO PROFILE */
-.no-profile{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;text-align:center;padding:40px}
-.no-profile-icon{font-size:70px;margin-bottom:20px;animation:bounce 2s ease infinite}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.no-profile h2{font-size:22px;font-weight:700;margin-bottom:10px}
-.no-profile p{font-size:14px;color:var(--text3);margin-bottom:28px;max-width:340px;line-height:1.7}
-.big-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(124,111,222,.4);transition:all .2s;font-family:inherit}
-.big-btn:hover{opacity:.9;transform:translateY(-2px)}
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;animation:ovIn .2s}
-.overlay.hidden{display:none}
-@keyframes ovIn{from{opacity:0}to{opacity:1}}
-.modal{background:var(--card);border-radius:16px;padding:26px;width:420px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:mdIn .22s ease}
-@keyframes mdIn{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
-.modal h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:18px}
-.emoji-picker{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-bottom:14px}
-.emoji-opt{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.emoji-opt:hover,.emoji-opt.sel{border-color:var(--accent);background:var(--bg2);transform:scale(1.1)}
-.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.color-opt{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s}
-.color-opt:hover,.color-opt.sel{border-color:var(--text);transform:scale(1.15)}
-.modal-actions{display:flex;gap:9px;margin-top:18px}
-.mbtn{flex:1;padding:10px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:inherit}
-.mbtn.primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(124,111,222,.3)}
-.mbtn.primary:hover{opacity:.9}
-.mbtn.secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
-.mbtn.secondary:hover{background:var(--border)}
-.mbtn.del{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
-.dark .mbtn.del{background:#4c0519;color:#fda4af;border-color:#be123c}
-.mbtn.del:hover{background:#fca5a5}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+.animate-fadeInUp { animation: fadeInUp 0.5s ease forwards; }
+.animate-fadeIn { animation: fadeIn 0.4s ease forwards; }
+.animate-scaleIn { animation: scaleIn 0.3s ease forwards; }
+.animate-slideLeft { animation: slideInLeft 0.4s ease forwards; }
+
+/* ===== LAYOUT ===== */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: var(--transition);
+  box-shadow: 2px 0 20px var(--shadow);
+}
+.sidebar-logo {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  animation: heartbeat 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.sidebar-logo .logo-text {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.sidebar-logo .logo-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+.nav-section-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 10px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 2px;
+  color: var(--text2);
+  font-weight: 600;
+  font-size: 14px;
+  user-select: none;
+}
+.nav-item:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+.nav-item.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(76,175,80,0.35);
+}
+.nav-item .nav-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  background: rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+.nav-item.active .nav-icon {
+  background: rgba(255,255,255,0.2);
+}
+.nav-count {
+  margin-left: auto;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.nav-item.active .nav-count {
+  background: rgba(255,255,255,0.3);
+  color: white;
+}
+
+.sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sidebar-footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text2);
+  font-weight: 600;
+  font-size: 13px;
+  user-select: none;
+}
+.sidebar-footer-btn:hover { background: var(--bg); color: var(--text); }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: var(--transition);
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+}
+.header-subtitle {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 14px;
+  transition: var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(76,175,80,0.35);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76,175,80,0.45);
+}
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: var(--bg);
+  transform: translateY(-1px);
+}
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+.btn-danger:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.btn-sm {
+  padding: 6px 13px;
+  font-size: 12px;
+}
+.btn-icon {
+  width: 36px; height: 36px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  justify-content: center;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+  padding: 28px;
+  flex: 1;
+}
+
+/* ===== SEARCH BAR ===== */
+.search-wrapper {
+  position: relative;
+  max-width: 340px;
+}
+.search-input {
+  width: 100%;
+  padding: 9px 36px 9px 14px;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  transition: var(--transition);
+  outline: none;
+}
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.15);
+}
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 15px;
+}
+
+/* ===== STATS CARDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: var(--transition);
+  animation: fadeInUp 0.5s ease forwards;
+  cursor: pointer;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px var(--shadow-md);
+}
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.stat-info .stat-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1;
+}
+.stat-info .stat-label {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+.card:hover {
+  box-shadow: 0 6px 22px var(--shadow-md);
+}
+.card-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--text);
+}
+.card-body {
+  padding: 18px 22px;
+}
+
+/* ===== TABLE ===== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+thead th {
+  background: var(--bg);
+  color: var(--text2);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 14px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  animation: fadeIn 0.3s ease forwards;
+}
+tbody tr:hover { background: var(--bg); }
+tbody tr:last-child { border-bottom: none; }
+td {
+  padding: 12px 14px;
+  color: var(--text);
+  vertical-align: middle;
+}
+.td-actions {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* ===== BADGE ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge-green { background: rgba(76,175,80,0.15); color: #2E7D32; }
+.badge-blue { background: rgba(66,165,245,0.15); color: #1565C0; }
+.badge-orange { background: rgba(255,167,38,0.15); color: #E65100; }
+.badge-red { background: rgba(239,68,68,0.15); color: #C62828; }
+.badge-purple { background: rgba(171,71,188,0.15); color: #6A1B9A; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+.modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 580px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  animation: scaleIn 0.25s ease;
+}
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  z-index: 10;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-body {
+  padding: 22px 24px;
+}
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--card);
+  position: sticky;
+  bottom: 0;
+}
+
+/* ===== FORM ===== */
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+.form-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  transition: var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.15);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238896A0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* ===== TOAST ===== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 30px var(--shadow-md);
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 280px;
+  animation: slideInRight 0.3s ease;
+  border-left: 4px solid var(--primary);
+}
+.toast.success { border-color: var(--primary); }
+.toast.error { border-color: #ef4444; }
+.toast.info { border-color: var(--accent2); }
+.toast-icon { font-size: 18px; }
+
+/* ===== DASHBOARD ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+.recent-list { display: flex; flex-direction: column; gap: 0; }
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  animation: fadeInUp 0.4s ease forwards;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.recent-item:hover { padding-left: 6px; }
+.recent-item:last-child { border-bottom: none; }
+.recent-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.recent-info { flex: 1; min-width: 0; }
+.recent-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.recent-date { font-size: 12px; color: var(--text3); white-space: nowrap; }
+
+/* ===== CHART ===== */
+.chart-area {
+  position: relative;
+  height: 220px;
+  margin-top: 10px;
+}
+canvas { max-width: 100%; }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-align: center;
+}
+.quick-action:hover {
+  border-color: var(--primary);
+  background: rgba(76,175,80,0.06);
+  color: var(--primary);
+  transform: scale(1.03);
+}
+.quick-action .qa-icon { font-size: 24px; }
+
+/* ===== GROWTH CHART ===== */
+.growth-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.growth-metric {
+  flex: 1;
+  text-align: center;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.growth-metric .gm-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--primary);
+}
+.growth-metric .gm-lbl { font-size: 11px; color: var(--text3); font-weight: 700; }
+
+/* ===== VACCINE TABLE ===== */
+.vaccine-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.vs-done { background: rgba(76,175,80,0.15); color: #2E7D32; }
+.vs-pending { background: rgba(255,167,38,0.15); color: #E65100; }
+.vs-planned { background: rgba(66,165,245,0.15); color: #1565C0; }
+
+/* ===== TOOTH TRACKER ===== */
+.tooth-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin: 12px 0;
+}
+.tooth-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid var(--border);
+  background: var(--card);
+  gap: 2px;
+  padding: 4px 2px;
+}
+.tooth-cell:hover { transform: scale(1.08); }
+.tooth-cell.erupted { background: rgba(76,175,80,0.15); border-color: var(--primary); color: var(--primary); }
+.tooth-cell.not-erupted { background: var(--bg); color: var(--text3); }
+.tooth-cell .tooth-emoji { font-size: 16px; }
+.tooth-label { font-size: 8px; color: var(--text3); text-align: center; margin-top: 4px; }
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: var(--transition);
+}
+.theme-toggle:hover {
+  background: var(--bg);
+  transform: rotate(20deg);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+  animation: fadeIn 0.5s ease;
+}
+.empty-state .es-icon { font-size: 60px; margin-bottom: 16px; animation: bounce 2s ease infinite; }
+.empty-state .es-title { font-family: var(--font-display); font-size: 20px; color: var(--text2); margin-bottom: 8px; }
+.empty-state .es-sub { font-size: 14px; }
+
+/* ===== LOADING ===== */
+.loading {
+  display: flex; align-items: center; justify-content: center; padding: 40px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ===== COLORS ===== */
+.color-green { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+.color-blue { background: linear-gradient(135deg, #42A5F5, #1565C0); }
+.color-orange { background: linear-gradient(135deg, #FFA726, #E65100); }
+.color-purple { background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+.color-red { background: linear-gradient(135deg, #EF5350, #C62828); }
+.color-teal { background: linear-gradient(135deg, #26A69A, #00695C); }
+.color-pink { background: linear-gradient(135deg, #EC407A, #880E4F); }
+
+/* ===== MOBILE TOGGLE ===== */
+.mobile-menu-btn {
+  display: none;
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+
+/* ===== BACKUP SECTION ===== */
+.backup-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.backup-icon { font-size: 52px; animation: pulse 2s ease infinite; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.visible { display: block; }
+  .main-content { margin-left: 0; }
+  .mobile-menu-btn { display: flex; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-content { padding: 16px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .header { padding: 0 14px; }
+}
+
+/* ===== PAGE TRANSITIONS ===== */
+.page {
+  display: none;
+  animation: fadeInUp 0.4s ease;
+}
+.page.active {
+  display: block;
+}
+
+/* ===== STAR RATING ===== */
+.star-rating { display: flex; gap: 3px; }
+.star-rating span {
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.star-rating span:hover { transform: scale(1.2); }
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent2));
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ===== INFO ROW ===== */
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .ir-label { color: var(--text3); font-weight: 700; min-width: 120px; flex-shrink: 0; }
+.info-row .ir-value { color: var(--text); font-weight: 600; flex: 1; }
+
+/* Colorful gradients for section headers */
+.section-header-olay { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+.section-header-gelisim { background: linear-gradient(135deg, #42A5F5, #1565C0); }
+.section-header-kontrol { background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+.section-header-gida { background: linear-gradient(135deg, #FFA726, #E65100); }
+.section-header-gunluk { background: linear-gradient(135deg, #EC407A, #880E4F); }
+.section-header-dis { background: linear-gradient(135deg, #26A69A, #00695C); }
+.section-header-asi { background: linear-gradient(135deg, #EF5350, #C62828); }
+
+/* ===== MULTI-BABY PROFILE SWITCHER ===== */
+.baby-switcher {
+  padding: 14px 10px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.baby-switcher-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 6px 8px;
+}
+.baby-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.baby-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  user-select: none;
+}
+.baby-item:hover { background: var(--bg); }
+.baby-item.active-baby {
+  background: rgba(76,175,80,0.1);
+  border: 1.5px solid rgba(76,175,80,0.3);
+}
+.baby-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: var(--transition);
+  position: relative;
+}
+.baby-item.active-baby .baby-avatar {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.2);
+}
+.baby-info { flex: 1; min-width: 0; }
+.baby-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.baby-age {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.baby-active-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+}
+.baby-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 4px;
+  border: 1.5px dashed var(--border);
+}
+.baby-add-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(76,175,80,0.05);
+}
+
+/* Profile color themes */
+.avatar-green  { background: linear-gradient(135deg,#4CAF50,#2E7D32); color: white; }
+.avatar-blue   { background: linear-gradient(135deg,#42A5F5,#1565C0); color: white; }
+.avatar-pink   { background: linear-gradient(135deg,#EC407A,#880E4F); color: white; }
+.avatar-orange { background: linear-gradient(135deg,#FFA726,#E65100); color: white; }
+.avatar-purple { background: linear-gradient(135deg,#AB47BC,#6A1B9A); color: white; }
+.avatar-teal   { background: linear-gradient(135deg,#26A69A,#00695C); color: white; }
+
+/* Profile switcher modal / dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 60px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px var(--shadow-md);
+  min-width: 260px;
+  z-index: 500;
+  animation: scaleIn 0.2s ease;
+  overflow: hidden;
+}
+.profile-dropdown-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text);
+}
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.profile-dropdown-item:hover { background: var(--bg); }
+.profile-dropdown-item.active-profile { background: rgba(76,175,80,0.08); }
+.profile-dropdown-item .pd-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.profile-dropdown-item .pd-age { font-size: 12px; color: var(--text3); }
+.profile-dropdown-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+
+/* Header baby switcher button */
+.header-baby-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  position: relative;
+}
+.header-baby-btn:hover { background: var(--bg); border-color: var(--primary); }
+.header-baby-btn .hb-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.header-baby-btn .hb-chevron {
+  font-size: 10px;
+  color: var(--text3);
+  transition: transform 0.2s;
+}
+.header-baby-btn.open .hb-chevron { transform: rotate(180deg); }
+
+/* Baby profile form in modal */
+.color-picker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.color-option {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: var(--transition);
+}
+.color-option:hover { transform: scale(1.15); }
+.color-option.selected { border-color: var(--text); }
+
+.emoji-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.emoji-option {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  transition: var(--transition);
+  background: var(--bg);
+}
+.emoji-option:hover { transform: scale(1.1); border-color: var(--primary); }
+.emoji-option.selected { border-color: var(--primary); background: rgba(76,175,80,0.1); }
+
+/* Baby switcher page */
+.babies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+.baby-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 12px var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  text-align: center;
+  position: relative;
+}
+.baby-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px var(--shadow-md);
+}
+.baby-card.active-baby-card {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(76,175,80,0.25);
+}
+.baby-card-avatar {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+.baby-card-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+}
+.baby-card-age { font-size: 13px; color: var(--text3); font-weight: 600; }
+.baby-card-stats {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 700;
+}
+.baby-card-actions {
+  position: absolute;
+  top: 10px; right: 10px;
+  display: flex; gap: 4px;
+  opacity: 0;
+  transition: var(--transition);
+}
+.baby-card:hover .baby-card-actions { opacity: 1; }
+.baby-card-active-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.add-baby-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 12px var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px dashed var(--border);
+  text-align: center;
+  color: var(--text3);
+  font-weight: 700;
+}
+.add-baby-card:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-4px);
+}
+.add-baby-card .add-icon { font-size: 40px; }
+
 </style>
 </head>
 <body>
-<div class="app">
 
-<div class="header">
-  <div class="logo"><div class="logo-icon">👶</div>Bebek Takip</div>
-  <div class="profile-bar" id="profileBar"></div>
-  <div class="header-right">
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Karanlık</button>
-    <label class="import-btn" for="xlsxInput">📂 Excel Yükle</label>
-    <input type="file" id="xlsxInput" accept=".xlsx,.xls" style="display:none" onchange="loadExcel(event)">
+<!-- Sidebar Overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">👶</div>
+    <div>
+      <div class="logo-text">Bebek Takip</div>
+      <div class="logo-sub">Sağlık Günlüğü</div>
+    </div>
+  </div>
+
+  
+  <!-- BABY SWITCHER in sidebar -->
+  <div class="baby-switcher">
+    <div class="baby-switcher-label">Bebekler</div>
+    <div class="baby-list" id="sidebarBabyList"></div>
+    <div class="baby-add-btn" onclick="openAddBabyModal()">
+      <span>➕</span> Bebek Ekle
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">Ana Menü</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <div class="nav-icon">🏠</div>
+      <span>Ana Sayfa</span>
+    </div>
+
+    <div class="nav-item" onclick="showPage('bebekler')" id="nav-bebekler">
+      <div class="nav-icon">👨‍👩‍👧</div>
+      <span>Bebekler</span>
+    </div>
+    <div class="nav-section-title" style="margin-top:10px">Takip</div>
+    <div class="nav-item" onclick="showPage('olay')" id="nav-olay">
+      <div class="nav-icon">⚡</div>
+      <span>Olaylar</span>
+      <span class="nav-count" id="count-olay">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('gelisim')" id="nav-gelisim">
+      <div class="nav-icon">📈</div>
+      <span>Gelişim</span>
+      <span class="nav-count" id="count-gelisim">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('kontrol')" id="nav-kontrol">
+      <div class="nav-icon">🏥</div>
+      <span>Kontroller</span>
+      <span class="nav-count" id="count-kontrol">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('gida')" id="nav-gida">
+      <div class="nav-icon">🍼</div>
+      <span>Gıda</span>
+      <span class="nav-count" id="count-gida">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('gunluk')" id="nav-gunluk">
+      <div class="nav-icon">📔</div>
+      <span>Günlük</span>
+      <span class="nav-count" id="count-gunluk">0</span>
+    </div>
+
+    <div class="nav-section-title" style="margin-top:10px">Sağlık</div>
+    <div class="nav-item" onclick="showPage('dis')" id="nav-dis">
+      <div class="nav-icon">🦷</div>
+      <span>Diş Takibi</span>
+    </div>
+    <div class="nav-item" onclick="showPage('asi')" id="nav-asi">
+      <div class="nav-icon">💉</div>
+      <span>Aşı Takvimi</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-btn" onclick="showPage('yedek')">
+      <span>💾</span> Yedek & Geri Yükle
+    </div>
+    <div class="sidebar-footer-btn" onclick="showPage('ayarlar')">
+      <span>⚙️</span> Ayarlar
+    </div>
   </div>
 </div>
 
-<div class="profile-banner" id="profileBanner" style="display:none">
-  <div class="banner-avatar" id="bannerAvatar"></div>
-  <div>
-    <div class="banner-name" id="bannerName">—</div>
-    <div class="banner-sub" id="bannerSub">Veri yüklenmedi</div>
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div>
+        <div class="header-title" id="headerTitle">Ana Sayfa</div>
+        <div class="header-subtitle" id="headerSubtitle">Hoş geldiniz 👶</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="search-wrapper" id="globalSearchWrapper">
+        <input class="search-input" type="search" placeholder="Ara..." id="globalSearch" oninput="globalSearchFn(this.value)" />
+        <span class="search-icon">🔍</span>
+      </div>
+      <div style="position:relative">
+      <button class="header-baby-btn" id="headerBabyBtn" onclick="toggleProfileDropdown()">
+        <div class="hb-avatar avatar-green" id="headerBabyAvatar">👶</div>
+        <span id="headerBabyName">Bebek</span>
+        <span class="hb-chevron">▼</span>
+      </button>
+      <div class="profile-dropdown" id="profileDropdown" style="display:none">
+        <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
+        <div id="dropdownBabyList"></div>
+        <div class="profile-dropdown-footer">
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
+        </div>
+      </div>
+    </div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Tema Değiştir" id="themeBtn">🌙</button>
+      <button class="btn btn-primary btn-sm" id="addBtn" onclick="openAddModal()">+ Ekle</button>
+    </div>
   </div>
-  <div class="banner-actions">
-    <button class="banner-btn" onclick="openEditModal()">✏️ Düzenle</button>
-    <button class="banner-btn danger" onclick="confirmDelete()">🗑️ Sil</button>
-  </div>
-</div>
 
-<div class="nav" id="mainNav" style="display:none">
-  <div class="nav-item active" onclick="showSec('dashboard',this)">📊 Genel Bakış</div>
-  <div class="nav-item" onclick="showSec('gelisim',this)">📏 Büyüme</div>
-  <div class="nav-item" onclick="showSec('kontrol',this)">🏥 Kontroller</div>
-  <div class="nav-item" onclick="showSec('asi',this)">💉 Aşılar</div>
-  <div class="nav-item" onclick="showSec('dis',this)">🦷 Dişler</div>
-  <div class="nav-item" onclick="showSec('gunluk',this)">📖 Günlük</div>
-  <div class="nav-item" onclick="showSec('giris',this)">✏️ Veri Giriş</div>
-</div>
+  <!-- PAGES -->
+  <div class="page-content">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="dashboard-grid">
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📊 Gelişim Grafiği</span>
+              <select class="form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:12px" onchange="renderGrowthChart(this.value)">
+                <option value="weight">Ağırlık</option>
+                <option value="height">Boy</option>
+                <option value="head">Baş Çevresi</option>
+              </select>
+            </div>
+            <div class="card-body">
+              <div class="chart-area">
+                <canvas id="growthChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-header">
+              <span class="card-title">🕐 Son Aktiviteler</span>
+            </div>
+            <div class="card-body" id="recentActivities">
+              <div class="empty-state" style="padding:30px 20px">
+                <div class="es-icon" style="font-size:36px">📝</div>
+                <div class="es-sub">Henüz kayıt yok</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚡ Hızlı Ekle</span></div>
+            <div class="card-body">
+              <div class="quick-actions">
+                <div class="quick-action" onclick="showPage('olay');openAddModal()">
+                  <div class="qa-icon">⚡</div>Olay
+                </div>
+                <div class="quick-action" onclick="showPage('gelisim');openAddModal()">
+                  <div class="qa-icon">📈</div>Gelişim
+                </div>
+                <div class="quick-action" onclick="showPage('kontrol');openAddModal()">
+                  <div class="qa-icon">🏥</div>Kontrol
+                </div>
+                <div class="quick-action" onclick="showPage('gida');openAddModal()">
+                  <div class="qa-icon">🍼</div>Gıda
+                </div>
+                <div class="quick-action" onclick="showPage('gunluk');openAddModal()">
+                  <div class="qa-icon">📔</div>Günlük
+                </div>
+                <div class="quick-action" onclick="showPage('dis')">
+                  <div class="qa-icon">🦷</div>Diş
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📋 Son Kontrol</span></div>
+            <div class="card-body" id="lastControlInfo">
+              <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">🏥</div><div class="es-sub">Kontrol kaydı yok</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">💉 Yaklaşan Aşı</span></div>
+            <div class="card-body" id="nextVaccineInfo">
+              <div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">💉</div><div class="es-sub">Bilgi yok</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div class="main" id="mainContent">
 
-<div id="noProfileState" class="no-profile">
-  <div class="no-profile-icon">👶</div>
-  <h2>Bebek Profili Ekleyin</h2>
-  <p>Başlamak için bir profil oluşturun. Her bebek için ayrı profil ekleyebilir, profiller arasında kolayca geçiş yapabilirsiniz.</p>
-  <button class="big-btn" onclick="openAddModal()">+ Yeni Profil Oluştur</button>
-</div>
+    <!-- BEBEKLER PAGE -->
+    <div class="page" id="page-bebekler">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:22px">👨‍👩‍👧 Bebek Profilleri</h2>
+          <p style="font-size:14px;color:var(--text3);margin-top:4px">Profil seçmek için kartlara tıklayın</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddBabyModal()">+ Yeni Bebek Ekle</button>
+      </div>
+      <div class="babies-grid" id="babiesGrid"></div>
+    </div>
 
-<div id="dashboard" class="section" style="display:none">
-  <div class="page-header mb20"><h2 id="babyTitle">Genel Bakış</h2><div style="font-size:12px;color:var(--text3)" id="dataStatus">Excel yüklenmedi</div></div>
-  <div class="grid4 mb20">
-    <div class="card stat-card"><div class="label" style="color:var(--accent)">📏 Son Boy</div><div class="value" id="lastHeight" style="color:var(--accent)">—</div><div class="sub" id="lastHeightDate">Veri yok</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent2)">⚖️ Son Kilo</div><div class="value" id="lastWeight" style="color:var(--accent2)">—</div><div class="sub" id="lastWeightDate">Veri yok</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent3)">💉 Aşı</div><div class="value" id="totalVaccines" style="color:var(--accent3)">—</div><div class="sub">Uygulanan</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent4)">🏥 Ziyaret</div><div class="value" id="totalVisits" style="color:var(--accent4)">—</div><div class="sub">Toplam</div></div>
-  </div>
-  <div class="grid2 mb20">
-    <div class="card"><div class="section-title">📈 Boy & Kilo Gelişimi</div><div class="chart-wrap"><canvas id="dashGrowthChart" role="img">Boy ve kilo verileri.</canvas></div></div>
-    <div class="card">
-      <div class="section-title">🦷 Diş Haritası</div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Üst Dişler</div>
-      <div class="tooth-grid" id="dashUpperTeeth"></div>
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">Alt Dişler</div>
-      <div class="tooth-grid" id="dashLowerTeeth"></div>
-      <div style="margin-top:10px;display:flex;gap:12px;font-size:11px;color:var(--text3)">
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#d1fae5;border:1.5px solid #6ee7b7;border-radius:3px;display:inline-block"></span>Çıkmış</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#ffe4e6;border:1.5px solid #fca5a5;border-radius:3px;display:inline-block"></span>Düşmüş</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--bg3);border:1.5px dashed var(--border);border-radius:3px;display:inline-block"></span>Bekl.</span>
+    <!-- OLAY PAGE -->
+    <div class="page" id="page-olay">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ Olaylar</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-wrapper" style="max-width:220px">
+              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('olay', this.value)" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Olay Ekle</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="olay-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Saat</th>
+                <th>Olay</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="olay-tbody"></tbody>
+          </table>
+        </div>
+        <div id="olay-empty" class="empty-state" style="display:none">
+          <div class="es-icon">⚡</div>
+          <div class="es-title">Henüz olay yok</div>
+          <div class="es-sub">İlk olayı eklemek için + butonuna tıklayın</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GELİŞİM PAGE -->
+    <div class="page" id="page-gelisim">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📈 Gelişim Kayıtları</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-wrapper" style="max-width:220px">
+              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gelisim', this.value)" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Gelişim Ekle</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="gelisim-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Boy (cm)</th>
+                <th>Ağırlık (kg)</th>
+                <th>Baş (cm)</th>
+                <th>Notlar</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="gelisim-tbody"></tbody>
+          </table>
+        </div>
+        <div id="gelisim-empty" class="empty-state" style="display:none">
+          <div class="es-icon">📈</div>
+          <div class="es-title">Henüz gelişim kaydı yok</div>
+          <div class="es-sub">Boy, kilo ve baş çevresi verisi ekleyin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KONTROL PAGE -->
+    <div class="page" id="page-kontrol">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🏥 Doktor Kontrolleri</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-wrapper" style="max-width:220px">
+              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('kontrol', this.value)" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Kontrol Ekle</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="kontrol-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Hastane</th>
+                <th>Doktor</th>
+                <th>Tanı</th>
+                <th>Tedavi</th>
+                <th>Verilen İlaç</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="kontrol-tbody"></tbody>
+          </table>
+        </div>
+        <div id="kontrol-empty" class="empty-state" style="display:none">
+          <div class="es-icon">🏥</div>
+          <div class="es-title">Henüz kontrol kaydı yok</div>
+          <div class="es-sub">Doktor ziyaretlerinizi buraya ekleyin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GIDA PAGE -->
+    <div class="page" id="page-gida">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🍼 Gıda Takibi</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-wrapper" style="max-width:220px">
+              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gida', this.value)" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Gıda Ekle</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="gida-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Saat</th>
+                <th>Tür</th>
+                <th>Adı</th>
+                <th>İçerik</th>
+                <th>Miktar</th>
+                <th>Alerji</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="gida-tbody"></tbody>
+          </table>
+        </div>
+        <div id="gida-empty" class="empty-state" style="display:none">
+          <div class="es-icon">🍼</div>
+          <div class="es-title">Henüz gıda kaydı yok</div>
+          <div class="es-sub">Bebeğin beslenmesini takip edin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GÜNLÜK PAGE -->
+    <div class="page" id="page-gunluk">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📔 Günlük</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="search-wrapper" style="max-width:220px">
+              <input class="search-input" type="search" placeholder="Ara..." oninput="filterTable('gunluk', this.value)" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Günlük Ekle</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="gunluk-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Başlık</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="gunluk-tbody"></tbody>
+          </table>
+        </div>
+        <div id="gunluk-empty" class="empty-state" style="display:none">
+          <div class="es-icon">📔</div>
+          <div class="es-title">Henüz günlük kaydı yok</div>
+          <div class="es-sub">Bebeğinizin özel anlarını kaydedin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DİŞ PAGE -->
+    <div class="page" id="page-dis">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🦷 Diş Takibi</span>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Diş Ekle</button>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div>
+              <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px;color:var(--text2)">🔼 Üst Dişler (Çıkma)</h3>
+              <div class="tooth-grid" id="upperTeeth"></div>
+            </div>
+            <div>
+              <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px;color:var(--text2)">🔽 Alt Dişler (Çıkma)</h3>
+              <div class="tooth-grid" id="lowerTeeth"></div>
+            </div>
+          </div>
+          <div class="table-wrapper" style="margin-top:20px">
+            <table id="dis-table">
+              <thead>
+                <tr>
+                  <th>Diş</th>
+                  <th>Konum</th>
+                  <th>Çıkma Tarihi</th>
+                  <th>Not</th>
+                  <th>İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="dis-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AŞI PAGE -->
+    <div class="page" id="page-asi">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💉 Aşı Takvimi</span>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Aşı Ekle</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrapper">
+            <table id="asi-table">
+              <thead>
+                <tr>
+                  <th>Tarih</th>
+                  <th>Dönem</th>
+                  <th>Aşı Adı</th>
+                  <th>Durum</th>
+                  <th>Açıklama</th>
+                  <th>İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="asi-tbody"></tbody>
+            </table>
+          </div>
+          <div id="asi-empty" class="empty-state" style="display:none">
+            <div class="es-icon">💉</div>
+            <div class="es-title">Henüz aşı kaydı yok</div>
+            <div class="es-sub">Aşı takvimini buradan yönetin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YEDEK PAGE -->
+    <div class="page" id="page-yedek">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px">
+        <div class="backup-card">
+          <div class="backup-icon">💾</div>
+          <div style="font-family:var(--font-display);font-size:20px">Yedek Al</div>
+          <div style="font-size:14px;color:var(--text3)">Tüm verilerinizi JSON dosyası olarak indirin</div>
+          <button class="btn btn-primary" onclick="exportData()">⬇️ Yedek İndir</button>
+        </div>
+        <div class="backup-card">
+          <div class="backup-icon">📂</div>
+          <div style="font-family:var(--font-display);font-size:20px">Geri Yükle</div>
+          <div style="font-size:14px;color:var(--text3)">Daha önce aldığınız yedeği yükleyin</div>
+          <label class="btn btn-secondary" style="cursor:pointer">
+            ⬆️ Dosya Seç
+            <input type="file" accept=".json" style="display:none" onchange="importData(this)" />
+          </label>
+        </div>
+      </div>
+      <div class="card" style="max-width:700px;margin-top:20px">
+        <div class="card-header"><span class="card-title">⚠️ Veri Sil</span></div>
+        <div class="card-body">
+          <p style="font-size:14px;color:var(--text2);margin-bottom:14px">Tüm kayıtları kalıcı olarak silmek için aşağıdaki butonu kullanın. Bu işlem geri alınamaz!</p>
+          <button class="btn btn-danger" onclick="clearAllData()">🗑️ Tüm Verileri Sil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AYARLAR PAGE -->
+    <div class="page" id="page-ayarlar">
+      <div class="card" style="max-width:500px">
+        <div class="card-header"><span class="card-title">⚙️ Ayarlar</span></div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">👶 Bebek Adı</label>
+            <input class="form-input" type="text" id="babyNameInput" placeholder="Bebeğin adını girin" />
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">🎂 Doğum Tarihi</label>
+            <input class="form-input" type="date" id="babyBirthInput" />
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">🎨 Tema</label>
+            <select class="form-select" onchange="setTheme(this.value)" id="themeSelect">
+              <option value="light">☀️ Açık Tema</option>
+              <option value="dark">🌙 Karanlık Tema</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">💾 Kaydet</button>
+        </div>
       </div>
     </div>
   </div>
-  <div class="card"><div class="section-title">📅 Son Etkinlikler</div><div id="recentEvents"><div class="empty-state"><div class="empty-icon">📂</div><div style="font-weight:600;margin-bottom:6px">Excel Dosyası Yükleyin</div><div style="font-size:13px">Sağ üstteki "Excel Yükle" butonuna tıklayın.</div></div></div></div>
 </div>
 
-<div id="gelisim" class="section" style="display:none">
-  <div class="page-header mb20"><h2>📏 Büyüme & Gelişim</h2></div>
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],0,this)">Boy & Kilo</div>
-    <div class="tab" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],1,this)">Baş Çevresi</div>
-    <div class="tab" onclick="switchTab('gelisim',['gBoyKilo','gBas','gTablo'],2,this)">Tablo</div>
-  </div>
-  <div id="gBoyKilo">
-    <div class="card mb16"><div class="section-title">📏 Boy Gelişimi</div><div class="chart-wrap" style="height:300px"><canvas id="heightChart" role="img">Boy verileri.</canvas></div></div>
-    <div class="card"><div class="section-title">⚖️ Kilo Gelişimi</div><div class="chart-wrap" style="height:300px"><canvas id="weightChart" role="img">Kilo verileri.</canvas></div></div>
-  </div>
-  <div id="gBas" style="display:none"><div class="card"><div class="section-title">🔵 Baş Çevresi</div><div class="chart-wrap" style="height:320px"><canvas id="headChart" role="img">Baş verileri.</canvas></div></div></div>
-  <div id="gTablo" style="display:none"><div class="card" style="overflow-x:auto"><table class="mini-table"><thead><tr><th>Tarih</th><th>Yaş</th><th>Boy cm</th><th>Kilo kg</th><th>Baş cm</th><th>Hastane</th></tr></thead><tbody id="gelisimTbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Veri bekleniyor...</td></tr></tbody></table></div></div>
-</div>
-
-<div id="kontrol" class="section" style="display:none">
-  <div class="page-header mb20"><h2>🏥 Doktor Ziyaretleri</h2></div>
-  <div class="grid2 mb16">
-    <div class="card stat-card"><div class="label">🏨 En Çok Gidilen</div><div id="topHospital" style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-top:4px">—</div></div>
-    <div class="card stat-card"><div class="label">👨‍⚕️ En Çok Görülen</div><div id="topDoctor" style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-top:4px">—</div></div>
-  </div>
-  <div class="card mb16"><div class="section-title">📊 Aylık Ziyaretler</div><div class="chart-sm"><canvas id="visitChart" role="img">Ziyaret verileri.</canvas></div></div>
-  <div class="card"><div class="section-title">📋 Ziyaret Listesi</div><div id="kontrolList"><div class="empty-state" style="padding:20px">Veri bekleniyor...</div></div></div>
-</div>
-
-<div id="asi" class="section" style="display:none">
-  <div class="page-header mb20"><h2>💉 Aşı Takvimi</h2></div>
-  <div class="grid3 mb16">
-    <div class="card stat-card"><div class="label" style="color:#059669">✅ Uygulanan</div><div class="value" id="doneVax" style="color:#059669">0</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent4)">⏳ Bekleyen</div><div class="value" id="pendingVax" style="color:var(--accent4)">0</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent)">📊 Tamamlama</div><div class="value" id="vaxPct" style="color:var(--accent)">0%</div><div class="progress-bar"><div class="progress-fill" id="vaxBar" style="width:0%;background:var(--accent)"></div></div></div>
-  </div>
-  <div class="card"><div class="section-title">💉 Aşı Listesi</div><div id="asiList"><div class="empty-state" style="padding:20px">Veri bekleniyor...</div></div></div>
-</div>
-
-<div id="dis" class="section" style="display:none">
-  <div class="page-header mb20"><h2>🦷 Diş Gelişimi</h2></div>
-  <div class="grid2 mb16">
-    <div class="card stat-card"><div class="label" style="color:var(--accent2)">🌱 Çıkan</div><div class="value" id="teethOut" style="color:var(--accent2)">0</div></div>
-    <div class="card stat-card"><div class="label" style="color:var(--accent3)">🍂 Düşen</div><div class="value" id="teethFell" style="color:var(--accent3)">0</div></div>
-  </div>
-  <div class="grid2 mb16">
-    <div class="card"><div class="section-title">🦷 Üst Dişler</div><div id="upperTeethDetail"></div></div>
-    <div class="card"><div class="section-title">🦷 Alt Dişler</div><div id="lowerTeethDetail"></div></div>
-  </div>
-  <div class="card"><div class="section-title">🍂 Düşen Dişler</div><div id="fellTeethDetail"></div></div>
-</div>
-
-<div id="gunluk" class="section" style="display:none">
-  <div class="page-header mb20"><h2>📖 Günlük Anılar</h2></div>
-  <div class="card"><div id="gunlukList"><div class="empty-state"><div class="empty-icon">📝</div><div style="font-weight:600;margin-bottom:6px">Anılar burada görünecek</div></div></div></div>
-</div>
-
-<div id="giris" class="section" style="display:none">
-  <div class="page-header mb20"><h2>✏️ Yeni Kayıt Ekle</h2></div>
-  <div class="tabs">
-    <div class="tab active" onclick="switchGirisTab('fBoy',this)">📏 Boy & Kilo</div>
-    <div class="tab" onclick="switchGirisTab('fKontrol',this)">🏥 Kontrol</div>
-    <div class="tab" onclick="switchGirisTab('fGunluk',this)">📖 Anı</div>
-    <div class="tab" onclick="switchGirisTab('fAsi',this)">💉 Aşı</div>
-  </div>
-  <div id="fBoy" class="card mb16">
-    <div class="section-title">📏 Büyüme Ölçümü</div>
-    <div class="grid2"><div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="gTarih"></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="gHastane" placeholder="Hastane adı"></div></div>
-    <div class="grid3"><div class="form-group"><label class="form-label">Boy (cm)</label><input type="number" class="form-input" id="gBoy" placeholder="75.5" step="0.1"></div><div class="form-group"><label class="form-label">Kilo (kg)</label><input type="number" class="form-input" id="gKilo" placeholder="9.2" step="0.01"></div><div class="form-group"><label class="form-label">Baş (cm)</label><input type="number" class="form-input" id="gBas" placeholder="43.0" step="0.1"></div></div>
-    <div class="form-group"><label class="form-label">Not</label><textarea class="form-input" id="gNot" placeholder="Ek notlar..."></textarea></div>
-    <button class="submit-btn" onclick="addGrowthRecord()">+ Ölçüm Ekle</button>
-  </div>
-  <div id="fKontrol" class="card mb16" style="display:none">
-    <div class="section-title">🏥 Doktor Ziyareti</div>
-    <div class="grid2"><div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="kTarih"></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="kHastane" placeholder="Hastane adı"></div></div>
-    <div class="grid2"><div class="form-group"><label class="form-label">Doktor</label><input type="text" class="form-input" id="kDoktor" placeholder="Dr. Adı Soyadı"></div><div class="form-group"><label class="form-label">Teşhis / Neden</label><input type="text" class="form-input" id="kTeshis" placeholder="Rutin kontrol..."></div></div>
-    <div class="form-group"><label class="form-label">Notlar</label><textarea class="form-input" id="kNot" placeholder="Muayene notları..."></textarea></div>
-    <button class="submit-btn" onclick="addVisitRecord()">+ Ziyaret Ekle</button>
-  </div>
-  <div id="fGunluk" class="card mb16" style="display:none">
-    <div class="section-title">📖 Anı Kaydet</div>
-    <div class="form-group"><label class="form-label">Tarih *</label><input type="date" class="form-input" id="anTarih"></div>
-    <div class="form-group"><label class="form-label">Başlık *</label><input type="text" class="form-input" id="anBaslik" placeholder="İlk adımını attım..."></div>
-    <div class="form-group"><label class="form-label">Detay</label><textarea class="form-input" id="anDetay" placeholder="Bu anıyı anlat..."></textarea></div>
-    <button class="submit-btn" onclick="addMemory()">+ Anı Ekle</button>
-  </div>
-  <div id="fAsi" class="card mb16" style="display:none">
-    <div class="section-title">💉 Aşı Kaydı</div>
-    <div class="grid2"><div class="form-group"><label class="form-label">Tarih</label><input type="date" class="form-input" id="aTarih"></div><div class="form-group"><label class="form-label">Aşı Adı *</label><input type="text" class="form-input" id="aAdi" placeholder="KKK, DaBT-IPA..."></div></div>
-    <div class="grid2"><div class="form-group"><label class="form-label">Doz</label><select class="form-select" id="aDoz"><option>I. Doz</option><option>II. Doz</option><option>III. Doz</option><option>R (Rapel)</option></select></div><div class="form-group"><label class="form-label">Hastane</label><input type="text" class="form-input" id="aHastane" placeholder="Uygulama yeri"></div></div>
-    <div class="form-group"><label class="form-label">Not</label><input type="text" class="form-input" id="aNot" placeholder="Ek bilgi..."></div>
-    <button class="submit-btn" onclick="addVaccine()">+ Aşı Ekle</button>
-  </div>
-  <div class="card"><div class="section-title">📋 Son Eklenen Kayıtlar</div><div id="logList"><div class="empty-state" style="padding:16px">Henüz kayıt yok</div></div></div>
-</div>
-
-</div><!-- /main -->
-
-<!-- MODAL: Profil -->
-<div class="overlay hidden" id="profileModal">
-  <div class="modal">
-    <h3 id="modalTitle">Yeni Bebek Profili</h3>
-    <div class="form-group"><label class="form-label">Bebeğin Adı *</label><input type="text" class="form-input" id="pName" placeholder="Adını girin..."></div>
-    <div class="form-group"><label class="form-label">Doğum Tarihi</label><input type="date" class="form-input" id="pBirth"></div>
-    <div class="form-group"><label class="form-label">Emoji</label><div class="emoji-picker" id="emojiPicker"></div></div>
-    <div class="form-group"><label class="form-label">Renk</label><div class="color-row" id="colorPicker"></div></div>
-    <div class="modal-actions">
-      <button class="mbtn secondary" onclick="closeModal('profileModal')">İptal</button>
-      <button class="mbtn primary" onclick="saveProfile()" id="savePBtn">Oluştur</button>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModalOnOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Ekle</div>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+      <button class="btn btn-primary" onclick="saveRecord()">💾 Kaydet</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: Sil -->
-<div class="overlay hidden" id="deleteModal">
-  <div class="modal">
-    <h3>Profili Sil</h3>
-    <p style="color:var(--text2);margin-bottom:20px;line-height:1.6"><strong id="delName"></strong> profilini ve tüm verilerini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
-    <div class="modal-actions">
-      <button class="mbtn secondary" onclick="closeModal('deleteModal')">İptal</button>
-      <button class="mbtn del" onclick="deleteProfile()">Evet, Sil</button>
-    </div>
-  </div>
-</div>
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-/* ===== GLOBALS ===== */
-var isDark=false,charts={};
-var profiles={},activeId=null,editingId=null;
-var selEmoji='👶',selColor='#7C6FDE';
-var EMOJIS=['👶','🌸','🌟','🐣','🦋','🌈','🐥','🍀','🎀','🌙','☀️','❤️','🐧','🐰','🦊','🐻'];
-var COLORS=['#7C6FDE','#5CB8B2','#F4845F','#E8A838','#EC4899','#10B981','#3B82F6','#8B5CF6','#F97316','#06B6D4'];
+// ===== DATA LAYER =====
+const STORAGE_KEY = 'bebekTakipData_v3';
 
-/* ===== HELPERS ===== */
-function genId(){return 'p'+Date.now()+Math.random().toString(36).slice(2,5);}
-function esc(s){if(!s||s==='NaN'||s==='null'||s==='undefined')return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmt(d){if(!d)return'—';return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'});}
-function todayStr(){return new Date().toISOString().split('T')[0];}
-function parseDate(v){
-  if(!v)return null;
-  if(v instanceof Date&&!isNaN(v))return v;
-  if(typeof v==='number'){var d=new Date((v-25569)*86400*1000);return(d.getFullYear()>1990&&d.getFullYear()<2035)?d:null;}
-  if(typeof v==='string'){var d2=new Date(v);return(!isNaN(d2)&&d2.getFullYear()>1990&&d2.getFullYear()<2035)?d2:null;}
-  return null;
-}
-function normStr(s){return s.toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c');}
-function emptyState(){return{growth:[],visits:[],vaccines:[],teeth:{upper:[],lower:[],upperFell:[],lowerFell:[]},diary:[],logs:[]};}
-function destroyChart(id){if(charts[id]){try{charts[id].destroy();}catch(e){}delete charts[id];}}
+let data = {
+  settings: { babyName: 'Bebe\u011fim', birthDate: '', theme: 'light' },
+  olay: [],
+  gelisim: [],
+  kontrol: [],
+  gida: [],
+  gunluk: [],
+  dis: [],
+  asi: []
+};
 
-/* ===== STORAGE ===== */
-function save(){
-  try{
-    var out={};
-    Object.keys(profiles).forEach(function(id){
-      var p=profiles[id];
-      out[id]={meta:p.meta,state:{
-        growth:p.state.growth.map(r=>({...r,date:r.date?r.date.toISOString():null})),
-        visits:p.state.visits.map(r=>({...r,date:r.date?r.date.toISOString():null})),
-        vaccines:p.state.vaccines.map(r=>({...r,date:r.date?r.date.toISOString():null})),
-        teeth:p.state.teeth,
-        diary:p.state.diary.map(r=>({...r,date:r.date?r.date.toISOString():null})),
-        logs:p.state.logs
-      }};
-    });
-    localStorage.setItem('bt_p',JSON.stringify(out));
-    localStorage.setItem('bt_a',activeId||'');
-    localStorage.setItem('bt_th',isDark?'1':'0');
-  }catch(e){}
-}
-function load(){
-  try{
-    var raw=localStorage.getItem('bt_p');
-    if(raw){
-      var saved=JSON.parse(raw);
-      Object.keys(saved).forEach(function(id){
-        var p=saved[id];
-        var dd=function(v){var d=parseDate(v);return d;};
-        profiles[id]={meta:p.meta,state:{
-          growth:(p.state.growth||[]).map(r=>({...r,date:dd(r.date)})),
-          visits:(p.state.visits||[]).map(r=>({...r,date:dd(r.date)})),
-          vaccines:(p.state.vaccines||[]).map(r=>({...r,date:dd(r.date)})),
-          teeth:p.state.teeth||{upper:[],lower:[],upperFell:[],lowerFell:[]},
-          diary:(p.state.diary||[]).map(r=>({...r,date:dd(r.date)})),
-          logs:p.state.logs||[]
-        }};
-      });
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      data = { ...data, ...parsed };
     }
-    var sa=localStorage.getItem('bt_a');
-    if(sa&&profiles[sa])activeId=sa;
-    else if(Object.keys(profiles).length)activeId=Object.keys(profiles)[0];
-    if(localStorage.getItem('bt_th')==='1'){isDark=true;document.body.classList.add('dark');document.getElementById('themeBtn').textContent='☀️ Açık Mod';}
-  }catch(e){}
-}
-function getP(){return activeId&&profiles[activeId]?profiles[activeId]:null;}
-function getSt(){var p=getP();return p?p.state:emptyState();}
-
-/* ===== PROFILE CRUD ===== */
-function createProfile(name,birth,emoji,color){
-  var id=genId();
-  profiles[id]={meta:{id,name,birth:birth||'',emoji:emoji||'👶',color:color||'#7C6FDE',dataStatus:'Excel yüklenmedi'},state:emptyState()};
-  save();return id;
-}
-function switchProfile(id){
-  activeId=id;save();
-  renderBar();renderBanner();
-  showNav();
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelectorAll('.nav-item')[0].classList.add('active');
-  showSec('dashboard',document.querySelectorAll('.nav-item')[0]);
-  renderAll();
+  } catch(e) { console.error('Veri y\u00fckleme hatas\u0131:', e); }
 }
 
-/* ===== MODAL ===== */
-function buildEmojiPicker(){
-  document.getElementById('emojiPicker').innerHTML=EMOJIS.map(e=>'<div class="emoji-opt'+(e===selEmoji?' sel':'')+'" onclick="pickEmoji(this,\''+e+'\')">'+e+'</div>').join('');
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) { showToast('Kaydetme hatas\u0131!', 'error'); }
 }
-function buildColorPicker(){
-  document.getElementById('colorPicker').innerHTML=COLORS.map(c=>'<div class="color-opt'+(c===selColor?' sel':'')+'" style="background:'+c+'" onclick="pickColor(this,\''+c+'\')"></div>').join('');
+
+// ===== TURKISH SEARCH =====
+function normalizeTR(str) {
+  if (!str) return '';
+  return str.toString().toLowerCase()
+    .replace(/\u011f/g, 'g').replace(/\u00fc/g, 'u').replace(/\u015f/g, 's')
+    .replace(/\u0131/g, 'i').replace(/\u00f6/g, 'o').replace(/\u00e7/g, 'c')
+    .replace(/\u0130/g, 'i').replace(/\u011e/g, 'g').replace(/\u00dc/g, 'u')
+    .replace(/\u015e/g, 's').replace(/\u00d6/g, 'o').replace(/\u00c7/g, 'c');
 }
-function pickEmoji(el,e){selEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}
-function pickColor(el,c){selColor=c;document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}
-function openAddModal(){
-  editingId=null;selEmoji='👶';selColor='#7C6FDE';
-  document.getElementById('modalTitle').textContent='Yeni Bebek Profili';
-  document.getElementById('savePBtn').textContent='Oluştur';
-  document.getElementById('pName').value='';document.getElementById('pBirth').value='';
-  buildEmojiPicker();buildColorPicker();
-  document.getElementById('profileModal').classList.remove('hidden');
+
+function trSearch(text, query) {
+  return normalizeTR(text).includes(normalizeTR(query));
 }
-function openEditModal(){
-  var p=getP();if(!p)return;
-  editingId=activeId;selEmoji=p.meta.emoji;selColor=p.meta.color;
-  document.getElementById('modalTitle').textContent='Profili Düzenle';
-  document.getElementById('savePBtn').textContent='Kaydet';
-  document.getElementById('pName').value=p.meta.name;
-  document.getElementById('pBirth').value=p.meta.birth||'';
-  buildEmojiPicker();buildColorPicker();
-  document.getElementById('profileModal').classList.remove('hidden');
+
+// ===== ID GENERATION =====
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
-function closeModal(id){document.getElementById(id).classList.add('hidden');}
-function saveProfile(){
-  var name=document.getElementById('pName').value.trim();
-  if(!name){document.getElementById('pName').focus();return;}
-  var birth=document.getElementById('pBirth').value;
-  if(editingId){
-    profiles[editingId].meta.name=name;profiles[editingId].meta.birth=birth;
-    profiles[editingId].meta.emoji=selEmoji;profiles[editingId].meta.color=selColor;
-    save();renderBar();renderBanner();
-  }else{
-    var id=createProfile(name,birth,selEmoji,selColor);
-    switchProfile(id);
+
+// ===== CURRENT PAGE =====
+let currentPage = 'dashboard';
+let editingId = null;
+let editingSection = null;
+
+// ===== THEME =====
+function loadTheme() {
+  const theme = data.settings.theme || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const sel = document.getElementById('themeSelect');
+  if (sel) sel.value = theme;
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'light' ? 'dark' : 'light';
+  setTheme(next);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  data.settings.theme = theme;
+  saveData();
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const sel = document.getElementById('themeSelect');
+  if (sel) sel.value = theme;
+}
+
+// ===== NAVIGATION =====
+const pageMeta = {
+  dashboard: { title: 'Ana Sayfa', sub: 'Genel bak\u0131\u015f', icon: '🏠' },
+  olay: { title: 'Olaylar', sub: 'Sa\u011fl\u0131k ve geli\u015fim olaylar\u0131', icon: '⚡' },
+  gelisim: { title: 'Geli\u015fim', sub: 'Boy, kilo ve ba\u015f \u00e7evresi', icon: '📈' },
+  kontrol: { title: 'Doktor Kontrolleri', sub: 'Hastane ve poliklinik ziyaretleri', icon: '🏥' },
+  gida: { title: 'G\u0131da Takibi', sub: 'Beslenme kay\u0131tlar\u0131', icon: '🍼' },
+  gunluk: { title: 'G\u00fcnl\u00fck', sub: '\u00d6zel anlar ve notlar', icon: '📔' },
+  dis: { title: 'Di\u015f Takibi', sub: 'Di\u015f \u00e7\u0131karma ve d\u00fc\u015fme', icon: '🦷' },
+  asi: { title: 'A\u015f\u0131 Takvimi', sub: 'A\u015f\u0131 plan\u0131 ve takibi', icon: '💉' },
+  yedek: { title: 'Yedek & Geri Y\u00fckle', sub: 'Veri y\u00f6netimi', icon: '💾' },
+  ayarlar: { title: 'Ayarlar', sub: 'Uygulama ayarlar\u0131', icon: '⚙️' }
+};
+
+function showPage(page) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+
+  currentPage = page;
+  const meta = pageMeta[page] || { title: page, sub: '', icon: '' };
+  document.getElementById('headerTitle').textContent = meta.icon + ' ' + meta.title;
+  document.getElementById('headerSubtitle').textContent = data.settings.babyName ? data.settings.babyName + ' · ' + meta.sub : meta.sub;
+
+  // Update add button
+  const addBtn = document.getElementById('addBtn');
+  const noAddPages = ['dashboard', 'yedek', 'ayarlar'];
+  addBtn.style.display = noAddPages.includes(page) ? 'none' : '';
+
+  // Render page
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'olay') renderTable('olay');
+  else if (page === 'gelisim') renderTable('gelisim');
+  else if (page === 'kontrol') renderTable('kontrol');
+  else if (page === 'gida') renderTable('gida');
+  else if (page === 'gunluk') renderTable('gunluk');
+  else if (page === 'dis') renderDisPage();
+  else if (page === 'asi') renderTable('asi');
+  else if (page === 'ayarlar') loadSettings();
+
+  // Mobile: close sidebar
+  if (window.innerWidth < 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('visible');
   }
-  closeModal('profileModal');
-}
-function confirmDelete(){
-  var p=getP();if(!p)return;
-  document.getElementById('delName').textContent=p.meta.name;
-  document.getElementById('deleteModal').classList.remove('hidden');
-}
-function deleteProfile(){
-  if(!activeId)return;
-  delete profiles[activeId];
-  activeId=Object.keys(profiles)[0]||null;
-  save();closeModal('deleteModal');
-  renderBar();
-  if(activeId){renderBanner();showNav();renderAll();}
-  else{document.getElementById('profileBanner').style.display='none';document.getElementById('mainNav').style.display='none';document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById('noProfileState').style.display='flex';}
 }
 
-/* ===== UI ===== */
-function renderBar(){
-  var bar=document.getElementById('profileBar');
-  bar.innerHTML=Object.keys(profiles).map(function(id){
-    var p=profiles[id],isA=id===activeId;
-    return'<div class="profile-chip'+(isA?' active':'')+'" onclick="switchProfile(\''+id+'\')">'+
-      '<div class="chip-avatar" style="background:'+(isA?'rgba(255,255,255,.2)':p.meta.color+'20')+';color:'+(isA?'#fff':p.meta.color)+'">'+p.meta.emoji+'</div>'+
-      esc(p.meta.name)+
-    '</div>';
-  }).join('')+'<button class="add-profile-btn" onclick="openAddModal()" title="Yeni profil">+</button>';
-}
-function renderBanner(){
-  var p=getP();if(!p)return;
-  document.getElementById('profileBanner').style.display='flex';
-  var av=document.getElementById('bannerAvatar');
-  av.textContent=p.meta.emoji;av.style.background=p.meta.color+'22';
-  document.getElementById('bannerName').textContent=p.meta.name;
-  var age='';
-  if(p.meta.birth){var b=new Date(p.meta.birth),now=new Date(),m=(now.getFullYear()-b.getFullYear())*12+now.getMonth()-b.getMonth(),y=Math.floor(m/12),rm=m%12;age=(y>0?y+' yaş ':'')+(rm>0?rm+' aylık':'')+' · ';}
-  document.getElementById('bannerSub').textContent=age+(p.meta.dataStatus||'Excel yüklenmedi');
-}
-function showNav(){
-  document.getElementById('mainNav').style.display='flex';
-  document.getElementById('profileBanner').style.display='flex';
-  document.getElementById('noProfileState').style.display='none';
-}
-function showSec(id,el){
-  document.querySelectorAll('.section').forEach(s=>{s.classList.remove('active');s.style.display='none';});
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  var s=document.getElementById(id);
-  if(s){s.style.display='block';requestAnimationFrame(()=>s.classList.add('active'));}
-  if(el)el.classList.add('active');
-}
-function switchTab(prefix,ids,idx,el){
-  document.querySelectorAll('#'+prefix+' .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ids.forEach((id,i)=>document.getElementById(id).style.display=i===idx?'block':'none');
-}
-function switchGirisTab(sid,el){
-  document.querySelectorAll('#giris .tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['fBoy','fKontrol','fGunluk','fAsi'].forEach(id=>document.getElementById(id).style.display=id===sid?'block':'none');
-}
-function toggleTheme(){
-  isDark=!isDark;document.body.classList.toggle('dark',isDark);
-  document.getElementById('themeBtn').textContent=isDark?'☀️ Açık Mod':'🌙 Karanlık';
-  setTimeout(renderAll,100);save();
+// ===== SIDEBAR MOBILE =====
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('visible');
 }
 
-/* ===== EXCEL ===== */
-function loadExcel(e){
-  var f=e.target.files[0];if(!f)return;
-  var p=getP();if(!p){alert('Önce profil seçin');return;}
-  var r=new FileReader();
-  r.onload=function(ev){
-    try{
-      var wb=XLSX.read(ev.target.result,{type:'binary'});
-      parseWB(wb,p.state);
-      p.meta.dataStatus='✅ '+f.name;
-      save();renderBanner();renderAll();
-    }catch(err){alert('Hata: '+err.message);}
-  };
-  r.readAsBinaryString(f);e.target.value='';
+// ===== TOAST =====
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="toast-icon">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(30px)'; toast.style.transition = 'all 0.3s'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
-function parseWB(wb,st){
-  wb.SheetNames.forEach(function(name){
-    var ws=wb.Sheets[name];var data=XLSX.utils.sheet_to_json(ws,{header:1});var n=normStr(name);
-    if(n==='gelisim')parseGrowth(data,st);
-    else if(n==='kontrol')parseKontrol(data,st);
-    else if(n==='asi')parseAsi(data,st);
-    else if(n==='dis')parseDis(data,st);
-    else if(n==='gunluk')parseGunluk(data,st);
+
+// ===== MODAL =====
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  editingId = null;
+  editingSection = null;
+}
+
+function closeModalOnOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function openAddModal() {
+  editingId = null;
+  editingSection = currentPage;
+  showModal(currentPage, null);
+}
+
+function showModal(section, record) {
+  editingSection = section;
+  const overlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+
+  const meta = pageMeta[section] || {};
+  modalTitle.innerHTML = `${meta.icon || ''} ${record ? 'D\u00fczenle' : 'Yeni ' + meta.title}`;
+
+  modalBody.innerHTML = getFormHTML(section, record);
+  overlay.style.display = 'flex';
+}
+
+function getFormHTML(section, r) {
+  const v = r || {};
+  const today = new Date().toISOString().split('T')[0];
+
+  if (section === 'olay') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⏰ Saat</label>
+        <input class="form-input" type="time" id="f_saat" value="${v.saat||''}" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">⚡ Olay *</label>
+        <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="\u00d6rn: Titreme, Ate\u015f, \u00d6ks\u00fcr\u00fck..." required />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📝 Not</label>
+        <textarea class="form-textarea" id="f_not" placeholder="Detaylar\u0131 buraya yaz\u0131n...">${v.not||''}</textarea>
+      </div>
+    </div>`;
+
+  if (section === 'gelisim') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group full">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📏 Boy (cm)</label>
+        <input class="form-input" type="number" step="0.1" id="f_boy" value="${v.boy||''}" placeholder="\u00d6rn: 52.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⚖️ A\u011f\u0131rl\u0131k (kg)</label>
+        <input class="form-input" type="number" step="0.001" id="f_agirlik" value="${v.agirlik||''}" placeholder="\u00d6rn: 0.830" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📐 Ba\u015f \u00c7evresi (cm)</label>
+        <input class="form-input" type="number" step="0.1" id="f_bas" value="${v.bas||''}" placeholder="\u00d6rn: 34.0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📝 Di\u011fer</label>
+        <input class="form-input" type="text" id="f_diger" value="${v.diger||''}" placeholder="Di\u011fer \u00f6l\u00e7\u00fcmler..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">💬 Notlar</label>
+        <textarea class="form-textarea" id="f_notlar" placeholder="Ek notlar...">${v.notlar||''}</textarea>
+      </div>
+    </div>`;
+
+  if (section === 'kontrol') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group full">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🏥 Hastane</label>
+        <input class="form-input" type="text" id="f_hastane" value="${v.hastane||''}" placeholder="Hastane ad\u0131..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">👨‍⚕️ Doktor</label>
+        <input class="form-input" type="text" id="f_doktor" value="${v.doktor||''}" placeholder="Doktor ad\u0131..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">🔬 Hastal\u0131k / Te\u015fhis</label>
+        <input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Te\u015fhis..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">💊 Tedavi</label>
+        <input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">💉 Verilen \u0130la\u00e7lar</label>
+        <input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="\u0130la\u00e7 adlar\u0131..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">🔭 Yap\u0131lan Tetkikler</label>
+        <input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📝 Not</label>
+        <textarea class="form-textarea" id="f_not" placeholder="Ek notlar...">${v.not||''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">⭐ Doktor Puan\u0131</label>
+        <div class="star-rating" id="doctorStars" data-val="${v.doktorPuan||0}">
+          ${[1,2,3,4,5].map(i=>`<span onclick="setStar('doctorStars',${i})" style="color:${i<=(v.doktorPuan||0)?'#FFA726':'#CBD5E0'}">${i<=(v.doktorPuan||0)?'★':'☆'}</span>`).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">⭐ Hastane Puan\u0131</label>
+        <div class="star-rating" id="hospitalStars" data-val="${v.hastanePuan||0}">
+          ${[1,2,3,4,5].map(i=>`<span onclick="setStar('hospitalStars',${i})" style="color:${i<=(v.hastanePuan||0)?'#FFA726':'#CBD5E0'}">${i<=(v.hastanePuan||0)?'★':'☆'}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  if (section === 'gida') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⏰ Saat</label>
+        <input class="form-input" type="time" id="f_saat" value="${v.saat||''}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🏷️ T\u00fcr</label>
+        <select class="form-select" id="f_tur">
+          ${['Sebze','Meyve','Et','Tah\u0131l','S\u00fct \u00dcr\u00fcnleri','Anne S\u00fct\u00fc','Mama','\u00c7orba','Di\u011fer'].map(t=>`<option value="${t}" ${v.tur===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🍽️ Ad\u0131 *</label>
+        <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="G\u0131da ad\u0131..." required />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📋 \u0130\u00e7erik</label>
+        <input class="form-input" type="text" id="f_icerik" value="${v.icerik||''}" placeholder="Malzemeler..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📏 Miktar</label>
+        <input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="\u00d6rn: 1.5 tatl\u0131 ka\u015f\u0131\u011f\u0131" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⚠️ Alerji Belirtileri</label>
+        <input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📝 Not</label>
+        <textarea class="form-textarea" id="f_not" placeholder="Reaksiyon, sevmesi...">${v.not||''}</textarea>
+      </div>
+    </div>`;
+
+  if (section === 'gunluk') return `
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📝 Ba\u015fl\u0131k *</label>
+        <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="\u0130lk ad\u0131m, ilk kelime..." required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">💬 Not</label>
+        <textarea class="form-textarea" style="min-height:120px" id="f_not" placeholder="O an\u0131 detayl\u0131 yaz\u0131n...">${v.not||''}</textarea>
+      </div>
+    </div>`;
+
+  if (section === 'dis') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label class="form-label">🦷 Di\u015f Ad\u0131 *</label>
+        <select class="form-select" id="f_dis">
+          ${['Merkez Kesici','Yan Kesici','K\u00f6pek Di\u015fi','1. Az\u0131 Di\u015fi','2. Az\u0131 Di\u015fi'].map(d=>`<option value="${d}" ${v.dis===d?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">📍 Konum</label>
+        <select class="form-select" id="f_konum">
+          ${['\u00dcst Sa\u011f','\u00dcst Sol','Alt Sa\u011f','Alt Sol'].map(k=>`<option value="${k}" ${v.konum===k?'selected':''}>${k}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">📅 \u00c7\u0131kma Tarihi</label>
+        <input class="form-input" type="date" id="f_cikma" value="${v.cikma||''}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📅 D\u00fc\u015fme Tarihi</label>
+        <input class="form-input" type="date" id="f_dusme" value="${v.dusme||''}" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📝 Not</label>
+        <textarea class="form-textarea" id="f_not" placeholder="Belirtiler, tarih...">${v.not||''}</textarea>
+      </div>
+    </div>`;
+
+  if (section === 'asi') return `
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label class="form-label">📅 Tarih *</label>
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🗓️ D\u00f6nem</label>
+        <select class="form-select" id="f_donem">
+          ${['Do\u011fumda','1. Ay\u0131n Sonu','2. Ay\u0131n Sonu','4. Ay\u0131n Sonu','6. Ay\u0131n Sonu','12. Ay Sonu','18. Ay Sonu','24. Ay Sonu','48. Ay Sonu','\u0130lk\u00f6\u011fretim 1. S\u0131n\u0131f','\u0130lk\u00f6\u011fretim 8. S\u0131n\u0131f','Di\u011fer'].map(d=>`<option value="${d}" ${v.donem===d?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">💉 A\u015f\u0131 Ad\u0131 *</label>
+        <input class="form-input" type="text" id="f_asi" value="${v.asi||''}" placeholder="\u00d6rn: Hep B, BCG, KKK..." required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">✅ Durum</label>
+        <select class="form-select" id="f_durum">
+          <option value="Planland\u0131" ${v.durum==='Planland\u0131'?'selected':''}>📋 Planland\u0131</option>
+          <option value="Uyguland\u0131" ${v.durum==='Uyguland\u0131'?'selected':''}>✅ Uyguland\u0131</option>
+          <option value="Beklemede" ${v.durum==='Beklemede'?'selected':''}>⏳ Beklemede</option>
+          <option value="Ertelendi" ${v.durum==='Ertelendi'?'selected':''}>📅 Ertelendi</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">📝 A\u00e7\u0131klama</label>
+        <textarea class="form-textarea" id="f_aciklama" placeholder="Notlar...">${v.aciklama||''}</textarea>
+      </div>
+    </div>`;
+
+  return '<p>Bu b\u00f6l\u00fcm i\u00e7in form bulunamad\u0131.</p>';
+}
+
+function setStar(containerId, val) {
+  const container = document.getElementById(containerId);
+  container.setAttribute('data-val', val);
+  const spans = container.querySelectorAll('span');
+  spans.forEach((s, i) => {
+    s.style.color = i < val ? '#FFA726' : '#CBD5E0';
+    s.textContent = i < val ? '★' : '☆';
   });
 }
-function parseGrowth(rows,st){
-  st.growth=[];
-  rows.forEach(function(r){if(!r||r.length<12)return;var d=parseDate(r[10]);if(!d)return;var h=parseFloat(r[11]),w=parseFloat(r[12]),hd=parseFloat(r[13]);if(!isNaN(w)||!isNaN(h))st.growth.push({date:d,height:isNaN(h)?null:h,weight:isNaN(w)?null:w,head:isNaN(hd)?null:hd,hospital:String(r[16]||''),age:String(r[15]||'')});});
-  st.growth.sort((a,b)=>a.date-b.date);
-}
-function parseKontrol(rows,st){
-  st.visits=[];
-  rows.forEach(function(r){if(!r||r.length<5)return;var d=parseDate(r[3]);if(!d)return;var h=String(r[4]||'').trim();if(h==='Hastane'||h==='NaN'||!h)return;st.visits.push({date:d,hospital:h,doctor:String(r[5]||''),diagnosis:String(r[6]||''),notes:String(r[7]||''),age:String(r[13]||'')});});
-  st.visits.sort((a,b)=>a.date-b.date);
-}
-function parseAsi(rows,st){
-  st.vaccines=[];
-  rows.forEach(function(r){if(!r||r.length<7)return;var s=String(r[5]||''),v=String(r[6]||'');if(v.length<2)return;if(s.includes('Uygulandı')||s.includes('Uygulanmadı'))st.vaccines.push({status:s,name:v,dose:String(r[7]||''),date:parseDate(r[8]),hospital:String(r[9]||''),note:String(r[10]||'')});});
-}
-function parseDis(rows,st){
-  st.teeth={upper:[],lower:[],upperFell:[],lowerFell:[]};var sec='';
-  var ns=['Merkez kesici','Yan kesici','Köpek dişi','1. Azıdişi','2. Azıdişi'];
-  rows.forEach(function(r){if(!r)return;var t=String(r[4]||'');if(t.includes('Üst dişler (Çıkma)'))sec='upper';else if(t.includes('Alt dişler (Çıkma)'))sec='lower';else if(t.includes('Üst dişler (Düşme)'))sec='upperFell';else if(t.includes('Alt dişler (Düşme)'))sec='lowerFell';if(ns.includes(t.trim())&&sec)st.teeth[sec].push({name:t.trim(),right:parseDate(r[6]),left:parseDate(r[8])});});
-}
-function parseGunluk(rows,st){
-  st.diary=[];
-  rows.forEach(function(r){if(!r||!r[1])return;var d=parseDate(r[1]);if(!d)return;var ev=String(r[2]||'').trim();if(ev.length<2||ev==='Günlük')return;st.diary.push({date:d,event:ev,note:String(r[3]||'').trim()});});
-  st.diary.sort((a,b)=>a.date-b.date);
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
 }
 
-/* ===== RENDER ===== */
-function renderAll(){var st=getSt();rdDash(st);rdGelisim(st);rdKontrol(st);rdAsi(st);rdDis(st);rdGunluk(st);}
+function saveRecord() {
+  const section = editingSection;
+  if (!section || !pageMeta[section]) return;
 
-function rdDash(st){
-  var lh=st.growth.filter(x=>x.height!=null),lw=st.growth.filter(x=>x.weight!=null);
-  if(lh.length){var e=lh[lh.length-1];document.getElementById('lastHeight').textContent=e.height+' cm';document.getElementById('lastHeightDate').textContent=fmt(e.date);}else{document.getElementById('lastHeight').textContent='—';document.getElementById('lastHeightDate').textContent='Veri yok';}
-  if(lw.length){var e2=lw[lw.length-1];document.getElementById('lastWeight').textContent=e2.weight+' kg';document.getElementById('lastWeightDate').textContent=fmt(e2.date);}else{document.getElementById('lastWeight').textContent='—';document.getElementById('lastWeightDate').textContent='Veri yok';}
-  var done=st.vaccines.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı'));
-  document.getElementById('totalVaccines').textContent=done.length||'—';
-  document.getElementById('totalVisits').textContent=st.visits.length||'—';
-  buildDashChart(st);buildToothMaps(st);buildRecent(st);
+  let record = { id: editingId || genId() };
+
+  if (section === 'olay') {
+    if (!getVal('f_tarih') || !getVal('f_olay')) { showToast('Tarih ve Olay zorunlu!', 'error'); return; }
+    record = { ...record, tarih: getVal('f_tarih'), saat: getVal('f_saat'), olay: getVal('f_olay'), not: getVal('f_not') };
+  } else if (section === 'gelisim') {
+    if (!getVal('f_tarih')) { showToast('Tarih zorunlu!', 'error'); return; }
+    record = { ...record, tarih: getVal('f_tarih'), boy: getVal('f_boy'), agirlik: getVal('f_agirlik'), bas: getVal('f_bas'), diger: getVal('f_diger'), notlar: getVal('f_notlar') };
+  } else if (section === 'kontrol') {
+    if (!getVal('f_tarih')) { showToast('Tarih zorunlu!', 'error'); return; }
+    const dp = document.getElementById('doctorStars') ? +document.getElementById('doctorStars').getAttribute('data-val') : 0;
+    const hp = document.getElementById('hospitalStars') ? +document.getElementById('hospitalStars').getAttribute('data-val') : 0;
+    record = { ...record, tarih: getVal('f_tarih'), hastane: getVal('f_hastane'), doktor: getVal('f_doktor'), teshis: getVal('f_teshis'), tedavi: getVal('f_tedavi'), ilac: getVal('f_ilac'), tetkik: getVal('f_tetkik'), not: getVal('f_not'), doktorPuan: dp, hastanePuan: hp };
+  } else if (section === 'gida') {
+    if (!getVal('f_tarih') || !getVal('f_adi')) { showToast('Tarih ve Ad\u0131 zorunlu!', 'error'); return; }
+    record = { ...record, tarih: getVal('f_tarih'), saat: getVal('f_saat'), tur: getVal('f_tur'), adi: getVal('f_adi'), icerik: getVal('f_icerik'), miktar: getVal('f_miktar'), alerji: getVal('f_alerji'), not: getVal('f_not') };
+  } else if (section === 'gunluk') {
+    if (!getVal('f_tarih') || !getVal('f_baslik')) { showToast('Tarih ve Ba\u015fl\u0131k zorunlu!', 'error'); return; }
+    record = { ...record, tarih: getVal('f_tarih'), baslik: getVal('f_baslik'), not: getVal('f_not') };
+  } else if (section === 'dis') {
+    record = { ...record, dis: getVal('f_dis'), konum: getVal('f_konum'), cikma: getVal('f_cikma'), dusme: getVal('f_dusme'), not: getVal('f_not') };
+  } else if (section === 'asi') {
+    if (!getVal('f_tarih') || !getVal('f_asi')) { showToast('Tarih ve A\u015f\u0131 ad\u0131 zorunlu!', 'error'); return; }
+    record = { ...record, tarih: getVal('f_tarih'), donem: getVal('f_donem'), asi: getVal('f_asi'), durum: getVal('f_durum'), aciklama: getVal('f_aciklama') };
+  }
+
+  if (editingId) {
+    const idx = data[section].findIndex(r => r.id === editingId);
+    if (idx >= 0) data[section][idx] = record;
+  } else {
+    data[section].push(record);
+  }
+
+  saveData();
+  closeModal();
+  updateCounts();
+  showToast(editingId ? 'Kay\u0131t g\u00fcncellendi! ✨' : 'Kay\u0131t eklendi! 🎉');
+
+  // Re-render current page
+  if (currentPage === section) {
+    if (section === 'dis') renderDisPage();
+    else renderTable(section);
+  }
+  if (currentPage === 'dashboard') renderDashboard();
 }
-function buildDashChart(st){
-  var g=st.growth;var s=g.length>20?g.filter((_,i)=>i%Math.ceil(g.length/20)===0||i===g.length-1):g;
-  destroyChart('dashGrowthChart');var ctx=document.getElementById('dashGrowthChart');if(!ctx)return;
-  charts['dashGrowthChart']=new Chart(ctx,{type:'line',data:{labels:s.map(x=>fmt(x.date)),datasets:[{label:'Boy (cm)',data:s.map(x=>x.height),borderColor:'#7C6FDE',backgroundColor:'rgba(124,111,222,.12)',tension:0.4,fill:true,pointRadius:3},{label:'Kilo×10',data:s.map(x=>x.weight?+(x.weight*10).toFixed(1):null),borderColor:'#5CB8B2',backgroundColor:'rgba(92,184,178,.12)',tension:0.4,fill:true,pointRadius:3,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{x:{ticks:{font:{size:10},maxRotation:45,maxTicksLimit:8}},y:{ticks:{font:{size:10}}}}}});
+
+function editRecord(section, id) {
+  const record = data[section].find(r => r.id === id);
+  if (!record) return;
+  editingId = id;
+  editingSection = section;
+  showModal(section, record);
 }
-function buildToothMaps(st){
-  buildTeethRow('dashUpperTeeth',st.teeth.upper,st.teeth.upperFell);
-  buildTeethRow('dashLowerTeeth',st.teeth.lower,st.teeth.lowerFell);
+
+function deleteRecord(section, id) {
+  if (!confirm('Bu kayd\u0131 silmek istedi\u011finizden emin misiniz?')) return;
+  data[section] = data[section].filter(r => r.id !== id);
+  saveData();
+  updateCounts();
+  showToast('Kay\u0131t silindi!', 'info');
+  if (currentPage === section) {
+    if (section === 'dis') renderDisPage();
+    else renderTable(section);
+  }
+  if (currentPage === 'dashboard') renderDashboard();
 }
-function buildTeethRow(cid,outD,fellD){
-  var el=document.getElementById(cid);if(!el)return;el.innerHTML='';
-  var ns=['M','YK','K','1A','2A'];
-  ['Sağ','Sol'].forEach(function(side){
-    for(var i=0;i<5;i++){
-      var t=outD[i],ft=fellD?fellD[i]:null;
-      var hasO=t&&(side==='Sağ'?t.right:t.left);
-      var hasF=ft&&(side==='Sağ'?ft.right:ft.left);
-      var cls=hasF?'fell':hasO?'out':'empty';
-      var date=hasO?(side==='Sağ'?t.right:t.left):null;
-      var d=document.createElement('div');
-      d.className='tooth '+cls;
-      d.title=(ns[i]||'')+' '+side+(date?' — '+fmt(date):'');
-      d.textContent=ns[i]||'?';
-      el.appendChild(d);
+
+// ===== TABLE RENDERING =====
+function formatDate(d) {
+  if (!d) return '-';
+  try {
+    const parts = d.split('-');
+    const months = ['Oca','\u015eub','Mar','Nis','May','Haz','Tem','A\u011fu','Eyl','Eki','Kas','Ara'];
+    return `${parts[2]} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+  } catch { return d; }
+}
+
+function truncate(str, n=40) {
+  if (!str) return '-';
+  return str.length > n ? str.substring(0, n) + '…' : str;
+}
+
+function starDisplay(n) {
+  if (!n) return '-';
+  return '★'.repeat(n) + '☆'.repeat(5-n);
+}
+
+function renderTable(section, filterQuery = '') {
+  const configs = {
+    olay: {
+      fields: ['tarih','saat','olay','not'],
+      headers: ['Tarih','Saat','Olay','Not'],
+      render: r => [formatDate(r.tarih), r.saat||'-', `<strong>${escHtml(r.olay||'-')}</strong>`, `<span title="${escHtml(r.not||'')}">${truncate(r.not)}</span>`]
+    },
+    gelisim: {
+      fields: ['tarih','boy','agirlik','bas','notlar'],
+      headers: ['Tarih','Boy (cm)','A\u011f\u0131rl\u0131k (kg)','Ba\u015f (cm)','Notlar'],
+      render: r => [formatDate(r.tarih), r.boy||'-', r.agirlik||'-', r.bas||'-', truncate(r.notlar)]
+    },
+    kontrol: {
+      fields: ['tarih','hastane','doktor','teshis','tedavi','ilac'],
+      headers: ['Tarih','Hastane','Doktor','Tan\u0131','Tedavi','\u0130la\u00e7'],
+      render: r => [formatDate(r.tarih), escHtml(r.hastane||'-'), escHtml(r.doktor||'-'), truncate(r.teshis), truncate(r.tedavi), truncate(r.ilac)]
+    },
+    gida: {
+      fields: ['tarih','saat','tur','adi','icerik','miktar','alerji','not'],
+      headers: ['Tarih','Saat','T\u00fcr','Ad\u0131','\u0130\u00e7erik','Miktar','Alerji','Not'],
+      render: r => [formatDate(r.tarih), r.saat||'-', r.tur?`<span class="badge badge-orange">${r.tur}</span>`:'-', `<strong>${escHtml(r.adi||'-')}</strong>`, truncate(r.icerik), r.miktar||'-', r.alerji||'-', truncate(r.not)]
+    },
+    gunluk: {
+      fields: ['tarih','baslik','not'],
+      headers: ['Tarih','Ba\u015fl\u0131k','Not'],
+      render: r => [formatDate(r.tarih), `<strong>${escHtml(r.baslik||'-')}</strong>`, `<span title="${escHtml(r.not||'')}">${truncate(r.not,60)}</span>`]
+    },
+    asi: {
+      fields: ['tarih','donem','asi','durum','aciklama'],
+      headers: ['Tarih','D\u00f6nem','A\u015f\u0131','Durum','A\u00e7\u0131klama'],
+      render: r => {
+        const durumClass = { 'Uyguland\u0131': 'badge-green', 'Planland\u0131': 'badge-blue', 'Beklemede': 'badge-orange', 'Ertelendi': 'badge-red' };
+        return [formatDate(r.tarih), r.donem||'-', `<strong>${escHtml(r.asi||'-')}</strong>`, `<span class="badge ${durumClass[r.durum]||'badge-blue'}">${r.durum||'Planland\u0131'}</span>`, truncate(r.aciklama)];
+      }
+    }
+  };
+
+  const config = configs[section];
+  if (!config) return;
+
+  let rows = [...data[section]];
+  if (filterQuery) {
+    rows = rows.filter(r => Object.values(r).some(v => trSearch(String(v), filterQuery)));
+  }
+  rows.sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+
+  const tbody = document.getElementById(section + '-tbody');
+  const emptyEl = document.getElementById(section + '-empty');
+  const tableEl = document.getElementById(section + '-table');
+  if (!tbody) return;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    if (tableEl) tableEl.style.display = 'none';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  if (tableEl) tableEl.style.display = 'table';
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr style="animation-delay:${i*0.04}s">
+      ${config.render(r).map(cell => `<td>${cell}</td>`).join('')}
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('${section}','${r.id}')" title="D\u00fczenle">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('${section}','${r.id}')" title="Sil">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterTable(section, query) {
+  renderTable(section, query);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== D\u0130\u015e PAGE =====
+const toothTypes = ['Merkez Kesici','Yan Kesici','K\u00f6pek Di\u015fi','1. Az\u0131','2. Az\u0131'];
+const positions = ['\u00dcst Sa\u011f','\u00dcst Sol','Alt Sa\u011f','Alt Sol'];
+
+function renderDisPage() {
+  renderDisGrid('upperTeeth', ['\u00dcst Sa\u011f','\u00dcst Sol']);
+  renderDisGrid('lowerTeeth', ['Alt Sa\u011f','Alt Sol']);
+
+  const tbody = document.getElementById('dis-tbody');
+  if (!tbody) return;
+  const rows = [...data.dis].sort((a,b) => (b.cikma||'').localeCompare(a.cikma||''));
+  tbody.innerHTML = rows.map((r,i) => `
+    <tr style="animation-delay:${i*0.04}s">
+      <td><strong>${escHtml(r.dis||'-')}</strong></td>
+      <td>${r.konum||'-'}</td>
+      <td>${formatDate(r.cikma)}</td>
+      <td>${truncate(r.not)}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('dis','${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('dis','${r.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderDisGrid(containerId, posFilter) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  toothTypes.forEach(type => {
+    posFilter.forEach(pos => {
+      const erupted = data.dis.find(d => (d.dis||'').includes(type.split('.')[0].trim()) && d.konum === pos && d.cikma);
+      const cell = document.createElement('div');
+      cell.className = `tooth-cell ${erupted ? 'erupted' : 'not-erupted'}`;
+      cell.innerHTML = `<div class="tooth-emoji">🦷</div><div style="font-size:9px;text-align:center">${pos.replace('\u00dcst ','').replace('Alt ','')}</div>`;
+      cell.title = `${type} - ${pos}${erupted ? ' (\u00c7\u0131kt\u0131: ' + formatDate(erupted.cikma) + ')' : ' (Hen\u00fcz \u00e7\u0131kmad\u0131)'}`;
+      container.appendChild(cell);
+    });
+  });
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  updateStats();
+  renderRecentActivities();
+  updateLastControl();
+  updateNextVaccine();
+  setTimeout(renderGrowthChart, 100);
+}
+
+function updateStats() {
+  const grid = document.getElementById('statsGrid');
+  const stats = [
+    { icon: '⚡', label: 'Olaylar', value: data.olay.length, bg: 'color-green', page: 'olay' },
+    { icon: '📈', label: 'Geli\u015fim', value: data.gelisim.length, bg: 'color-blue', page: 'gelisim' },
+    { icon: '🏥', label: 'Kontroller', value: data.kontrol.length, bg: 'color-purple', page: 'kontrol' },
+    { icon: '🍼', label: 'G\u0131da', value: data.gida.length, bg: 'color-orange', page: 'gida' },
+    { icon: '📔', label: 'G\u00fcnl\u00fckler', value: data.gunluk.length, bg: 'color-pink', page: 'gunluk' },
+    { icon: '🦷', label: 'Di\u015fler', value: data.dis.length, bg: 'color-teal', page: 'dis' },
+    { icon: '💉', label: 'A\u015f\u0131lar', value: data.asi.length, bg: 'color-red', page: 'asi' },
+  ];
+
+  grid.innerHTML = stats.map((s,i) => `
+    <div class="stat-card" onclick="showPage('${s.page}')" style="animation-delay:${i*0.07}s">
+      <div class="stat-icon ${s.bg}" style="color:white">${s.icon}</div>
+      <div class="stat-info">
+        <div class="stat-value">${s.value}</div>
+        <div class="stat-label">${s.label}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRecentActivities() {
+  const container = document.getElementById('recentActivities');
+  const all = [];
+  const colors = { olay:'#4CAF50', gelisim:'#42A5F5', kontrol:'#AB47BC', gida:'#FFA726', gunluk:'#EC407A', dis:'#26A69A', asi:'#EF5350' };
+  const icons = { olay:'⚡', gelisim:'📈', kontrol:'🏥', gida:'🍼', gunluk:'📔', dis:'🦷', asi:'💉' };
+  const labels = { olay:'Olay', gelisim:'Geli\u015fim', kontrol:'Kontrol', gida:'G\u0131da', gunluk:'G\u00fcnl\u00fck', dis:'Di\u015f', asi:'A\u015f\u0131' };
+
+  Object.keys(colors).forEach(section => {
+    data[section].forEach(r => {
+      const title = r.olay || r.baslik || r.adi || r.dis || r.asi || r.teshis || 'Kay\u0131t';
+      const date = r.tarih || r.cikma || '';
+      all.push({ section, title, date, color: colors[section], icon: icons[section], label: labels[section] });
+    });
+  });
+
+  all.sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0,12);
+
+  if (all.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="padding:30px 20px"><div class="es-icon" style="font-size:36px">📝</div><div class="es-sub">Hen\u00fcz kay\u0131t yok</div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="recent-list">${all.slice(0,12).map((a,i) => `
+    <div class="recent-item" onclick="showPage('${a.section}')" style="animation-delay:${i*0.05}s">
+      <div class="recent-dot" style="background:${a.color}"></div>
+      <div class="recent-info">
+        <div class="recent-title">${a.icon} ${escHtml(a.title)}</div>
+        <div class="recent-sub">${a.label}</div>
+      </div>
+      <div class="recent-date">${formatDate(a.date)}</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function updateLastControl() {
+  const container = document.getElementById('lastControlInfo');
+  const sorted = [...data.kontrol].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+  if (sorted.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">🏥</div><div class="es-sub">Kontrol kayd\u0131 yok</div></div>`;
+    return;
+  }
+  const r = sorted[0];
+  container.innerHTML = `
+    <div class="info-row"><span class="ir-label">📅 Tarih</span><span class="ir-value">${formatDate(r.tarih)}</span></div>
+    <div class="info-row"><span class="ir-label">🏥 Hastane</span><span class="ir-value">${escHtml(r.hastane||'-')}</span></div>
+    <div class="info-row"><span class="ir-label">👨‍⚕️ Doktor</span><span class="ir-value">${escHtml(r.doktor||'-')}</span></div>
+    <div class="info-row"><span class="ir-label">🔬 Tan\u0131</span><span class="ir-value">${escHtml(r.teshis||'-')}</span></div>
+  `;
+}
+
+function updateNextVaccine() {
+  const container = document.getElementById('nextVaccineInfo');
+  const pending = data.asi.filter(a => a.durum !== 'Uyguland\u0131').sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
+  if (pending.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="padding:20px"><div class="es-icon" style="font-size:30px">✅</div><div class="es-sub">Bekleyen a\u015f\u0131 yok</div></div>`;
+    return;
+  }
+  const r = pending[0];
+  container.innerHTML = `
+    <div class="info-row"><span class="ir-label">💉 A\u015f\u0131</span><span class="ir-value"><strong>${escHtml(r.asi||'-')}</strong></span></div>
+    <div class="info-row"><span class="ir-label">📅 Tarih</span><span class="ir-value">${formatDate(r.tarih)}</span></div>
+    <div class="info-row"><span class="ir-label">🗓️ D\u00f6nem</span><span class="ir-value">${r.donem||'-'}</span></div>
+  `;
+}
+
+// ===== GROWTH CHART =====
+let growthChartInstance = null;
+
+function renderGrowthChart(metric = 'weight') {
+  const canvas = document.getElementById('growthChart');
+  if (!canvas) return;
+
+  const sorted = [...data.gelisim].sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
+  const fieldMap = { weight: 'agirlik', height: 'boy', head: 'bas' };
+  const labelMap = { weight: 'A\u011f\u0131rl\u0131k (kg)', height: 'Boy (cm)', head: 'Ba\u015f (cm)' };
+  const colorMap = { weight: '#4CAF50', height: '#42A5F5', head: '#AB47BC' };
+
+  const field = fieldMap[metric] || 'agirlik';
+  const labels = sorted.map(r => formatDate(r.tarih));
+  const values = sorted.map(r => parseFloat(r[field]) || null);
+
+  if (growthChartInstance) { growthChartInstance.destroy(); growthChartInstance = null; }
+
+  if (typeof Chart === 'undefined') { canvas.parentElement.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">📊 Grafik y\u00fcklenemedi (Chart.js gerekli)</div>'; return; }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#CBD5E0' : '#4A5568';
+
+  growthChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: labelMap[metric],
+        data: values,
+        borderColor: colorMap[metric],
+        backgroundColor: colorMap[metric] + '20',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: colorMap[metric],
+        tension: 0.35,
+        fill: true,
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+          titleColor: textColor,
+          bodyColor: textColor,
+          borderColor: colorMap[metric],
+          borderWidth: 1,
+          padding: 10,
+          callbacks: { label: ctx => ` ${ctx.parsed.y} ${labelMap[metric].split('(')[1]?.replace(')','') || ''}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 6, font: { family: 'Nunito', size: 11 } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Nunito', size: 11 } } }
+      }
     }
   });
 }
-function buildRecent(st){
-  var ev=[];
-  st.visits.slice(-4).forEach(v=>ev.push({date:v.date,text:(v.hospital||'').substring(0,35)+': '+(v.diagnosis||''),type:'k'}));
-  st.vaccines.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı')&&v.date).slice(-3).forEach(v=>ev.push({date:v.date,text:'Aşı: '+v.name+' — '+v.dose,type:'a'}));
-  st.diary.slice(-4).forEach(d=>ev.push({date:d.date,text:d.event,type:'g'}));
-  ev.sort((a,b)=>b.date-a.date);
-  var el=document.getElementById('recentEvents');
-  if(!ev.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div style="font-weight:600;margin-bottom:6px">Excel Dosyası Yükleyin</div><div style="font-size:13px">Sağ üstteki "Excel Yükle" butonuna tıklayın.</div></div>';return;}
-  var col={k:'#5CB8B2',a:'#F4845F',g:'#7C6FDE'};
-  var bdg={k:'badge-blue',a:'badge-pink',g:'badge-purple'};
-  var lbl={k:'Kontrol',a:'Aşı',g:'Anı'};
-  el.innerHTML=ev.slice(0,9).map(e=>'<div class="list-item"><div class="dot" style="background:'+col[e.type]+'"></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">'+esc(e.text.substring(0,90))+'</div><div style="font-size:12px;color:var(--text3);margin-top:3px"><span class="badge '+bdg[e.type]+'">'+lbl[e.type]+'</span>  '+fmt(e.date)+'</div></div></div>').join('');
+
+// ===== COUNT BADGES =====
+function updateCounts() {
+  ['olay','gelisim','kontrol','gida','gunluk'].forEach(s => {
+    const el = document.getElementById('count-' + s);
+    if (el) el.textContent = data[s].length;
+  });
 }
 
-function rdGelisim(st){
-  var g=st.growth;var s=g.length>30?g.filter((_,i)=>i%Math.ceil(g.length/30)===0||i===g.length-1):g;
-  var lb=s.map(x=>fmt(x.date));
-  ['heightChart','weightChart','headChart'].forEach(id=>destroyChart(id));
-  function lc(id,label,data,color){var c=document.getElementById(id);if(!c)return;charts[id]=new Chart(c,{type:'line',data:{labels:lb,datasets:[{label:label,data:data,borderColor:color,backgroundColor:color.replace('1)','0.15)').replace('#','rgba(').replace(/([0-9a-f]{2})/gi,function(m,p,o){return o===0?parseInt(m,16)+',':o===2?parseInt(m,16)+',':o===4?parseInt(m,16)+', ':m})+'0.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}},y:{}}}});}
-  var c1=document.getElementById('heightChart');if(c1)charts['heightChart']=new Chart(c1,{type:'line',data:{labels:lb,datasets:[{label:'Boy (cm)',data:s.map(x=>x.height),borderColor:'#7C6FDE',backgroundColor:'rgba(124,111,222,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
-  var c2=document.getElementById('weightChart');if(c2)charts['weightChart']=new Chart(c2,{type:'line',data:{labels:lb,datasets:[{label:'Kilo (kg)',data:s.map(x=>x.weight),borderColor:'#5CB8B2',backgroundColor:'rgba(92,184,178,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
-  var c3=document.getElementById('headChart');if(c3)charts['headChart']=new Chart(c3,{type:'line',data:{labels:lb,datasets:[{label:'Baş (cm)',data:s.map(x=>x.head),borderColor:'#F4845F',backgroundColor:'rgba(244,132,95,.15)',tension:0.4,fill:true,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{ticks:{maxTicksLimit:10,maxRotation:45,font:{size:10}}}}}});
-  var tb=document.getElementById('gelisimTbody');if(tb)tb.innerHTML=g.slice().reverse().map(r=>'<tr><td>'+fmt(r.date)+'</td><td class="val">'+esc(r.age.substring(0,25))+'</td><td class="val">'+(r.height!=null?r.height:'—')+'</td><td class="val">'+(r.weight!=null?r.weight:'—')+'</td><td class="val">'+(r.head!=null?r.head:'—')+'</td><td>'+esc(r.hospital.substring(0,30))+'</td></tr>').join('');
+// ===== GLOBAL SEARCH =====
+function globalSearchFn(query) {
+  if (!query) return;
+  // Search across all sections and navigate to best match
+  const sections = ['olay','gelisim','kontrol','gida','gunluk','dis','asi'];
+  let bestSection = null, bestCount = 0;
+  sections.forEach(s => {
+    const count = data[s].filter(r => Object.values(r).some(v => trSearch(String(v), query))).length;
+    if (count > bestCount) { bestCount = count; bestSection = s; }
+  });
+  if (bestSection) showPage(bestSection);
 }
 
-function rdKontrol(st){
-  var v=st.visits;
-  if(!v.length){document.getElementById('kontrolList').innerHTML='<div class="empty-state">Veri yüklenmedi</div>';document.getElementById('topHospital').textContent='—';document.getElementById('topDoctor').textContent='—';destroyChart('visitChart');return;}
-  var hc={},dc={};
-  v.forEach(x=>{var h=(x.hospital||'').trim().substring(0,45);var d=(x.doctor||'').trim();if(h&&h!='NaN')hc[h]=(hc[h]||0)+1;if(d&&d!='NaN')dc[d]=(dc[d]||0)+1;});
-  var tH=Object.keys(hc).sort((a,b)=>hc[b]-hc[a])[0]||'—';
-  var tD=Object.keys(dc).sort((a,b)=>dc[b]-dc[a])[0]||'—';
-  document.getElementById('topHospital').textContent=tH+(hc[tH]?' ('+hc[tH]+' kez)':'');
-  document.getElementById('topDoctor').textContent=tD+(dc[tD]?' ('+dc[tD]+' kez)':'');
-  destroyChart('visitChart');
-  var mn={};v.forEach(x=>{if(x.date){var k=x.date.getFullYear()+'/'+String(x.date.getMonth()+1).padStart(2,'0');mn[k]=(mn[k]||0)+1;}});
-  var mk=Object.keys(mn).sort();
-  var vc=document.getElementById('visitChart');if(vc)charts['visitChart']=new Chart(vc,{type:'bar',data:{labels:mk,datasets:[{label:'Ziyaret',data:mk.map(k=>mn[k]),backgroundColor:'rgba(124,111,222,.7)',borderColor:'#7C6FDE',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxRotation:45,font:{size:9}}},y:{ticks:{stepSize:1}}}}});
-  document.getElementById('kontrolList').innerHTML=v.slice().reverse().slice(0,30).map(x=>'<div class="list-item"><div class="dot" style="background:var(--accent2)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc((x.diagnosis||'Kontrol').substring(0,65))+'</div><div style="font-size:12px;color:var(--text3);margin-top:3px">'+fmt(x.date)+' · '+esc((x.hospital||'').substring(0,35))+(x.doctor&&x.doctor!='NaN'?' · '+esc(x.doctor.substring(0,25)):'')+'</div></div></div>').join('');
+// ===== BACKUP & RESTORE =====
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bebek-takip-yedek-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Yedek ba\u015far\u0131yla indirildi! 💾');
 }
 
-function rdAsi(st){
-  var vax=st.vaccines;
-  var done=vax.filter(v=>v.status.includes('Uygulandı')&&!v.status.includes('Uygulanmadı'));
-  var pend=vax.filter(v=>v.status.includes('Uygulanmadı'));
-  document.getElementById('doneVax').textContent=done.length;document.getElementById('pendingVax').textContent=pend.length;
-  var pct=vax.length?Math.round(done.length/vax.length*100):0;
-  document.getElementById('vaxPct').textContent=pct+'%';document.getElementById('vaxBar').style.width=pct+'%';
-  var html=done.map(v=>'<div class="list-item"><div class="dot" style="background:#059669"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(v.name)+' <span class="badge badge-green">'+esc(v.dose)+'</span></div><div style="font-size:12px;color:var(--text3);margin-top:3px">'+fmt(v.date)+(v.hospital&&v.hospital!='NaN'?' · '+esc(v.hospital.substring(0,30)):'')+'</div></div></div>');
-  if(pend.length){html.push('<div style="padding:10px 0 3px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Bekleyen</div>');html=html.concat(pend.map(v=>'<div class="list-item"><div class="dot" style="background:var(--accent4)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(v.name)+' <span class="badge badge-orange">Bekliyor</span></div></div></div>'));}
-  document.getElementById('asiList').innerHTML=html.join('')||'<div class="empty-state" style="padding:20px">Veri yüklenmedi</div>';
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!confirm('Mevcut veriler silinecek ve yedek y\u00fcklenecek. Onayl\u0131yor musunuz?')) return;
+      data = { ...data, ...imported };
+      saveData();
+      updateCounts();
+      renderDashboard();
+      showToast('Veriler ba\u015far\u0131yla geri y\u00fcklendi! 🎉');
+    } catch { showToast('Ge\u00e7ersiz dosya format\u0131!', 'error'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
-function rdDis(st){
-  var ut=st.teeth.upper,lt=st.teeth.lower,uf=st.teeth.upperFell,lf=st.teeth.lowerFell;
-  document.getElementById('teethOut').textContent=ut.filter(t=>t.right||t.left).length+lt.filter(t=>t.right||t.left).length;
-  document.getElementById('teethFell').textContent=uf.filter(t=>t.right||t.left).length+lf.filter(t=>t.right||t.left).length;
-  var tl=function(data){if(!data.length)return'<div class="empty-state" style="padding:14px">Veri yok</div>';return data.map(t=>'<div class="list-item"><div class="dot" style="background:var(--accent2)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(t.name)+'</div><div style="font-size:12px;color:var(--text3);margin-top:2px">'+(t.right?'🦷 Sağ: '+fmt(t.right):'— Sağ')+'  |  '+(t.left?'🦷 Sol: '+fmt(t.left):'— Sol')+'</div></div></div>').join('');};
-  document.getElementById('upperTeethDetail').innerHTML=tl(ut);document.getElementById('lowerTeethDetail').innerHTML=tl(lt);
-  var fell=[...uf,...lf].filter(t=>t.right||t.left);
-  document.getElementById('fellTeethDetail').innerHTML=fell.length?fell.map(t=>'<div class="list-item"><div class="dot" style="background:var(--accent3)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(t.name)+' <span class="badge badge-orange">Düştü</span></div><div style="font-size:12px;color:var(--text3);margin-top:2px">'+(t.right?'Sağ: '+fmt(t.right):'')+(t.left?' Sol: '+fmt(t.left):'')+'</div></div></div>').join(''):'<div class="empty-state" style="padding:14px">Henüz düşen diş yok</div>';
+function clearAllData() {
+  if (!confirm('T\u00dcM verileri kal\u0131c\u0131 olarak silmek istedi\u011finizden emin misiniz?\nBu i\u015flem geri al\u0131namaz!')) return;
+  const settings = { ...data.settings };
+  data = { settings, olay: [], gelisim: [], kontrol: [], gida: [], gunluk: [], dis: [], asi: [] };
+  saveData();
+  updateCounts();
+  renderDashboard();
+  showToast('T\u00fcm veriler silindi!', 'info');
 }
 
-function rdGunluk(st){
-  var d=st.diary;
-  if(!d.length){document.getElementById('gunlukList').innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><div style="font-weight:600;margin-bottom:6px">Anılar burada görünecek</div></div>';return;}
-  document.getElementById('gunlukList').innerHTML=d.slice().reverse().map((e,i)=>'<div class="list-item" style="animation:fadeIn .3s ease '+Math.min(i*20,400)+'ms both"><div class="dot" style="background:var(--accent)"></div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(e.event.substring(0,110))+'</div>'+(e.note&&e.note!='NaN'&&e.note.length>1?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5">'+esc(e.note.substring(0,160))+'</div>':'')+'<div style="font-size:11px;color:var(--text3);margin-top:3px">'+fmt(e.date)+'</div></div></div>').join('');
+// ===== SETTINGS =====
+function loadSettings() {
+  const nameInput = document.getElementById('babyNameInput');
+  const birthInput = document.getElementById('babyBirthInput');
+  if (nameInput) nameInput.value = data.settings.babyName || '';
+  if (birthInput) birthInput.value = data.settings.birthDate || '';
 }
 
-/* ===== VERİ GİRİŞ ===== */
-function addGrowthRecord(){
-  var p=getP();if(!p){alert('Profil seçin');return;}
-  var t=document.getElementById('gTarih').value;if(!t){alert('Tarih girin');return;}
-  var b=document.getElementById('gBoy').value,k=document.getElementById('gKilo').value,ba=document.getElementById('gBas').value;
-  p.state.growth.push({date:new Date(t),height:b?parseFloat(b):null,weight:k?parseFloat(k):null,head:ba?parseFloat(ba):null,hospital:document.getElementById('gHastane').value,age:'—'});
-  p.state.growth.sort((a,b)=>a.date-b.date);
-  addLog(p,'📏 Büyüme — '+new Date(t).toLocaleDateString('tr-TR')+(b?' Boy:'+b:'')+(k?' Kilo:'+k:''));
-  save();renderAll();['gBoy','gKilo','gBas','gHastane','gNot'].forEach(id=>document.getElementById(id).value='');
-}
-function addVisitRecord(){
-  var p=getP();if(!p)return;var t=document.getElementById('kTarih').value;if(!t){alert('Tarih girin');return;}
-  p.state.visits.push({date:new Date(t),hospital:document.getElementById('kHastane').value,doctor:document.getElementById('kDoktor').value,diagnosis:document.getElementById('kTeshis').value,notes:document.getElementById('kNot').value,age:'—'});
-  p.state.visits.sort((a,b)=>a.date-b.date);
-  addLog(p,'🏥 Kontrol — '+document.getElementById('kTeshis').value);
-  save();renderAll();['kHastane','kDoktor','kTeshis','kNot'].forEach(id=>document.getElementById(id).value='');
-}
-function addMemory(){
-  var p=getP();if(!p)return;var t=document.getElementById('anTarih').value,b=document.getElementById('anBaslik').value;if(!t||!b){alert('Tarih ve başlık zorunlu');return;}
-  p.state.diary.push({date:new Date(t),event:b,note:document.getElementById('anDetay').value});
-  p.state.diary.sort((a,b)=>a.date-b.date);
-  addLog(p,'📖 Anı — '+b);save();rdGunluk(p.state);buildRecent(p.state);
-  ['anBaslik','anDetay'].forEach(id=>document.getElementById(id).value='');
-}
-function addVaccine(){
-  var p=getP();if(!p)return;var a=document.getElementById('aAdi').value;if(!a){alert('Aşı adı girin');return;}
-  var t=document.getElementById('aTarih').value;
-  p.state.vaccines.push({status:'Uygulandı',name:a,dose:document.getElementById('aDoz').value,date:t?new Date(t):null,hospital:document.getElementById('aHastane').value,note:document.getElementById('aNot').value});
-  addLog(p,'💉 Aşı — '+a+' '+document.getElementById('aDoz').value);save();rdAsi(p.state);rdDash(p.state);
-  ['aAdi','aHastane','aNot'].forEach(id=>document.getElementById(id).value='');
-}
-function addLog(p,msg){
-  p.state.logs.unshift({msg:msg,time:new Date().toISOString()});
-  var el=document.getElementById('logList');
-  el.innerHTML=p.state.logs.slice(0,15).map(function(l){var t=new Date(l.time);return'<div class="log-item"><div class="color-strip" style="background:var(--accent)"></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">'+esc(l.msg)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+t.toLocaleTimeString('tr-TR')+' · '+t.toLocaleDateString('tr-TR')+'</div></div></div>';}).join('');
+function saveSettings() {
+  data.settings.babyName = document.getElementById('babyNameInput')?.value || data.settings.babyName;
+  data.settings.birthDate = document.getElementById('babyBirthInput')?.value || data.settings.birthDate;
+  saveData();
+  showToast('Ayarlar kaydedildi! ✨');
 }
 
-/* ===== INIT ===== */
-(function(){
-  load();renderBar();
-  if(Object.keys(profiles).length&&activeId){renderBanner();showNav();renderAll();}
-  var ts=todayStr();['gTarih','kTarih','anTarih','aTarih'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=ts;});
-  buildTeethRow('dashUpperTeeth',[],[]);buildTeethRow('dashLowerTeeth',[],[]);
-})();
+// ===== SAMPLE DATA =====
+function loadSampleData() {
+  if (data.olay.length > 0 || data.gelisim.length > 0) return;
+  // Add sample data from the images
+  data.olay.push({ id: genId(), tarih: '2019-07-23', saat: '20:00', olay: 'Titreme', not: 'Saat 20:00 5-7 saniye \u0130lk 2 g\u00fcn emmeden \u00f6nce 37-37.1 emip terliyor, 5 6 sn titredikten sonra 36.3 ate\u015f.' });
+  data.gelisim.push({ id: genId(), tarih: '2018-12-12', boy: '', agirlik: '0.830', bas: '', notlar: '' });
+  data.kontrol.push({ id: genId(), tarih: '2018-12-19', hastane: 'Sultan Hastanesi', doktor: '\u00d6zg\u00fcr \u00d6zkul', teshis: 'Kan uyu\u015fmazl\u0131\u011f\u0131', tedavi: 'Kan uyu\u015fmazl\u0131\u011f\u0131 i\u011fnesi yap\u0131ld\u0131', ilac: 'RHOGAM ANT\u0130 RH IMMUN 1 FLOKAN', tetkik: '', not: 'Saat 17 civar\u0131', doktorPuan: 5, hastanePuan: 2 });
+  data.gida.push({ id: genId(), tarih: '2019-08-24', saat: '13:10', tur: 'Sebze', adi: 'Sebze kar\u0131\u015f\u0131m\u0131 \u00e7orba', icerik: 'Kabak patates su', miktar: '1,5 tatl\u0131 ka\u015f\u0131\u011f\u0131', alerji: '', not: '\u0130lk yemek 10 dk s\u00fcrd\u00fc. Sevdi' });
+  data.gunluk.push({ id: genId(), tarih: '2018-12-28', baslik: 'Babam ile ilk oyunumu oynad\u0131m', not: 'Babam\u0131n sesleni\u015fine Annemin karn\u0131nda tepki vererek oyun oynad\u0131k 😊' });
+  data.asi.push({ id: genId(), tarih: '2019-03-07', donem: 'Do\u011fumda', asi: 'Hep B (Hepatit B)', durum: 'Uyguland\u0131', aciklama: 'Do\u011fumda uyguland\u0131' });
+  data.asi.push({ id: genId(), tarih: '2019-04-06', donem: '1. Ay\u0131n Sonu', asi: 'Hep B (Hepatit B)', durum: 'Uyguland\u0131', aciklama: '' });
+  data.asi.push({ id: genId(), tarih: '2019-05-06', donem: '2. Ay\u0131n Sonu', asi: 'BCG', durum: 'Uyguland\u0131', aciklama: '' });
+  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sa\u011f', cikma: '2019-08-28', not: '' });
+  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sol', cikma: '2019-09-03', not: '' });
+  saveData();
+}
+
+// ===== INIT =====
+function init() {
+  loadData();
+  loadSampleData();
+  loadTheme();
+  updateCounts();
+  renderDashboard();
+
+  // Load Chart.js dynamically
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+  script.onload = () => setTimeout(renderGrowthChart, 200);
+  document.head.appendChild(script);
+
+  // Update header subtitle with baby name
+  const sub = document.getElementById('headerSubtitle');
+  if (sub) sub.textContent = (data.settings.babyName || 'Bebe\u011fim') + ' · Ho\u015f geldiniz 👶';
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
