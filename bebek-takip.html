@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.57</title>
+<title>Bebek Takip Pro v1.0.58</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1205,25 +1205,75 @@ input[type="date"], input[type="time"] {
 }
 canvas { max-width: 100%; }
 
+/* ===== GROWTH CHART CUSTOM ===== */
+.gc-metric-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.gc-metric-btn.gc-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.gc-range-btn {
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text3);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.gc-range-btn.gc-range-active {
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: #fff;
+}
+.gc-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+.gc-list-item:hover { background: var(--border); }
+.gc-list-item.gc-highlight { background: rgba(76,175,80,0.12); }
+
 /* ===== QUICK ACTIONS ===== */
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 .quick-action {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 14px 8px 12px;
+  gap: 4px;
+  padding: 10px 4px 8px;
   background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text2);
   text-align: center;
@@ -1236,7 +1286,7 @@ canvas { max-width: 100%; }
   transform: scale(1.03);
 }
 .quick-action .qa-icon {
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1;
   position: relative;
 }
@@ -2204,7 +2254,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.57</span>
+  <span>Pro 1.0.58</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2271,16 +2321,29 @@ mark.hl {
         <div class="card" id="gelisimGrafikCard">
           <div class="card-header">
             <span class="card-title">📊 Gelişim Grafiği</span>
-            <select class="form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:16px" onchange="renderGrowthChart(this.value)">
-              <option value="weight">Ağırlık</option>
-              <option value="height">Boy</option>
-              <option value="head">Baş Çevresi</option>
-            </select>
           </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="growthChart"></canvas>
+          <div class="card-body" style="padding:0">
+            <!-- Metrik seçici -->
+            <div style="display:flex;gap:6px;padding:12px 14px 0;flex-wrap:wrap">
+              <button class="gc-metric-btn gc-active" data-m="agirlik" onclick="gcSetMetric('agirlik')">⚖️ Ağırlık</button>
+              <button class="gc-metric-btn" data-m="boy" onclick="gcSetMetric('boy')">📏 Boy</button>
+              <button class="gc-metric-btn" data-m="bas" onclick="gcSetMetric('bas')">📐 Baş</button>
             </div>
+            <!-- Zaman filtresi -->
+            <div style="display:flex;gap:6px;padding:8px 14px 0;flex-wrap:wrap">
+              <button class="gc-range-btn" data-r="30" onclick="gcSetRange(30)">30 Gün</button>
+              <button class="gc-range-btn" data-r="90" onclick="gcSetRange(90)">90 Gün</button>
+              <button class="gc-range-btn" data-r="365" onclick="gcSetRange(365)">1 Yıl</button>
+              <button class="gc-range-btn gc-range-active" data-r="0" onclick="gcSetRange(0)">Tümü</button>
+            </div>
+            <!-- SVG Grafik -->
+            <div style="padding:10px 14px 0">
+              <svg id="gcSvg" width="100%" viewBox="0 0 320 180" style="display:block;overflow:visible"></svg>
+            </div>
+            <!-- Tıklanan nokta detay -->
+            <div id="gcTooltip" style="display:none;margin:6px 14px;padding:8px 12px;background:var(--primary);color:#fff;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font)"></div>
+            <!-- Liste -->
+            <div id="gcList" style="padding:0 14px 14px;margin-top:6px;max-height:200px;overflow-y:auto"></div>
           </div>
         </div>
         <div class="card" id="sonAktiviteCard">
@@ -2405,34 +2468,6 @@ mark.hl {
         </div>
         <div class="card-body" style="padding:12px 10px">
           <div id="toothMapSvgWrap" style="width:100%;overflow:hidden"></div>
-        </div>
-      </div>
-
-      <!-- Seçili Diş Paneli -->
-      <div class="card" id="toothDetailPanel" style="display:none;margin-bottom:16px">
-        <div class="card-header">
-          <span class="card-title" id="toothDetailTitle">Diş Detayı</span>
-        </div>
-        <div class="card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-            <div class="form-group">
-              <label class="form-label">📅 Çıkma Tarihi</label>
-              <input class="form-input" type="date" id="toothCikmaInput" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">📅 Düşme Tarihi</label>
-              <input class="form-input" type="date" id="toothDusmeInput" />
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:14px">
-            <label class="form-label">📝 Not</label>
-            <input class="form-input" type="text" id="toothNotInput" placeholder="İsteğe bağlı not..." />
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="closeToothPanel()">İptal</button>
-            <button class="btn btn-danger btn-sm" id="toothDeleteBtn" style="flex:1;display:none" onclick="deleteToothRecord()">🗑️ Sil</button>
-            <button class="btn btn-primary btn-sm" style="flex:2" onclick="saveToothRecord()">💾 Kaydet</button>
-          </div>
         </div>
       </div>
 
@@ -3697,7 +3732,6 @@ function renderToothMap() {
   const bgMouth = isDark ? '#0f1824' : '#ffe8e0';
   const stroke  = isDark ? '#334' : '#ddd';
   const textCol = isDark ? '#8899aa' : '#888';
-  const labelCol= isDark ? '#aabbcc' : '#555';
 
   function toothFill(t) {
     const rec = data.dis.find(d => d.toothId === t.id);
@@ -3721,38 +3755,51 @@ function renderToothMap() {
       <title>${t.label} · ${t.side==='right'?'Sağ':'Sol'} · ${t.jaw==='upper'?'Üst':'Alt'}</title>
     </ellipse>`).join('');
 
-  const labels = TOOTH_MAP.map(t => {
+  const dotMarks = TOOTH_MAP.map(t => {
     const rec = data.dis.find(d => d.toothId === t.id);
-    const mark = rec ? (rec.dusme ? '●' : '●') : '';
     const fill = rec ? (rec.dusme ? '#FFA726' : '#4CAF50') : 'none';
-    return mark ? `<circle cx="${t.cx}" cy="${t.cy}" r="4" fill="${fill}" style="pointer-events:none"/>` : '';
+    return rec ? `<circle cx="${t.cx}" cy="${t.cy}" r="4" fill="${fill}" style="pointer-events:none"/>` : '';
   }).join('');
 
-  const labelLines = ['Merkez Kesici','Yan Kesici','Köpekdişi','1. Azıdişi','2. Azıdişi'].map((lbl,i) => {
-    const t = TOOTH_MAP.find(t=>t.id===`UR${i+1}`);
-    return `<text x="28" y="${t.cy+3}" text-anchor="end" font-size="8.5" fill="${labelCol}">${lbl}</text>
-            <line x1="30" y1="${t.cy}" x2="${t.cx-t.rx-1}" y2="${t.cy}" stroke="${stroke}" stroke-width="0.8"/>`;
-  }).join('');
+  wrap.innerHTML = `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+    <rect width="400" height="400" fill="${isDark?'#0d1520':'#fafafa'}" rx="16"/>
 
-  wrap.innerHTML = `<svg viewBox="0 0 400 395" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-    <rect width="400" height="395" fill="${isDark?'#0d1520':'#fafafa'}" rx="16"/>
-    <ellipse cx="200" cy="197" rx="155" ry="172" fill="${bgJaw}" stroke="${stroke}" stroke-width="1.5"/>
-    <ellipse cx="200" cy="197" rx="105" ry="125" fill="${bgMouth}" stroke="${stroke}" stroke-width="1"/>
-    <line x1="200" y1="75" x2="200" y2="320" stroke="${stroke}" stroke-width="1" stroke-dasharray="4,3"/>
-    <line x1="85" y1="197" x2="315" y2="197" stroke="${stroke}" stroke-width="1" stroke-dasharray="4,3"/>
-    <text x="200" y="50" text-anchor="middle" font-size="11" fill="${textCol}" font-weight="bold">SAĞ</text>
-    <text x="200" y="380" text-anchor="middle" font-size="11" fill="${textCol}" font-weight="bold">SOL</text>
-    <text x="48" y="145" text-anchor="middle" font-size="10" fill="${textCol}" font-weight="bold">ÜST</text>
-    <text x="48" y="258" text-anchor="middle" font-size="10" fill="${textCol}" font-weight="bold">ALT</text>
-    ${labelLines}
+    <!-- Çene ve ağız -->
+    <ellipse cx="200" cy="200" rx="155" ry="172" fill="${bgJaw}" stroke="${stroke}" stroke-width="1.5"/>
+    <ellipse cx="200" cy="200" rx="105" ry="125" fill="${bgMouth}" stroke="${stroke}" stroke-width="1"/>
+
+    <!-- Dikey orta çizgi (belirgin) -->
+    <line x1="200" y1="30" x2="200" y2="370" stroke="${isDark?'#445566':'#bbb'}" stroke-width="2"/>
+
+    <!-- Yatay orta çizgi (kesik) -->
+    <line x1="40" y1="200" x2="360" y2="200" stroke="${isDark?'#445566':'#bbb'}" stroke-width="1.2" stroke-dasharray="6,4"/>
+
+    <!-- SAĞ etiketi — sol taraf (hasta görüşüne göre) -->
+    <text x="60" y="200" dominant-baseline="middle" text-anchor="middle"
+      font-size="16" font-weight="900" font-family="Nunito,sans-serif"
+      fill="${isDark?'#4fc3f7':'#1976D2'}" letter-spacing="1">SAĞ</text>
+
+    <!-- SOL etiketi — sağ taraf -->
+    <text x="340" y="200" dominant-baseline="middle" text-anchor="middle"
+      font-size="16" font-weight="900" font-family="Nunito,sans-serif"
+      fill="${isDark?'#81c784':'#388E3C'}" letter-spacing="1">SOL</text>
+
+    <!-- ÜST / ALT -->
+    <text x="200" y="22" text-anchor="middle" font-size="11"
+      fill="${textCol}" font-weight="700" font-family="Nunito,sans-serif">ÜST</text>
+    <text x="200" y="392" text-anchor="middle" font-size="11"
+      fill="${textCol}" font-weight="700" font-family="Nunito,sans-serif">ALT</text>
+
     ${teeth}
-    ${labels}
-    <rect x="10" y="370" width="10" height="10" rx="2" fill="${isDark?'#1a4a2a':'#e8f5e9'}" stroke="#4CAF50" stroke-width="1.5"/>
-    <text x="24" y="379" font-size="9" fill="${labelCol}">Çıktı</text>
-    <rect x="65" y="370" width="10" height="10" rx="2" fill="${isDark?'#3a3010':'#fff8e1'}" stroke="#FFA726" stroke-width="1.5"/>
-    <text x="79" y="379" font-size="9" fill="${labelCol}">Düştü</text>
-    <rect x="120" y="370" width="10" height="10" rx="2" fill="${isDark?'#1e3040':'#f5f5f5'}" stroke="${isDark?'#2a3f55':'#ccc'}" stroke-width="1.5"/>
-    <text x="134" y="379" font-size="9" fill="${labelCol}">Çıkmadı</text>
+    ${dotMarks}
+
+    <!-- Lejant -->
+    <rect x="10" y="375" width="10" height="10" rx="2" fill="${isDark?'#1a4a2a':'#e8f5e9'}" stroke="#4CAF50" stroke-width="1.5"/>
+    <text x="24" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Çıktı</text>
+    <rect x="65" y="375" width="10" height="10" rx="2" fill="${isDark?'#3a3010':'#fff8e1'}" stroke="#FFA726" stroke-width="1.5"/>
+    <text x="79" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Düştü</text>
+    <rect x="125" y="375" width="10" height="10" rx="2" fill="${isDark?'#1e3040':'#f5f5f5'}" stroke="${isDark?'#2a3f55':'#ccc'}" stroke-width="1.5"/>
+    <text x="139" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Çıkmadı</text>
   </svg>`;
 }
 
@@ -3760,20 +3807,20 @@ function openToothPanel(toothId) {
   selectedToothId = toothId;
   const tooth = TOOTH_MAP.find(t => t.id === toothId);
   const rec = data.dis.find(d => d.toothId === toothId);
-  const jawLabel = tooth.jaw === 'upper' ? 'Üst' : 'Alt';
-  const sideLabel = tooth.side === 'right' ? 'Sağ' : 'Sol';
+  const jawLabel  = tooth.jaw   === 'upper' ? 'Üst' : 'Alt';
+  const sideLabel = tooth.side  === 'right' ? 'Sağ' : 'Sol';
   document.getElementById('toothDetailTitle').textContent = `🦷 ${tooth.label} — ${jawLabel} ${sideLabel}`;
   document.getElementById('toothCikmaInput').value = rec?.cikma || '';
   document.getElementById('toothDusmeInput').value = rec?.dusme || '';
   document.getElementById('toothNotInput').value   = rec?.not   || '';
   document.getElementById('toothDeleteBtn').style.display = rec ? '' : 'none';
-  document.getElementById('toothDetailPanel').style.display = '';
-  document.getElementById('toothDetailPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  const overlay = document.getElementById('toothModalOverlay');
+  overlay.style.display = 'flex';
   setTimeout(applyDatePlaceholders, 50);
 }
 
 function closeToothPanel() {
-  document.getElementById('toothDetailPanel').style.display = 'none';
+  document.getElementById('toothModalOverlay').style.display = 'none';
   selectedToothId = null;
 }
 
@@ -3937,67 +3984,155 @@ function updateNextVaccine() {
 }
 
 // ===== GROWTH CHART =====
-let growthChartInstance = null;
+/* ===== CUSTOM SVG GROWTH CHART ===== */
+let gcMetric  = 'agirlik';
+let gcRange   = 0; // 0 = tümü
+let gcSelIdx  = -1;
 
-function renderGrowthChart(metric = 'weight') {
-  const canvas = document.getElementById('growthChart');
-  if (!canvas) return;
+const gcMeta = {
+  agirlik: { label: 'Ağırlık', unit: 'kg',  color: '#4CAF50', field: 'agirlik' },
+  boy:     { label: 'Boy',     unit: 'cm',  color: '#42A5F5', field: 'boy'     },
+  bas:     { label: 'Baş',     unit: 'cm',  color: '#AB47BC', field: 'bas'     },
+};
 
-  const sorted = [...data.gelisim].sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
-  const fieldMap = { weight: 'agirlik', height: 'boy', head: 'bas' };
-  const labelMap = { weight: 'A\u011f\u0131rl\u0131k (kg)', height: 'Boy (cm)', head: 'Ba\u015f (cm)' };
-  const colorMap = { weight: '#4CAF50', height: '#42A5F5', head: '#AB47BC' };
+function gcSetMetric(m) {
+  gcMetric = m;
+  gcSelIdx = -1;
+  document.querySelectorAll('.gc-metric-btn').forEach(b => b.classList.toggle('gc-active', b.dataset.m === m));
+  renderGrowthChart();
+}
 
-  const field = fieldMap[metric] || 'agirlik';
-  const labels = sorted.map(r => formatDate(r.tarih));
-  const values = sorted.map(r => parseFloat(r[field]) || null);
+function gcSetRange(r) {
+  gcRange = r;
+  gcSelIdx = -1;
+  document.querySelectorAll('.gc-range-btn').forEach(b => b.classList.toggle('gc-range-active', +b.dataset.r === r));
+  renderGrowthChart();
+}
 
-  if (growthChartInstance) { growthChartInstance.destroy(); growthChartInstance = null; }
+function renderGrowthChart() {
+  const svg  = document.getElementById('gcSvg');
+  const list = document.getElementById('gcList');
+  const tip  = document.getElementById('gcTooltip');
+  if (!svg || !list) return;
 
-  if (typeof Chart === 'undefined') { canvas.parentElement.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">📊 Grafik y\u00fcklenemedi (Chart.js gerekli)</div>'; return; }
-
+  const meta   = gcMeta[gcMetric] || gcMeta.agirlik;
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  const textColor = isDark ? '#CBD5E0' : '#4A5568';
+  const gridC  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+  const textC  = isDark ? '#A0AEC0' : '#718096';
 
-  growthChartInstance = new Chart(canvas, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: labelMap[metric],
-        data: values,
-        borderColor: colorMap[metric],
-        backgroundColor: colorMap[metric] + '20',
-        borderWidth: 2.5,
-        pointRadius: 5,
-        pointBackgroundColor: colorMap[metric],
-        tension: 0.35,
-        fill: true,
-        spanGaps: true
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-          titleColor: textColor,
-          bodyColor: textColor,
-          borderColor: colorMap[metric],
-          borderWidth: 1,
-          padding: 10,
-          callbacks: { label: ctx => ` ${ctx.parsed.y} ${labelMap[metric].split('(')[1]?.replace(')','') || ''}` }
-        }
-      },
-      scales: {
-        x: { grid: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 6, font: { family: 'Nunito', size: 11 } } },
-        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Nunito', size: 11 } } }
-      }
-    }
+  // Veriyi filtrele ve sırala
+  let rows = [...(data.gelisim || [])].sort((a,b) => (a.tarih||'').localeCompare(b.tarih||''));
+  if (gcRange > 0) {
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - gcRange);
+    const cutStr = cutoff.toISOString().split('T')[0];
+    rows = rows.filter(r => (r.tarih||'') >= cutStr);
+  }
+  // Sadece değeri olan kayıtlar
+  const pts = rows.map((r,i) => ({ r, v: parseFloat(r[meta.field]), i })).filter(p => !isNaN(p.v) && p.v > 0);
+
+  // Liste her zaman (tüm rows, değer yoksa tire)
+  list.innerHTML = rows.length === 0
+    ? `<div style="text-align:center;padding:20px;color:var(--text3);font-family:var(--font);font-size:13px">Bu aralıkta gelişim kaydı yok</div>`
+    : rows.map((r, i) => {
+        const v = parseFloat(r[meta.field]);
+        const valStr = (!isNaN(v) && v > 0) ? `<b style="color:${meta.color}">${v} ${meta.unit}</b>` : `<span style="color:var(--text3)">—</span>`;
+        const isHl = pts.findIndex(p => p.r === r) === gcSelIdx;
+        return `<div class="gc-list-item${isHl ? ' gc-highlight' : ''}" onclick="gcSelectPoint(${pts.findIndex(p=>p.r===r)})">
+          <span style="font-size:12px;color:var(--text2)">${formatDate(r.tarih)}</span>
+          ${valStr}
+        </div>`;
+      }).join('');
+
+  // SVG grafik
+  if (pts.length === 0) {
+    svg.innerHTML = `<text x="160" y="90" text-anchor="middle" font-family="Nunito,sans-serif" font-size="13" fill="${textC}">Bu aralıkta ${meta.label} verisi yok</text>`;
+    if (tip) tip.style.display = 'none';
+    return;
+  }
+
+  const W = 320, H = 180;
+  const pad = { top: 18, right: 18, bottom: 32, left: 44 };
+  const gW = W - pad.left - pad.right;
+  const gH = H - pad.top  - pad.bottom;
+
+  const vals = pts.map(p => p.v);
+  let minV = Math.min(...vals), maxV = Math.max(...vals);
+  if (minV === maxV) { minV -= 0.5; maxV += 0.5; }
+  const span = maxV - minV || 1;
+
+  const xOf = (i) => pad.left + (pts.length === 1 ? gW/2 : (i / (pts.length-1)) * gW);
+  const yOf = (v)  => pad.top  + gH - ((v - minV) / span) * gH;
+
+  // Y grid lines (4 adet)
+  const steps = 4;
+  let gridLines = '';
+  let yLabels   = '';
+  for (let s = 0; s <= steps; s++) {
+    const v  = minV + (span / steps) * s;
+    const y  = yOf(v);
+    const lv = v < 10 ? v.toFixed(2) : v.toFixed(1);
+    gridLines += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="${gridC}" stroke-width="1"/>`;
+    yLabels   += `<text x="${pad.left - 5}" y="${y+4}" text-anchor="end" font-family="Nunito,sans-serif" font-size="9" fill="${textC}">${lv}</text>`;
+  }
+
+  // X labels (en fazla 5 tane)
+  let xLabels = '';
+  const xStep = Math.max(1, Math.floor(pts.length / 5));
+  for (let i = 0; i < pts.length; i += xStep) {
+    const x = xOf(i);
+    const d = (pts[i].r.tarih || '').slice(5); // MM-DD
+    xLabels += `<text x="${x}" y="${H - pad.bottom + 12}" text-anchor="middle" font-family="Nunito,sans-serif" font-size="9" fill="${textC}">${d}</text>`;
+  }
+
+  // Alan (fill)
+  const lineD = pts.map((p,i) => `${i===0?'M':'L'}${xOf(i)},${yOf(p.v)}`).join(' ');
+  const areaD = lineD + ` L${xOf(pts.length-1)},${H-pad.bottom} L${xOf(0)},${H-pad.bottom} Z`;
+
+  // Noktalar
+  let circles = '';
+  pts.forEach((p, i) => {
+    const x = xOf(i), y = yOf(p.v);
+    const isSel = i === gcSelIdx;
+    circles += `<circle cx="${x}" cy="${y}" r="${isSel ? 7 : 4.5}" fill="${meta.color}" stroke="#fff" stroke-width="2"
+      style="cursor:pointer" onclick="gcSelectPoint(${i})" />`;
   });
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="gcGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${meta.color}" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="${meta.color}" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    ${gridLines}${yLabels}${xLabels}
+    <path d="${areaD}" fill="url(#gcGrad)"/>
+    <path d="${lineD}" fill="none" stroke="${meta.color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${circles}
+  `;
+
+  // Tooltip
+  if (gcSelIdx >= 0 && pts[gcSelIdx]) {
+    const p = pts[gcSelIdx];
+    if (tip) {
+      tip.style.display = 'block';
+      tip.textContent = `${formatDate(p.r.tarih)}  •  ${meta.label}: ${p.v} ${meta.unit}`;
+      tip.style.background = meta.color;
+    }
+  } else {
+    if (tip) tip.style.display = 'none';
+  }
+}
+
+function gcSelectPoint(i) {
+  gcSelIdx = i;
+  renderGrowthChart();
+  // Listedeki satıra scroll
+  setTimeout(() => {
+    const items = document.querySelectorAll('#gcList .gc-list-item');
+    // pts index → rows index bulmak için highlight'lı olanı bul
+    const hl = document.querySelector('#gcList .gc-highlight');
+    if (hl) hl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
 }
 
 // ===== GLOBAL SEARCH =====
@@ -4424,24 +4559,9 @@ function saveSettings() {
 }
 
 // ===== SAMPLE DATA =====
-function loadSampleData() {
-  if (data.olay.length > 0 || data.gelisim.length > 0) return;
-  data.olay.push({ id: genId(), tarih: '2019-07-23', saat: '20:00', olay: 'Titreme', not: 'Saat 20:00 5-7 saniye İlk 2 gün emmeden önce 37-37.1 emip terliyor, 5 6 sn titredikten sonra 36.3 ateş.' });
-  data.gelisim.push({ id: genId(), tarih: '2018-12-12', boy: '', agirlik: '0.830', bas: '', notlar: '' });
-  data.kontrol.push({ id: genId(), tarih: '2018-12-19', hastane: 'Sultan Hastanesi', doktor: 'Özgür Özkul', teshis: 'Kan uyuşmazlığı', tedavi: 'Kan uyuşmazlığı iğnesi yapıldı', ilac: 'RHOGAM ANTİ RH IMMUN 1 FLOKAN', tetkik: '', not: 'Saat 17 civarı', doktorPuan: 5, hastanePuan: 2 });
-  data.gida.push({ id: genId(), tarih: '2019-08-24', saat: '13:10', tur: 'Sebze', adi: 'Sebze karışımı çorba', icerik: 'Kabak patates su', miktar: '1,5 tatlı kaşığı', alerji: '', not: 'İlk yemek 10 dk sürdü. Sevdi' });
-  data.gunluk.push({ id: genId(), tarih: '2018-12-28', baslik: 'Babam ile ilk oyunumu oynadım', not: 'Babamın seslenişine Annemin karnında tepki vererek oyun oynadık 😊' });
-  data.asi.push({ id: genId(), tarih: '2019-03-07', donem: 'Doğumda', asi: 'Hep B (Hepatit B)', durum: 'Uygulandı', aciklama: 'Doğumda uygulandı' });
-  data.asi.push({ id: genId(), tarih: '2019-04-06', donem: '1. Ayın Sonu', asi: 'Hep B (Hepatit B)', durum: 'Uygulandı', aciklama: '' });
-  data.dis.push({ id: genId(), dis: 'Merkez Kesici', konum: 'Alt Sağ', cikma: '2019-08-28', not: '' });
-  profiles[activeId] = data;
-  saveProfiles();
-}
-
 // ===== INIT =====
 function init() {
   loadProfiles();
-  loadSampleData();
   loadTheme();
   updateCounts();
   renderDashboard();
@@ -4450,11 +4570,8 @@ function init() {
   updateHeaderBaby();
   initNavScroll();
 
-  // Load Chart.js dynamically
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-  script.onload = () => setTimeout(renderGrowthChart, 200);
-  document.head.appendChild(script);
+  // Grafik — CDN gerektirmez, saf SVG
+  setTimeout(renderGrowthChart, 150);
 
   // Veri kaybı uyarısı — sayfa kapanmadan yedek al
   window.addEventListener('beforeunload', () => {
@@ -4667,6 +4784,37 @@ self.addEventListener('fetch', e => {
 
 })();
 </script>
+<!-- Diş Modal -->
+<div id="toothModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:900;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeToothPanel()">
+  <div style="background:var(--card);border-radius:var(--radius);width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)">
+      <span style="font-family:var(--font);font-size:16px;font-weight:800;color:var(--text)" id="toothDetailTitle">Diş Detayı</span>
+      <button onclick="closeToothPanel()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1">✕</button>
+    </div>
+    <div style="padding:18px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="form-group">
+          <label class="form-label">📅 Çıkma Tarihi</label>
+          <input class="form-input" type="date" id="toothCikmaInput" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 Düşme Tarihi</label>
+          <input class="form-input" type="date" id="toothDusmeInput" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">📝 Not</label>
+        <input class="form-input" type="text" id="toothNotInput" placeholder="İsteğe bağlı not..." />
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="closeToothPanel()">İptal</button>
+        <button class="btn btn-danger btn-sm" id="toothDeleteBtn" style="flex:1;display:none" onclick="deleteToothRecord()">🗑️ Sil</button>
+        <button class="btn btn-primary btn-sm" style="flex:2" onclick="saveToothRecord()">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Profil dropdown — body seviyesinde, JS ile konumlandırılır -->
 <div class="profile-dropdown" id="profileDropdown" style="display:none">
   <div class="profile-dropdown-header">👶 Bebek Profilleri</div>
