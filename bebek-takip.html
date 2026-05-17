@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.39
+  Bebek Takip Pro v1.0.43
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.39">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.43">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.39</title>
+<title>Bebek Takip Pro v1.0.43</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2049,10 +2049,10 @@ mark.hl {
   </div>
   <div class="settings-drawer-body">
     <div class="drawer-tabs">
-      <div class="drawer-tab active" onclick="switchDrawerTab('ayarlar')">⚙️ Ayarlar</div>
-      <div class="drawer-tab" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
-      <div class="drawer-tab" onclick="switchDrawerTab('iceaktar')">📥 Aktar</div>
-      <div class="drawer-tab" onclick="switchDrawerTab('anasayfa')">🏠 Sayfa</div>
+      <div class="drawer-tab active" data-tab="ayarlar" onclick="switchDrawerTab('ayarlar')">⚙️ Ayarlar</div>
+      <div class="drawer-tab" data-tab="yedek" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
+      <div class="drawer-tab" data-tab="iceaktar" onclick="switchDrawerTab('iceaktar')">📥 Aktar</div>
+      <div class="drawer-tab" data-tab="anasayfa" onclick="switchDrawerTab('anasayfa')">🏠 Sayfa</div>
     </div>
 
     <!-- Ayarlar Tab -->
@@ -2182,12 +2182,19 @@ mark.hl {
       </div>
     </div>
 
+    <!-- Ana Sayfa Özelleştirme Tab -->
+    <div class="drawer-section" id="drawer-anasayfa">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Kartları açıp kapatın ve ☰ ile sıralayın.</div>
+      <div id="dashCardList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveDashLayout()">💾 Kaydet</button>
+    </div>
+
   </div>
 </div>
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.39</span>
+  <span>Pro 1.0.43</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2439,14 +2446,6 @@ mark.hl {
       <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
       <button class="btn btn-primary" onclick="saveRecord()">💾 Kaydet</button>
     </div>
-
-    <!-- Ana Sayfa Özelleştirme Tab -->
-    <div class="drawer-section" id="drawer-anasayfa">
-      <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Kartları açıp kapatın ve sürükleyerek sıralayın.</div>
-      <div id="dashCardList" style="display:flex;flex-direction:column;gap:8px"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveDashLayout()">💾 Kaydet</button>
-    </div>
-
   </div>
 </div>
 
@@ -2540,30 +2539,64 @@ function renderDashCardList() {
   const list = document.getElementById('dashCardList');
   if (!list) return;
   const layout = getDashLayout();
-  let dragSrc = null;
 
   list.innerHTML = layout.map(c => `
-    <div class="dash-card-row" data-id="${c.id}" draggable="true">
-      <span class="drag-handle">☰</span>
+    <div class="dash-card-row" data-id="${c.id}">
+      <span class="drag-handle" style="cursor:ns-resize;touch-action:none">☰</span>
       <span class="card-row-label">${c.label}</span>
-      <button class="card-row-toggle ${c.visible ? 'on' : ''}" onclick="this.classList.toggle('on')" title="${c.visible ? 'Gizle' : 'Göster'}"></button>
+      <button class="card-row-toggle ${c.visible ? 'on' : ''}"
+        onclick="this.classList.toggle('on')" type="button"></button>
     </div>
   `).join('');
 
-  list.querySelectorAll('.dash-card-row').forEach(row => {
-    row.addEventListener('dragstart', e => { dragSrc = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-    row.addEventListener('dragend', () => { row.classList.remove('dragging'); list.querySelectorAll('.dash-card-row').forEach(r => r.classList.remove('drag-over')); });
-    row.addEventListener('dragover', e => { e.preventDefault(); if (row !== dragSrc) row.classList.add('drag-over'); });
+  // Touch-based drag sort
+  let dragEl = null, startY = 0, startIdx = 0;
+
+  list.querySelectorAll('.drag-handle').forEach(handle => {
+    const row = handle.closest('.dash-card-row');
+
+    handle.addEventListener('touchstart', e => {
+      dragEl = row;
+      startY = e.touches[0].clientY;
+      startIdx = [...list.children].indexOf(row);
+      row.style.opacity = '0.5';
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchmove', e => {
+      if (!dragEl) return;
+      e.preventDefault();
+      const y = e.touches[0].clientY;
+      const rows = [...list.querySelectorAll('.dash-card-row')];
+      for (const r of rows) {
+        if (r === dragEl) continue;
+        const rect = r.getBoundingClientRect();
+        if (y > rect.top && y < rect.bottom) {
+          const idx = rows.indexOf(r);
+          if (idx < rows.indexOf(dragEl)) list.insertBefore(dragEl, r);
+          else list.insertBefore(dragEl, r.nextSibling);
+          break;
+        }
+      }
+    }, { passive: false });
+
+    handle.addEventListener('touchend', () => {
+      if (dragEl) { dragEl.style.opacity = ''; dragEl = null; }
+    });
+
+    // Mouse drag fallback
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', e => { dragEl = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    row.addEventListener('dragend', () => { row.classList.remove('dragging'); dragEl = null; list.querySelectorAll('.dash-card-row').forEach(r => r.classList.remove('drag-over')); });
+    row.addEventListener('dragover', e => { e.preventDefault(); if (row !== dragEl) row.classList.add('drag-over'); });
     row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
     row.addEventListener('drop', e => {
       e.preventDefault();
       row.classList.remove('drag-over');
-      if (dragSrc && row !== dragSrc) {
-        const allRows = [...list.querySelectorAll('.dash-card-row')];
-        const fromIdx = allRows.indexOf(dragSrc);
-        const toIdx = allRows.indexOf(row);
-        if (fromIdx < toIdx) list.insertBefore(dragSrc, row.nextSibling);
-        else list.insertBefore(dragSrc, row);
+      if (dragEl && row !== dragEl) {
+        const all = [...list.querySelectorAll('.dash-card-row')];
+        if (all.indexOf(dragEl) < all.indexOf(row)) list.insertBefore(dragEl, row.nextSibling);
+        else list.insertBefore(dragEl, row);
       }
     });
   });
@@ -2571,34 +2604,33 @@ function renderDashCardList() {
 
 function renderDashboard() {
   const layout = getDashLayout();
-  const dashGrid = document.getElementById('page-dashboard');
-  if (!dashGrid) return;
 
-  // Hızlı Ekle her zaman en üstte (ayrı render)
+  // Hızlı Ekle
   renderQuickActions();
+  const hizliCard = document.getElementById('hizliEkleCard');
+  if (hizliCard) {
+    const hizli = layout.find(c => c.id === 'hizliEkle');
+    hizliCard.style.display = (hizli && !hizli.visible) ? 'none' : '';
+  }
 
-  // Diğer kartların görünürlüğünü ayarla
-  const cardMap = {
-    hizliEkle:     document.getElementById('hizliEkleCard'),
-    gelisimGrafik: document.getElementById('gelisimGrafikCard'),
-    sonAktivite:   document.getElementById('sonAktiviteCard'),
-    sonKontrol:    document.getElementById('sonKontrolCard'),
-    yaklasanAsi:   document.getElementById('yaklasanAsiCard'),
-  };
+  // Diğer kartları sırayla container'a ekle
+  const container = document.getElementById('dashCardsContainer');
+  if (container) {
+    const cardMap = {
+      gelisimGrafik: document.getElementById('gelisimGrafikCard'),
+      sonAktivite:   document.getElementById('sonAktiviteCard'),
+      sonKontrol:    document.getElementById('sonKontrolCard'),
+      yaklasanAsi:   document.getElementById('yaklasanAsiCard'),
+    };
 
-  layout.forEach(c => {
-    const el = cardMap[c.id];
-    if (el) el.style.display = c.visible ? '' : 'none';
-  });
-
-  // Sırayı uygula — dashboard-grid içindeki kartları yeniden sırala
-  const grid = document.getElementById('dashCardsContainer');
-  if (grid) {
-    const ordered = layout.filter(c => c.id !== 'hizliEkle' && c.visible);
-    ordered.forEach(c => {
-      const el = cardMap[c.id];
-      if (el) grid.appendChild(el);
-    });
+    layout
+      .filter(c => c.id !== 'hizliEkle')
+      .forEach(c => {
+        const el = cardMap[c.id];
+        if (!el) return;
+        el.style.display = c.visible ? '' : 'none';
+        if (c.visible) container.appendChild(el); // sona ekle = sırayı uygula
+      });
   }
 
   renderRecentActivities();
@@ -3002,9 +3034,8 @@ function closeSettingsDrawer() {
   document.getElementById('settingsDrawer').classList.remove('open');
 }
 function switchDrawerTab(tab) {
-  const tabs = ['ayarlar','yedek','iceaktar','anasayfa'];
-  document.querySelectorAll('.drawer-tab').forEach((el, i) => {
-    el.classList.toggle('active', tabs[i] === tab);
+  document.querySelectorAll('.drawer-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
   });
   document.querySelectorAll('.drawer-section').forEach(el => el.classList.remove('active'));
   const sec = document.getElementById('drawer-' + tab);
