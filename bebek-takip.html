@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.58</title>
+<title>Bebek Takip Pro v1.0.61</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2254,7 +2254,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.58</span>
+  <span>Pro 1.0.61</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3199,10 +3199,85 @@ function closeModalOnOutside(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
 }
 
+/* ===== AŞI LİSTESİ (T.C. Sağlık Bakanlığı 2025 Takvimi) ===== */
+const ASI_LIST = [
+  { ad: 'Hepatit B (Hep-B) – 1. doz',               donem: 'Doğumda',        kisaltma: 'Hep-B' },
+  { ad: 'BCG – Verem Aşısı',                         donem: '2. Ayın Sonu',   kisaltma: 'BCG' },
+  { ad: 'KPA – Pnömokok – 1. doz',                   donem: '2. Ayın Sonu',   kisaltma: 'KPA' },
+  { ad: 'DaBT-İPA-Hib-HepB – 6lı Karma – 1. doz',   donem: '2. Ayın Sonu',   kisaltma: 'DaBT 1' },
+  { ad: 'KPA – Pnömokok – 2. doz',                   donem: '4. Ayın Sonu',   kisaltma: 'KPA 2' },
+  { ad: 'DaBT-İPA-Hib-HepB – 6lı Karma – 2. doz',   donem: '4. Ayın Sonu',   kisaltma: 'DaBT 2' },
+  { ad: 'OPA – Oral Polio – 1. doz',                 donem: '6. Ayın Sonu',   kisaltma: 'OPA 1' },
+  { ad: 'DaBT-İPA-Hib-HepB – 6lı Karma – 3. doz',   donem: '6. Ayın Sonu',   kisaltma: 'DaBT 3' },
+  { ad: 'KKK – Kızamık-Kabakulak-Kızamıkçık – 1. doz', donem: '9. Ayın Sonu', kisaltma: 'KKK 1' },
+  { ad: 'Suçiçeği (Varisella) – 1. doz',             donem: '9. Ayın Sonu',   kisaltma: 'Suçiçeği' },
+  { ad: 'KPA – Pnömokok – Rapel',                    donem: '12. Ayın Sonu',  kisaltma: 'KPA R' },
+  { ad: 'Hepatit A (Hep-A) – 1. doz',                donem: '18. Ayın Sonu',  kisaltma: 'Hep-A 1' },
+  { ad: 'DaBT-İPA-Hib-HepB – 6lı Karma – Rapel',    donem: '18. Ayın Sonu',  kisaltma: 'DaBT R' },
+  { ad: 'OPA – Oral Polio – Rapel',                  donem: '18. Ayın Sonu',  kisaltma: 'OPA R' },
+  { ad: 'Hepatit A (Hep-A) – 2. doz',                donem: '24. Ayın Sonu',  kisaltma: 'Hep-A 2' },
+  { ad: 'KKK – Kızamık-Kabakulak-Kızamıkçık – 2. doz', donem: '24. Ayın Sonu', kisaltma: 'KKK 2' },
+  { ad: 'DaBT-İPA – Dörtlü Karma – Rapel',           donem: '48. Ay (4 Yaş)', kisaltma: 'DaBT-İPA' },
+  { ad: 'OPA – Oral Polio – 2. Rapel',               donem: '48. Ay (4 Yaş)', kisaltma: 'OPA 2R' },
+  { ad: 'Td – Erişkin Tetanos-Difteri',              donem: '13 Yaş',         kisaltma: 'Td' },
+  { ad: 'Tdab – Tetanos-Difteri-Boğmaca',            donem: 'Erişkin',        kisaltma: 'Tdab' },
+  { ad: 'Grip Aşısı (Yıllık)',                        donem: 'Diğer',          kisaltma: 'Grip' },
+  { ad: 'Meningokok (MenACWY)',                       donem: 'Diğer',          kisaltma: 'MenACWY' },
+  { ad: 'Rotavirüs Aşısı',                            donem: 'Diğer',          kisaltma: 'Rotavirüs' },
+  { ad: 'HPV Aşısı',                                  donem: 'Diğer',          kisaltma: 'HPV' },
+  { ad: 'Kuduz Aşısı',                                donem: 'Diğer',          kisaltma: 'Kuduz' },
+  { ad: 'Tifoid Aşısı',                               donem: 'Diğer',          kisaltma: 'Tifoid' },
+];
+
+function asiSetVal(ad) {
+  const inp = document.getElementById('f_asi');
+  if (inp) inp.value = ad;
+  asiCloseDD();
+}
+function asiCloseDD() {
+  const dd = document.getElementById('asiDropdown');
+  if (dd) dd.style.display = 'none';
+}
+function asiSearchFn(q) {
+  const dd = document.getElementById('asiDropdown');
+  if (!dd) return;
+  const norm = s => s.toLocaleLowerCase('tr-TR');
+  const list = (q || '').trim()
+    ? ASI_LIST.filter(a => norm(a.ad).includes(norm(q)) || norm(a.kisaltma).includes(norm(q)))
+    : ASI_LIST;
+  if (!list.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = list.map(a => {
+    const safe = a.ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div onclick="asiSetVal('${safe}')"
+      style="padding:9px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)"
+      onmouseover="this.style.background='rgba(76,175,80,0.1)'"
+      onmouseout="this.style.background=''">
+      <span style="font-weight:700;color:var(--text)">${a.kisaltma}</span>
+      <span style="color:var(--text3);font-size:11px;margin-left:6px">${a.donem}</span>
+      <div style="font-size:11px;color:var(--text2);margin-top:1px">${a.ad}</div>
+    </div>`;
+  }).join('');
+  dd.style.display = 'block';
+}
+function asiRenderQuick() {
+  const sel   = document.getElementById('f_donem');
+  const quick = document.getElementById('asiQuickBtns');
+  if (!sel || !quick) return;
+  const items = ASI_LIST.filter(a => a.donem === sel.value);
+  quick.innerHTML = items.map(a => {
+    const safe = a.ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<button type="button" onclick="asiSetVal('${safe}')"
+      style="padding:4px 10px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">
+      ${a.kisaltma}
+    </button>`;
+  }).join('');
+}
+
 function openAddModal() {
   editingId = null;
   editingSection = currentPage;
   showModal(currentPage, null);
+  if (currentPage === 'asi') setTimeout(asiRenderQuick, 50);
 }
 
 function showModal(section, record) {
@@ -3231,7 +3306,7 @@ function getFormHTML(section, r) {
     <div class="form-grid form-grid-2">
       <div class="form-group">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
         <label class="form-label">⏰ Saat</label>
@@ -3239,7 +3314,7 @@ function getFormHTML(section, r) {
       </div>
       <div class="form-group full">
         <label class="form-label">⚡ Olay *</label>
-        <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="\u00d6rn: Titreme, Ate\u015f, \u00d6ks\u00fcr\u00fck..." required />
+        <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="\u00d6rn: Titreme, Ate\u015f, \u00d6ks\u00fcr\u00fck..."/>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3251,7 +3326,7 @@ function getFormHTML(section, r) {
     <div class="form-grid form-grid-2">
       <div class="form-group full">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
         <label class="form-label">📏 Boy (cm)</label>
@@ -3279,7 +3354,7 @@ function getFormHTML(section, r) {
     <div class="form-grid form-grid-2">
       <div class="form-group full">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
         <label class="form-label">🏥 Hastane</label>
@@ -3327,7 +3402,7 @@ function getFormHTML(section, r) {
     <div class="form-grid form-grid-2">
       <div class="form-group">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
         <label class="form-label">⏰ Saat</label>
@@ -3341,7 +3416,7 @@ function getFormHTML(section, r) {
       </div>
       <div class="form-group">
         <label class="form-label">🍽️ Ad\u0131 *</label>
-        <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="G\u0131da ad\u0131..." required />
+        <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="G\u0131da ad\u0131..."/>
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
@@ -3365,11 +3440,11 @@ function getFormHTML(section, r) {
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
         <label class="form-label">📝 Ba\u015fl\u0131k *</label>
-        <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="\u0130lk ad\u0131m, ilk kelime..." required />
+        <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="\u0130lk ad\u0131m, ilk kelime..."/>
       </div>
       <div class="form-group">
         <label class="form-label">💬 Not</label>
@@ -3409,34 +3484,44 @@ function getFormHTML(section, r) {
     <div class="form-grid form-grid-2">
       <div class="form-group">
         <label class="form-label">📅 Tarih *</label>
-        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}" required />
+        <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
-        <label class="form-label">🗓️ D\u00f6nem</label>
-        <select class="form-select" id="f_donem">
-          ${['Do\u011fumda','1. Ay\u0131n Sonu','2. Ay\u0131n Sonu','4. Ay\u0131n Sonu','6. Ay\u0131n Sonu','12. Ay Sonu','18. Ay Sonu','24. Ay Sonu','48. Ay Sonu','\u0130lk\u00f6\u011fretim 1. S\u0131n\u0131f','\u0130lk\u00f6\u011fretim 8. S\u0131n\u0131f','Di\u011fer'].map(d=>`<option value="${d}" ${v.donem===d?'selected':''}>${d}</option>`).join('')}
+        <label class="form-label">🗓️ Dönem</label>
+        <select class="form-select" id="f_donem" onchange="asiRenderQuick()">
+          ${['Doğumda','2. Ayın Sonu','4. Ayın Sonu','6. Ayın Sonu','9. Ayın Sonu','12. Ayın Sonu','18. Ayın Sonu','24. Ayın Sonu','48. Ay (4 Yaş)','13 Yaş','Erişkin','Diğer'].map(d=>`<option value="${d}" ${v.donem===d?'selected':''}>${d}</option>`).join('')}
         </select>
       </div>
       <div class="form-group full">
-        <label class="form-label">💉 A\u015f\u0131 Ad\u0131 *</label>
-        <input class="form-input" type="text" id="f_asi" value="${v.asi||''}" placeholder="\u00d6rn: Hep B, BCG, KKK..." required />
+        <label class="form-label">💉 Aşı Adı *</label>
+        <div style="position:relative">
+          <input class="form-input" type="text" id="f_asi" value="${v.asi||''}"
+            placeholder="Aşı adı yazın veya listeden seçin..."
+            autocomplete="off"
+            oninput="asiSearchFn(this.value)"
+            onfocus="asiSearchFn(this.value)"
+            onblur="setTimeout(asiCloseDD,200)"
+           />
+          <div id="asiDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--card);border:1.5px solid var(--primary);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;margin-top:3px"></div>
+        </div>
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px" id="asiQuickBtns"></div>
       </div>
       <div class="form-group">
         <label class="form-label">✅ Durum</label>
         <select class="form-select" id="f_durum">
-          <option value="Planland\u0131" ${v.durum==='Planland\u0131'?'selected':''}>📋 Planland\u0131</option>
-          <option value="Uyguland\u0131" ${v.durum==='Uyguland\u0131'?'selected':''}>✅ Uyguland\u0131</option>
+          <option value="Planlandı" ${v.durum==='Planlandı'?'selected':''}>📋 Planlandı</option>
+          <option value="Uygulandı" ${v.durum==='Uygulandı'?'selected':''}>✅ Uygulandı</option>
           <option value="Beklemede" ${v.durum==='Beklemede'?'selected':''}>⏳ Beklemede</option>
           <option value="Ertelendi" ${v.durum==='Ertelendi'?'selected':''}>📅 Ertelendi</option>
         </select>
       </div>
       <div class="form-group full">
-        <label class="form-label">📝 A\u00e7\u0131klama</label>
+        <label class="form-label">📝 Açıklama</label>
         <textarea class="form-textarea" id="f_aciklama" placeholder="Notlar...">${v.aciklama||''}</textarea>
       </div>
     </div>`;
 
-  return '<p>Bu b\u00f6l\u00fcm i\u00e7in form bulunamad\u0131.</p>';
+  return '<p>Bu bölüm için form bulunamadı.</p>';
 }
 
 function setStar(containerId, val) {
@@ -3464,26 +3549,23 @@ function saveRecord() {
   let record = { id: editingId || genId() };
 
   if (section === 'olay') {
-    if (!getVal('f_tarih') || !getVal('f_olay')) { showToast('Tarih ve Olay zorunlu!', 'error'); return; }
+    // zorunlu kontrol kaldırıldı
     record = { ...record, tarih: getVal('f_tarih'), saat: getVal('f_saat'), olay: getVal('f_olay'), not: getVal('f_not') };
   } else if (section === 'gelisim') {
-    if (!getVal('f_tarih')) { showToast('Tarih zorunlu!', 'error'); return; }
+    // zorunlu kontrol kaldırıldı
     record = { ...record, tarih: getVal('f_tarih'), boy: getVal('f_boy'), agirlik: getVal('f_agirlik'), bas: getVal('f_bas'), diger: getVal('f_diger'), notlar: getVal('f_notlar') };
   } else if (section === 'kontrol') {
-    if (!getVal('f_tarih')) { showToast('Tarih zorunlu!', 'error'); return; }
+    // zorunlu kontrol kaldırıldı
     const dp = document.getElementById('doctorStars') ? +document.getElementById('doctorStars').getAttribute('data-val') : 0;
     const hp = document.getElementById('hospitalStars') ? +document.getElementById('hospitalStars').getAttribute('data-val') : 0;
     record = { ...record, tarih: getVal('f_tarih'), hastane: getVal('f_hastane'), doktor: getVal('f_doktor'), teshis: getVal('f_teshis'), tedavi: getVal('f_tedavi'), ilac: getVal('f_ilac'), tetkik: getVal('f_tetkik'), not: getVal('f_not'), doktorPuan: dp, hastanePuan: hp };
   } else if (section === 'gida') {
-    if (!getVal('f_tarih') || !getVal('f_adi')) { showToast('Tarih ve Ad\u0131 zorunlu!', 'error'); return; }
     record = { ...record, tarih: getVal('f_tarih'), saat: getVal('f_saat'), tur: getVal('f_tur'), adi: getVal('f_adi'), icerik: getVal('f_icerik'), miktar: getVal('f_miktar'), alerji: getVal('f_alerji'), not: getVal('f_not') };
   } else if (section === 'gunluk') {
-    if (!getVal('f_tarih') || !getVal('f_baslik')) { showToast('Tarih ve Ba\u015fl\u0131k zorunlu!', 'error'); return; }
     record = { ...record, tarih: getVal('f_tarih'), baslik: getVal('f_baslik'), not: getVal('f_not') };
   } else if (section === 'dis') {
     record = { ...record, dis: getVal('f_dis'), konum: getVal('f_konum'), cikma: getVal('f_cikma'), dusme: getVal('f_dusme'), not: getVal('f_not') };
   } else if (section === 'asi') {
-    if (!getVal('f_tarih') || !getVal('f_asi')) { showToast('Tarih ve A\u015f\u0131 ad\u0131 zorunlu!', 'error'); return; }
     record = { ...record, tarih: getVal('f_tarih'), donem: getVal('f_donem'), asi: getVal('f_asi'), durum: getVal('f_durum'), aciklama: getVal('f_aciklama') };
   }
 
@@ -3513,6 +3595,7 @@ function editRecord(section, id) {
   editingId = id;
   editingSection = section;
   showModal(section, record);
+  if (section === 'asi') setTimeout(asiRenderQuick, 50);
 }
 
 function deleteRecord(section, id) {
