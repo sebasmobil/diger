@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.65
+  Bebek Takip Pro v1.0.73
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.65">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.73">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.65</title>
+<title>Bebek Takip Pro v1.0.73</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2262,12 +2262,13 @@ mark.hl {
       <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveDashLayout()">💾 Kaydet</button>
     </div>
 
+
   </div>
 </div>
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.64</span>
+  <span>Pro 1.0.73</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2775,6 +2776,7 @@ function renderDashboard() {
   renderRecentActivities();
   updateLastControl();
   updateNextVaccine();
+  autoCollectKontrolLists();
   renderOlayKart();
   renderGelisimOzet();
   renderGidaKart();
@@ -3397,6 +3399,8 @@ function asiRenderQuick() {
 }
 
 function openAddModal() {
+  window._currentFormSection = currentPage;
+  window._currentFormVal = {};
   editingId = null;
   editingSection = currentPage;
   showModal(currentPage, null);
@@ -3416,6 +3420,8 @@ function showModal(section, record) {
   modalBody.innerHTML = getFormHTML(section, record);
   overlay.style.display = 'flex';
   setTimeout(applyDatePlaceholders, 50);
+  if (section === 'kontrol') initKontrolChips();
+  if (section === 'olay') setTimeout(initOlayChips, 300);
 }
 
 function getFormHTML(section, r) {
@@ -3436,8 +3442,9 @@ function getFormHTML(section, r) {
         <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
       <div class="form-group full">
-        <label class="form-label">⚡ Olay</label>
-        <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="\u00d6rn: Titreme, Ate\u015f, \u00d6ks\u00fcr\u00fck..."/>
+        <label class="form-label">⚡ Olay <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('olay_tur','Hızlı Olay Seçenekleri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="Örn: Titreme, Ateş, Öksürük..."/>
+        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3480,12 +3487,20 @@ function getFormHTML(section, r) {
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
-        <label class="form-label">🏥 Hastane</label>
-        <input class="form-input" type="text" id="f_hastane" value="${v.hastane||''}" placeholder="Hastane ad\u0131..." />
+        <label class="form-label">🏥 Hastane <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_hastane','Hastaneler')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_hastane" value="${v.hastane||''}" placeholder="Hastane adı..."
+          autocomplete="off"
+          oninput="renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane')"
+          onfocus="renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane')" />
+        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">👨‍⚕️ Doktor</label>
-        <input class="form-input" type="text" id="f_doktor" value="${v.doktor||''}" placeholder="Doktor ad\u0131..." />
+        <label class="form-label">👨‍⚕️ Doktor <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_doktor','Doktorlar')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_doktor" value="${v.doktor||''}" placeholder="Doktor adı..."
+          autocomplete="off"
+          oninput="renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor')"
+          onfocus="renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor')" />
+        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔬 Hastal\u0131k / Te\u015fhis</label>
@@ -3532,9 +3547,9 @@ function getFormHTML(section, r) {
         <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
       <div class="form-group">
-        <label class="form-label">🏷️ T\u00fcr</label>
+        <label class="form-label">🏷️ T\u00fcr <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_tur','Gıda Türleri')">✏️ Düzenle</span></label>
         <select class="form-select" id="f_tur">
-          ${['Sebze','Meyve','Et','Tah\u0131l','S\u00fct \u00dcr\u00fcnleri','Anne S\u00fct\u00fc','Mama','\u00c7orba','Di\u011fer'].map(t=>`<option value="${t}" ${v.tur===t?'selected':''}>${t}</option>`).join('')}
+          ${getCustomList('gida_tur',['Sebze','Meyve','Et','Tahıl','Süt Ürünleri','Anne Sütü','Mama','Çorba','Diğer']).map(t=>`<option value="${t}" ${v.tur===t?'selected':''}>${t}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -3578,15 +3593,15 @@ function getFormHTML(section, r) {
   if (section === 'dis') return `
     <div class="form-grid form-grid-2">
       <div class="form-group">
-        <label class="form-label">🦷 Di\u015f Ad\u0131</label>
+        <label class="form-label">🦷 Di\u015f Ad\u0131 <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('dis_tur','Diş Türleri')">✏️ Düzenle</span></label>
         <select class="form-select" id="f_dis">
-          ${['Merkez Kesici','Yan Kesici','K\u00f6pek Di\u015fi','1. Az\u0131 Di\u015fi','2. Az\u0131 Di\u015fi'].map(d=>`<option value="${d}" ${v.dis===d?'selected':''}>${d}</option>`).join('')}
+          ${getCustomList('dis_tur',['Merkez Kesici','Yan Kesici','Köpek Dişi','1. Azı Dişi','2. Azı Dişi']).map(d=>`<option value="${d}" ${v.dis===d?'selected':''}>${d}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">📍 Konum</label>
+        <label class="form-label">📍 Konum <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('dis_konum','Diş Konumları')">✏️ Düzenle</span></label>
         <select class="form-select" id="f_konum">
-          ${['\u00dcst Sa\u011f','\u00dcst Sol','Alt Sa\u011f','Alt Sol'].map(k=>`<option value="${k}" ${v.konum===k?'selected':''}>${k}</option>`).join('')}
+          ${getCustomList('dis_konum',['Üst Sağ','Üst Sol','Alt Sağ','Alt Sol']).map(k=>`<option value="${k}" ${v.konum===k?'selected':''}>${k}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -3610,9 +3625,9 @@ function getFormHTML(section, r) {
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
-        <label class="form-label">🗓️ Dönem</label>
+        <label class="form-label">🗓️ Dönem <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_donem','Aşı Dönemleri')">✏️ Düzenle</span></label>
         <select class="form-select" id="f_donem" onchange="asiRenderQuick()">
-          ${['Doğumda','2. Ayın Sonu','4. Ayın Sonu','6. Ayın Sonu','9. Ayın Sonu','12. Ayın Sonu','18. Ayın Sonu','24. Ayın Sonu','48. Ay (4 Yaş)','13 Yaş','Erişkin','Diğer'].map(d=>`<option value="${d}" ${v.donem===d?'selected':''}>${d}</option>`).join('')}
+          ${getCustomList('asi_donem',['Doğumda','2. Ayın Sonu','4. Ayın Sonu','6. Ayın Sonu','9. Ayın Sonu','12. Ayın Sonu','18. Ayın Sonu','24. Ayın Sonu','48. Ay (4 Yaş)','13 Yaş','Erişkin','Diğer']).map(d=>`<option value="${d}" ${v.donem===d?'selected':''}>${d}</option>`).join('')}
         </select>
       </div>
       <div class="form-group full">
@@ -4454,6 +4469,226 @@ function gcSelectPoint(i) {
   }, 50);
 }
 
+
+
+// ===== ÖZEL LİSTELER (Custom Lists) =====
+
+// Varsayılan listeler
+const CUSTOM_LIST_DEFAULTS = {
+  asi_donem: ['Doğumda','2. Ayın Sonu','4. Ayın Sonu','6. Ayın Sonu','9. Ayın Sonu',
+              '12. Ayın Sonu','18. Ayın Sonu','24. Ayın Sonu','48. Ay (4 Yaş)','13 Yaş','Erişkin','Diğer'],
+  gida_tur:  ['Sebze','Meyve','Et','Tahıl','Süt Ürünleri','Anne Sütü','Mama','Çorba','Diğer'],
+  dis_tur:   ['Merkez Kesici','Yan Kesici','Köpek Dişi','1. Azı Dişi','2. Azı Dişi'],
+  dis_konum: ['Üst Sağ','Üst Sol','Alt Sağ','Alt Sol'],
+  olay_tur:  ['Ateş','Titreme','Öksürük','Kusma','İshal','Kızarıklık','Düşme','Diş','Diğer'],
+  kontrol_hastane: [],
+  kontrol_doktor:  [],
+};
+
+function autoCollectKontrolLists() {
+  const hastaneler = [...new Set((data.kontrol||[]).map(r=>r.hastane).filter(Boolean))];
+  const doktorlar  = [...new Set((data.kontrol||[]).map(r=>r.doktor).filter(Boolean))];
+  const lists = (data.settings && data.settings.customLists) || {};
+  const mergeUnique = (existing, auto) => {
+    const base = existing && existing.length ? [...existing] : [];
+    const set = new Set(base.map(s=>s.trim().toLocaleLowerCase('tr-TR')));
+    auto.forEach(v => { if (v && !set.has(v.trim().toLocaleLowerCase('tr-TR'))) base.push(v); });
+    return base;
+  };
+  saveCustomList('kontrol_hastane', mergeUnique(lists.kontrol_hastane, hastaneler));
+  saveCustomList('kontrol_doktor',  mergeUnique(lists.kontrol_doktor,  doktorlar));
+}
+
+function getCustomList(key, fallback) {
+  const lists = (data.settings && data.settings.customLists) || {};
+  if (lists[key] && lists[key].length > 0) return lists[key];
+  return fallback || CUSTOM_LIST_DEFAULTS[key] || [];
+}
+
+function saveCustomList(key, arr) {
+  if (!data.settings) data.settings = {};
+  if (!data.settings.customLists) data.settings.customLists = {};
+  data.settings.customLists[key] = [...arr].sort((a, b) =>
+    a.toLocaleLowerCase('tr-TR').localeCompare(b.toLocaleLowerCase('tr-TR'), 'tr')
+  );
+  saveData();
+}
+
+
+
+
+function renderSuggestionChips(inputId, chipsId, listKey) {
+  const inp = document.getElementById(inputId);
+  const box = document.getElementById(chipsId);
+  if (!inp || !box) return;
+  const all    = getCustomList(listKey, []);
+  const query  = inp.value.trim().toLocaleLowerCase('tr-TR');
+  const filtered = query ? all.filter(s => s.toLocaleLowerCase('tr-TR').includes(query)) : all;
+  if (filtered.length === 0) { box.innerHTML = ''; return; }
+  box.innerHTML = '';
+  filtered.forEach(s => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = s;
+    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:var(--font);white-space:nowrap';
+    btn.addEventListener('click', () => {
+      inp.value = s;
+      box.innerHTML = '';
+    });
+    box.appendChild(btn);
+  });
+}
+
+
+function initKontrolChips() {
+  autoCollectKontrolLists();
+  setTimeout(() => {
+    renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane');
+    renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor');
+  }, 300);
+}
+function initOlayChips() {
+  const box = document.getElementById('olay_chips');
+  if (!box) return;
+  const items = getCustomList('olay_tur', ['Ateş','Titreme','Öksürük','Kusma','İshal','Kızarıklık','Düşme','Diş','Diğer']);
+  box.innerHTML = '';
+  items.forEach(t => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = t;
+    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--font)';
+    btn.addEventListener('click', () => {
+      const inp = document.getElementById('f_olay');
+      if (!inp) return;
+      const cur = inp.value.trim();
+      inp.value = cur ? cur + ', ' + t : t;
+      inp.focus();
+    });
+    box.appendChild(btn);
+  });
+}
+
+function olayChipClick(val) {
+  const inp = document.getElementById('f_olay');
+  if (!inp) return;
+  const cur = inp.value.trim();
+  inp.value = cur ? cur + ', ' + val : val;
+  inp.focus();
+}
+
+// ===== INLINE LİSTE DÜZENLE MİNİ MODAL =====
+let _lmmKey     = null;
+let _lmmEditIdx = null;  // null=ekle modu, number=düzenle modu
+
+function openMiniListModal(key, title) {
+  _lmmKey     = key;
+  _lmmEditIdx = null;
+  document.getElementById('lmmTitle').textContent = '✏️ ' + title;
+  document.getElementById('lmmInput').value = '';
+  document.getElementById('lmmInput').placeholder = 'Yeni öğe...';
+  document.getElementById('lmmConfirmBtn').textContent = '+ Ekle';
+  document.getElementById('lmmCancelBtn').style.display = 'none';
+  const modal = document.getElementById('listMiniModal');
+  modal.style.display = 'flex';
+  lmmRenderList();
+  setTimeout(() => document.getElementById('lmmInput').focus(), 100);
+}
+
+function closeMiniListModal() {
+  document.getElementById('listMiniModal').style.display = 'none';
+  _lmmKey = null; _lmmEditIdx = null;
+  // Formu yenile (seçenekler güncellensin)
+  const modalEl = document.getElementById('recordModal');
+  if (modalEl && modalEl.style.display !== 'none') {
+    const sec = window._currentFormSection;
+    const val = window._currentFormVal;
+    if (sec) {
+      const body = document.getElementById('recordModalBody');
+      if (body) body.innerHTML = getFormHTML(sec, val);
+      if (sec === 'asi') asiRenderQuick();
+      if (sec === 'kontrol') initKontrolChips();
+      if (sec === 'olay') setTimeout(initOlayChips, 300);
+    }
+  }
+}
+
+function lmmRenderList() {
+  const items = getCustomList(_lmmKey, CUSTOM_LIST_DEFAULTS[_lmmKey] || []);
+  const el = document.getElementById('lmmList');
+  if (!el) return;
+  if (items.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;font-family:var(--font)">Liste boş — yukarıdan ekleyin</div>';
+    return;
+  }
+  el.innerHTML = items.map((item, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;font-size:13px;font-weight:600;color:var(--text);font-family:var(--font)">${escHtml(item)}</div>
+      <button onclick="lmmStartEdit(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:var(--text3)" title="Düzenle">✏️</button>
+      <button onclick="lmmDelete(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:#ef4444" title="Sil">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function lmmStartEdit(i) {
+  _lmmEditIdx = i;
+  const items = getCustomList(_lmmKey, CUSTOM_LIST_DEFAULTS[_lmmKey] || []);
+  const inp = document.getElementById('lmmInput');
+  inp.value = items[i];
+  inp.focus(); inp.select();
+  document.getElementById('lmmConfirmBtn').textContent = '✓ Kaydet';
+  document.getElementById('lmmCancelBtn').style.display = '';
+}
+
+function lmmCancelEdit() {
+  _lmmEditIdx = null;
+  document.getElementById('lmmInput').value = '';
+  document.getElementById('lmmInput').placeholder = 'Yeni öğe...';
+  document.getElementById('lmmConfirmBtn').textContent = '+ Ekle';
+  document.getElementById('lmmCancelBtn').style.display = 'none';
+}
+
+function lmmConfirm() {
+  const inp = document.getElementById('lmmInput');
+  const val = inp.value.trim();
+  if (!val) { showToast('Öğe adı boş olamaz!', 'error'); inp.focus(); return; }
+  const items = [...getCustomList(_lmmKey, CUSTOM_LIST_DEFAULTS[_lmmKey] || [])];
+  if (_lmmEditIdx === null) {
+    if (items.map(s => s.toLocaleLowerCase('tr-TR')).includes(val.toLocaleLowerCase('tr-TR'))) {
+      showToast('Bu öğe zaten mevcut!', 'error'); return;
+    }
+    items.push(val);
+    showToast('Öğe eklendi ✅');
+  } else {
+    items[_lmmEditIdx] = val;
+    showToast('Güncellendi ✅');
+    _lmmEditIdx = null;
+  }
+  saveCustomList(_lmmKey, items);
+  inp.value = '';
+  document.getElementById('lmmConfirmBtn').textContent = '+ Ekle';
+  document.getElementById('lmmCancelBtn').style.display = 'none';
+  lmmRenderList();
+}
+
+function lmmDelete(i) {
+  const items = [...getCustomList(_lmmKey, CUSTOM_LIST_DEFAULTS[_lmmKey] || [])];
+  const name = items[i];
+  showConfirm(`"${name}" silinsin mi?`, () => {
+    items.splice(i, 1);
+    saveCustomList(_lmmKey, items);
+    showToast('Silindi!', 'info');
+    lmmRenderList();
+    if (_lmmEditIdx === i) lmmCancelEdit();
+  });
+}
+
+function lmmResetDefault() {
+  showConfirm('Liste varsayılan değerlere sıfırlansın mı?', () => {
+    saveCustomList(_lmmKey, [...(CUSTOM_LIST_DEFAULTS[_lmmKey] || [])]);
+    showToast('Sıfırlandı ↺');
+    lmmRenderList();
+  });
+}
 
 // ===== BÖLÜM ÖZET KARTLARI =====
 
@@ -5312,6 +5547,27 @@ self.addEventListener('fetch', e => {
   <div class="profile-dropdown-footer">
     <button class="btn btn-primary btn-sm" style="flex:1" onclick="openAddBabyModal();closeDropdown()">+ Yeni Bebek</button>
     <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showPage('bebekler');closeDropdown()">Tümünü Gör</button>
+  </div>
+</div>
+
+<!-- LİSTE DÜZENLE MINI MODAL -->
+<div id="listMiniModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeMiniListModal()">
+  <div style="background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,0.18)">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--border)">
+      <div id="lmmTitle" style="flex:1;font-weight:800;font-size:15px;color:var(--text);font-family:var(--font)"></div>
+      <button onclick="closeMiniListModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);padding:0 4px">✕</button>
+    </div>
+    <div style="padding:12px 18px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="lmmInput" class="form-input" style="flex:1;margin:0" placeholder="Yeni öğe..." onkeydown="if(event.key==='Enter')lmmConfirm()" />
+        <button id="lmmConfirmBtn" class="btn btn-primary btn-sm" onclick="lmmConfirm()" style="white-space:nowrap;flex-shrink:0">+ Ekle</button>
+        <button id="lmmCancelBtn" class="btn btn-secondary btn-sm" onclick="lmmCancelEdit()" style="display:none;white-space:nowrap;flex-shrink:0">✕</button>
+      </div>
+    </div>
+    <div id="lmmList" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+    <div style="padding:10px 18px 18px">
+      <button onclick="lmmResetDefault()" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px;width:100%;font-size:12px;color:var(--text3);cursor:pointer;font-family:var(--font)">↺ Varsayılana sıfırla</button>
+    </div>
   </div>
 </div>
 </body>
