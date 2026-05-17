@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.46
+  Bebek Takip Pro v1.0.49
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.46">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.49">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.46</title>
+<title>Bebek Takip Pro v1.0.49</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2130,6 +2130,7 @@ mark.hl {
           <div class="import-sec-btn" onclick="impSelectSection('gida')">🍼<span>Gıda</span></div>
           <div class="import-sec-btn" onclick="impSelectSection('gunluk')">📔<span>Günlük</span></div>
           <div class="import-sec-btn" onclick="impSelectSection('asi')">💉<span>Aşı</span></div>
+          <div class="import-sec-btn" onclick="impSelectSection('dis')">🦷<span>Diş</span></div>
         </div>
       </div>
       <!-- Adım 2: Dosya yükle -->
@@ -2194,7 +2195,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.46</span>
+  <span>Pro 1.0.49</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2395,22 +2396,53 @@ mark.hl {
 
     <!-- DİŞ PAGE -->
     <div class="page" id="page-dis">
-      <div class="card">
+      <!-- İnteraktif Diş Haritası -->
+      <div class="card" style="margin-bottom:16px">
         <div class="card-header">
-          <span class="card-title">🦷 Diş Takibi</span>
+          <span class="card-title">🦷 Diş Haritası</span>
+          <span style="font-size:12px;color:var(--text3)">Dişe tıkla → kaydet</span>
+        </div>
+        <div class="card-body" style="padding:12px 10px">
+          <div id="toothMapSvgWrap" style="width:100%;overflow:hidden"></div>
+        </div>
+      </div>
+
+      <!-- Seçili Diş Paneli -->
+      <div class="card" id="toothDetailPanel" style="display:none;margin-bottom:16px">
+        <div class="card-header">
+          <span class="card-title" id="toothDetailTitle">Diş Detayı</span>
         </div>
         <div class="card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-            <div>
-              <h3 style="font-family:var(--font);font-size:16px;font-weight:800;margin-bottom:12px;color:var(--text2)">🔼 Üst Dişler (Çıkma)</h3>
-              <div class="tooth-grid" id="upperTeeth"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="form-group">
+              <label class="form-label">📅 Çıkma Tarihi</label>
+              <input class="form-input" type="date" id="toothCikmaInput" />
             </div>
-            <div>
-              <h3 style="font-family:var(--font);font-size:16px;font-weight:800;margin-bottom:12px;color:var(--text2)">🔽 Alt Dişler (Çıkma)</h3>
-              <div class="tooth-grid" id="lowerTeeth"></div>
+            <div class="form-group">
+              <label class="form-label">📅 Düşme Tarihi</label>
+              <input class="form-input" type="date" id="toothDusmeInput" />
             </div>
           </div>
-          <div class="records-list" id="dis-cards" style="margin-top:16px"></div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">📝 Not</label>
+            <input class="form-input" type="text" id="toothNotInput" placeholder="İsteğe bağlı not..." />
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="closeToothPanel()">İptal</button>
+            <button class="btn btn-danger btn-sm" id="toothDeleteBtn" style="flex:1;display:none" onclick="deleteToothRecord()">🗑️ Sil</button>
+            <button class="btn btn-primary btn-sm" style="flex:2" onclick="saveToothRecord()">💾 Kaydet</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kayıt Listesi -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">📋 Diş Kayıtları</span></div>
+        <div class="records-list" id="dis-cards">
+          <div class="empty-state" style="padding:24px">
+            <div class="es-icon">🦷</div>
+            <div class="es-sub">Henüz diş kaydı yok</div>
+          </div>
         </div>
       </div>
     </div>
@@ -3006,7 +3038,7 @@ function showPage(page) {
 
   // Update add button
   const addBtn = document.getElementById('addBtn');
-  const noAddPages = ['dashboard', 'yedek', 'ayarlar', 'bebekler'];
+  const noAddPages = ['dashboard', 'yedek', 'ayarlar', 'bebekler', 'dis'];
   if (addBtn) addBtn.style.display = noAddPages.includes(page) ? 'none' : '';
 
   // Render page
@@ -3602,49 +3634,179 @@ function escHtml(s) {
 }
 
 // ===== D\u0130\u015e PAGE =====
-const toothTypes = ['Merkez Kesici','Yan Kesici','K\u00f6pek Di\u015fi','1. Az\u0131','2. Az\u0131'];
-const positions = ['\u00dcst Sa\u011f','\u00dcst Sol','Alt Sa\u011f','Alt Sol'];
+// ===== DİŞ HARİTASI =====
+const TOOTH_MAP = [
+  {id:'UR1',label:'Merkez Kesici',jaw:'upper',side:'right',cx:188,cy:82,rx:16,ry:19},
+  {id:'UR2',label:'Yan Kesici',   jaw:'upper',side:'right',cx:162,cy:90,rx:14,ry:17},
+  {id:'UR3',label:'Köpekdişi',   jaw:'upper',side:'right',cx:138,cy:102,rx:13,ry:17},
+  {id:'UR4',label:'1. Azıdişi',  jaw:'upper',side:'right',cx:115,cy:118,rx:14,ry:16},
+  {id:'UR5',label:'2. Azıdişi',  jaw:'upper',side:'right',cx:94, cy:138,rx:15,ry:16},
+  {id:'UL1',label:'Merkez Kesici',jaw:'upper',side:'left', cx:212,cy:82,rx:16,ry:19},
+  {id:'UL2',label:'Yan Kesici',   jaw:'upper',side:'left', cx:238,cy:90,rx:14,ry:17},
+  {id:'UL3',label:'Köpekdişi',   jaw:'upper',side:'left', cx:262,cy:102,rx:13,ry:17},
+  {id:'UL4',label:'1. Azıdişi',  jaw:'upper',side:'left', cx:285,cy:118,rx:14,ry:16},
+  {id:'UL5',label:'2. Azıdişi',  jaw:'upper',side:'left', cx:306,cy:138,rx:15,ry:16},
+  {id:'LR1',label:'Merkez Kesici',jaw:'lower',side:'right',cx:188,cy:310,rx:14,ry:17},
+  {id:'LR2',label:'Yan Kesici',   jaw:'lower',side:'right',cx:162,cy:302,rx:13,ry:16},
+  {id:'LR3',label:'Köpekdişi',   jaw:'lower',side:'right',cx:139,cy:290,rx:12,ry:16},
+  {id:'LR4',label:'1. Azıdişi',  jaw:'lower',side:'right',cx:116,cy:274,rx:14,ry:15},
+  {id:'LR5',label:'2. Azıdişi',  jaw:'lower',side:'right',cx:96, cy:255,rx:15,ry:15},
+  {id:'LL1',label:'Merkez Kesici',jaw:'lower',side:'left', cx:212,cy:310,rx:14,ry:17},
+  {id:'LL2',label:'Yan Kesici',   jaw:'lower',side:'left', cx:238,cy:302,rx:13,ry:16},
+  {id:'LL3',label:'Köpekdişi',   jaw:'lower',side:'left', cx:261,cy:290,rx:12,ry:16},
+  {id:'LL4',label:'1. Azıdişi',  jaw:'lower',side:'left', cx:284,cy:274,rx:14,ry:15},
+  {id:'LL5',label:'2. Azıdişi',  jaw:'lower',side:'left', cx:304,cy:255,rx:15,ry:15},
+];
+
+let selectedToothId = null;
 
 function renderDisPage() {
-  renderDisGrid('upperTeeth', ['\u00dcst Sa\u011f','\u00dcst Sol']);
-  renderDisGrid('lowerTeeth', ['Alt Sa\u011f','Alt Sol']);
+  renderToothMap();
+  renderDisList();
+}
 
+function renderToothMap() {
+  const wrap = document.getElementById('toothMapSvgWrap');
+  if (!wrap) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const bgJaw   = isDark ? '#1a2535' : '#fff3f0';
+  const bgMouth = isDark ? '#0f1824' : '#ffe8e0';
+  const stroke  = isDark ? '#334' : '#ddd';
+  const textCol = isDark ? '#8899aa' : '#888';
+  const labelCol= isDark ? '#aabbcc' : '#555';
+
+  function toothFill(t) {
+    const rec = data.dis.find(d => d.toothId === t.id);
+    if (!rec) return isDark ? '#1e3040' : '#f5f5f5';
+    if (rec.cikma && !rec.dusme) return isDark ? '#1a4a2a' : '#e8f5e9';
+    if (rec.dusme) return isDark ? '#3a3010' : '#fff8e1';
+    return isDark ? '#1e3040' : '#f5f5f5';
+  }
+  function toothStroke(t) {
+    const rec = data.dis.find(d => d.toothId === t.id);
+    if (!rec) return isDark ? '#2a3f55' : '#ccc';
+    if (rec.cikma && !rec.dusme) return '#4CAF50';
+    if (rec.dusme) return '#FFA726';
+    return isDark ? '#2a3f55' : '#ccc';
+  }
+
+  const teeth = TOOTH_MAP.map(t => `
+    <ellipse cx="${t.cx}" cy="${t.cy}" rx="${t.rx}" ry="${t.ry}"
+      fill="${toothFill(t)}" stroke="${toothStroke(t)}" stroke-width="2.5"
+      style="cursor:pointer" onclick="openToothPanel('${t.id}')">
+      <title>${t.label} · ${t.side==='right'?'Sağ':'Sol'} · ${t.jaw==='upper'?'Üst':'Alt'}</title>
+    </ellipse>`).join('');
+
+  const labels = TOOTH_MAP.map(t => {
+    const rec = data.dis.find(d => d.toothId === t.id);
+    const mark = rec ? (rec.dusme ? '●' : '●') : '';
+    const fill = rec ? (rec.dusme ? '#FFA726' : '#4CAF50') : 'none';
+    return mark ? `<circle cx="${t.cx}" cy="${t.cy}" r="4" fill="${fill}" style="pointer-events:none"/>` : '';
+  }).join('');
+
+  const labelLines = ['Merkez Kesici','Yan Kesici','Köpekdişi','1. Azıdişi','2. Azıdişi'].map((lbl,i) => {
+    const t = TOOTH_MAP.find(t=>t.id===`UR${i+1}`);
+    return `<text x="28" y="${t.cy+3}" text-anchor="end" font-size="8.5" fill="${labelCol}">${lbl}</text>
+            <line x1="30" y1="${t.cy}" x2="${t.cx-t.rx-1}" y2="${t.cy}" stroke="${stroke}" stroke-width="0.8"/>`;
+  }).join('');
+
+  wrap.innerHTML = `<svg viewBox="0 0 400 395" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+    <rect width="400" height="395" fill="${isDark?'#0d1520':'#fafafa'}" rx="16"/>
+    <ellipse cx="200" cy="197" rx="155" ry="172" fill="${bgJaw}" stroke="${stroke}" stroke-width="1.5"/>
+    <ellipse cx="200" cy="197" rx="105" ry="125" fill="${bgMouth}" stroke="${stroke}" stroke-width="1"/>
+    <line x1="200" y1="75" x2="200" y2="320" stroke="${stroke}" stroke-width="1" stroke-dasharray="4,3"/>
+    <line x1="85" y1="197" x2="315" y2="197" stroke="${stroke}" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="200" y="50" text-anchor="middle" font-size="11" fill="${textCol}" font-weight="bold">SAĞ</text>
+    <text x="200" y="380" text-anchor="middle" font-size="11" fill="${textCol}" font-weight="bold">SOL</text>
+    <text x="48" y="145" text-anchor="middle" font-size="10" fill="${textCol}" font-weight="bold">ÜST</text>
+    <text x="48" y="258" text-anchor="middle" font-size="10" fill="${textCol}" font-weight="bold">ALT</text>
+    ${labelLines}
+    ${teeth}
+    ${labels}
+    <rect x="10" y="370" width="10" height="10" rx="2" fill="${isDark?'#1a4a2a':'#e8f5e9'}" stroke="#4CAF50" stroke-width="1.5"/>
+    <text x="24" y="379" font-size="9" fill="${labelCol}">Çıktı</text>
+    <rect x="65" y="370" width="10" height="10" rx="2" fill="${isDark?'#3a3010':'#fff8e1'}" stroke="#FFA726" stroke-width="1.5"/>
+    <text x="79" y="379" font-size="9" fill="${labelCol}">Düştü</text>
+    <rect x="120" y="370" width="10" height="10" rx="2" fill="${isDark?'#1e3040':'#f5f5f5'}" stroke="${isDark?'#2a3f55':'#ccc'}" stroke-width="1.5"/>
+    <text x="134" y="379" font-size="9" fill="${labelCol}">Çıkmadı</text>
+  </svg>`;
+}
+
+function openToothPanel(toothId) {
+  selectedToothId = toothId;
+  const tooth = TOOTH_MAP.find(t => t.id === toothId);
+  const rec = data.dis.find(d => d.toothId === toothId);
+  const jawLabel = tooth.jaw === 'upper' ? 'Üst' : 'Alt';
+  const sideLabel = tooth.side === 'right' ? 'Sağ' : 'Sol';
+  document.getElementById('toothDetailTitle').textContent = `🦷 ${tooth.label} — ${jawLabel} ${sideLabel}`;
+  document.getElementById('toothCikmaInput').value = rec?.cikma || '';
+  document.getElementById('toothDusmeInput').value = rec?.dusme || '';
+  document.getElementById('toothNotInput').value   = rec?.not   || '';
+  document.getElementById('toothDeleteBtn').style.display = rec ? '' : 'none';
+  document.getElementById('toothDetailPanel').style.display = '';
+  document.getElementById('toothDetailPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeToothPanel() {
+  document.getElementById('toothDetailPanel').style.display = 'none';
+  selectedToothId = null;
+}
+
+function saveToothRecord() {
+  if (!selectedToothId) return;
+  const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
+  const cikma = document.getElementById('toothCikmaInput').value;
+  const dusme = document.getElementById('toothDusmeInput').value;
+  const not   = document.getElementById('toothNotInput').value;
+  const idx = data.dis.findIndex(d => d.toothId === selectedToothId);
+  const rec = {
+    id: idx >= 0 ? data.dis[idx].id : genId(),
+    toothId: selectedToothId,
+    dis: tooth.label,
+    konum: `${tooth.jaw==='upper'?'Üst':'Alt'} ${tooth.side==='right'?'Sağ':'Sol'}`,
+    cikma, dusme, not,
+    tarih: cikma || new Date().toISOString().split('T')[0]
+  };
+  if (idx >= 0) data.dis[idx] = rec;
+  else data.dis.push(rec);
+  saveData(); updateCounts(); closeToothPanel(); renderDisPage();
+  showToast(`${tooth.label} kaydedildi! 🦷`);
+}
+
+function deleteToothRecord() {
+  if (!selectedToothId) return;
+  const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
+  if (!confirm(`"${tooth.label}" kaydını silmek istiyor musunuz?`)) return;
+  data.dis = data.dis.filter(d => d.toothId !== selectedToothId);
+  saveData(); updateCounts(); closeToothPanel(); renderDisPage();
+  showToast('Kayıt silindi.');
+}
+
+function renderDisGrid() {}
+
+function renderDisList() {
   const container = document.getElementById('dis-cards');
   if (!container) return;
   const rows = [...data.dis].sort((a,b) => (b.cikma||'').localeCompare(a.cikma||''));
-  if (rows.length === 0) { container.innerHTML = ''; return; }
+  if (rows.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="padding:24px"><div class="es-icon">🦷</div><div class="es-sub">Henüz diş kaydı yok</div></div>`;
+    return;
+  }
   container.innerHTML = rows.map((r,i) => `
-    <div class="record-card" style="animation-delay:${i*0.04}s">
+    <div class="record-card" style="animation-delay:${i*0.04}s;cursor:pointer" onclick="openToothPanel('${r.toothId}')">
       <div class="rc-top">
         <span class="rc-date">🦷 ${escHtml(r.dis||'-')} · ${r.konum||'-'}</span>
         <div class="rc-actions">
-          <button class="btn btn-secondary btn-sm btn-icon" onclick="editRecord('dis','${r.id}')">✏️</button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('dis','${r.id}')">🗑️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();data.dis=data.dis.filter(d=>d.id!=='${r.id}');saveData();updateCounts();renderDisPage();showToast('Silindi.')">🗑️</button>
         </div>
       </div>
       <div class="rc-chips">
-        ${r.cikma ? `<span class="rc-chip">📅 Çıkma: <strong>${formatDate(r.cikma)}</strong></span>` : ''}
-        ${r.dusme ? `<span class="rc-chip">📅 Düşme: <strong>${formatDate(r.dusme)}</strong></span>` : ''}
+        ${r.cikma ? `<span class="rc-chip">🟢 Çıkma: <strong>${formatDate(r.cikma)}</strong></span>` : ''}
+        ${r.dusme ? `<span class="rc-chip">🟡 Düşme: <strong>${formatDate(r.dusme)}</strong></span>` : ''}
       </div>
       ${r.not ? `<div class="rc-note">${escHtml(r.not)}</div>` : ''}
     </div>
   `).join('');
-}
-
-function renderDisGrid(containerId, posFilter) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  toothTypes.forEach(type => {
-    posFilter.forEach(pos => {
-      const erupted = data.dis.find(d => (d.dis||'').includes(type.split('.')[0].trim()) && d.konum === pos && d.cikma);
-      const cell = document.createElement('div');
-      cell.className = `tooth-cell ${erupted ? 'erupted' : 'not-erupted'}`;
-      cell.innerHTML = `<div class="tooth-emoji">🦷</div><div style="font-size:9px;text-align:center">${pos.replace('\u00dcst ','').replace('Alt ','')}</div>`;
-      cell.title = `${type} - ${pos}${erupted ? ' (\u00c7\u0131kt\u0131: ' + formatDate(erupted.cikma) + ')' : ' (Hen\u00fcz \u00e7\u0131kmad\u0131)'}`;
-      container.appendChild(cell);
-    });
-  });
 }
 
 // ===== DASHBOARD =====
@@ -3657,11 +3819,11 @@ function renderQuickActions() {
     { icon: '🏥', label: 'Kontrol', page: 'kontrol', count: data.kontrol.length, add: true  },
     { icon: '🍼', label: 'Gıda',    page: 'gida',    count: data.gida.length,    add: true  },
     { icon: '📔', label: 'Günlük',  page: 'gunluk',  count: data.gunluk.length,  add: true  },
-    { icon: '🦷', label: 'Diş',     page: 'dis',     count: data.dis.length,     add: false },
+    { icon: '🦷', label: 'Diş', page: 'dis', count: data.dis.length, add: false, action: "setTimeout(()=>{const el=document.getElementById('toothMapSvgWrap');if(el)el.scrollIntoView({behavior:'smooth'})},200)" },
     { icon: '💉', label: 'Aşı',     page: 'asi',     count: data.asi.length,     add: true  },
   ];
   grid.innerHTML = items.map((item, i) => `
-    <div class="quick-action" onclick="showPage('${item.page}')${item.add ? ';openAddModal()' : ''}" style="animation-delay:${i*0.05}s">
+    <div class="quick-action" onclick="showPage('${item.page}')${item.add ? ';openAddModal()' : ''}${item.action ? ';' + item.action : ''}" style="animation-delay:${i*0.05}s">
       <div class="qa-icon">
         ${item.icon}
         ${item.count > 0 ? `<span class="qa-count">${item.count}</span>` : ''}
@@ -3902,9 +4064,10 @@ const impFieldDefs = {
   kontrol: [ {key:'tarih',label:'📅 Tarih'}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'ilac',label:'💉 İlaç'}, {key:'not',label:'📝 Not'} ],
   gida:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı'}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
   gunluk:  [ {key:'tarih',label:'📅 Tarih'}, {key:'baslik',label:'📝 Başlık'}, {key:'not',label:'💬 Not'} ],
-  asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ]
+  asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ],
+  dis:     [ {key:'dis',label:'🦷 Diş Adı'}, {key:'konum',label:'📍 Konum (Üst Sağ vb.)'}, {key:'cikma',label:'📅 Çıkma Tarihi'}, {key:'dusme',label:'📅 Düşme Tarihi'}, {key:'not',label:'📝 Not'} ]
 };
-const impSectionNames = { olay:'Olaylar', gelisim:'Gelişim', kontrol:'Kontroller', gida:'Gıda', gunluk:'Günlük', asi:'Aşı' };
+const impSectionNames = { olay:'Olaylar', gelisim:'Gelişim', kontrol:'Kontroller', gida:'Gıda', gunluk:'Günlük', asi:'Aşı', dis:'Diş Takibi' };
 
 let impSection = null;
 let impHeaders = [];
@@ -4111,6 +4274,24 @@ function impDoImport() {
     data[impSection].push(rec);
     added++;
   });
+
+  // Diş importu için toothId otomatik eşleştir
+  if (impSection === 'dis' && added > 0) {
+    data.dis.forEach(rec => {
+      if (!rec.toothId && (rec.dis || rec.konum)) {
+        const tooth = TOOTH_MAP.find(t => {
+          const disName = (rec.dis || '').toLowerCase();
+          const konum = (rec.konum || '').toLowerCase();
+          const jawMatch = konum.includes('üst') ? t.jaw === 'upper' : konum.includes('alt') ? t.jaw === 'lower' : true;
+          const sideMatch = konum.includes('sağ') ? t.side === 'right' : konum.includes('sol') ? t.side === 'left' : true;
+          const nameMatch = !disName || t.label.toLowerCase().includes(disName.split(' ')[0]);
+          return jawMatch && sideMatch && nameMatch;
+        });
+        if (tooth) rec.toothId = tooth.id;
+      }
+      if (!rec.tarih) rec.tarih = rec.cikma || '';
+    });
+  }
 
   if (added > 0) {
     saveData();
