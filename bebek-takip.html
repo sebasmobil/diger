@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.74
+  Bebek Takip Pro v1.0.81
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.74">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.81">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.74</title>
+<title>Bebek Takip Pro v1.0.81</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2269,7 +2269,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.74</span>
+  <span>Pro 1.0.81</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3389,14 +3389,28 @@ function asiRenderQuick() {
   const sel   = document.getElementById('f_donem');
   const quick = document.getElementById('asiQuickBtns');
   if (!sel || !quick) return;
-  const items = ASI_LIST.filter(a => a.donem === sel.value);
-  quick.innerHTML = items.map(a => {
-    const safe = a.ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return `<button type="button" onclick="asiSetVal('${safe}')"
-      style="padding:4px 10px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">
-      ${a.kisaltma}
+  // Özel eklenen aşılar (bu dönem için)
+  const customItems = getCustomList('asi_ozel_' + sel.value, []);
+  let html = '';
+  // Sadece özel eklenenler görünsün
+  customItems.forEach(ad => {
+    const safe = ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html += `<button type="button" onclick="asiSetVal('${safe}')"
+      style="padding:4px 10px;border-radius:14px;border:1.5px solid var(--accent3);background:rgba(171,71,188,0.08);color:var(--accent3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">
+      ✦ ${ad}
     </button>`;
-  }).join('');
+  });
+  quick.innerHTML = html;
+}
+
+function asiOzelEkle() {
+  const sel = document.getElementById('f_donem');
+  if (!sel) return;
+  const donem = sel.value;
+  openMiniListModal('asi_ozel_' + donem, '➕ ' + donem + ' — Özel Aşılar');
+  // Modal kapanınca quick btns yenile
+  const origClose = window._lmmOnClose;
+  window._lmmOnClose = () => { asiRenderQuick(); if (origClose) origClose(); };
 }
 
 function openAddModal() {
@@ -3405,7 +3419,7 @@ function openAddModal() {
   editingId = null;
   editingSection = currentPage;
   showModal(currentPage, null);
-  if (currentPage === 'asi') setTimeout(asiRenderQuick, 50);
+  if (currentPage === 'asi') { setTimeout(asiRenderQuick, 50); setTimeout(initAsiDurumChips, 300); }
 }
 
 function showModal(section, record) {
@@ -3422,7 +3436,10 @@ function showModal(section, record) {
   overlay.style.display = 'flex';
   setTimeout(applyDatePlaceholders, 50);
   if (section === 'kontrol') initKontrolChips();
-  if (section === 'olay') setTimeout(initOlayChips, 300);
+  if (section === 'olay')    setTimeout(initOlayChips, 300);
+  if (section === 'gida')    initGidaChips();
+  if (section === 'gunluk')  initGunlukChips();
+  if (section === 'asi')     setTimeout(initAsiDurumChips, 300);
 }
 
 function getFormHTML(section, r) {
@@ -3504,20 +3521,24 @@ function getFormHTML(section, r) {
         <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
-        <label class="form-label">🔬 Hastal\u0131k / Te\u015fhis</label>
-        <input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Te\u015fhis..." />
+        <label class="form-label">🔬 Hastalık / Teşhis <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_teshis','Teşhis Önerileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Teşhis..." autocomplete="off" />
+        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
-        <label class="form-label">💊 Tedavi</label>
-        <input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." />
+        <label class="form-label">💊 Tedavi <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tedavi','Tedavi Önerileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." autocomplete="off" />
+        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
-        <label class="form-label">💉 Verilen \u0130la\u00e7lar</label>
-        <input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="\u0130la\u00e7 adlar\u0131..." />
+        <label class="form-label">💉 Verilen İlaçlar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_ilac','İlaç Önerileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="İlaç adları..." autocomplete="off" />
+        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
-        <label class="form-label">🔭 Yap\u0131lan Tetkikler</label>
-        <input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." />
+        <label class="form-label">🔭 Yapılan Tetkikler <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tetkik','Tetkik Önerileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." autocomplete="off" />
+        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3547,27 +3568,29 @@ function getFormHTML(section, r) {
         <label class="form-label">⏰ Saat</label>
         <input class="form-input" type="time" id="f_saat" value="${v.saat||(isNew?currentTime:'')}" />
       </div>
-      <div class="form-group">
-        <label class="form-label">🏷️ T\u00fcr <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_tur','Gıda Türleri')">✏️ Düzenle</span></label>
-        <select class="form-select" id="f_tur">
-          ${getCustomList('gida_tur',['Sebze','Meyve','Et','Tahıl','Süt Ürünleri','Anne Sütü','Mama','Çorba','Diğer']).map(t=>`<option value="${t}" ${v.tur===t?'selected':''}>${t}</option>`).join('')}
-        </select>
+      <div class="form-group full">
+        <label class="form-label">🏷️ Tür <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_tur','Gıda Türleri')">✏️ Düzenle</span></label>
+        <input type="hidden" id="f_tur" value="${v.tur||'Sebze'}" />
+        <div id="gida_tur_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">🍽️ Ad\u0131</label>
-        <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="G\u0131da ad\u0131..."/>
+        <label class="form-label">🍽️ Adı <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_adi','Gıda Adları')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="Gıda adı..." autocomplete="off" />
+        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
         <input class="form-input" type="text" id="f_icerik" value="${v.icerik||''}" placeholder="Malzemeler..." />
       </div>
       <div class="form-group">
-        <label class="form-label">📏 Miktar</label>
-        <input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="\u00d6rn: 1.5 tatl\u0131 ka\u015f\u0131\u011f\u0131" />
+        <label class="form-label">📏 Miktar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_miktar','Miktar Seçenekleri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="Örn: 1.5 tatlı kaşığı" autocomplete="off" />
+        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">⚠️ Alerji Belirtileri</label>
-        <input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." />
+        <label class="form-label">⚠️ Alerji Belirtileri <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_alerji','Alerji Belirtileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." autocomplete="off" />
+        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3582,8 +3605,9 @@ function getFormHTML(section, r) {
         <input class="form-input" type="date" id="f_tarih" value="${v.tarih||today}"/>
       </div>
       <div class="form-group">
-        <label class="form-label">📝 Ba\u015fl\u0131k</label>
-        <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="\u0130lk ad\u0131m, ilk kelime..."/>
+        <label class="form-label">📝 Başlık <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gunluk_baslik','Başlık Önerileri')">✏️ Düzenle</span></label>
+        <input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="İlk adım, ilk kelime..." autocomplete="off" />
+        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>
       </div>
       <div class="form-group">
         <label class="form-label">💬 Not</label>
@@ -3632,7 +3656,7 @@ function getFormHTML(section, r) {
         </select>
       </div>
       <div class="form-group full">
-        <label class="form-label">💉 Aşı Adı</label>
+        <label class="form-label">💉 Aşı Adı <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="asiOzelEkle()">✏️ Düzenle</span></label>
         <div style="position:relative">
           <input class="form-input" type="text" id="f_asi" value="${v.asi||''}"
             placeholder="Aşı adı yazın veya listeden seçin..."
@@ -3645,14 +3669,10 @@ function getFormHTML(section, r) {
         </div>
         <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px" id="asiQuickBtns"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">✅ Durum</label>
-        <select class="form-select" id="f_durum">
-          <option value="Planlandı" ${v.durum==='Planlandı'?'selected':''}>📋 Planlandı</option>
-          <option value="Uygulandı" ${v.durum==='Uygulandı'?'selected':''}>✅ Uygulandı</option>
-          <option value="Beklemede" ${v.durum==='Beklemede'?'selected':''}>⏳ Beklemede</option>
-          <option value="Ertelendi" ${v.durum==='Ertelendi'?'selected':''}>📅 Ertelendi</option>
-        </select>
+      <div class="form-group full">
+        <label class="form-label">✅ Durum <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_durum','Durum Seçenekleri')">✏️ Düzenle</span></label>
+        <input type="hidden" id="f_durum" value="${v.durum||'Planlandı'}" />
+        <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Açıklama</label>
@@ -4479,11 +4499,20 @@ const CUSTOM_LIST_DEFAULTS = {
   asi_donem: ['Doğumda','2. Ayın Sonu','4. Ayın Sonu','6. Ayın Sonu','9. Ayın Sonu',
               '12. Ayın Sonu','18. Ayın Sonu','24. Ayın Sonu','48. Ay (4 Yaş)','13 Yaş','Erişkin','Diğer'],
   gida_tur:  ['Sebze','Meyve','Et','Tahıl','Süt Ürünleri','Anne Sütü','Mama','Çorba','Diğer'],
+  gida_miktar: ['1 tatlı kaşığı','2 tatlı kaşığı','3 tatlı kaşığı','1 yemek kaşığı','2 yemek kaşığı','50ml','100ml','150ml','200ml'],
+  gida_alerji: ['Kızarıklık','Kaşıntı','Şişme','Kusma','İshal','Nefes darlığı'],
   dis_tur:   ['Merkez Kesici','Yan Kesici','Köpek Dişi','1. Azı Dişi','2. Azı Dişi'],
   dis_konum: ['Üst Sağ','Üst Sol','Alt Sağ','Alt Sol'],
   olay_tur:  ['Ateş','Titreme','Öksürük','Kusma','İshal','Kızarıklık','Düşme','Diş','Diğer'],
   kontrol_hastane: [],
   kontrol_doktor:  [],
+  kontrol_teshis: ['Üst Solunum Yolu Enfeksiyonu','Alt Solunum Yolu Enfeksiyonu','Kulak İltihabı','Bağırsak Enfeksiyonu','Nezle','Grip','Ateş','Diş Çıkarma','Alerji','Rutin Kontrol'],
+  kontrol_tedavi: ['İstirahat','Bol sıvı','Burun açıcı damla','Antibiyotik','Ateş düşürücü','Probiyotik','Nemli ortam','Fizyoterapi'],
+  kontrol_ilac: ['Parol','Nurofen','Augmentin','Rifasin','Duphalac','Colief','Lactoferrin','D Vitamini','Demir Surubu'],
+  kontrol_tetkik: ['Tam kan sayımı','CRP','Boğaz Kültürü','İdrar Tahlili','Kulak Muayenesi','Akciğer Grafisi','Ultrason','Dışkı Tahlili'],
+  gunluk_baslik: ['İlk adım','İlk kelime','İlk diş','İlk gülüş','İlk yemek','İlk banyo','İlk gece','Doğum günü','Özel an'],
+  gida_adi: [],
+  asi_durum: ['Planlandı','Uygulandı','Beklemede','Ertelendi'],
 };
 
 function autoCollectKontrolLists() {
@@ -4522,8 +4551,11 @@ function renderSuggestionChips(inputId, chipsId, listKey) {
   const inp = document.getElementById(inputId);
   const box = document.getElementById(chipsId);
   if (!inp || !box) return;
-  const all    = getCustomList(listKey, []);
-  const query  = inp.value.trim().toLocaleLowerCase('tr-TR');
+  // Her zaman varsayılan + kayıtlı listeyi göster
+  const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
+  if (all.length === 0) { box.innerHTML = ''; return; }
+  // Yazıya göre filtrele
+  const query = inp.value.trim().toLocaleLowerCase('tr-TR');
   const filtered = query ? all.filter(s => s.toLocaleLowerCase('tr-TR').includes(query)) : all;
   if (filtered.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
@@ -4531,39 +4563,155 @@ function renderSuggestionChips(inputId, chipsId, listKey) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = s;
-    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:var(--font);white-space:nowrap';
+    // Seçili olanı vurgula
+    const isSelected = inp.value.trim() === s;
+    btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       inp.value = s;
-      box.innerHTML = '';
+      // Seçim sonrası chip'leri güncelle (liste kalır, seçili vurgulanır)
+      renderSuggestionChips(inputId, chipsId, listKey);
     });
     box.appendChild(btn);
   });
 }
 
 
+// ── Bölüm chip başlatıcıları ──────────────────────────────────────
+
 function initKontrolChips() {
   autoCollectKontrolLists();
+  // gıda adlarından da benzer şekilde teşhis/tedavi/ilaç/tetkik topla
+  autoCollectKontrolDetailLists();
   setTimeout(() => {
     renderSuggestionChips('f_hastane','hastane_chips','kontrol_hastane');
-    renderSuggestionChips('f_doktor','doktor_chips','kontrol_doktor');
+    renderSuggestionChips('f_doktor', 'doktor_chips', 'kontrol_doktor');
+    renderSuggestionChips('f_teshis', 'teshis_chips', 'kontrol_teshis');
+    renderSuggestionChips('f_tedavi', 'tedavi_chips', 'kontrol_tedavi');
+    renderSuggestionChips('f_ilac',   'ilac_chips',   'kontrol_ilac');
+    renderSuggestionChips('f_tetkik', 'tetkik_chips', 'kontrol_tetkik');
   }, 300);
 }
-function initOlayChips() {
-  const box = document.getElementById('olay_chips');
-  if (!box) return;
-  const items = getCustomList('olay_tur', ['Ateş','Titreme','Öksürük','Kusma','İshal','Kızarıklık','Düşme','Diş','Diğer']);
+
+function autoCollectKontrolDetailLists() {
+  const recs = data.kontrol || [];
+  const collect = (field, key) => {
+    const vals = [...new Set(recs.map(r => r[field]).filter(Boolean))];
+    const lists = (data.settings && data.settings.customLists) || {};
+    const existing = lists[key] || CUSTOM_LIST_DEFAULTS[key] || [];
+    const set = new Set(existing.map(s => s.trim().toLocaleLowerCase('tr-TR')));
+    const merged = [...existing];
+    vals.forEach(v => { if (!set.has(v.trim().toLocaleLowerCase('tr-TR'))) merged.push(v); });
+    if (merged.length > existing.length) saveCustomList(key, merged);
+  };
+  collect('teshis', 'kontrol_teshis');
+  collect('tedavi', 'kontrol_tedavi');
+  collect('ilac',   'kontrol_ilac');
+  collect('tetkik', 'kontrol_tetkik');
+}
+
+
+function initGidaTurChips() {
+  const box = document.getElementById('gida_tur_chips');
+  const inp = document.getElementById('f_tur');
+  if (!box || !inp) return;
+  const items = getCustomList('gida_tur', CUSTOM_LIST_DEFAULTS['gida_tur'] || []);
   box.innerHTML = '';
   items.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = t;
-    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--font)';
+    const isSelected = inp.value === t;
+    btn.style.cssText = `background:${isSelected ? 'var(--accent4)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--accent4)' : 'var(--border)'};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
+    btn.addEventListener('click', () => {
+      inp.value = t;
+      // Seçimi güncelle
+      box.querySelectorAll('button').forEach(b => {
+        const sel = b.textContent === t;
+        b.style.background = sel ? 'var(--accent4)' : 'var(--bg)';
+        b.style.borderColor = sel ? 'var(--accent4)' : 'var(--border)';
+        b.style.color = sel ? '#fff' : 'var(--text2)';
+      });
+    });
+    box.appendChild(btn);
+  });
+}
+
+function initGidaChips() {
+  autoCollectGidaAdiList();
+  setTimeout(() => {
+    initGidaTurChips();
+    renderSuggestionChips('f_adi',    'gida_adi_chips', 'gida_adi');
+    renderSuggestionChips('f_miktar', 'miktar_chips',   'gida_miktar');
+    renderSuggestionChips('f_alerji', 'alerji_chips',   'gida_alerji');
+  }, 300);
+}
+
+function autoCollectGidaAdiList() {
+  const vals = [...new Set((data.gida || []).map(r => r.adi).filter(Boolean))];
+  const lists = (data.settings && data.settings.customLists) || {};
+  const existing = lists['gida_adi'] || [];
+  const set = new Set(existing.map(s => s.trim().toLocaleLowerCase('tr-TR')));
+  const merged = [...existing];
+  vals.forEach(v => { if (!set.has(v.trim().toLocaleLowerCase('tr-TR'))) merged.push(v); });
+  if (merged.length !== existing.length) saveCustomList('gida_adi', merged);
+}
+
+
+function initAsiDurumChips() {
+  const box = document.getElementById('asi_durum_chips');
+  const inp = document.getElementById('f_durum');
+  if (!box || !inp) return;
+  const colorMap = {
+    'Planlandı':  { bg: 'rgba(66,165,250,0.12)', border: '#42A5F5', text: '#1565C0' },
+    'Uygulandı':  { bg: 'rgba(76,175,80,0.12)',  border: '#4CAF50', text: '#2E7D32' },
+    'Beklemede':  { bg: 'rgba(255,167,38,0.12)', border: '#FFA726', text: '#E65100' },
+    'Ertelendi':  { bg: 'rgba(239,83,80,0.12)',  border: '#EF5350', text: '#C62828' },
+  };
+  const items = getCustomList('asi_durum', CUSTOM_LIST_DEFAULTS['asi_durum'] || []);
+  box.innerHTML = '';
+  items.forEach(t => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = t;
+    const c = colorMap[t] || { bg: 'var(--bg)', border: 'var(--border)', text: 'var(--text2)' };
+    const isSelected = inp.value === t;
+    btn.style.cssText = `background:${isSelected ? c.border : c.bg};border:2px solid ${c.border};border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : c.text};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
+    btn.addEventListener('click', () => {
+      inp.value = t;
+      box.querySelectorAll('button').forEach((b, i) => {
+        const ti = items[i];
+        const ci = colorMap[ti] || { bg: 'var(--bg)', border: 'var(--border)', text: 'var(--text2)' };
+        const sel = ti === t;
+        b.style.background = sel ? ci.border : ci.bg;
+        b.style.color = sel ? '#fff' : ci.text;
+      });
+    });
+    box.appendChild(btn);
+  });
+}
+
+function initGunlukChips() {
+  setTimeout(() => {
+    renderSuggestionChips('f_baslik', 'baslik_chips', 'gunluk_baslik');
+  }, 300);
+}
+function initOlayChips() {
+  const box = document.getElementById('olay_chips');
+  if (!box) return;
+  const items = getCustomList('olay_tur', CUSTOM_LIST_DEFAULTS['olay_tur'] || []);
+  box.innerHTML = '';
+  items.forEach(t => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = t;
+    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--font);white-space:nowrap';
     btn.addEventListener('click', () => {
       const inp = document.getElementById('f_olay');
       if (!inp) return;
       const cur = inp.value.trim();
       inp.value = cur ? cur + ', ' + t : t;
       inp.focus();
+      // Chip'ler kapanmasın, kalıcı listede kalsın
     });
     box.appendChild(btn);
   });
@@ -4598,6 +4746,8 @@ function openMiniListModal(key, title) {
 function closeMiniListModal() {
   document.getElementById('listMiniModal').style.display = 'none';
   _lmmKey = null; _lmmEditIdx = null;
+  // Özel callback varsa çağır (asiOzelEkle vs.)
+  if (window._lmmOnClose) { const cb = window._lmmOnClose; window._lmmOnClose = null; cb(); }
   // Formu yenile (seçenekler güncellensin)
   const modalEl = document.getElementById('recordModal');
   if (modalEl && modalEl.style.display !== 'none') {
@@ -4606,28 +4756,38 @@ function closeMiniListModal() {
     if (sec) {
       const body = document.getElementById('recordModalBody');
       if (body) body.innerHTML = getFormHTML(sec, val);
-      if (sec === 'asi') asiRenderQuick();
+      if (sec === 'asi')     { asiRenderQuick(); setTimeout(initAsiDurumChips, 300); return; }
       if (sec === 'kontrol') initKontrolChips();
-      if (sec === 'olay') setTimeout(initOlayChips, 300);
+      if (sec === 'olay')    setTimeout(initOlayChips, 300);
+      if (sec === 'gida')    initGidaChips();
+      if (sec === 'gunluk')  initGunlukChips();
     }
   }
 }
 
 function lmmRenderList() {
   const items = getCustomList(_lmmKey, CUSTOM_LIST_DEFAULTS[_lmmKey] || []);
+  const defaults = CUSTOM_LIST_DEFAULTS[_lmmKey] || [];
+  // Kilitli listeler: varsayılan öğeler silinemez/düzenlenemez
+  const lockedKeys = ['asi_durum'];
   const el = document.getElementById('lmmList');
   if (!el) return;
   if (items.length === 0) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;font-family:var(--font)">Liste boş — yukarıdan ekleyin</div>';
     return;
   }
-  el.innerHTML = items.map((item, i) => `
+  el.innerHTML = items.map((item, i) => {
+    const isDefault = lockedKeys.includes(_lmmKey) && defaults.includes(item);
+    return `
     <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--border)">
       <div style="flex:1;font-size:13px;font-weight:600;color:var(--text);font-family:var(--font)">${escHtml(item)}</div>
-      <button onclick="lmmStartEdit(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:var(--text3)" title="Düzenle">✏️</button>
-      <button onclick="lmmDelete(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:#ef4444" title="Sil">🗑️</button>
-    </div>
-  `).join('');
+      ${isDefault
+        ? `<span style="font-size:11px;color:var(--text3);padding:2px 8px;border:1px solid var(--border);border-radius:10px">varsayılan</span>`
+        : `<button onclick="lmmStartEdit(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:var(--text3)" title="Düzenle">✏️</button>
+           <button onclick="lmmDelete(${i})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 6px;color:#ef4444" title="Sil">🗑️</button>`
+      }
+    </div>`;
+  }).join('');
 }
 
 function lmmStartEdit(i) {
