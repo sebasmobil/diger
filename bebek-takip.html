@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.81
+  Bebek Takip Pro v1.0.86
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.81">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.86">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.81</title>
+<title>Bebek Takip Pro v1.0.86</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2126,6 +2126,7 @@ mark.hl {
       <div class="drawer-tab" data-tab="yedek" onclick="switchDrawerTab('yedek')">💾 Yedek</div>
       <div class="drawer-tab" data-tab="iceaktar" onclick="switchDrawerTab('iceaktar')">📥 Aktar</div>
       <div class="drawer-tab" data-tab="anasayfa" onclick="switchDrawerTab('anasayfa')">🏠 Sayfa</div>
+      <div class="drawer-tab" data-tab="kimlik" onclick="switchDrawerTab('kimlik');renderKimlikSection()">🪪 Kimlik</div>
     </div>
 
     <!-- Ayarlar Tab -->
@@ -2263,13 +2264,18 @@ mark.hl {
       <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveDashLayout()">💾 Kaydet</button>
     </div>
 
+    <!-- Kimlik Tab -->
+    <div class="drawer-section" id="drawer-kimlik">
+      <div id="kimlikRoot"></div>
+    </div>
+
 
   </div>
 </div>
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.81</span>
+  <span>Pro 1.0.86</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2815,7 +2821,7 @@ function addBaby(name, birthDate, avatarColor, avatarEmoji) {
   const id = genIdStatic();
   profiles[id] = {
     id,
-    ...emptyBabyData({ babyName: name || 'Bebek', birthDate: birthDate || '', theme: data.settings.theme || 'light', avatarColor: avatarColor || 'green', avatarEmoji: avatarEmoji || '👶' })
+    ...emptyBabyData({ babyName: name || 'Bebek', birthDate: birthDate || '', theme: data.settings.theme || 'light', avatarColor: avatarColor || 'green', avatarEmoji: avatarEmoji || '👶', ...(extra||{}) })
   };
   saveProfiles();
   switchBaby(id);
@@ -2844,12 +2850,13 @@ function deleteBaby(id) {
 }
 
 /* ── Bebek düzenle ── */
-function updateBaby(id, name, birthDate, avatarColor, avatarEmoji) {
+function updateBaby(id, name, birthDate, avatarColor, avatarEmoji, extra) {
   if (!profiles[id]) return;
   profiles[id].settings.babyName  = name || profiles[id].settings.babyName;
   profiles[id].settings.birthDate = birthDate;
   profiles[id].settings.avatarColor = avatarColor || profiles[id].settings.avatarColor;
   profiles[id].settings.avatarEmoji = avatarEmoji || profiles[id].settings.avatarEmoji;
+  if (extra) Object.assign(profiles[id].settings, extra);
   if (id === activeId) {
     data = profiles[id];
     applyColorTheme(avatarColor || 'green');
@@ -2967,15 +2974,40 @@ function openAddBabyModal(editId) {
   const emoji = p?.settings?.avatarEmoji || '👶';
 
   document.getElementById('modalTitle').innerHTML = editId ? '✏️ Profil Düzenle' : '👶 Yeni Bebek Ekle';
+  const s = p?.settings || {};
   document.getElementById('modalBody').innerHTML = `
     <div class="form-grid">
       <div class="form-group">
-        <label class="form-label">👶 Bebek Adı</label>
-        <input class="form-input" type="text" id="bf_name" value="${escHtml(p?.settings?.babyName || '')}" placeholder="Bebeğin adını girin" />
+        <label class="form-label">👶 Adı Soyadı</label>
+        <input class="form-input" type="text" id="bf_name" value="${escHtml(s.babyName || '')}" placeholder="Bebeğin adı soyadı" />
       </div>
       <div class="form-group">
         <label class="form-label">🎂 Doğum Tarihi</label>
-        <input class="form-input" type="date" id="bf_birth" value="${p?.settings?.birthDate || ''}" />
+        <input class="form-input" type="date" id="bf_birth" value="${s.birthDate || ''}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⏰ Doğum Saati</label>
+        <input class="form-input" type="time" id="bf_birthTime" value="${s.birthTime || ''}" placeholder="15:14" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">🏥 Doğum Yeri</label>
+        <input class="form-input" type="text" id="bf_birthPlace" value="${escHtml(s.birthPlace || '')}" placeholder="Hastane / Şehir..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">⚖️ Doğum Kilosu (gram)</label>
+        <input class="form-input" type="number" id="bf_birthWeight" value="${s.birthWeight || ''}" placeholder="3225" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📏 Doğum Boyu (cm)</label>
+        <input class="form-input" type="number" step="0.1" id="bf_birthHeight" value="${s.birthHeight || ''}" placeholder="49" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">📐 Doğum Baş Çevresi (cm)</label>
+        <input class="form-input" type="number" step="0.1" id="bf_birthHead" value="${s.birthHead || ''}" placeholder="36" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">🩸 Kan Grubu</label>
+        <input class="form-input" type="text" id="bf_bloodType" value="${escHtml(s.bloodType || '')}" placeholder="0 Rh+" />
       </div>
       <div class="form-group">
         <label class="form-label">🎨 Avatar Rengi</label>
@@ -3027,11 +3059,19 @@ function saveBabyProfile() {
   const birth = document.getElementById('bf_birth')?.value;
   const color = getSelectedColor();
   const emoji = getSelectedEmoji();
+  const extra = {
+    birthTime:   document.getElementById('bf_birthTime')?.value   || '',
+    birthPlace:  document.getElementById('bf_birthPlace')?.value  || '',
+    birthWeight: document.getElementById('bf_birthWeight')?.value || '',
+    birthHeight: document.getElementById('bf_birthHeight')?.value || '',
+    birthHead:   document.getElementById('bf_birthHead')?.value   || '',
+    bloodType:   document.getElementById('bf_bloodType')?.value   || '',
+  };
 
   if (editingBabyId) {
-    updateBaby(editingBabyId, name, birth, color, emoji);
+    updateBaby(editingBabyId, name, birth, color, emoji, extra);
   } else {
-    addBaby(name, birth, color, emoji);
+    addBaby(name, birth, color, emoji, extra);
   }
   closeModal();
   if (currentPage === 'bebekler') renderBabiesGrid();
@@ -3775,10 +3815,19 @@ function deleteRecord(section, id) {
 function formatDate(d) {
   if (!d) return '-';
   try {
-    const parts = d.split('-');
-    const months = ['Oca','\u015eub','Mar','Nis','May','Haz','Tem','A\u011fu','Eyl','Eki','Kas','Ara'];
-    return `${parts[2]} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
-  } catch { return d; }
+    let s = String(d).trim();
+    // Excel serial veya sayısal tarih kontrolü
+    const num = Number(s);
+    if (!isNaN(num) && num > 1000 && num < 100000) {
+      s = parseImpDate(s);
+    }
+    const parts = s.split('-');
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return s;
+    const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    const m = months[parseInt(parts[1])-1];
+    if (!m) return s;
+    return `${parts[2]} ${m} ${parts[0]}`;
+  } catch { return String(d); }
 }
 
 function truncate(str, n=40) {
@@ -4554,9 +4603,10 @@ function renderSuggestionChips(inputId, chipsId, listKey) {
   // Her zaman varsayılan + kayıtlı listeyi göster
   const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (all.length === 0) { box.innerHTML = ''; return; }
-  // Yazıya göre filtrele
+  // Yazıya göre filtrele — seçili değer varsa tüm listeyi göster
   const query = inp.value.trim().toLocaleLowerCase('tr-TR');
-  const filtered = query ? all.filter(s => s.toLocaleLowerCase('tr-TR').includes(query)) : all;
+  const exactMatch = query && all.some(s => s.toLocaleLowerCase('tr-TR') === query);
+  const filtered = (query && !exactMatch) ? all.filter(s => s.toLocaleLowerCase('tr-TR').includes(query)) : all;
   if (filtered.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
   filtered.forEach(s => {
@@ -4610,30 +4660,33 @@ function autoCollectKontrolDetailLists() {
 }
 
 
-function initGidaTurChips() {
-  const box = document.getElementById('gida_tur_chips');
-  const inp = document.getElementById('f_tur');
+
+// Tek seçimli chip renderer (select/hidden input için)
+function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
+  const box = document.getElementById(chipsId);
+  const inp = document.getElementById(inputId);
   if (!box || !inp) return;
-  const items = getCustomList('gida_tur', CUSTOM_LIST_DEFAULTS['gida_tur'] || []);
+  const items = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
+  if (items.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
   items.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = t;
+    const color = colorMap ? (colorMap[t] || 'var(--primary)') : (accentColor || 'var(--primary)');
     const isSelected = inp.value === t;
-    btn.style.cssText = `background:${isSelected ? 'var(--accent4)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--accent4)' : 'var(--border)'};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
+    btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       inp.value = t;
-      // Seçimi güncelle
-      box.querySelectorAll('button').forEach(b => {
-        const sel = b.textContent === t;
-        b.style.background = sel ? 'var(--accent4)' : 'var(--bg)';
-        b.style.borderColor = sel ? 'var(--accent4)' : 'var(--border)';
-        b.style.color = sel ? '#fff' : 'var(--text2)';
-      });
+      // Listeyi güncelle, seçili vurgusu değişsin
+      renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap);
     });
     box.appendChild(btn);
   });
+}
+
+function initGidaTurChips() {
+  renderSelectChips('f_tur', 'gida_tur_chips', 'gida_tur', 'var(--accent4)');
 }
 
 function initGidaChips() {
@@ -4658,36 +4711,11 @@ function autoCollectGidaAdiList() {
 
 
 function initAsiDurumChips() {
-  const box = document.getElementById('asi_durum_chips');
-  const inp = document.getElementById('f_durum');
-  if (!box || !inp) return;
   const colorMap = {
-    'Planlandı':  { bg: 'rgba(66,165,250,0.12)', border: '#42A5F5', text: '#1565C0' },
-    'Uygulandı':  { bg: 'rgba(76,175,80,0.12)',  border: '#4CAF50', text: '#2E7D32' },
-    'Beklemede':  { bg: 'rgba(255,167,38,0.12)', border: '#FFA726', text: '#E65100' },
-    'Ertelendi':  { bg: 'rgba(239,83,80,0.12)',  border: '#EF5350', text: '#C62828' },
+    'Planlandı': '#42A5F5', 'Uygulandı': '#4CAF50',
+    'Beklemede': '#FFA726', 'Ertelendi': '#EF5350',
   };
-  const items = getCustomList('asi_durum', CUSTOM_LIST_DEFAULTS['asi_durum'] || []);
-  box.innerHTML = '';
-  items.forEach(t => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = t;
-    const c = colorMap[t] || { bg: 'var(--bg)', border: 'var(--border)', text: 'var(--text2)' };
-    const isSelected = inp.value === t;
-    btn.style.cssText = `background:${isSelected ? c.border : c.bg};border:2px solid ${c.border};border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : c.text};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
-    btn.addEventListener('click', () => {
-      inp.value = t;
-      box.querySelectorAll('button').forEach((b, i) => {
-        const ti = items[i];
-        const ci = colorMap[ti] || { bg: 'var(--bg)', border: 'var(--border)', text: 'var(--text2)' };
-        const sel = ti === t;
-        b.style.background = sel ? ci.border : ci.bg;
-        b.style.color = sel ? '#fff' : ci.text;
-      });
-    });
-    box.appendChild(btn);
-  });
+  renderSelectChips('f_durum', 'asi_durum_chips', 'asi_durum', null, colorMap);
 }
 
 function initGunlukChips() {
@@ -4696,6 +4724,7 @@ function initGunlukChips() {
   }, 300);
 }
 function initOlayChips() {
+  // Olay için çoklu seçim — tıklayınca virgülle ekler, chip'ler kalır
   const box = document.getElementById('olay_chips');
   if (!box) return;
   const items = getCustomList('olay_tur', CUSTOM_LIST_DEFAULTS['olay_tur'] || []);
@@ -4704,14 +4733,18 @@ function initOlayChips() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = t;
-    btn.style.cssText = 'background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--font);white-space:nowrap';
+    const inp = document.getElementById('f_olay');
+    const isActive = inp && inp.value.split(',').map(s=>s.trim()).includes(t);
+    btn.style.cssText = `background:${isActive ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isActive ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:${isActive ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
       const inp = document.getElementById('f_olay');
       if (!inp) return;
-      const cur = inp.value.trim();
-      inp.value = cur ? cur + ', ' + t : t;
+      const parts = inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+      const idx = parts.indexOf(t);
+      if (idx >= 0) parts.splice(idx, 1); else parts.push(t);
+      inp.value = parts.join(', ');
       inp.focus();
-      // Chip'ler kapanmasın, kalıcı listede kalsın
+      initOlayChips(); // listeyi güncelle (seçili vurgusu değişsin)
     });
     box.appendChild(btn);
   });
@@ -4723,6 +4756,63 @@ function olayChipClick(val) {
   const cur = inp.value.trim();
   inp.value = cur ? cur + ', ' + val : val;
   inp.focus();
+}
+
+
+function renderKimlikSection() {
+  const root = document.getElementById('kimlikRoot');
+  if (!root) return;
+  const s = data.settings || {};
+
+  const row = (icon, label, val) => val
+    ? `<div style="display:flex;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+         <span style="font-size:16px;flex-shrink:0">${icon}</span>
+         <div style="flex:1">
+           <div style="font-size:11px;color:var(--text3);font-weight:700;font-family:var(--font)">${label}</div>
+           <div style="font-size:14px;font-weight:700;color:var(--text);font-family:var(--font);margin-top:1px">${escHtml(String(val))}</div>
+         </div>
+       </div>`
+    : '';
+
+  // Yaş hesabı
+  const age = calcAge(s.birthDate) || '—';
+  // Doğum tarihi Türkçe
+  let birthStr = '—';
+  if (s.birthDate) {
+    try {
+      const d = new Date(s.birthDate + 'T12:00:00');
+      const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+      const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+      birthStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} ${days[d.getDay()]}`;
+    } catch {}
+  }
+
+  // Doğum kilosunu kg'a çevir
+  const weightStr = s.birthWeight
+    ? (parseFloat(s.birthWeight) >= 500
+        ? (parseFloat(s.birthWeight)/1000).toFixed(3) + ' kg (' + s.birthWeight + ' gr)'
+        : s.birthWeight + ' kg')
+    : '';
+
+  root.innerHTML = `
+    <div style="text-align:center;padding:16px 0 12px">
+      <div class="baby-card-avatar avatar-${s.avatarColor||'green'}" style="font-size:48px;width:80px;height:80px;border-radius:24px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px">${s.avatarEmoji||'👶'}</div>
+      <div style="font-size:20px;font-weight:900;color:var(--text);font-family:var(--font-display)">${escHtml(s.babyName||'Bebek')}</div>
+      <div style="font-size:13px;color:var(--primary);font-weight:700;margin-top:4px">${age}</div>
+    </div>
+    <div style="padding:0 2px">
+      ${row('📅','Doğum Tarihi', birthStr !== '—' ? birthStr : '')}
+      ${row('⏰','Doğum Saati', s.birthTime)}
+      ${row('🏥','Doğum Yeri', s.birthPlace)}
+      ${row('⚖️','Doğum Kilosu', weightStr)}
+      ${row('📏','Doğum Boyu', s.birthHeight ? s.birthHeight + ' cm' : '')}
+      ${row('📐','Doğum Baş Çevresi', s.birthHead ? s.birthHead + ' cm' : '')}
+      ${row('🩸','Kan Grubu', s.bloodType)}
+    </div>
+    <button onclick="openAddBabyModal(activeId)" style="width:100%;margin-top:16px;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">
+      ✏️ Profili Düzenle
+    </button>
+  `;
 }
 
 // ===== INLINE LİSTE DÜZENLE MİNİ MODAL =====
@@ -5061,21 +5151,19 @@ function highlightText(text, query) {
 
 // ===== EXCEL İÇE AKTARMA =====
 
-// Excel serial date → YYYY-MM-DD
+// Excel serial date → YYYY-MM-DD (sadece tarih kısmı)
 function parseImpDate(raw) {
   if (!raw && raw !== 0) return '';
   const s = String(raw).trim();
   if (!s) return '';
 
-  // Sayısal serial (Excel: 1 = 1900-01-01, ama 1900 yılı hatası var)
+  // Sayısal serial — Excel datetime: tam kısım tarih, ondalık kısım saat
   const num = Number(s);
   if (!isNaN(num) && num > 1000 && num < 100000) {
-    // Excel serial → JS Date (Excel epoch: 25569 = 1970-01-01)
-    const ms = (num - 25569) * 86400 * 1000;
+    const dateSerial = Math.floor(num); // sadece tarih kısmı
+    const ms = (dateSerial - 25569) * 86400 * 1000;
     const d = new Date(ms);
-    if (!isNaN(d)) {
-      return d.toISOString().split('T')[0];
-    }
+    if (!isNaN(d)) return d.toISOString().split('T')[0];
   }
 
   // DD.MM.YYYY veya DD/MM/YYYY veya DD-MM-YYYY
@@ -5089,7 +5177,6 @@ function parseImpDate(raw) {
   // MM/DD/YYYY (Amerikan)
   const mdy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (mdy) {
-    // Eğer ilk sayı > 12 ise gün, değilse ay olarak yorumla
     if (parseInt(mdy[1]) > 12) return `${mdy[3]}-${mdy[2].padStart(2,'0')}-${mdy[1].padStart(2,'0')}`;
     return `${mdy[3]}-${mdy[1].padStart(2,'0')}-${mdy[2].padStart(2,'0')}`;
   }
@@ -5098,12 +5185,30 @@ function parseImpDate(raw) {
   const parsed = Date.parse(s);
   if (!isNaN(parsed)) return new Date(parsed).toISOString().split('T')[0];
 
-  return s; // dönüştürülemediyse ham bırak
+  return s;
+}
+
+// Excel datetime → HH:MM (ondalık kısımdan saat çıkar)
+function parseImpTime(raw) {
+  if (!raw && raw !== 0) return '';
+  const s = String(raw).trim();
+  const num = Number(s);
+  // Excel datetime decimal: ondalık kısım günün saat oranı
+  if (!isNaN(num) && num > 1000 && num < 100000 && s.includes('.')) {
+    const fraction = num - Math.floor(num);
+    const totalMinutes = Math.round(fraction * 24 * 60);
+    const h = Math.floor(totalMinutes / 60) % 24;
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  }
+  // Zaten HH:MM formatında
+  if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0,5);
+  return '';
 }
 const impFieldDefs = {
   olay:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'olay',label:'⚡ Olay'}, {key:'not',label:'📝 Not'} ],
-  gelisim: [ {key:'tarih',label:'📅 Tarih'}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'notlar',label:'💬 Notlar'} ],
-  kontrol: [ {key:'tarih',label:'📅 Tarih'}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'ilac',label:'💉 İlaç'}, {key:'not',label:'📝 Not'} ],
+  gelisim: [ {key:'tarih',label:'📅 Tarih'}, {key:'boy',label:'📏 Boy (cm)'}, {key:'agirlik',label:'⚖️ Ağırlık (kg)'}, {key:'bas',label:'📐 Baş Çevresi (cm)'}, {key:'diger',label:'📋 Diğer Ölçüm'}, {key:'notlar',label:'💬 Notlar'} ],
+  kontrol: [ {key:'tarih',label:'📅 Tarih'}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis / Hastalık'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'tetkik',label:'🔭 Yapılan Tetkikler'}, {key:'ilac',label:'💉 Verilen İlaçlar'}, {key:'not',label:'📝 Not'}, {key:'doktorPuan',label:'⭐ Doktor Puanı (5)'}, {key:'hastanePuan',label:'⭐ Hastane Puanı (5)'} ],
   gida:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı'}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
   gunluk:  [ {key:'tarih',label:'📅 Tarih'}, {key:'baslik',label:'📝 Başlık'}, {key:'not',label:'💬 Not'} ],
   asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'aciklama',label:'📝 Açıklama'} ],
@@ -5264,10 +5369,15 @@ function impBuildPreview() {
   impRows.forEach(row => {
     if (!row || row.every(c => !c)) return;
     const rec = {};
+    const DATE_KEYS = new Set(['tarih','cikma','dusme']);
+    const TIME_KEYS = new Set(['saat']);
     fields.forEach(f => {
       const colIdx = mapping[f.key];
       const raw = colIdx > 0 ? (row[colIdx - 1] || '') : '';
-      rec[f.key] = f.key === 'tarih' ? parseImpDate(raw) : raw;
+      if (DATE_KEYS.has(f.key)) rec[f.key] = parseImpDate(raw);
+      else if (TIME_KEYS.has(f.key)) rec[f.key] = parseImpTime(raw);
+      else if (f.key === 'doktorPuan' || f.key === 'hastanePuan') { const n = parseInt(raw); rec[f.key] = (!isNaN(n) && n >= 1 && n <= 5) ? n : 0; }
+      else rec[f.key] = raw;
     });
     valid.push(rec);
   });
@@ -5303,13 +5413,18 @@ function impDoImport() {
   const mapping = impGetMapping();
 
   let added = 0, skipped = 0;
+  const DATE_KEYS = new Set(['tarih','cikma','dusme']);
+  const TIME_KEYS = new Set(['saat']);
   impRows.forEach(row => {
     if (!row || row.every(c => !c)) return;
     const rec = { id: genId() };
     fields.forEach(f => {
       const colIdx = mapping[f.key];
       const raw = colIdx > 0 ? (row[colIdx - 1] || '') : '';
-      rec[f.key] = f.key === 'tarih' ? parseImpDate(raw) : raw;
+      if (DATE_KEYS.has(f.key)) rec[f.key] = parseImpDate(raw);
+      else if (TIME_KEYS.has(f.key)) rec[f.key] = parseImpTime(raw);
+      else if (f.key === 'doktorPuan' || f.key === 'hastanePuan') { const n = parseInt(raw); rec[f.key] = (!isNaN(n) && n >= 1 && n <= 5) ? n : 0; }
+      else rec[f.key] = raw;
     });
     const missing = fields.filter(f => f.req && !rec[f.key]);
     if (missing.length) { skipped++; return; }
