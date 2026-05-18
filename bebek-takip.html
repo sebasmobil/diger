@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.88
+  Bebek Takip Pro v1.0.90
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.88">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.90">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.88</title>
+<title>Bebek Takip Pro v1.0.90</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2275,7 +2275,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.86</span>
+  <span>Pro 1.0.90</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -5327,6 +5327,8 @@ function impShowMapping() {
       notlar:  ['notlar','not','note','açıklama'],
       hastane: ['hastane','hospital','klinik'],
       doktor:  ['doktor','doctor','hekim'],
+      doktorPuan: ['doktor puanı','doktor puan','doktorpuan','doctor rating','doktor_puan'],
+      hastanePuan: ['hastane puanı','hastane puan','hastanepuan','hospital rating','hastane_puan'],
       teshis:  ['teşhis','teshis','tanı','diagnosis'],
       tedavi:  ['tedavi','treatment'],
       ilac:    ['ilaç','ilac','medicine','drug'],
@@ -5400,7 +5402,7 @@ function impBuildPreview() {
 
   const tbody = `<tbody>${
     valid.slice(0, previewCount).map((rec, ri) => `<tr style="border-bottom:1px solid var(--border);${ri%2===1?'background:var(--bg)':''}">${
-      shownFields.map(f => `<td style="padding:6px 10px;font-size:11px;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(rec[f.key]||'').replace(/"/g,"'")}">${rec[f.key]||'<span style="color:var(--text3)">—</span>'}</td>`).join('')
+      shownFields.map(f => { const v = rec[f.key]; const disp = (v !== undefined && v !== null && v !== '') ? v : null; return `<td style="padding:6px 10px;font-size:11px;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${String(v??'').replace(/"/g,"'")}">${disp !== null ? disp : '<span style="color:var(--text3)">—</span>'}</td>`; }).join('')
     }</tr>`).join('')
   }</tbody>`;
 
