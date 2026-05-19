@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.1.5
+  Bebek Takip Pro v1.2.4
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.5">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.2.4">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.1.5</title>
+<title>Bebek Takip Pro v1.2.4</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -789,7 +789,7 @@ button, a, [onclick] {
   left: 50%;
   transform: translateX(-50%);
   z-index: 45;
-  opacity: 0.45;
+  opacity: 1;
   box-shadow: 0 3px 14px var(--shadow);
 }
 .home-back-btn:hover {
@@ -2381,7 +2381,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.1.5</span>
+  <span>Pro 1.2.4</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -2465,7 +2465,7 @@ mark.hl {
             </div>
             <!-- SVG Grafik -->
             <div style="padding:10px 14px 0">
-              <svg id="gcSvg" width="100%" viewBox="0 0 320 180" style="display:block;overflow:visible"></svg>
+              <svg id="gcSvg" width="100%" viewBox="0 0 320 185" style="display:block"></svg>
             </div>
             <!-- Tıklanan nokta detay -->
             <div id="gcTooltip" style="display:none;margin:6px 14px;padding:8px 12px;background:var(--primary);color:#fff;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font)"></div>
@@ -3516,17 +3516,23 @@ function asiSetVal(ad) {
   asiCloseDD();
 }
 function asiCloseDD() {
-  const dd = document.getElementById('asiDropdown');
-  if (dd) dd.style.display = 'none';
+  const dd = document.getElementById('asiDropdownPortal');
+  if (dd) dd.remove();
 }
 function asiSearchFn(q) {
-  const dd = document.getElementById('asiDropdown');
-  if (!dd) return;
+  asiCloseDD();
+  const inp = document.getElementById('f_asi');
+  if (!inp) return;
   const norm = s => s.toLocaleLowerCase('tr-TR');
   const list = (q || '').trim()
     ? ASI_LIST.filter(a => norm(a.ad).includes(norm(q)) || norm(a.kisaltma).includes(norm(q)))
     : ASI_LIST;
-  if (!list.length) { dd.style.display = 'none'; return; }
+  if (!list.length) return;
+
+  const dd = document.createElement('div');
+  dd.id = 'asiDropdownPortal';
+  dd.className = 'ac-dropdown';
+  dd.style.cssText = 'position:fixed;z-index:99999;overflow-y:auto;overflow-x:hidden;';
   dd.innerHTML = list.map(a => {
     const safe = a.ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     return `<div onclick="asiSetVal('${safe}')"
@@ -3538,24 +3544,39 @@ function asiSearchFn(q) {
       <div style="font-size:11px;color:var(--text2);margin-top:1px">${a.ad}</div>
     </div>`;
   }).join('');
-  dd.style.display = 'block';
+  document.body.appendChild(dd);
+
+  // Portal konumlandır
+  const rect = inp.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  dd.style.width = rect.width + 'px';
+  dd.style.left = rect.left + 'px';
+  if (spaceBelow >= 150) {
+    dd.style.top = (rect.bottom + 4) + 'px';
+    dd.style.maxHeight = Math.max(120, spaceBelow - 12) + 'px';
+  } else {
+    dd.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+    dd.style.maxHeight = Math.max(120, rect.top - 12) + 'px';
+  }
 }
 function asiRenderQuick() {
   const sel   = document.getElementById('f_donem');
   const quick = document.getElementById('asiQuickBtns');
   if (!sel || !quick) return;
-  // Özel eklenen aşılar (bu dönem için)
-  const customItems = getCustomList('asi_ozel_' + sel.value, []);
-  let html = '';
-  // Sadece özel eklenenler görünsün
-  customItems.forEach(ad => {
+  const donem = sel.value;
+  const customItems = getCustomList('asi_ozel_' + donem, []);
+  // Dönem aşılarını ASI_LIST'ten al
+  const donemAsilar = ASI_LIST.filter(a => a.donem === donem).map(a => a.ad);
+  const allItems = [...new Set([...donemAsilar, ...customItems])];
+
+  quick.innerHTML = allItems.map(ad => {
     const safe = ad.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    html += `<button type="button" onclick="asiSetVal('${safe}')"
-      style="padding:4px 10px;border-radius:14px;border:1.5px solid var(--accent3);background:rgba(171,71,188,0.08);color:var(--accent3);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">
-      ✦ ${ad}
+    const isCustom = customItems.includes(ad);
+    return `<button type="button" onclick="asiSetVal('${safe}')"
+      style="padding:4px 10px;border-radius:14px;border:1.5px solid ${isCustom ? 'var(--accent3)' : 'var(--border)'};background:${isCustom ? 'rgba(171,71,188,0.08)' : 'var(--bg)'};color:${isCustom ? 'var(--accent3)' : 'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s">
+      ${isCustom ? '✦ ' : ''}${escHtml(ad)}
     </button>`;
-  });
-  quick.innerHTML = html;
+  }).join('');
 }
 
 function asiOzelEkle() {
@@ -3816,9 +3837,8 @@ function getFormHTML(section, r) {
             onfocus="asiSearchFn(this.value)"
             onblur="setTimeout(asiCloseDD,200)"
            />
-          <div id="asiDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--card);border:1.5px solid var(--primary);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;margin-top:3px"></div>
         </div>
-        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;overflow:visible;padding-bottom:6px;width:100%" id="asiQuickBtns"></div>
+        <div class="chip-panel open" id="asiQuickBtns"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">✅ Durum <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_durum','Durum Seçenekleri')">✏️ Düzenle</span></label>
@@ -4004,8 +4024,16 @@ function renderTable(section, filterQuery = '') {
           <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('kontrol','${r.id}')">🗑️</button>
         </div>
       </div>
-      ${r.hastane ? `<div class="rc-title">🏥 ${hl(r.hastane)}</div>` : ''}
-      ${r.doktor ? `<div class="rc-sub">👨‍⚕️ ${hl(r.doktor)}</div>` : ''}
+      ${r.hastane ? `
+        <div class="rc-top" style="margin-top:2px;align-items:center;gap:6px">
+          <div class="rc-title" style="margin:0">🏥 ${hl(r.hastane)}</div>
+          ${r.hastanePuan ? `<span style="color:#FFA726;font-size:13px;letter-spacing:1px;white-space:nowrap">${'★'.repeat(r.hastanePuan)}${'☆'.repeat(5-r.hastanePuan)}</span>` : ''}
+        </div>` : ''}
+      ${r.doktor ? `
+        <div class="rc-top" style="margin-top:2px;align-items:center;gap:6px">
+          <div class="rc-sub" style="margin:0">👨‍⚕️ ${hl(r.doktor)}</div>
+          ${r.doktorPuan ? `<span style="color:#FFA726;font-size:13px;letter-spacing:1px;white-space:nowrap">${'★'.repeat(r.doktorPuan)}${'☆'.repeat(5-r.doktorPuan)}</span>` : ''}
+        </div>` : ''}
       <div class="rc-chips">
         ${r.teshis ? `<span class="rc-chip">🩺 Tanı: <strong>${hl(r.teshis)}</strong></span>` : ''}
         ${r.tedavi ? `<span class="rc-chip">💊 Tedavi: <strong>${hl(r.tedavi)}</strong></span>` : ''}
@@ -4146,17 +4174,17 @@ function renderToothMap() {
 
   function toothFill(t) {
     const rec = data.dis.find(d => d.toothId === t.id);
-    if (!rec) return isDark ? '#1e3040' : '#f5f5f5';
+    if (!rec) return isDark ? '#2c3e55' : '#dde3ea';
     if (rec.cikma && !rec.dusme) return isDark ? '#1a4a2a' : '#e8f5e9';
     if (rec.dusme) return isDark ? '#3a3010' : '#fff8e1';
-    return isDark ? '#1e3040' : '#f5f5f5';
+    return isDark ? '#2c3e55' : '#dde3ea';
   }
   function toothStroke(t) {
     const rec = data.dis.find(d => d.toothId === t.id);
-    if (!rec) return isDark ? '#2a3f55' : '#ccc';
+    if (!rec) return isDark ? '#5a7a99' : '#9aafc4';
     if (rec.cikma && !rec.dusme) return '#4CAF50';
     if (rec.dusme) return '#FFA726';
-    return isDark ? '#2a3f55' : '#ccc';
+    return isDark ? '#5a7a99' : '#9aafc4';
   }
 
   const teeth = TOOTH_MAP.map(t => `
@@ -4209,7 +4237,7 @@ function renderToothMap() {
     <text x="24" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Çıktı</text>
     <rect x="65" y="375" width="10" height="10" rx="2" fill="${isDark?'#3a3010':'#fff8e1'}" stroke="#FFA726" stroke-width="1.5"/>
     <text x="79" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Düştü</text>
-    <rect x="125" y="375" width="10" height="10" rx="2" fill="${isDark?'#1e3040':'#f5f5f5'}" stroke="${isDark?'#2a3f55':'#ccc'}" stroke-width="1.5"/>
+    <rect x="125" y="375" width="10" height="10" rx="2" fill="${isDark?'#2c3e55':'#dde3ea'}" stroke="${isDark?'#5a7a99':'#9aafc4'}" stroke-width="1.5"/>
     <text x="139" y="384" font-size="9" font-family="Nunito,sans-serif" fill="${textCol}">Çıkmadı</text>
   </svg>`;
 }
@@ -4221,7 +4249,8 @@ function openToothPanel(toothId) {
   const jawLabel  = tooth.jaw   === 'upper' ? 'Üst' : 'Alt';
   const sideLabel = tooth.side  === 'right' ? 'Sağ' : 'Sol';
   document.getElementById('toothDetailTitle').textContent = `🦷 ${tooth.label} — ${jawLabel} ${sideLabel}`;
-  document.getElementById('toothCikmaInput').value = rec?.cikma || '';
+  // cikma yoksa tarih'e bak (içe aktarım uyumu)
+  document.getElementById('toothCikmaInput').value = rec?.cikma || rec?.tarih || '';
   document.getElementById('toothDusmeInput').value = rec?.dusme || '';
   document.getElementById('toothNotInput').value   = rec?.not   || '';
   document.getElementById('toothDeleteBtn').style.display = rec ? '' : 'none';
@@ -4277,15 +4306,16 @@ function renderDisList() {
     return;
   }
   container.innerHTML = rows.map((r,i) => `
-    <div class="record-card" style="animation-delay:${i*0.04}s;cursor:pointer" onclick="openToothPanel('${r.toothId}')">
+    <div class="record-card" style="animation-delay:${i*0.04}s">
       <div class="rc-top">
         <span class="rc-date">🦷 ${escHtml(r.dis||'-')} · ${r.konum||'-'}</span>
         <div class="rc-actions">
-          <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();data.dis=data.dis.filter(d=>d.id!=='${r.id}');saveData();updateCounts();renderDisPage();showToast('Silindi.')">🗑️</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="openToothPanel('${r.toothId}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="data.dis=data.dis.filter(d=>d.id!=='${r.id}');saveData();updateCounts();renderDisPage();showToast('Silindi.')">🗑️</button>
         </div>
       </div>
       <div class="rc-chips">
-        ${r.cikma ? `<span class="rc-chip">🟢 Çıkma: <strong>${formatDate(r.cikma)}</strong></span>` : ''}
+        ${r.cikma||r.tarih ? `<span class="rc-chip">🟢 Çıkma: <strong>${formatDate(r.cikma||r.tarih)}</strong></span>` : ''}
         ${r.dusme ? `<span class="rc-chip">🟡 Düşme: <strong>${formatDate(r.dusme)}</strong></span>` : ''}
       </div>
       ${r.not ? `<div class="rc-note">${escHtml(r.not)}</div>` : ''}
@@ -4573,8 +4603,8 @@ function renderGrowthChart() {
     return;
   }
 
-  const W = 320, H = 180;
-  const pad = { top: 18, right: 18, bottom: 32, left: 44 };
+  const W = 320, H = 185;
+  const pad = { top: 18, right: 18, bottom: 38, left: 44 };
   const gW = W - pad.left - pad.right;
   const gH = H - pad.top  - pad.bottom;
 
@@ -4598,13 +4628,20 @@ function renderGrowthChart() {
     yLabels   += `<text x="${pad.left - 5}" y="${y+4}" text-anchor="end" font-family="Nunito,sans-serif" font-size="9" fill="${textC}">${lv}</text>`;
   }
 
-  // X labels (en fazla 5 tane)
+  // X labels (en fazla 6 tane)
+  const MONTHS_SHORT = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
   let xLabels = '';
-  const xStep = Math.max(1, Math.floor(pts.length / 5));
+  const xStep = Math.max(1, Math.floor(pts.length / 6));
   for (let i = 0; i < pts.length; i += xStep) {
     const x = xOf(i);
-    const d = (pts[i].r.tarih || '').slice(5); // MM-DD
-    xLabels += `<text x="${x}" y="${H - pad.bottom + 12}" text-anchor="middle" font-family="Nunito,sans-serif" font-size="9" fill="${textC}">${d}</text>`;
+    const tarih = pts[i].r.tarih || '';
+    let label = tarih;
+    if (tarih.length >= 7) {
+      const ay = parseInt(tarih.slice(5,7),10) - 1;
+      const yil = tarih.slice(2,4);
+      label = `${MONTHS_SHORT[ay] || ''} '${yil}`;
+    }
+    xLabels += `<text x="${x}" y="${H - pad.bottom + 14}" text-anchor="middle" font-family="Nunito,sans-serif" font-size="9" fill="${textC}">${label}</text>`;
   }
 
   // Alan (fill)
@@ -5127,20 +5164,19 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
   const items = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (items.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
-  // Mevcut seçili değerleri virgülle ayır
-  const selected = _acGetVals(inp);
+  // Tek seçim — input.value ile direkt karşılaştır
+  const current = inp.value.trim();
   items.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = t;
     const color = colorMap ? (colorMap[t] || 'var(--primary)') : (accentColor || 'var(--primary)');
-    const isSelected = selected.includes(t);
+    const isSelected = current === t;
     btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:normal;word-break:break-word;transition:all 0.15s`;
     btn.addEventListener('click', () => {
-      const cur = _acGetVals(inp);
-      const idx = cur.indexOf(t);
-      if (idx >= 0) cur.splice(idx, 1); else cur.push(t);
-      _acJoinVals(cur, inp);
+      // Tek seçim: aynıya tıklayınca kaldır, farklıya tıklayınca değiştir
+      inp.value = inp.value.trim() === t ? '' : t;
+      inp.dataset.values = ''; // multi cache temizle
       renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap);
     });
     box.appendChild(btn);
@@ -5404,7 +5440,7 @@ function renderOlayKart() {
         <div style="font-weight:700;font-size:13px;color:var(--text);font-family:var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(r.olay||'Kayit')}</div>
         ${r.not ? `<div style="font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(truncate(r.not,40))}</div>` : ''}
       </div>
-      <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${formatDate(r.tarih)}${r.saat?' '+r.saat:''}</div>
+      <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;text-align:right">${formatDate(r.tarih)}${r.saat ? '<br><span style="opacity:0.7">🕐 '+r.saat+'</span>' : ''}</div>
     </div>
   `).join('');
 }
@@ -5479,7 +5515,7 @@ function renderGidaKart() {
           <div style="font-size:11px;color:var(--text3)">${r.miktar?escHtml(r.miktar)+' · ':''}<span style="color:var(--accent4)">${r.tur||''}</span></div>
         </div>
         ${r.alerji ? `<span title="Alerji: ${escHtml(r.alerji)}" style="font-size:14px">⚠️</span>` : ''}
-        <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0">${r.saat||formatDate(r.tarih)}</div>
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;text-align:right">${formatDate(r.tarih)}${r.saat ? '<br><span style="color:var(--text3);opacity:0.7">🕐 '+r.saat+'</span>' : ''}</div>
       </div>
     `).join('')}
   `;
@@ -5888,6 +5924,7 @@ function impDoImport() {
         if (tooth) rec.toothId = tooth.id;
       }
       if (!rec.tarih) rec.tarih = rec.cikma || '';
+      if (!rec.cikma) rec.cikma = rec.tarih || ''; // cikma boşsa tarih'ten doldur
     });
   }
 
