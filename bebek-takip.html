@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.1.3
+  Bebek Takip Pro v1.1.4
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.3">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.4">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.1.3</title>
+<title>Bebek Takip Pro v1.1.4</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2368,7 +2368,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.1.3</span>
+  <span>Pro 1.1.4</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4856,7 +4856,7 @@ function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
     const parts = _acGetVals(inp);
     const idx = parts.indexOf(value);
     if (idx >= 0) parts.splice(idx, 1); else parts.push(value);
-    inp.value = _acJoinVals(parts, inp);
+    _acJoinVals(parts, inp);
     // Dropdown açık kalsın, listeyi güncelle
     if (dd && dd.parentNode) {
       const searchInp = dd.querySelector('.ac-search-bar input');
@@ -4905,7 +4905,7 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
         const parts = _acGetVals(inp);
         const idx = parts.indexOf(s);
         if (idx >= 0) parts.splice(idx, 1); else parts.push(s);
-        inp.value = _acJoinVals(parts, inp);
+        _acJoinVals(parts, inp);
         const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
         if (clr) clr.classList.toggle('visible', inp.value.length > 0);
       } else {
@@ -5031,18 +5031,30 @@ function setupAcField(inputId, chipsId, listKey, opts) {
 
   // Multi modda mevcut value'yu dataset.values'a yükle
   if (opts && opts.multi && inp.value && !inp.dataset.values) {
-    // Kayıtlı değer virgüllü metin olarak geliyor, her öğeyi listeden eşleştir
     const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
-    const raw = inp.value;
-    // Önce tam eşleşmeleri dene (liste öğeleriyle)
-    const matched = all.filter(s => raw.split(', ').some(v => v.trim() === s) || raw.includes(s));
+    const raw = inp.value.trim();
+    // Liste öğelerini uzundan kısaya sırala: uzun olanlar önce eşleşsin
+    const sorted = [...all].sort((a, b) => b.length - a.length);
+    let remaining = raw;
+    const matched = [];
+    // Her liste öğesini sırayla dene — tam eşleşme veya ", " ile ayrılmış parça
+    for (const s of sorted) {
+      // raw içinde bu öğe tam olarak geçiyor mu?
+      if (remaining === s || remaining.startsWith(s + ', ') ||
+          remaining.endsWith(', ' + s) || remaining.includes(', ' + s + ', ')) {
+        matched.push(s);
+        remaining = remaining.replace(s, '').replace(/^,\s*/, '').replace(/,\s*$/, '').trim();
+      }
+    }
+    // Kalan parçaları da ekle (listede olmayan ama girilmiş değerler)
+    if (remaining) {
+      remaining.split(',').map(s => s.trim()).filter(Boolean).forEach(s => matched.push(s));
+    }
     if (matched.length > 0) {
       inp.dataset.values = JSON.stringify(matched);
       inp.value = matched.join(', ');
     } else {
-      // Fallback: virgüllü split
-      const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
-      inp.dataset.values = JSON.stringify(parts);
+      inp.dataset.values = JSON.stringify([raw]);
     }
   }
 
@@ -5105,7 +5117,7 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
       const cur = _acGetVals(inp);
       const idx = cur.indexOf(t);
       if (idx >= 0) cur.splice(idx, 1); else cur.push(t);
-      inp.value = _acJoinVals(cur, inp);
+      _acJoinVals(cur, inp);
       renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap);
     });
     box.appendChild(btn);
