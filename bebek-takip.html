@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.97
+  Bebek Takip Pro v1.0.99
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.97">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.99">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.97</title>
+<title>Bebek Takip Pro v1.0.99</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2346,7 +2346,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.97</span>
+  <span>Pro 1.0.99</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4678,6 +4678,27 @@ function saveCustomList(key, arr) {
 
 const _acState = {};
 
+// Dropdown dışına tıklayınca tüm açık dropdown'ları kapat
+document.addEventListener('mousedown', (e) => {
+  Object.keys(_acState).forEach(inputId => {
+    const st = _acState[inputId];
+    if (!st || !st.dropdown) return;
+    const inp = document.getElementById(inputId);
+    const wrap = inp && inp.parentNode;
+    // Tıklanan yer dropdown veya input değilse kapat
+    if (!st.dropdown.contains(e.target) && wrap && !wrap.contains(e.target)) {
+      _acClose(inputId);
+      const chipsId = st.chipsId;
+      const listKey = st.listKey;
+      const opts = st.opts;
+      if (chipsId) {
+        const box = document.getElementById(chipsId);
+        if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
+      }
+    }
+  });
+});
+
 function _acHighlight(text, query) {
   if (!query) return escHtml(text);
   const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
@@ -4735,6 +4756,9 @@ function _acOpen(inputId, chipsId, listKey, opts) {
   const st = _acState[inputId] || (_acState[inputId] = {});
   st.activeIdx = -1;
   st.items = all;
+  st.chipsId = chipsId;
+  st.listKey = listKey;
+  st.opts = opts;
   const wrap = inp.parentNode;
   if (!wrap) return;
 
@@ -4801,42 +4825,37 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
   const inp = document.getElementById(inputId);
   const box = document.getElementById(chipsId);
   if (!inp || !box) return;
-
-  if (opts && opts.multi) {
-    // Multi modda: sadece seçili olanları küçük kaldırılabilir etiket olarak göster
-    const selected = inp.value.split(',').map(s => s.trim()).filter(Boolean);
-    box.innerHTML = '';
-    if (selected.length === 0) return;
-    selected.forEach(s => {
-      const tag = document.createElement('span');
-      tag.style.cssText = `display:inline-flex;align-items:center;gap:4px;background:var(--primary);color:#fff;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;font-family:var(--font);`;
-      tag.innerHTML = `${escHtml(s)}<button type="button" style="background:none;border:none;color:#fff;font-size:14px;cursor:pointer;padding:0 0 0 2px;line-height:1;opacity:0.85" data-val="${escHtml(s)}">✕</button>`;
-      tag.querySelector('button').addEventListener('click', () => {
-        const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
-        const idx = parts.indexOf(s);
-        if (idx >= 0) parts.splice(idx, 1);
-        inp.value = parts.join(', ');
-        const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-        if (clr) clr.classList.toggle('visible', inp.value.length > 0);
-        renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
-      });
-      box.appendChild(tag);
-    });
-    return;
-  }
-
-  // Tek seçim modu: tüm listeyi chip olarak göster
   const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (all.length === 0) { box.innerHTML = ''; return; }
+
+  const selectedVals = (opts && opts.multi)
+    ? inp.value.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
   box.innerHTML = '';
-  all.forEach(s => {
+
+  // Seçili olanları üste, diğerlerini alta
+  const ordered = opts && opts.multi
+    ? [...all.filter(s => selectedVals.includes(s)), ...all.filter(s => !selectedVals.includes(s))]
+    : all;
+
+  ordered.forEach(s => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = s;
-    const isSelected = inp.value.trim() === s;
+    const isSelected = opts && opts.multi ? selectedVals.includes(s) : inp.value.trim() === s;
     btn.style.cssText = `background:${isSelected ? 'var(--primary)' : 'var(--bg)'};border:1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border)'};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;color:${isSelected ? '#fff' : 'var(--text2)'};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
-      inp.value = inp.value.trim() === s ? '' : s;
+      if (opts && opts.multi) {
+        const parts = inp.value.split(',').map(x => x.trim()).filter(Boolean);
+        const idx = parts.indexOf(s);
+        if (idx >= 0) parts.splice(idx, 1); else parts.push(s);
+        inp.value = parts.join(', ');
+        const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+        if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+      } else {
+        inp.value = inp.value.trim() === s ? '' : s;
+      }
       renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
     });
     box.appendChild(btn);
@@ -4856,38 +4875,17 @@ function setupAcField(inputId, chipsId, listKey, opts) {
   inp._acSetup = true;
 
   if (opts && opts.multi) {
-    // Multi: dış input sadece gösterir, tıklayınca dropdown açılır
     inp.setAttribute('readonly', 'readonly');
     inp.style.cursor = 'pointer';
     inp.addEventListener('focus', () => _acOpen(inputId, chipsId, listKey, opts));
     inp.addEventListener('click',  () => _acOpen(inputId, chipsId, listKey, opts));
-    inp.addEventListener('blur', () => {
-      // Arama barına geçişte kapanmasın — 300ms bekle
-      setTimeout(() => {
-        const st = _acState[inputId];
-        if (st && st.dropdown) {
-          // Dropdown içindeki bir elemente focus gittiyse kapat
-          const focused = document.activeElement;
-          if (!st.dropdown.contains(focused)) {
-            _acClose(inputId);
-            const box = document.getElementById(chipsId);
-            if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
-          }
-        }
-      }, 300);
-    });
   } else {
-    // Tek seçim: input'a yazınca filtreler
     inp.addEventListener('input', () => {
       _acOpen(inputId, chipsId, listKey, opts);
       const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
       if (clr) clr.classList.toggle('visible', inp.value.length > 0);
     });
-    inp.addEventListener('focus', () => {
-      _acOpen(inputId, chipsId, listKey, opts);
-      const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-      if (clr) clr.classList.toggle('visible', inp.value.length > 0);
-    });
+    inp.addEventListener('focus', () => _acOpen(inputId, chipsId, listKey, opts));
     inp.addEventListener('blur', () => {
       setTimeout(() => {
         _acClose(inputId);
@@ -4915,6 +4913,8 @@ function setupAcField(inputId, chipsId, listKey, opts) {
         if (sel) _acSelect(inputId, chipsId, listKey, sel, opts);
       } else if (e.key === 'Escape') {
         _acClose(inputId);
+        const box = document.getElementById(chipsId);
+        if (box) { box.style.display = ''; renderSuggestionChipsStatic(inputId, chipsId, listKey, opts); }
       }
     });
   }
