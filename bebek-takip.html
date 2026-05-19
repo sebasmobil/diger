@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.0.92
+  Bebek Takip Pro v1.0.94
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.92">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.0.94">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.0.92</title>
+<title>Bebek Takip Pro v1.0.94</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1078,7 +1078,7 @@ td {
   max-width: 580px;
   max-height: 88vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   box-shadow: 0 25px 60px rgba(0,0,0,0.3);
   animation: scaleIn 0.25s ease;
 }
@@ -1104,8 +1104,8 @@ td {
 }
 .modal-body {
   padding: 22px 24px;
-  overflow-x: hidden;
-  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 .modal-footer {
   padding: 16px 24px;
@@ -2317,7 +2317,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.0.92</span>
+  <span>Pro 1.0.94</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3553,7 +3553,7 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">⚡ Olay <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('olay_tur','Hızlı Olay Seçenekleri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_olay" value="${v.olay||''}" placeholder="Örn: Titreme, Ateş, Öksürük..." autocomplete="off"/><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="olay_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3599,33 +3599,33 @@ function getFormHTML(section, r) {
         <label class="form-label">🏥 Hastane <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_hastane','Hastaneler')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_hastane" value="${v.hastane||''}" placeholder="Hastane adı..."
           autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="hastane_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">👨‍⚕️ Doktor <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_doktor','Doktorlar')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_doktor" value="${v.doktor||''}" placeholder="Doktor adı..."
           autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="doktor_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔬 Hastalık / Teşhis <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_teshis','Teşhis Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_teshis" value="${v.teshis||''}" placeholder="Teşhis..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="teshis_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💊 Tedavi <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tedavi','Tedavi Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_tedavi" value="${v.tedavi||''}" placeholder="Uygulanan tedavi..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="tedavi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">💉 Verilen İlaçlar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_ilac','İlaç Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_ilac" value="${v.ilac||''}" placeholder="İlaç adları..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="ilac_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">🔭 Yapılan Tetkikler <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('kontrol_tetkik','Tetkik Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_tetkik" value="${v.tetkik||''}" placeholder="Kan tahlili, ultrason..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="tetkik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3658,12 +3658,12 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">🏷️ Tür <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_tur','Gıda Türleri')">✏️ Düzenle</span></label>
         <input type="hidden" id="f_tur" value="${v.tur||'Sebze'}" />
-        <div id="gida_tur_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="gida_tur_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">🍽️ Adı <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_adi','Gıda Adları')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_adi" value="${v.adi||''}" placeholder="Gıda adı..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="gida_adi_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
@@ -3672,12 +3672,12 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📏 Miktar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_miktar','Miktar Seçenekleri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_miktar" value="${v.miktar||''}" placeholder="Örn: 1.5 tatlı kaşığı" autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="miktar_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">⚠️ Alerji Belirtileri <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_alerji','Alerji Belirtileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_alerji" value="${v.alerji||''}" placeholder="Varsa belirtin..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="alerji_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Not</label>
@@ -3694,7 +3694,7 @@ function getFormHTML(section, r) {
       <div class="form-group">
         <label class="form-label">📝 Başlık <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gunluk_baslik','Başlık Önerileri')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap"><input class="form-input" type="text" id="f_baslik" value="${v.baslik||''}" placeholder="İlk adım, ilk kelime..." autocomplete="off" /><button class="ac-clear" type="button" tabindex="-1">✕</button></div>
-        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="baslik_chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group">
         <label class="form-label">💬 Not</label>
@@ -3754,12 +3754,12 @@ function getFormHTML(section, r) {
            />
           <div id="asiDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:var(--card);border:1.5px solid var(--primary);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);max-height:220px;overflow-y:auto;margin-top:3px"></div>
         </div>
-        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;overflow-x:auto;padding-bottom:4px;max-width:100%" id="asiQuickBtns"></div>
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;overflow:visible;padding-bottom:6px;width:100%" id="asiQuickBtns"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">✅ Durum <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_durum','Durum Seçenekleri')">✏️ Düzenle</span></label>
         <input type="hidden" id="f_durum" value="${v.durum||'Planlandı'}" />
-        <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow-x:auto;padding-bottom:4px;max-width:100%"></div>
+        <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
         <label class="form-label">📝 Açıklama</label>
@@ -4669,34 +4669,32 @@ function _acOpen(inputId, chipsId, listKey, opts) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
   const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
-  const query = inp.value.trim().toLocaleLowerCase('tr-TR');
+  if (all.length === 0) return;
 
-  // Çoklu seçimde son segmenti filtrele
-  let segment = query;
+  // Çoklu seçimde mevcut seçili değerler
+  const selectedVals = (opts && opts.multi)
+    ? inp.value.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
+  // Arama segmentini belirle
+  let segment = inp.value.trim().toLocaleLowerCase('tr-TR');
   if (opts && opts.multi) {
     const parts = inp.value.split(',');
     segment = parts[parts.length - 1].trim().toLocaleLowerCase('tr-TR');
+    // Eğer son segment zaten tam seçili bir değerse filtre yapma
+    if (selectedVals.includes(parts[parts.length - 1].trim())) segment = '';
   }
 
-  const exactMatch = segment && all.some(s => s.toLocaleLowerCase('tr-TR') === segment);
+  // Filtrele — segment yoksa tümünü göster
   let filtered;
   if (!segment) {
     filtered = all;
-  } else if (exactMatch) {
-    filtered = [];
   } else {
     filtered = all.filter(s => s.toLocaleLowerCase('tr-TR').includes(segment));
+    if (filtered.length === 0) filtered = all; // eşleşme yoksa tümünü göster
   }
 
-  // Mevcut dropdown'u kapat
   _acClose(inputId);
-
-  if (filtered.length === 0) {
-    // Eski chips kutusunu temizle
-    const box = document.getElementById(chipsId);
-    if (box) box.innerHTML = '';
-    return;
-  }
 
   const st = _acState[inputId] || (_acState[inputId] = {});
   st.activeIdx = -1;
@@ -4709,13 +4707,17 @@ function _acOpen(inputId, chipsId, listKey, opts) {
   dd.className = 'ac-dropdown';
   dd.setAttribute('role', 'listbox');
 
-  filtered.forEach((s, i) => {
+  filtered.forEach((s) => {
     const item = document.createElement('div');
     item.className = 'ac-item';
     item.setAttribute('role', 'option');
-    item.innerHTML = _acHighlight(s, segment);
+    const isSelected = selectedVals.includes(s);
+    if (isSelected) item.classList.add('ac-active');
+    // Seçili öğede ✓ işareti göster
+    const check = isSelected ? '<span style="margin-right:6px;color:var(--primary);font-weight:900">✓</span>' : '<span style="margin-right:6px;opacity:0">✓</span>';
+    item.innerHTML = check + _acHighlight(s, segment);
     item.addEventListener('mousedown', (e) => {
-      e.preventDefault(); // blur tetiklemesin
+      e.preventDefault();
       _acSelect(inputId, chipsId, listKey, s, opts);
     });
     dd.appendChild(item);
@@ -4724,7 +4726,7 @@ function _acOpen(inputId, chipsId, listKey, opts) {
   wrap.appendChild(dd);
   st.dropdown = dd;
 
-  // Eski chips kutusunu gizle (dropdown varken)
+  // Dropdown açıkken chips kutusunu gizle
   const box = document.getElementById(chipsId);
   if (box) box.style.display = 'none';
 }
@@ -4735,10 +4737,18 @@ function _acSelect(inputId, chipsId, listKey, value, opts) {
 
   if (opts && opts.multi) {
     const parts = inp.value.split(',').map(s => s.trim()).filter(Boolean);
-    // Son segment'i değiştir
-    if (parts.length > 0) parts[parts.length - 1] = value;
-    else parts.push(value);
-    inp.value = parts.join(', ') + ', ';
+    const idx = parts.indexOf(value);
+    if (idx >= 0) {
+      // Zaten seçili → kaldır (toggle off)
+      parts.splice(idx, 1);
+    } else {
+      // Yeni seçim — son yarım yazılı segmenti temizle, değeri ekle
+      const last = parts[parts.length - 1] || '';
+      const isPartial = last && value.toLocaleLowerCase('tr-TR').includes(last.toLocaleLowerCase('tr-TR')) && last !== value;
+      if (isPartial) parts[parts.length - 1] = value;
+      else parts.push(value);
+    }
+    inp.value = parts.length ? parts.join(', ') : '';
   } else {
     inp.value = value;
   }
@@ -4746,11 +4756,16 @@ function _acSelect(inputId, chipsId, listKey, value, opts) {
   _acClose(inputId);
   inp.focus();
 
-  // Eski chips kutusunu tekrar göster (seçili vurgulu)
+  if (opts && opts.multi) {
+    // Çoklu seçimde dropdown'u tekrar aç (kullanıcı seçmeye devam edebilsin)
+    setTimeout(() => _acOpen(inputId, chipsId, listKey, opts), 0);
+  }
+
+  // Chip şeridini güncelle
   const box = document.getElementById(chipsId);
   if (box) {
-    box.style.display = '';
-    renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
+    box.style.display = opts && opts.multi ? 'none' : ''; // dropdown açıkken gizli kal
+    if (!(opts && opts.multi)) renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
   }
 
   if (opts && opts.onSelect) opts.onSelect(value);
@@ -4814,14 +4829,14 @@ function setupAcField(inputId, chipsId, listKey, opts) {
   });
 
   inp.addEventListener('blur', () => {
-    // Kısa gecikme: mousedown seçimi önce tetiklensin
-    setTimeout(() => _acClose(inputId), 200);
-    // Chips kutusunu tekrar göster
-    const box = document.getElementById(chipsId);
-    if (box) {
-      box.style.display = '';
-      renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
-    }
+    setTimeout(() => {
+      _acClose(inputId);
+      const box = document.getElementById(chipsId);
+      if (box) {
+        box.style.display = '';
+        renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
+      }
+    }, 200);
   });
 
   // Ok tuşları + Enter klavye navigasyonu
@@ -4876,12 +4891,12 @@ function initKontrolChips() {
   autoCollectKontrolLists();
   autoCollectKontrolDetailLists();
   setTimeout(() => {
-    setupAcField('f_hastane','hastane_chips','kontrol_hastane');
-    setupAcField('f_doktor', 'doktor_chips', 'kontrol_doktor');
-    setupAcField('f_teshis', 'teshis_chips', 'kontrol_teshis');
-    setupAcField('f_tedavi', 'tedavi_chips', 'kontrol_tedavi');
-    setupAcField('f_ilac',   'ilac_chips',   'kontrol_ilac');
-    setupAcField('f_tetkik', 'tetkik_chips', 'kontrol_tetkik');
+    setupAcField('f_hastane','hastane_chips','kontrol_hastane', { multi: true });
+    setupAcField('f_doktor', 'doktor_chips', 'kontrol_doktor', { multi: true });
+    setupAcField('f_teshis', 'teshis_chips', 'kontrol_teshis', { multi: true });
+    setupAcField('f_tedavi', 'tedavi_chips', 'kontrol_tedavi', { multi: true });
+    setupAcField('f_ilac',   'ilac_chips',   'kontrol_ilac', { multi: true });
+    setupAcField('f_tetkik', 'tetkik_chips', 'kontrol_tetkik', { multi: true });
   }, 300);
 }
 
@@ -4912,16 +4927,20 @@ function renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap) {
   const items = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
   if (items.length === 0) { box.innerHTML = ''; return; }
   box.innerHTML = '';
+  // Mevcut seçili değerleri virgülle ayır
+  const selected = inp.value.split(',').map(s => s.trim()).filter(Boolean);
   items.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = t;
     const color = colorMap ? (colorMap[t] || 'var(--primary)') : (accentColor || 'var(--primary)');
-    const isSelected = inp.value === t;
+    const isSelected = selected.includes(t);
     btn.style.cssText = `background:${isSelected ? color : 'var(--bg)'};border:2px solid ${color};border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;color:${isSelected ? '#fff' : color};font-family:var(--font);white-space:nowrap;transition:all 0.15s`;
     btn.addEventListener('click', () => {
-      inp.value = t;
-      // Listeyi güncelle, seçili vurgusu değişsin
+      const cur = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+      const idx = cur.indexOf(t);
+      if (idx >= 0) cur.splice(idx, 1); else cur.push(t);
+      inp.value = cur.join(', ');
       renderSelectChips(inputId, chipsId, listKey, accentColor, colorMap);
     });
     box.appendChild(btn);
@@ -4936,9 +4955,9 @@ function initGidaChips() {
   autoCollectGidaAdiList();
   setTimeout(() => {
     initGidaTurChips();
-    setupAcField('f_adi',    'gida_adi_chips', 'gida_adi');
-    setupAcField('f_miktar', 'miktar_chips',   'gida_miktar');
-    setupAcField('f_alerji', 'alerji_chips',   'gida_alerji');
+    setupAcField('f_adi',    'gida_adi_chips', 'gida_adi', { multi: true });
+    setupAcField('f_miktar', 'miktar_chips',   'gida_miktar', { multi: true });
+    setupAcField('f_alerji', 'alerji_chips',   'gida_alerji', { multi: true });
   }, 300);
 }
 
@@ -4963,7 +4982,7 @@ function initAsiDurumChips() {
 
 function initGunlukChips() {
   setTimeout(() => {
-    setupAcField('f_baslik', 'baslik_chips', 'gunluk_baslik');
+    setupAcField('f_baslik', 'baslik_chips', 'gunluk_baslik', { multi: true });
   }, 300);
 }
 function initOlayChips() {
