@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.1.4
+  Bebek Takip Pro v1.1.5
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.4">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.1.5">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.1.4</title>
+<title>Bebek Takip Pro v1.1.5</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -973,9 +973,22 @@ canvas {
   max-width: 100%;
 }
 .chip-panel.open {
-  max-height: 400px;
+  max-height: 200px;
   opacity: 1;
   margin-top: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Altta daha fazla içerik olduğunu gösteren gölge */
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  padding-bottom: 16px;
+}
+/* Tamamen scroll edilince gölgeyi kaldır */
+.chip-panel.open.scrolled-bottom {
+  mask-image: none;
+  -webkit-mask-image: none;
+  padding-bottom: 4px;
 }
 .ac-input-wrap.active .form-input {
   border-color: var(--primary);
@@ -2368,7 +2381,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.1.4</span>
+  <span>Pro 1.1.5</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4949,6 +4962,16 @@ function acPanelOpen(chipsId, inputId) {
   const box = document.getElementById(chipsId);
   if (box) {
     box.classList.add('open');
+    // Scroll fade listener
+    if (!box._scrollListener) {
+      box._scrollListener = () => {
+        const atBottom = box.scrollHeight - box.scrollTop <= box.clientHeight + 4;
+        box.classList.toggle('scrolled-bottom', atBottom);
+      };
+      box.addEventListener('scroll', box._scrollListener, { passive: true });
+    }
+    // Başlangıçta scroll gerekip gerekmediğini kontrol et
+    setTimeout(() => box._scrollListener && box._scrollListener(), 300);
   }
   if (inp && inp.parentNode) inp.parentNode.classList.add('active');
 }
