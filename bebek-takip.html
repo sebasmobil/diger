@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.3.0
+  Bebek Takip Pro v1.3.1
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.0">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.1">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.3.0</title>
+<title>Bebek Takip Pro v1.3.1</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -994,6 +994,18 @@ canvas {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(76,175,80,0.15);
 }
+
+/* ===== KART KAYDIRMANİMASYONU ===== */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.kart-slide-right { animation: slideInRight 0.22s ease; }
+.kart-slide-left  { animation: slideInLeft  0.22s ease; }
 
 /* ===== AUTOCOMPLETE DROPDOWN ===== */
 .ac-wrap {
@@ -2381,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.3.0</span>
+  <span>Pro 1.3.1</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4437,6 +4449,14 @@ function _kontNav(dir) {
   const sorted = [...data.kontrol].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
   _kontIdx = Math.max(0, Math.min(_kontIdx + dir, sorted.length - 1));
   updateLastControl();
+  setTimeout(() => {
+    const el = document.getElementById('kontrolSwipeArea');
+    if (el) {
+      el.classList.remove('kart-slide-right','kart-slide-left');
+      void el.offsetWidth;
+      el.classList.add(dir > 0 ? 'kart-slide-left' : 'kart-slide-right');
+    }
+  }, 0);
 }
 
 function updateNextVaccine() { renderNextVaccine(); }
@@ -5514,6 +5534,17 @@ const _kartIdx = {};
 function _kartNav(key, dir, sortedLen, renderFn) {
   _kartIdx[key] = Math.max(0, Math.min((_kartIdx[key]||0) + dir, sortedLen - 1));
   renderFn();
+  // Animasyon: ileri (dir>0) = eski kayıt = soldan gel, geri (dir<0) = yeniden gel = sağdan gel
+  const areaMap = { olay:'olaySwipeArea', gida:'gidaSwipeArea', dis:'disSwipeArea' };
+  const areaId = areaMap[key];
+  setTimeout(() => {
+    const el = areaId && document.getElementById(areaId);
+    if (el) {
+      el.classList.remove('kart-slide-right','kart-slide-left');
+      void el.offsetWidth;
+      el.classList.add(dir > 0 ? 'kart-slide-left' : 'kart-slide-right');
+    }
+  }, 0);
 }
 
 function _kartNavBar(key, idx, total, renderFnName, icon, pageKey) {
@@ -5688,6 +5719,14 @@ function _gunlukNav(dir) {
   const sorted = [...(data.gunluk||[])].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
   _gunlukIdx = Math.max(0, Math.min(_gunlukIdx + dir, sorted.length - 1));
   renderGunlukKart();
+  setTimeout(() => {
+    const el = document.getElementById('gunlukSwipeArea');
+    if (el) {
+      el.classList.remove('kart-slide-right','kart-slide-left');
+      void el.offsetWidth;
+      el.classList.add(dir > 0 ? 'kart-slide-left' : 'kart-slide-right');
+    }
+  }, 0);
 }
 
 function _gunlukSwipe(el) {
