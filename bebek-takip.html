@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.2.5
+  Bebek Takip Pro v1.2.7
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.2.5">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.2.7">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.2.5</title>
+<title>Bebek Takip Pro v1.2.7</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2381,7 +2381,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.2.5</span>
+  <span>Pro 1.2.7</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4402,11 +4402,15 @@ function updateLastControl() {
     return;
   }
   const r = sorted[0];
+  const starHtml = p => p ? `<span style="color:#FFA726;font-size:13px;letter-spacing:1px;margin-left:6px">${'★'.repeat(p)}${'☆'.repeat(5-p)}</span>` : '';
   container.innerHTML = `
     <div class="info-row"><span class="ir-label">📅 Tarih</span><span class="ir-value">${formatDate(r.tarih)}</span></div>
-    <div class="info-row"><span class="ir-label">🏥 Hastane</span><span class="ir-value">${escHtml(r.hastane||'-')}</span></div>
-    <div class="info-row"><span class="ir-label">👨‍⚕️ Doktor</span><span class="ir-value">${escHtml(r.doktor||'-')}</span></div>
-    <div class="info-row"><span class="ir-label">🔬 Tan\u0131</span><span class="ir-value">${escHtml(r.teshis||'-')}</span></div>
+    ${r.hastane ? `<div class="info-row"><span class="ir-label">🏥 Hastane</span><span class="ir-value" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">${escHtml(r.hastane)}${starHtml(r.hastanePuan)}</span></div>` : ''}
+    ${r.doktor  ? `<div class="info-row"><span class="ir-label">👨‍⚕️ Doktor</span><span class="ir-value" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">${escHtml(r.doktor)}${starHtml(r.doktorPuan)}</span></div>` : ''}
+    ${r.teshis  ? `<div class="info-row"><span class="ir-label">🔬 Tanı</span><span class="ir-value">${escHtml(r.teshis)}</span></div>` : ''}
+    ${r.tedavi  ? `<div class="info-row"><span class="ir-label">💊 Tedavi</span><span class="ir-value">${escHtml(r.tedavi)}</span></div>` : ''}
+    ${r.ilac    ? `<div class="info-row"><span class="ir-label">💉 İlaç</span><span class="ir-value">${escHtml(r.ilac)}</span></div>` : ''}
+    ${r.not     ? `<div class="info-row" style="align-items:flex-start"><span class="ir-label">📝 Not</span><span class="ir-value" style="color:var(--text2)">${escHtml(r.not)}</span></div>` : ''}
   `;
 }
 
@@ -5555,6 +5559,8 @@ function renderGidaKart() {
   `;
 }
 
+let _gunlukIdx = 0; // mevcut görüntülenen kayıt indexi
+
 function renderGunlukKart() {
   const container = document.getElementById('gunlukKartInfo');
   const badge = document.getElementById('gunlukKartBadge');
@@ -5562,21 +5568,66 @@ function renderGunlukKart() {
   const sorted = [...(data.gunluk || [])].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
   if (badge) badge.textContent = sorted.length > 0 ? sorted.length + ' anı' : '';
   if (sorted.length === 0) {
-    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">📔</div>Henüz günlük kaydi yok</div>`;
+    container.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;font-family:var(--font)"><div style="font-size:28px;margin-bottom:6px">📔</div>Henüz günlük kaydı yok</div>`;
     return;
   }
-  const r = sorted[0];
+
+  // Index sınırla
+  _gunlukIdx = Math.max(0, Math.min(_gunlukIdx, sorted.length - 1));
+  const r = sorted[_gunlukIdx];
+  const isFirst = _gunlukIdx === 0;
+  const isLast  = _gunlukIdx === sorted.length - 1;
+
   container.innerHTML = `
-    <div style="padding:12px 14px;cursor:pointer" onclick="showPage('gunluk')">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:18px">📔</span>
-        <div style="font-weight:800;font-size:14px;color:var(--text);font-family:var(--font);flex:1">${escHtml(r.baslik||'Anı')}</div>
-        <span style="font-size:11px;color:var(--text3)">${formatDate(r.tarih)}</span>
+    <div id="gunlukSwipeArea" style="padding:12px 14px;touch-action:pan-y;user-select:none;cursor:pointer" onclick="showPage('gunluk')">
+      <!-- Navigasyon satırı -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px" onclick="event.stopPropagation()">
+        <button onclick="_gunlukNav(1)" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:3px 10px;font-size:16px;cursor:pointer;color:${isLast?'var(--text3)':'var(--text)'};opacity:${isLast?'0.35':'1'}" ${isLast?'disabled':''}>‹</button>
+        <span style="font-size:11px;color:var(--text3);font-weight:700">${_gunlukIdx+1} / ${sorted.length}</span>
+        <button onclick="_gunlukNav(-1)" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:3px 10px;font-size:16px;cursor:pointer;color:${isFirst?'var(--text3)':'var(--text)'};opacity:${isFirst?'0.35':'1'}" ${isFirst?'disabled':''}>›</button>
       </div>
-      ${r.not ? `<div style="font-size:13px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${escHtml(r.not)}</div>` : ''}
-      ${sorted.length > 1 ? `<div style="margin-top:8px;font-size:11px;color:var(--text3);font-weight:700">+ ${sorted.length-1} anı daha →</div>` : ''}
+      <!-- Başlık + Tarih -->
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">
+        <span style="font-size:18px;flex-shrink:0">📔</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:14px;color:var(--text);font-family:var(--font)">${escHtml(r.baslik||'Anı')}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px">${formatDate(r.tarih)}</div>
+        </div>
+      </div>
+      <!-- Not -->
+      ${r.not ? `<div style="font-size:13px;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;border-left:3px solid var(--border);padding-left:10px;margin-left:4px">${escHtml(r.not)}</div>` : ''}
+      <!-- Son Kayda Git butonu (sadece ilk değilse) -->
+      ${!isFirst ? `
+        <div onclick="event.stopPropagation();_gunlukIdx=0;renderGunlukKart()"
+          style="margin-top:10px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--primary);cursor:pointer">
+          ⏩ Son kayda git
+        </div>` : ''}
     </div>
   `;
+
+  // Swipe desteği
+  _gunlukSwipe(document.getElementById('gunlukSwipeArea'));
+}
+
+function _gunlukNav(dir) {
+  const sorted = [...(data.gunluk||[])].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+  _gunlukIdx = Math.max(0, Math.min(_gunlukIdx + dir, sorted.length - 1));
+  renderGunlukKart();
+}
+
+function _gunlukSwipe(el) {
+  if (!el || el._swipeBound) return;
+  el._swipeBound = true;
+  let sx = 0, sy = 0;
+  el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      // Sola kaydır → daha eski (index artır), sağa → daha yeni (index azalt)
+      _gunlukNav(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
 }
 
 function renderDisKart() {
