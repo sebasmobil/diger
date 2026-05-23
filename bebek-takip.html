@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.3.5
+  Bebek Takip Pro v1.3.6
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.5">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.6">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.3.5</title>
+<title>Bebek Takip Pro v1.3.6</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2393,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.3.5</span>
+  <span>Pro 1.3.6</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3862,9 +3862,9 @@ function getFormHTML(section, r) {
         <div id="asi_durum_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;overflow:visible;padding-bottom:6px;width:100%"></div>
       </div>
       <div class="form-group full">
-        <label class="form-label">📍 Uygulama Yeri <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_uygulama_yeri','Uygulama Yerleri')">✏️ Düzenle</span></label>
+        <label class="form-label">🏥 Hastane <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_uygulama_yeri','Hastaneler')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap">
-          <input class="form-input" type="text" id="f_uygulama_yeri" value="${v.uygulamaYeri||''}" placeholder="Sağ kol, sol bacak..." autocomplete="off" readonly style="cursor:pointer" />
+          <input class="form-input" type="text" id="f_uygulama_yeri" value="${v.uygulamaYeri||''}" placeholder="Hastane adı..." autocomplete="off" readonly style="cursor:pointer" />
           <button class="ac-clear ${v.uygulamaYeri?'visible':''}" type="button" tabindex="-1">✕</button>
         </div>
         <div id="uygulama_yeri_chips" class="chip-panel"></div>
@@ -4110,7 +4110,7 @@ function renderTable(section, filterQuery = '') {
           <span class="badge ${durumClass[r.durum]||'badge-blue'}">${r.durum||'Planlandı'}</span>
         </div>
         ${r.donem ? `<div class="rc-sub">🗓️ ${hl(r.donem)}</div>` : ''}
-        ${r.uygulamaYeri ? `<div class="rc-sub">📍 ${hl(r.uygulamaYeri)}</div>` : ''}
+        ${r.uygulamaYeri ? `<div class="rc-sub">🏥 ${hl(r.uygulamaYeri)}</div>` : ''}
         ${r.aciklama ? `<div class="rc-note">${hl(r.aciklama)}</div>` : ''}
       `;
     }
@@ -4814,7 +4814,7 @@ const CUSTOM_LIST_DEFAULTS = {
   gunluk_baslik: ['İlk adım','İlk kelime','İlk diş','İlk gülüş','İlk yemek','İlk banyo','İlk gece','Doğum günü','Özel an'],
   gida_adi: [],
   asi_durum: ['Planlandı','Uygulandı','Beklemede','Ertelendi'],
-  asi_uygulama_yeri: ['Sağ kol','Sol kol','Sağ bacak','Sol bacak','Ağız yolu','Burun yolu','Deri altı','Kas içi'],
+  asi_uygulama_yeri: [],
 };
 
 function autoCollectKontrolLists() {
@@ -5901,7 +5901,7 @@ const impFieldDefs = {
   kontrol: [ {key:'tarih',label:'📅 Tarih'}, {key:'hastane',label:'🏥 Hastane'}, {key:'doktor',label:'👨‍⚕️ Doktor'}, {key:'teshis',label:'🔬 Teşhis / Hastalık'}, {key:'tedavi',label:'💊 Tedavi'}, {key:'tetkik',label:'🔭 Yapılan Tetkikler'}, {key:'ilac',label:'💉 Verilen İlaçlar'}, {key:'not',label:'📝 Not'}, {key:'doktorPuan',label:'⭐ Doktor Puanı (5)'}, {key:'hastanePuan',label:'⭐ Hastane Puanı (5)'} ],
   gida:    [ {key:'tarih',label:'📅 Tarih'}, {key:'saat',label:'⏰ Saat'}, {key:'tur',label:'🏷️ Tür'}, {key:'adi',label:'🍽️ Adı'}, {key:'icerik',label:'📋 İçerik'}, {key:'miktar',label:'📏 Miktar'}, {key:'alerji',label:'⚠️ Alerji'}, {key:'not',label:'📝 Not'} ],
   gunluk:  [ {key:'tarih',label:'📅 Tarih'}, {key:'baslik',label:'📝 Başlık'}, {key:'not',label:'💬 Not'} ],
-  asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'uygulamaYeri',label:'📍 Uygulama Yeri'}, {key:'aciklama',label:'📝 Açıklama'} ],
+  asi:     [ {key:'tarih',label:'📅 Tarih'}, {key:'donem',label:'🗓️ Dönem'}, {key:'asi',label:'💉 Aşı Adı'}, {key:'durum',label:'✅ Durum'}, {key:'uygulamaYeri',label:'🏥 Hastane (Uygulama Yeri)'}, {key:'aciklama',label:'📝 Açıklama'} ],
   dis:     [ {key:'dis',label:'🦷 Diş Adı'}, {key:'konum',label:'📍 Konum (Üst Sağ vb.)'}, {key:'cikma',label:'📅 Çıkma Tarihi'}, {key:'dusme',label:'📅 Düşme Tarihi'}, {key:'not',label:'📝 Not'} ]
 };
 const impSectionNames = { olay:'Olaylar', gelisim:'Gelişim', kontrol:'Kontroller', gida:'Gıda', gunluk:'Günlük', asi:'Aşı', dis:'Diş Takibi' };
@@ -6008,7 +6008,7 @@ function impShowMapping() {
       notlar:  ['notlar','not','note','açıklama'],
       hastane: ['hastane','hospital','klinik'],
       doktor:  ['doktor','doctor','hekim'],
-      uygulamaYeri: ['uygulama yeri','uygulama','injection site','location','kol','uygulama_yeri'],
+      uygulamaYeri: ['uygulama yeri','hastane','hospital','klinik','uygulama_yeri','yapıldığı yer'],
       hastanePuan: ['hastane puanı','hastane puan','hastanepuan','hospital rating','hastane_puan'],
       teshis:  ['teşhis','teshis','tanı','diagnosis'],
       tedavi:  ['tedavi','treatment'],
