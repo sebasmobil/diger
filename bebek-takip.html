@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.3.6
+  Bebek Takip Pro v1.3.7
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.6">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.3.7">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.3.6</title>
+<title>Bebek Takip Pro v1.3.7</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2393,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.3.6</span>
+  <span>Pro 1.3.7</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3864,7 +3864,7 @@ function getFormHTML(section, r) {
       <div class="form-group full">
         <label class="form-label">🏥 Hastane <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('asi_uygulama_yeri','Hastaneler')">✏️ Düzenle</span></label>
         <div class="ac-input-wrap">
-          <input class="form-input" type="text" id="f_uygulama_yeri" value="${v.uygulamaYeri||''}" placeholder="Hastane adı..." autocomplete="off" readonly style="cursor:pointer" />
+          <input class="form-input" type="text" id="f_uygulama_yeri" value="${v.uygulamaYeri||''}" placeholder="Hastane adı..." autocomplete="off" />
           <button class="ac-clear ${v.uygulamaYeri?'visible':''}" type="button" tabindex="-1">✕</button>
         </div>
         <div id="uygulama_yeri_chips" class="chip-panel"></div>
@@ -5151,10 +5151,42 @@ function setupAcField(inputId, chipsId, listKey, opts) {
   inp._acSetup = true;
 
   if (opts && opts.multi) {
-    inp.setAttribute('readonly', 'readonly');
-    inp.style.cursor = 'pointer';
+    // Multi: input'a yazılabilir, focus ve input eventi dropdown'u açar
+    inp.style.cursor = 'text';
     inp.addEventListener('focus', () => { acPanelOpen(chipsId, inputId); _acOpen(inputId, chipsId, listKey, opts); });
     inp.addEventListener('click',  () => { acPanelOpen(chipsId, inputId); _acOpen(inputId, chipsId, listKey, opts); });
+    inp.addEventListener('input', () => {
+      // Yazılan metni dropdown arama kutusuna aktar
+      acPanelOpen(chipsId, inputId);
+      const st = _acState[inputId];
+      if (st && st.dropdown) {
+        const searchInp = st.dropdown.querySelector('.ac-search-bar input');
+        if (searchInp) {
+          searchInp.value = inp.value;
+          const cur = _acGetVals(inp);
+          _acBuildList(st.dropdown, getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey]||[]), cur, inp.value.trim(), inputId, chipsId, listKey, opts);
+        }
+      } else {
+        _acOpen(inputId, chipsId, listKey, opts);
+      }
+      const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
+      if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = inp.value.trim();
+        if (val) {
+          const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey]||[]);
+          const st = _acState[inputId];
+          _acSelect(inputId, chipsId, listKey, val, opts, st && st.dropdown, all);
+          inp.value = '';
+        }
+      } else if (e.key === 'Escape') {
+        _acClose(inputId);
+        acPanelClose(chipsId, inputId);
+      }
+    });
   } else {
     inp.addEventListener('input', () => {
       acPanelOpen(chipsId, inputId);
