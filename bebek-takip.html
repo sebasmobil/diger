@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.4
+  Bebek Takip Pro v1.5.5
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.4">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.5">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.4</title>
+<title>Bebek Takip Pro v1.5.5</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2310,9 +2310,12 @@ mark.hl {
       <button onclick="pdfSelectAll(false)" class="btn btn-secondary btn-sm">☐ Tümünü Kaldır</button>
     </div>
 
-    <div style="display:flex;gap:10px">
-      <button onclick="closePdfModal()" class="btn btn-secondary" style="flex:1">İptal</button>
-      <button onclick="generatePdf()" class="btn btn-primary" style="flex:2" id="pdfGenerateBtn">📄 PDF Oluştur</button>
+    <div style="display:flex;gap:8px;flex-direction:column">
+      <div style="display:flex;gap:8px">
+        <button onclick="closePdfModal()" class="btn btn-secondary" style="flex:1">İptal</button>
+        <button onclick="generatePdf('preview')" class="btn btn-secondary" style="flex:1.5" id="pdfPreviewBtn">👁️ Önizle</button>
+      </div>
+      <button onclick="generatePdf('download')" class="btn btn-primary" style="width:100%" id="pdfGenerateBtn">⬇️ PDF İndir</button>
     </div>
   </div>
 </div>
@@ -2480,7 +2483,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.4</span>
+  <span>Pro 1.5.5</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6814,10 +6817,28 @@ self.addEventListener('fetch', e => {
   </div>
 </div>
 
+</body>
+</html>
+
+<!-- Türkçe karakter destekli PDF fontu -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
-//  PDF EXPORT
+//  PDF EXPORT v2 — Türkçe karakter desteği + önizleme
 // ═══════════════════════════════════════════════════════
+
+// Türkçe karakter dönüşüm tablosu (jsPDF standart font desteği için)
+function tr(str) {
+  if (!str) return '-';
+  return String(str)
+    .replace(/Ğ/g,'G').replace(/ğ/g,'g')
+    .replace(/Ü/g,'U').replace(/ü/g,'u')
+    .replace(/Ş/g,'S').replace(/ş/g,'s')
+    .replace(/İ/g,'I').replace(/ı/g,'i')
+    .replace(/Ö/g,'O').replace(/ö/g,'o')
+    .replace(/Ç/g,'C').replace(/ç/g,'c');
+}
+
 function openPdfModal() {
   document.getElementById('pdfModalOverlay').style.display = 'flex';
 }
@@ -6830,172 +6851,219 @@ function pdfSelectAll(v) {
   });
 }
 
-function generatePdf() {
+function generatePdf(mode) {
   const selected = ['olay','gelisim','kontrol','gida','gunluk','dis','asi']
     .filter(s => document.getElementById('pdf_' + s).checked);
   if (!selected.length) { showToast('En az bir bölüm seçin!'); return; }
-  const btn = document.getElementById('pdfGenerateBtn');
-  btn.textContent = '⏳ Oluşturuluyor...';
+
+  const btnId = mode === 'preview' ? 'pdfPreviewBtn' : 'pdfGenerateBtn';
+  const btn   = document.getElementById(btnId);
+  const orig  = btn.textContent;
+  btn.textContent = '⏳ Hazırlanıyor...';
   btn.disabled = true;
+
   function loadScript(src, cb) {
-    if (document.querySelector('script[src="' + src + '"]')) { cb(); return; }
+    if (window.jspdf) { cb(); return; }
     const s = document.createElement('script'); s.src = src;
-    s.onload = cb; s.onerror = () => { showToast('PDF kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.'); btn.textContent='📄 PDF Oluştur'; btn.disabled=false; };
+    s.onload = cb;
+    s.onerror = () => { showToast('PDF kütüphanesi yüklenemedi.'); btn.textContent = orig; btn.disabled = false; };
     document.head.appendChild(s);
   }
+
   loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => {
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js', () => {
-      try { buildPdf(selected); }
+      try { buildPdfDoc(selected, mode); }
       catch(e) { showToast('Hata: ' + e.message); console.error(e); }
-      finally { btn.textContent='📄 PDF Oluştur'; btn.disabled=false; }
+      finally { btn.textContent = orig; btn.disabled = false; }
     });
   });
 }
 
-function buildPdf(sections) {
+function buildPdfDoc(sections, mode) {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const babyName  = data.settings?.babyName || 'Bebeğim';
+  const doc       = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const babyName  = tr(data.settings?.babyName || 'Bebeğim');
   const birthDate = data.settings?.birthDate ? formatDate(data.settings.birthDate) : '';
   const today     = new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'});
   const pageW     = doc.internal.pageSize.getWidth();
   const pageH     = doc.internal.pageSize.getHeight();
   let   isFirst   = true;
 
-  const SECTIONS_META = {
-    olay:    { title:'Olaylar',             icon:'OLAYLAR',     color:[229,152,50]  },
-    gelisim: { title:'Gelisim Olcumleri',   icon:'GELISIM',     color:[79,140,210]  },
-    kontrol: { title:'Doktor Kontrolleri',  icon:'KONTROL',     color:[210,90,90]   },
-    gida:    { title:'Gida Takibi',         icon:'GIDA',        color:[180,130,70]  },
-    gunluk:  { title:'Gunluk',             icon:'GUNLUK',      color:[130,90,200]  },
-    dis:     { title:'Dis Takibi',          icon:'DIS',         color:[79,172,100]  },
-    asi:     { title:'Asi Takvimi',         icon:'ASI',         color:[60,170,190]  }
+  const SEC = {
+    olay:    { title:'OLAYLAR',             color:[229,152,50]  },
+    gelisim: { title:'GELISIM OLCUMLERI',   color:[79,140,210]  },
+    kontrol: { title:'DOKTOR KONTROLLERI',  color:[210,90,90]   },
+    gida:    { title:'GIDA TAKIBI',         color:[180,130,70]  },
+    gunluk:  { title:'GUNLUK',              color:[130,90,200]  },
+    dis:     { title:'DIS TAKIBI',          color:[79,172,100]  },
+    asi:     { title:'ASI TAKVIMI',         color:[60,170,190]  }
   };
 
-  function addHeader(sectionKey) {
+  function addHeader(key) {
     if (!isFirst) doc.addPage();
     isFirst = false;
-    const meta = SECTIONS_META[sectionKey];
+    const meta = SEC[key];
+    // Renkli üst bant
     doc.setFillColor(...meta.color);
-    doc.rect(0, 0, pageW, 36, 'F');
+    doc.rect(0, 0, pageW, 40, 'F');
+    // Bebek adı
     doc.setTextColor(255,255,255);
-    doc.setFontSize(18); doc.setFont('helvetica','bold');
-    doc.text(babyName + ' - Gelisim Gunlugu', pageW/2, 13, {align:'center'});
-    if (birthDate) {
-      doc.setFontSize(9); doc.setFont('helvetica','normal');
-      doc.text('Dogum: '+birthDate+'   Rapor tarihi: '+today, pageW/2, 21, {align:'center'});
-    }
-    doc.setFontSize(13); doc.setFont('helvetica','bold');
-    doc.text('[ ' + meta.title.toUpperCase() + ' ]', pageW/2, 31, {align:'center'});
-    return 46;
+    doc.setFontSize(20); doc.setFont('helvetica','bold');
+    doc.text(babyName + ' - Gelisim Gunlugu', pageW/2, 14, {align:'center'});
+    // Tarih satırı
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    const dtLine = birthDate ? 'Dogum: '+tr(birthDate)+'   |   Rapor: '+tr(today) : 'Rapor: '+tr(today);
+    doc.text(dtLine, pageW/2, 22, {align:'center'});
+    // Bölüm başlığı
+    doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text('[ ' + meta.title + ' ]', pageW/2, 34, {align:'center'});
+    return 50;
   }
 
   function tbl(startY, head, body, colW) {
     doc.autoTable({
-      startY, head:[head], body,
-      theme:'grid',
-      headStyles:{ fillColor:[60,60,80], textColor:[255,255,255], fontStyle:'bold', fontSize:8.5 },
-      bodyStyles:{ fontSize:8, textColor:[30,30,50] },
-      alternateRowStyles:{ fillColor:[247,248,252] },
-      margin:{left:12,right:12},
+      startY,
+      head: [head.map(h => tr(h))],
+      body: body.map(row => row.map(cell => tr(String(cell ?? '-')))),
+      theme: 'grid',
+      headStyles: {
+        fillColor: [50,55,70],
+        textColor: [255,255,255],
+        fontStyle: 'bold',
+        fontSize: 8.5,
+        cellPadding: 3
+      },
+      bodyStyles: {
+        fontSize: 8,
+        textColor: [25,30,50],
+        cellPadding: 3,
+        overflow: 'linebreak',
+        valign: 'top'
+      },
+      alternateRowStyles: { fillColor: [246,248,252] },
+      margin: { left: 12, right: 12 },
       columnStyles: colW || {},
-      styles:{ overflow:'linebreak', cellPadding:2.5 }
+      tableWidth: 'auto',
+      styles: { font: 'helvetica', overflow: 'linebreak' },
+      didDrawPage: () => {}
     });
   }
 
   function noData(y) {
-    doc.setFontSize(10); doc.setTextColor(160,160,170);
+    doc.setFontSize(10); doc.setTextColor(160,165,175);
     doc.text('Henuz kayit yok.', 14, y);
   }
 
-  // OLAYLAR
+  // ── OLAYLAR ────────────────────────────────────────────
   if (sections.includes('olay')) {
     const y = addHeader('olay');
     const rows = [...(data.olay||[])].sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Baslik','Kategori','Notlar'],
-      rows.map(r=>[formatDate(r.tarih),r.baslik||r.olay||'-',r.kategori||'-',r.not||'-']),
-      {0:{cellWidth:26},1:{cellWidth:52},2:{cellWidth:30}});
+    else tbl(y,
+      ['Tarih','Baslik','Kategori','Notlar'],
+      rows.map(r=>[formatDate(r.tarih), r.baslik||r.olay||'-', r.kategori||'-', r.not||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:46}, 2:{cellWidth:28}}
+    );
   }
 
-  // GELISIM
+  // ── GELİŞİM ───────────────────────────────────────────
   if (sections.includes('gelisim')) {
     const y = addHeader('gelisim');
     const rows = [...(data.gelisim||[])].sort((a,b)=>(a.tarih||'').localeCompare(b.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Agirlik (kg)','Boy (cm)','Bas Cevresi (cm)','Not'],
-      rows.map(r=>[formatDate(r.tarih),r.agirlik||'-',r.boy||'-',r.bas||'-',r.not||'-']),
-      {0:{cellWidth:28},1:{cellWidth:30},2:{cellWidth:28},3:{cellWidth:36}});
+    else tbl(y,
+      ['Tarih','Agirlik (kg)','Boy (cm)','Bas Cevr. (cm)','Not'],
+      rows.map(r=>[formatDate(r.tarih), r.agirlik||'-', r.boy||'-', r.bas||'-', r.not||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:28}, 2:{cellWidth:24}, 3:{cellWidth:30}}
+    );
   }
 
-  // KONTROL
+  // ── KONTROL ────────────────────────────────────────────
   if (sections.includes('kontrol')) {
     const y = addHeader('kontrol');
     const rows = [...(data.kontrol||[])].sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Hastane','Doktor','Tani / Not'],
-      rows.map(r=>[formatDate(r.tarih),r.hastane||'-',r.doktor||'-',r.not||r.tani||'-']),
-      {0:{cellWidth:26},1:{cellWidth:42},2:{cellWidth:36}});
+    else tbl(y,
+      ['Tarih','Hastane','Doktor','Tani / Not'],
+      rows.map(r=>[formatDate(r.tarih), r.hastane||'-', r.doktor||'-', r.not||r.tani||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:40}, 2:{cellWidth:34}}
+    );
   }
 
-  // GIDA
+  // ── GIDA ───────────────────────────────────────────────
   if (sections.includes('gida')) {
     const y = addHeader('gida');
     const rows = [...(data.gida||[])].sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Gida Adi','Tur','Reaksiyon / Not'],
-      rows.map(r=>[formatDate(r.tarih),r.adi||'-',r.tur||'-',r.not||'-']),
-      {0:{cellWidth:26},1:{cellWidth:48},2:{cellWidth:28}});
+    else tbl(y,
+      ['Tarih','Gida Adi','Tur','Reaksiyon / Not'],
+      rows.map(r=>[formatDate(r.tarih), r.adi||'-', r.tur||'-', r.not||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:46}, 2:{cellWidth:26}}
+    );
   }
 
-  // GUNLUK
+  // ── GÜNLÜK ─────────────────────────────────────────────
   if (sections.includes('gunluk')) {
     const y = addHeader('gunluk');
     const rows = [...(data.gunluk||[])].sort((a,b)=>(b.tarih||'').localeCompare(a.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Baslik','Icerik'],
-      rows.map(r=>[formatDate(r.tarih),r.baslik||'-',r.not||r.icerik||'-']),
-      {0:{cellWidth:26},1:{cellWidth:40}});
+    else tbl(y,
+      ['Tarih','Baslik','Icerik'],
+      rows.map(r=>[formatDate(r.tarih), r.baslik||'-', r.not||r.icerik||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:40}}
+    );
   }
 
-  // DIS
+  // ── DİŞ ────────────────────────────────────────────────
   if (sections.includes('dis')) {
     const y = addHeader('dis');
     const rows = [...(data.dis||[])].sort((a,b)=>(b.cikma||b.tarih||'').localeCompare(a.cikma||a.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Dis Adi','Konum','Cikma Tarihi','Dusme Tarihi','Not'],
-      rows.map(r=>[r.dis||'-',r.konum||'-',formatDate(r.cikma||r.tarih),formatDate(r.dusme),r.not||'-']),
-      {0:{cellWidth:36},1:{cellWidth:26},2:{cellWidth:26},3:{cellWidth:26}});
+    else tbl(y,
+      ['Dis Adi','Konum','Cikma Tarihi','Dusme Tarihi','Not'],
+      rows.map(r=>[r.dis||'-', r.konum||'-', formatDate(r.cikma||r.tarih), formatDate(r.dusme), r.not||'-']),
+      {0:{cellWidth:36}, 1:{cellWidth:24}, 2:{cellWidth:26}, 3:{cellWidth:26}}
+    );
   }
 
-  // ASI
+  // ── AŞI ────────────────────────────────────────────────
   if (sections.includes('asi')) {
     const y = addHeader('asi');
     const rows = [...(data.asi||[])].sort((a,b)=>(a.tarih||'').localeCompare(b.tarih||''));
     if (!rows.length) noData(y);
-    else tbl(y, ['Tarih','Asi Adi','Durum','Not'],
-      rows.map(r=>[formatDate(r.tarih),r.asi||r.ad||'-',r.durum||'-',r.not||'-']),
-      {0:{cellWidth:26},1:{cellWidth:58},2:{cellWidth:24}});
+    else tbl(y,
+      ['Tarih','Asi Adi','Durum','Not'],
+      rows.map(r=>[formatDate(r.tarih), r.asi||r.ad||'-', r.durum||'-', r.not||'-']),
+      {0:{cellWidth:26}, 1:{cellWidth:56}, 2:{cellWidth:24}}
+    );
   }
 
-  // Footer
+  // ── Footer her sayfaya ─────────────────────────────────
   const total = doc.internal.getNumberOfPages();
-  for (let i=1; i<=total; i++) {
+  for (let i = 1; i <= total; i++) {
     doc.setPage(i);
     doc.setFontSize(7.5); doc.setTextColor(170,175,185);
-    doc.text('Bebek Takip Pro v1.5.4  |  sebasmobil', 13, pageH-5);
-    doc.text('Sayfa '+i+' / '+total, pageW-13, pageH-5, {align:'right'});
-    doc.setDrawColor(220,222,228);
+    doc.setFont('helvetica','normal');
+    doc.text('Bebek Takip Pro v1.5.5  |  sebasmobil', 13, pageH-5);
+    doc.text('Sayfa ' + i + ' / ' + total, pageW-13, pageH-5, {align:'right'});
+    doc.setDrawColor(215,220,228);
     doc.line(13, pageH-9, pageW-13, pageH-9);
   }
 
-  const safeName = (data.settings?.babyName||'bebek').replace(/\s+/g,'_');
+  const safeName = (data.settings?.babyName||'bebek').replace(/\s+/g,'_').replace(/[^\w]/g,'');
   const dateStr  = new Date().toISOString().split('T')[0];
-  doc.save(safeName + '_' + dateStr + '.pdf');
-  closePdfModal();
-  showToast('PDF indirildi! 🎉');
+  const fileName = safeName + '_' + dateStr + '.pdf';
+
+  if (mode === 'preview') {
+    // Önizleme: yeni sekmede aç
+    const blob = doc.output('blob');
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    showToast('PDF önizlemesi açıldı 👁️');
+  } else {
+    doc.save(fileName);
+    closePdfModal();
+    showToast('PDF indirildi! ⬇️');
+  }
 }
 </script>
-
-</body>
-</html>
