@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.6
+  Bebek Takip Pro v1.5.7
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.6">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.7">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.6</title>
+<title>Bebek Takip Pro v1.5.7</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2318,11 +2318,10 @@ mark.hl {
 
     <!-- Butonlar — her zaman görünür, altta sabit -->
     <div style="padding:14px 20px 20px;flex-shrink:0;border-top:1px solid var(--border);margin-top:8px">
-      <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="display:flex;gap:8px">
         <button onclick="closePdfModal()" class="btn btn-secondary" style="flex:1">İptal</button>
-        <button onclick="generatePdf('preview')" class="btn btn-secondary" style="flex:1.5" id="pdfPreviewBtn">👁️ Önizle</button>
+        <button onclick="generatePdf('download')" class="btn btn-primary" style="flex:2;font-size:16px;padding:14px" id="pdfGenerateBtn">⬇️ PDF İndir</button>
       </div>
-      <button onclick="generatePdf('download')" class="btn btn-primary" style="width:100%;font-size:16px;padding:14px" id="pdfGenerateBtn">⬇️ PDF İndir</button>
     </div>
 
   </div>
@@ -2491,7 +2490,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.6</span>
+  <span>Pro 1.5.7</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -7052,7 +7051,7 @@ function buildPdfDoc(sections, mode) {
     doc.setPage(i);
     doc.setFontSize(7.5); doc.setTextColor(170,175,185);
     doc.setFont('helvetica','normal');
-    doc.text('Bebek Takip Pro v1.5.6  |  sebasmobil', 13, pageH-5);
+    doc.text('Bebek Takip Pro v1.5.7  |  sebasmobil', 13, pageH-5);
     doc.text('Sayfa ' + i + ' / ' + total, pageW-13, pageH-5, {align:'right'});
     doc.setDrawColor(215,220,228);
     doc.line(13, pageH-9, pageW-13, pageH-9);
