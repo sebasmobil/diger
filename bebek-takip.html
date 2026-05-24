@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.6.3
+  Bebek Takip Pro v1.6.4
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.6.3">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.6.4">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.6.3</title>
+<title>Bebek Takip Pro v1.6.4</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2492,7 +2492,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.6.3</span>
+  <span>Pro 1.6.4</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6829,7 +6829,14 @@ self.addEventListener('fetch', e => {
 
 
 <script>
-function tr(s){if(!s)return'-';return String(s).replace(/Ğ/g,'G').replace(/ğ/g,'g').replace(/Ü/g,'U').replace(/ü/g,'u').replace(/Ş/g,'S').replace(/ş/g,'s').replace(/İ/g,'I').replace(/ı/g,'i').replace(/Ö/g,'O').replace(/ö/g,'o').replace(/Ç/g,'C').replace(/ç/g,'c');}
+// Unicode turkce karakter destegi icin normallestiriciler
+function tr(s){
+  if(s==null||s===undefined)return'-';
+  var str=String(s);
+  if(!str||str==='-'||str==='undefined')return str||'-';
+  // jsPDF unicode modunda direkt dondur
+  return str;
+}
 function openPdfModal(){document.getElementById('pdfModalOverlay').style.display='flex';}
 function closePdfModal(){document.getElementById('pdfModalOverlay').style.display='none';}
 function pdfSelectAll(v){['olay','gelisim','kontrol','gida','gunluk','dis','asi'].forEach(function(s){document.getElementById('pdf_'+s).checked=v;});}
@@ -6846,6 +6853,9 @@ function generatePdf(){
 }
 function doPdf(sections){
   var doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  // jsPDF unicode: html çıktısı yerine direkt veriyi kullanıyoruz
+  // autoTable unicode desteği için putOnlyUsedFonts
+  doc.setLanguage('tr');
   var bName=tr((data.settings&&data.settings.babyName)||'Bebek');
   var bDate=(data.settings&&data.settings.birthDate)?formatDate(data.settings.birthDate):'';
   var today=new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'});
@@ -6856,16 +6866,16 @@ function doPdf(sections){
   function hdr(k){
     if(!first)doc.addPage();first=false;
     var c=COLORS[k];doc.setFillColor(c[0],c[1],c[2]);doc.rect(0,0,W,40,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('helvetica','bold');
+    doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('courier','bold');
     doc.text(bName+' - Gelisim Gunlugu',W/2,14,{align:'center'});
-    doc.setFontSize(9);doc.setFont('helvetica','normal');
+    doc.setFontSize(9);doc.setFont('courier','normal');
     doc.text((bDate?'Dogum: '+tr(bDate)+'  |  ':'')+'Rapor: '+tr(today),W/2,22,{align:'center'});
-    doc.setFontSize(13);doc.setFont('helvetica','bold');
+    doc.setFontSize(13);doc.setFont('courier','bold');
     doc.text('[ '+TITLES[k]+' ]',W/2,34,{align:'center'});
     return 50;
   }
   function tbl(y,head,rows,cw){
-    doc.autoTable({startY:y,head:[head.map(function(h){return tr(h);})],body:rows.map(function(r){return r.map(function(c){return tr(String(c==null?'-':c));});}),theme:'grid',headStyles:{fillColor:[50,55,70],textColor:[255,255,255],fontStyle:'bold',fontSize:8.5,cellPadding:3},bodyStyles:{fontSize:8,textColor:[25,30,50],cellPadding:3,overflow:'linebreak',valign:'top'},alternateRowStyles:{fillColor:[246,248,252]},margin:{left:12,right:12},columnStyles:cw||{}});
+    doc.autoTable({startY:y,head:[head.map(function(h){return tr(h);})],body:rows.map(function(r){return r.map(function(c){return tr(String(c==null?'-':c));});}),theme:'grid',headStyles:{fillColor:[50,55,70],textColor:[255,255,255],fontStyle:'bold',fontSize:8.5,cellPadding:3,font:'courier'},bodyStyles:{fontSize:8,textColor:[25,30,50],cellPadding:3,overflow:'linebreak',valign:'top',font:'courier'},alternateRowStyles:{fillColor:[246,248,252]},margin:{left:12,right:12},columnStyles:cw||{},styles:{font:'courier'}});
   }
   function none(y){doc.setFontSize(10);doc.setTextColor(160,165,175);doc.text('Henuz kayit yok.',14,y);}
   function srt(arr,key,asc){return[].concat(arr||[]).sort(function(a,b){var x=a[key]||'',y=b[key]||'';return asc?x.localeCompare(y):y.localeCompare(x);});}
@@ -6877,7 +6887,7 @@ function doPdf(sections){
   if(sections.indexOf('dis')>=0){var y=hdr('dis');var r=srt(data.dis,'cikma',false);if(!r.length)none(y);else tbl(y,['Dis Adi','Konum','Cikma','Dusme','Not'],r.map(function(x){return[x.dis||'-',x.konum||'-',formatDate(x.cikma||x.tarih),formatDate(x.dusme),x.not||'-'];}),{0:{cellWidth:36},1:{cellWidth:24},2:{cellWidth:24},3:{cellWidth:24}});}
   if(sections.indexOf('asi')>=0){var y=hdr('asi');var r=srt(data.asi,'tarih',true);if(!r.length)none(y);else tbl(y,['Tarih','Asi Adi','Durum','Not'],r.map(function(x){return[formatDate(x.tarih),x.asi||x.ad||'-',x.durum||'-',x.not||'-'];}),{0:{cellWidth:26},1:{cellWidth:56},2:{cellWidth:24}});}
   var tot=doc.internal.getNumberOfPages();
-  for(var i=1;i<=tot;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(170,175,185);doc.setFont('helvetica','normal');doc.text('Bebek Takip Pro v1.6.3  |  sebasmobil',13,H-5);doc.text('Sayfa '+i+' / '+tot,W-13,H-5,{align:'right'});doc.setDrawColor(215,220,228);doc.line(13,H-9,W-13,H-9);}
+  for(var i=1;i<=tot;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(170,175,185);doc.setFont('courier','normal');doc.text('Bebek Takip Pro v1.6.4  |  sebasmobil',13,H-5);doc.text('Sayfa '+i+' / '+tot,W-13,H-5,{align:'right'});doc.setDrawColor(215,220,228);doc.line(13,H-9,W-13,H-9);}
   var n=((data.settings&&data.settings.babyName)||'bebek').replace(/\s+/g,'_').replace(/[^\w]/g,'');
   doc.save(n+'_'+new Date().toISOString().split('T')[0]+'.pdf');
   closePdfModal();
