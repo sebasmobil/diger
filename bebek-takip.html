@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.2
+  Bebek Takip Pro v1.5.3
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.2">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.3">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.2</title>
+<title>Bebek Takip Pro v1.5.3</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -86,16 +86,19 @@
 .info-bar a:hover { opacity: 0.8; }
 
 /* ===== IOS STATUS BAR ARKA PLAN (safe area) ===== */
-/* Karanlık temada status bar alanını (safe-area-inset-top) tamamen karanlık yap */
-[data-theme="dark"] body::before {
-  content: '';
+#statusBarBg {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: env(safe-area-inset-top, 0px);
-  background: #0b1120;
+  height: env(safe-area-inset-top, 44px);
   z-index: 9999;
+  pointer-events: none;
+  background: #f5f5f5;
+  transition: background 0.3s;
+}
+[data-theme="dark"] #statusBarBg {
+  background: #0b1120;
 }
 
 /* ===== IOS ZOOM ÖNLEME ===== */
@@ -2181,6 +2184,7 @@ mark.hl {
 </style>
 </head>
 <body>
+<div id="statusBarBg"></div>
 
 
 <!-- Sidebar Overlay for mobile -->
@@ -2416,7 +2420,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.2</span>
+  <span>Pro 1.5.3</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3337,6 +3341,8 @@ function setTheme(theme) {
   data.settings.theme = theme;
   saveData();
   document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const sbBg = document.getElementById('statusBarBg');
+  if (sbBg) sbBg.style.background = theme === 'dark' ? '#0b1120' : '';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = theme;
   // Update meta theme-color (status bar arka plan rengi)
