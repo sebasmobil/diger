@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.0
+  Bebek Takip Pro v1.5.1
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.0">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.1">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.0</title>
+<title>Bebek Takip Pro v1.5.1</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2401,7 +2401,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.0</span>
+  <span>Pro 1.5.1</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6482,6 +6482,14 @@ document.addEventListener('DOMContentLoaded', init);
 // Boş tarih/saat inputlarına overlay placeholder
 function applyDatePlaceholders() {
   document.querySelectorAll('input[type="date"], input[type="time"]').forEach(inp => {
+    // Her çağrıda label opacity'sini güncelle (modal yeniden açılınca değer dolu olabilir)
+    const existingLbl = inp.parentNode && inp.parentNode.classList.contains('date-ph-wrap')
+      ? inp.parentNode.querySelector('label') : null;
+    if (existingLbl) {
+      existingLbl.style.opacity = inp.value ? '0' : '1';
+      return;
+    }
+
     if (inp.dataset.placeholderDone) return;
     inp.dataset.placeholderDone = '1';
 
@@ -6514,7 +6522,6 @@ function applyDatePlaceholders() {
 
     const update = () => {
       lbl.style.opacity = inp.value ? '0' : '1';
-      lbl.style.pointerEvents = inp.value ? 'none' : 'none';
     };
     update();
     inp.addEventListener('change', update);
