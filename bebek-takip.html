@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.0
+  Bebek Takip Pro v1.4.3
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.0">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.3">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.0</title>
+<title>Bebek Takip Pro v1.4.3</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2393,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.4.0</span>
+  <span>Pro 1.4.3</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -5041,19 +5041,21 @@ function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
       }
     }
     _acJoinVals(parts, inp);
-    inp.value = ''; // Seçim sonrası input'u temizle, bir sonraki için hazır
+    inp.value = ''; // Seçim sonrası input'u temizle — kullanıcı yeni öğe yazabilsin
+    inp.dataset.values = JSON.stringify(parts); // dataset'i koru, inp.value temiz kalsın
+    _acUpdateSummary(inputId, chipsId);
     // Dropdown açık kalsın, güncel liste göster
     if (dd && dd.parentNode) {
       const freshAll = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey] || []);
       _acBuildList(dd, freshAll, parts, '', inputId, chipsId, listKey, opts);
-      // Sayacı güncelle
       const countEl = dd.querySelector('.ac-search-count');
       if (countEl) countEl.textContent = freshAll.length + '/' + freshAll.length;
     }
+    // Chip şeridini güncelle (inp.value'yu bozmadan)
+    const box = document.getElementById(chipsId);
+    if (box) renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
     const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-    // Seçili değerler varsa temizle butonu göster
-    const hasVals = _acGetVals(inp).length > 0 || parts.length > 0;
-    if (clr) clr.classList.toggle('visible', hasVals);
+    if (clr) clr.classList.toggle('visible', parts.length > 0);
   } else {
     inp.value = value;
     // Listede yoksa otomatik kaydet
@@ -5101,9 +5103,11 @@ function renderSuggestionChipsStatic(inputId, chipsId, listKey, opts) {
         const parts = _acGetVals(inp);
         const idx = parts.indexOf(s);
         if (idx >= 0) parts.splice(idx, 1); else parts.push(s);
-        _acJoinVals(parts, inp);
+        // Sadece dataset.values güncelle, inp.value'yu bozma (kullanıcı yazıyor olabilir)
+        inp.dataset.values = JSON.stringify(parts);
         const clr = inp.parentNode && inp.parentNode.querySelector('.ac-clear');
-        if (clr) clr.classList.toggle('visible', inp.value.length > 0);
+        if (clr) clr.classList.toggle('visible', parts.length > 0);
+        _acUpdateSummary(inputId, chipsId);
       } else {
         inp.value = inp.value.trim() === s ? '' : s;
       }
@@ -5127,6 +5131,34 @@ function _acGetVals(inp) {
 function _acJoinVals(parts, inp) {
   inp.dataset.values = JSON.stringify(parts);
   inp.value = parts.join(', ');
+}
+
+// Seçili değerleri input ÜSTÜNDE özet olarak göster (sadece bilgilendirme)
+function _acUpdateSummary(inputId, chipsId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const summaryId = inputId + '_summary';
+  let summary = document.getElementById(summaryId);
+  const parts = _acGetVals(inp);
+
+  if (!summary) {
+    summary = document.createElement('div');
+    summary.id = summaryId;
+    // ac-input-wrap'ın ÖNÜNE ekle (üstüne)
+    const acWrap = inp.parentNode;
+    if (acWrap && acWrap.classList.contains('ac-input-wrap')) {
+      acWrap.parentNode.insertBefore(summary, acWrap);
+    }
+  }
+
+  if (parts.length === 0) {
+    summary.style.display = 'none';
+    return;
+  }
+
+  summary.style.cssText = 'font-size:11px;font-weight:700;color:var(--primary);padding:0 2px 4px;font-family:var(--font);display:block;';
+  summary.style.display = '';
+  summary.textContent = '✓ ' + parts.join(', ');
 }
 
 function acPanelOpen(chipsId, inputId) {
@@ -5172,6 +5204,9 @@ function setupAcField(inputId, chipsId, listKey, opts) {
   if (!inp) return;
   if (inp._acSetup) return;
   inp._acSetup = true;
+  // listKey ve opts'u input üzerinde sakla (summary için gerekli)
+  inp.dataset._listKey = listKey;
+  if (opts) inp.dataset._opts = JSON.stringify(opts);
 
   if (opts && opts.multi) {
     // Multi: input'a yazılabilir, focus ve input eventi dropdown'u açar
@@ -5256,6 +5291,7 @@ function setupAcField(inputId, chipsId, listKey, opts) {
         e.preventDefault();
         inp.value = '';
         inp.dataset.values = '[]';
+        _acUpdateSummary(inputId, chipsId);
         _acClose(inputId);
         renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
         clr.classList.remove('visible');
@@ -5297,7 +5333,10 @@ function setupAcField(inputId, chipsId, listKey, opts) {
     }
   }
 
-  setTimeout(() => renderSuggestionChipsStatic(inputId, chipsId, listKey, opts), 50);
+  setTimeout(() => {
+    renderSuggestionChipsStatic(inputId, chipsId, listKey, opts);
+    if (opts && opts.multi) _acUpdateSummary(inputId, chipsId);
+  }, 50);
 }
 
 
