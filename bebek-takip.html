@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.8
+  Bebek Takip Pro v1.5.9
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.8">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.9">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.8</title>
+<title>Bebek Takip Pro v1.5.9</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2490,7 +2490,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.8</span>
+  <span>Pro 1.5.9</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -7051,7 +7051,7 @@ function buildPdfDoc(sections, mode) {
     doc.setPage(i);
     doc.setFontSize(7.5); doc.setTextColor(170,175,185);
     doc.setFont('helvetica','normal');
-    doc.text('Bebek Takip Pro v1.5.8  |  sebasmobil', 13, pageH-5);
+    doc.text('Bebek Takip Pro v1.5.9  |  sebasmobil', 13, pageH-5);
     doc.text('Sayfa ' + i + ' / ' + total, pageW-13, pageH-5, {align:'right'});
     doc.setDrawColor(215,220,228);
     doc.line(13, pageH-9, pageW-13, pageH-9);
@@ -7061,18 +7061,24 @@ function buildPdfDoc(sections, mode) {
   const dateStr  = new Date().toISOString().split('T')[0];
   const fileName = safeName + '_' + dateStr + '.pdf';
 
-  // iOS Safari'de blob URL + <a> ile indirme — "Dosyalara Kaydet" çıkar
-  const blob = doc.output('blob');
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = fileName;
-  a.target   = '_blank'; // iOS için fallback
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
+  // iOS Safari: window.open(blob) → üstte "İndir" butonu çıkar → Dosyalara Kaydet
+  const blob    = doc.output('blob');
+  const blobUrl = URL.createObjectURL(blob);
+  const newTab  = window.open(blobUrl, '_blank');
 
+  // Popup blocker engellerse fallback: data URI
+  if (!newTab || newTab.closed) {
+    const dataUri = doc.output('datauristring');
+    const a = document.createElement('a');
+    a.href = dataUri;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
   closePdfModal();
-  showToast('PDF hazır! Dosyalara kaydetmeyi unutma 📂');
+  showToast('PDF açıldı — "İndir" butonuna bas, Dosyalara Kaydet 📂');
 }
 </script>
