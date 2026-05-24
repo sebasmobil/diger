@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.8
+  Bebek Takip Pro v1.4.9
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.8">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.9">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.8</title>
+<title>Bebek Takip Pro v1.4.9</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2745,6 +2745,17 @@ function loadProfiles() {
 
   // Mevcut profillerde eksik id alanlarını onar
   Object.keys(profiles).forEach(k => { if (!profiles[k].id) profiles[k].id = k; });
+
+  // Diş kayıtlarını normalize et (eski format: cikma/toothId eksik olabilir)
+  Object.values(profiles).forEach(profile => {
+    if (!Array.isArray(profile.dis)) return;
+    let changed = false;
+    profile.dis.forEach(rec => {
+      if (!rec.tarih && rec.cikma) { rec.tarih = rec.cikma; changed = true; }
+      if (!rec.cikma && rec.tarih) { rec.cikma = rec.tarih; changed = true; }
+    });
+    if (changed) try { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); } catch(e) {}
+  });
 
   activeId = localStorage.getItem(ACTIVE_KEY);
 
@@ -6132,7 +6143,11 @@ function impShowMapping() {
       donem:   ['dönem','donem','period'],
       asi:     ['aşı','asi','vaccine'],
       durum:   ['durum','status','sonuç'],
-      aciklama:['açıklama','aciklama','note','not']
+      aciklama:['açıklama','aciklama','note','not'],
+      cikma:   ['çıkma','cikma','çıkma tarihi','cikma tarihi','eruption','eruption date','çıktı'],
+      dusme:   ['düşme','dusme','düşme tarihi','dusme tarihi','shedding','shed','düştü','döküldü'],
+      dis:     ['diş','dis','tooth','diş adı','dis adi','diş ismi'],
+      konum:   ['konum','location','yer','pozisyon','üst sağ','üst sol','alt sağ','alt sol','position']
     };
     const keys = aliases[fieldKey] || [fieldKey];
     const idx = impHeaders.findIndex(h => keys.some(k => h.toLowerCase().includes(k)));
@@ -6304,6 +6319,26 @@ function importData(input) {
             activeId = id;
           }
           localStorage.setItem(ACTIVE_KEY, activeId);
+          // Diş kayıtlarını normalize et (eski format uyumu)
+          Object.values(profiles).forEach(profile => {
+            if (!Array.isArray(profile.dis)) return;
+            profile.dis.forEach(rec => {
+              if (!rec.tarih) rec.tarih = rec.cikma || '';
+              if (!rec.cikma) rec.cikma = rec.tarih || '';
+              // toothId eksikse dis + konum ile eşleştir
+              if (!rec.toothId && (rec.dis || rec.konum)) {
+                const tooth = TOOTH_MAP.find(t => {
+                  const disName = (rec.dis || '').toLowerCase();
+                  const konum = (rec.konum || '').toLowerCase();
+                  const jawMatch = konum.includes('üst') ? t.jaw === 'upper' : konum.includes('alt') ? t.jaw === 'lower' : true;
+                  const sideMatch = konum.includes('sağ') ? t.side === 'right' : konum.includes('sol') ? t.side === 'left' : true;
+                  const nameMatch = !disName || t.label.toLowerCase().includes(disName.split(' ')[0]);
+                  return jawMatch && sideMatch && nameMatch;
+                });
+                if (tooth) rec.toothId = tooth.id;
+              }
+            });
+          });
           saveProfiles();
           data = profiles[activeId];
           loadTheme(); updateCounts(); renderDashboard();
