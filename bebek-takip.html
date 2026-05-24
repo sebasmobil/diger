@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.7
+  Bebek Takip Pro v1.4.8
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.7">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.8">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.7</title>
+<title>Bebek Takip Pro v1.4.8</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -1264,31 +1264,39 @@ input[type="date"], input[type="time"] {
 /* ===== TOAST ===== */
 .toast-container {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  top: calc(var(--info-bar-h, 26px) + var(--header-h, 56px) + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
 }
 .toast {
+  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 12px 18px;
   background: var(--card);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 30px var(--shadow-md);
+  border-radius: 30px;
+  box-shadow: 0 4px 20px var(--shadow-md);
   font-size: 14px;
   font-weight: 600;
-  min-width: 280px;
-  animation: slideInRight 0.3s ease;
-  border-left: 4px solid var(--primary);
+  white-space: nowrap;
+  animation: slideInDown 0.25s ease;
+  border-left: none;
+  border: 2px solid var(--primary);
+}
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .toast.success { border-color: var(--primary); }
 .toast.error { border-color: #ef4444; }
 .toast.info { border-color: var(--accent2); }
-.toast-icon { font-size: 18px; }
 
 /* ===== DASHBOARD ===== */
 .dashboard-grid {
@@ -2393,7 +2401,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.4.7</span>
+  <span>Pro 1.4.8</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
