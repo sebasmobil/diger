@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.4
+  Bebek Takip Pro v1.4.7
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.4">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.7">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.4</title>
+<title>Bebek Takip Pro v1.4.7</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2393,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.4.4</span>
+  <span>Pro 1.4.7</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -3775,7 +3775,8 @@ function getFormHTML(section, r) {
       </div>
       <div class="form-group full">
         <label class="form-label">📋 \u0130\u00e7erik</label>
-        <input class="form-input" type="text" id="f_icerik" value="${v.icerik||''}" placeholder="Malzemeler..." />
+        <div class="ac-input-wrap"><input class="form-input" type="text" id="f_icerik" value="${v.icerik||''}" placeholder="Malzemeler..." autocomplete="off" /><button class="ac-clear ${v.icerik?'visible':''}" type="button" tabindex="-1">✕</button></div>
+        <div id="icerik_chips" class="chip-panel"></div>
       </div>
       <div class="form-group">
         <label class="form-label">📏 Miktar <span style="float:right;font-size:11px;color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline" onclick="openMiniListModal('gida_miktar','Miktar Seçenekleri')">✏️ Düzenle</span></label>
@@ -4809,6 +4810,7 @@ const CUSTOM_LIST_DEFAULTS = {
   gida_tur:  ['Sebze','Meyve','Et','Tahıl','Süt Ürünleri','Anne Sütü','Mama','Çorba','Diğer'],
   gida_miktar: ['1 tatlı kaşığı','2 tatlı kaşığı','3 tatlı kaşığı','1 yemek kaşığı','2 yemek kaşığı','50ml','100ml','150ml','200ml'],
   gida_alerji: ['Kızarıklık','Kaşıntı','Şişme','Kusma','İshal','Nefes darlığı'],
+  gida_icerik: [],
   dis_tur:   ['Merkez Kesici','Yan Kesici','Köpek Dişi','1. Azı Dişi','2. Azı Dişi'],
   dis_konum: ['Üst Sağ','Üst Sol','Alt Sağ','Alt Sol'],
   olay_tur:  ['Ateş','Titreme','Öksürük','Kusma','İshal','Kızarıklık','Düşme','Diş','Diğer'],
@@ -4825,8 +4827,10 @@ const CUSTOM_LIST_DEFAULTS = {
 };
 
 function autoCollectKontrolLists() {
-  const hastaneler = [...new Set((data.kontrol||[]).map(r=>r.hastane).filter(Boolean))];
-  const doktorlar  = [...new Set((data.kontrol||[]).map(r=>r.doktor).filter(Boolean))];
+  // Virgüllü değerleri ayrı öğe olarak ekle
+  const splitVals = arr => [...new Set(arr.flatMap(v => v ? v.split(',').map(s=>s.trim()).filter(Boolean) : []))];
+  const hastaneler = splitVals((data.kontrol||[]).map(r=>r.hastane).filter(Boolean));
+  const doktorlar  = splitVals((data.kontrol||[]).map(r=>r.doktor).filter(Boolean));
   const lists = (data.settings && data.settings.customLists) || {};
   const mergeUnique = (existing, auto) => {
     const base = existing && existing.length ? [...existing] : [];
@@ -4921,7 +4925,12 @@ function _acBuildList(dd, all, selectedVals, segment, inputId, chipsId, listKey,
       addItem.innerHTML = `<span style="margin-right:8px;font-size:16px;opacity:0.8">＋</span><span>"${escHtml(segment.trim())}" olarak ekle</span>`;
       addItem.addEventListener('mousedown', e => {
         e.preventDefault();
-        _acSelect(inputId, chipsId, listKey, segment.trim(), opts, dd, all);
+        const newVal = segment.trim();
+        // "＋ ekle" tıklanınca listeye kalıcı kaydet
+        if (listKey && newVal && !all.includes(newVal)) {
+          saveCustomList(listKey, [...new Set([...all, newVal])]);
+        }
+        _acSelect(inputId, chipsId, listKey, newVal, opts, dd, all);
       });
       dd.appendChild(addItem);
     } else {
@@ -5231,6 +5240,10 @@ function setupAcField(inputId, chipsId, listKey, opts) {
         const val = inp.value.trim();
         if (val) {
           const all = getCustomList(listKey, CUSTOM_LIST_DEFAULTS[listKey]||[]);
+          // Enter ile ekleme → listeye kalıcı kaydet
+          if (listKey && !all.includes(val)) {
+            saveCustomList(listKey, [...new Set([...all, val])]);
+          }
           const st = _acState[inputId];
           _acSelect(inputId, chipsId, listKey, val, opts, st && st.dropdown, all);
           inp.value = '';
@@ -5352,7 +5365,9 @@ function initKontrolChips() {
 function autoCollectKontrolDetailLists() {
   const recs = data.kontrol || [];
   const collect = (field, key) => {
-    const vals = [...new Set(recs.map(r => r[field]).filter(Boolean))];
+    // Virgüllü değerleri ayrı öğe olarak ekle
+    const rawVals = recs.map(r => r[field]).filter(Boolean);
+    const vals = [...new Set(rawVals.flatMap(v => v.split(',').map(s => s.trim()).filter(Boolean)))];
     const lists = (data.settings && data.settings.customLists) || {};
     const existing = lists[key] || CUSTOM_LIST_DEFAULTS[key] || [];
     const set = new Set(existing.map(s => s.trim().toLocaleLowerCase('tr-TR')));
@@ -5404,13 +5419,16 @@ function initGidaChips() {
   setTimeout(() => {
     initGidaTurChips();
     setupAcField('f_adi',    'gida_adi_chips', 'gida_adi', { multi: true });
+    setupAcField('f_icerik', 'icerik_chips',   'gida_icerik', { multi: true });
     setupAcField('f_miktar', 'miktar_chips',   'gida_miktar', { multi: true });
     setupAcField('f_alerji', 'alerji_chips',   'gida_alerji', { multi: true });
   }, 300);
 }
 
 function autoCollectGidaAdiList() {
-  const vals = [...new Set((data.gida || []).map(r => r.adi).filter(Boolean))];
+  // r.adi "Y, C" gibi virgüllü olabilir — her birini ayrı öğe olarak ekle
+  const rawVals = (data.gida || []).map(r => r.adi).filter(Boolean);
+  const vals = [...new Set(rawVals.flatMap(v => v.split(',').map(s => s.trim()).filter(Boolean)))];
   const lists = (data.settings && data.settings.customLists) || {};
   const existing = lists['gida_adi'] || [];
   const set = new Set(existing.map(s => s.trim().toLocaleLowerCase('tr-TR')));
