@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.5.1
+  Bebek Takip Pro v1.5.2
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.1">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.2">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.5.1</title>
+<title>Bebek Takip Pro v1.5.2</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -68,9 +68,11 @@
   -webkit-backdrop-filter: blur(8px);
 }
 [data-theme="dark"] .info-bar {
-  background: rgba(18,18,28,0.88);
+  background: #0b1120;
   border-bottom: 1px solid rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .info-bar-sep {
   opacity: 0.35;
@@ -82,6 +84,19 @@
   transition: opacity 0.2s;
 }
 .info-bar a:hover { opacity: 0.8; }
+
+/* ===== IOS STATUS BAR ARKA PLAN (safe area) ===== */
+/* Karanlık temada status bar alanını (safe-area-inset-top) tamamen karanlık yap */
+[data-theme="dark"] body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background: #0b1120;
+  z-index: 9999;
+}
 
 /* ===== IOS ZOOM ÖNLEME ===== */
 input, select, textarea {
@@ -2401,7 +2416,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.5.1</span>
+  <span>Pro 1.5.2</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
