@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.3
+  Bebek Takip Pro v1.4.4
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.3">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.4">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.3</title>
+<title>Bebek Takip Pro v1.4.4</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2393,7 +2393,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.4.3</span>
+  <span>Pro 1.4.4</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -5035,10 +5035,7 @@ function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
       parts.splice(idx, 1);
     } else {
       parts.push(value);
-      // Listede yoksa otomatik kaydet
-      if (listKey && !all.includes(value)) {
-        saveCustomList(listKey, [...new Set([...all, value])]);
-      }
+      // Otomatik kayıt YOK — sadece "＋ ekle" ile eklenenler listeye girer
     }
     _acJoinVals(parts, inp);
     inp.value = ''; // Seçim sonrası input'u temizle — kullanıcı yeni öğe yazabilsin
@@ -5058,10 +5055,7 @@ function _acSelect(inputId, chipsId, listKey, value, opts, dd, all) {
     if (clr) clr.classList.toggle('visible', parts.length > 0);
   } else {
     inp.value = value;
-    // Listede yoksa otomatik kaydet
-    if (listKey && !all.includes(value) && value) {
-      saveCustomList(listKey, [...new Set([...all, value])]);
-    }
+    // Otomatik kayıt YOK — sadece "＋ ekle" ile eklenenler listeye girer
     _acClose(inputId);
     inp.focus();
     const box = document.getElementById(chipsId);
