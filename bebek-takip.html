@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.4.9
+  Bebek Takip Pro v1.5.0
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.4.9">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.5.0">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.4.9</title>
+<title>Bebek Takip Pro v1.5.0</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2401,7 +2401,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.4.9</span>
+  <span>Pro 1.5.0</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -4294,18 +4294,48 @@ function renderToothMap() {
   </svg>`;
 }
 
-function openToothPanel(toothId) {
+function openToothPanel(toothId, recId) {
+  // Kaydı önce toothId ile, bulamazsa recId ile bul
+  let rec = data.dis.find(d => d.toothId === toothId);
+  if (!rec && recId) rec = data.dis.find(d => d.id === recId);
+
+  // toothId eksikse rec'ten çıkar, hâlâ yoksa TOOTH_MAP'ten eşleştir
+  if (rec && !rec.toothId) {
+    const tooth = TOOTH_MAP.find(t => {
+      const disName = (rec.dis || '').toLowerCase();
+      const konum = (rec.konum || '').toLowerCase();
+      const jawMatch = konum.includes('üst') ? t.jaw === 'upper' : konum.includes('alt') ? t.jaw === 'lower' : true;
+      const sideMatch = konum.includes('sağ') ? t.side === 'right' : konum.includes('sol') ? t.side === 'left' : true;
+      const nameMatch = !disName || t.label.toLowerCase().includes(disName.split(' ')[0]);
+      return jawMatch && sideMatch && nameMatch;
+    });
+    if (tooth) { rec.toothId = tooth.id; saveData(); }
+    toothId = rec?.toothId || toothId;
+  }
+
   selectedToothId = toothId;
   const tooth = TOOTH_MAP.find(t => t.id === toothId);
-  const rec = data.dis.find(d => d.toothId === toothId);
-  const jawLabel  = tooth.jaw   === 'upper' ? 'Üst' : 'Alt';
-  const sideLabel = tooth.side  === 'right' ? 'Sağ' : 'Sol';
-  document.getElementById('toothDetailTitle').textContent = `🦷 ${tooth.label} — ${jawLabel} ${sideLabel}`;
+
+  // Başlık: tooth map'te bulunduysa onun adını, bulunamadıysa rec'teki dis+konum bilgisini kullan
+  if (tooth) {
+    const jawLabel  = tooth.jaw  === 'upper' ? 'Üst' : 'Alt';
+    const sideLabel = tooth.side === 'right' ? 'Sağ' : 'Sol';
+    document.getElementById('toothDetailTitle').textContent = `🦷 ${tooth.label} — ${jawLabel} ${sideLabel}`;
+  } else if (rec) {
+    document.getElementById('toothDetailTitle').textContent = `🦷 ${rec.dis || 'Diş'} — ${rec.konum || ''}`;
+  } else {
+    document.getElementById('toothDetailTitle').textContent = '🦷 Diş Detayı';
+  }
+
   // cikma yoksa tarih'e bak (içe aktarım uyumu)
   document.getElementById('toothCikmaInput').value = rec?.cikma || rec?.tarih || '';
   document.getElementById('toothDusmeInput').value = rec?.dusme || '';
   document.getElementById('toothNotInput').value   = rec?.not   || '';
   document.getElementById('toothDeleteBtn').style.display = rec ? '' : 'none';
+
+  // Silme butonu için recId'yi sakla (toothId eşleşmeyebilir)
+  if (rec) document.getElementById('toothDeleteBtn').dataset.recId = rec.id;
+
   const overlay = document.getElementById('toothModalOverlay');
   overlay.style.display = 'flex';
   setTimeout(applyDatePlaceholders, 50);
@@ -4317,31 +4347,37 @@ function closeToothPanel() {
 }
 
 function saveToothRecord() {
-  if (!selectedToothId) return;
-  const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
   const cikma = document.getElementById('toothCikmaInput').value;
   const dusme = document.getElementById('toothDusmeInput').value;
   const not   = document.getElementById('toothNotInput').value;
-  const idx = data.dis.findIndex(d => d.toothId === selectedToothId);
+  const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
+
+  // Mevcut kaydı toothId ile, bulamazsa deleteBtn'deki recId ile bul
+  const storedRecId = document.getElementById('toothDeleteBtn').dataset.recId;
+  let idx = data.dis.findIndex(d => d.toothId === selectedToothId);
+  if (idx < 0 && storedRecId) idx = data.dis.findIndex(d => d.id === storedRecId);
+
+  const existingRec = idx >= 0 ? data.dis[idx] : null;
   const rec = {
-    id: idx >= 0 ? data.dis[idx].id : genId(),
-    toothId: selectedToothId,
-    dis: tooth.label,
-    konum: `${tooth.jaw==='upper'?'Üst':'Alt'} ${tooth.side==='right'?'Sağ':'Sol'}`,
+    id:      existingRec?.id || genId(),
+    toothId: selectedToothId || existingRec?.toothId || '',
+    dis:     tooth?.label    || existingRec?.dis     || '',
+    konum:   tooth ? `${tooth.jaw==='upper'?'Üst':'Alt'} ${tooth.side==='right'?'Sağ':'Sol'}` : (existingRec?.konum || ''),
     cikma, dusme, not,
     tarih: cikma || new Date().toISOString().split('T')[0]
   };
   if (idx >= 0) data.dis[idx] = rec;
   else data.dis.push(rec);
   saveData(); updateCounts(); closeToothPanel(); renderDisPage();
-  showToast(`${tooth.label} kaydedildi! 🦷`);
+  showToast(`${rec.dis || 'Diş'} kaydedildi! 🦷`);
 }
 
 function deleteToothRecord() {
-  if (!selectedToothId) return;
   const tooth = TOOTH_MAP.find(t => t.id === selectedToothId);
-  showConfirm(`"${tooth.label}" kaydını silmek istiyor musunuz?`, () => {
-    data.dis = data.dis.filter(d => d.toothId !== selectedToothId);
+  const storedRecId = document.getElementById('toothDeleteBtn').dataset.recId;
+  const label = tooth?.label || (storedRecId ? (data.dis.find(d=>d.id===storedRecId)?.dis || 'Diş') : 'Diş');
+  showConfirm(`"${label}" kaydını silmek istiyor musunuz?`, () => {
+    data.dis = data.dis.filter(d => d.toothId !== selectedToothId && d.id !== storedRecId);
     saveData(); updateCounts(); closeToothPanel(); renderDisPage();
     showToast('Kayıt silindi.');
   });
@@ -4362,7 +4398,7 @@ function renderDisList() {
       <div class="rc-top">
         <span class="rc-date">🦷 ${escHtml(r.dis||'-')} · ${r.konum||'-'}</span>
         <div class="rc-actions">
-          <button class="btn btn-secondary btn-sm btn-icon" onclick="openToothPanel('${r.toothId}')">✏️</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="openToothPanel('${r.toothId}','${r.id}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="data.dis=data.dis.filter(d=>d.id!=='${r.id}');saveData();updateCounts();renderDisPage();showToast('Silindi.')">🗑️</button>
         </div>
       </div>
