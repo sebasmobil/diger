@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.7.7
+  Bebek Takip Pro v1.7.8
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.7">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.8">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.7.7</title>
+<title>Bebek Takip Pro v1.7.8</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2184,6 +2184,7 @@ mark.hl {
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 <body>
@@ -2497,7 +2498,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.7.7</span>
+  <span>Pro 1.7.8</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6958,7 +6959,7 @@ function doPdf(sections){
       margin:[20,10,20,0]
     }:{text:''},
     {text:'Rapor tarihi: '+today,fontSize:9,color:'#999',alignment:'center',margin:[0,30,0,4]},
-    {text:'Bebek Takip Pro v1.7.7  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
+    {text:'Bebek Takip Pro v1.7.8  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
     {text:'',pageBreak:'after'}
   ];
 
@@ -7014,7 +7015,7 @@ function doPdf(sections){
     defaultStyle:{font:'Roboto',fontSize:9},
     footer:function(page,count){
       return {columns:[
-        {text:'Bebek Takip Pro v1.7.7  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
+        {text:'Bebek Takip Pro v1.7.8  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
         {text:'Sayfa '+page+' / '+count,fontSize:7,color:'#aaa',alignment:'right',margin:[0,0,28,0]}
       ],margin:[0,10,0,0]};
     },
@@ -7028,216 +7029,210 @@ function doPdf(sections){
 }
 </script>
 
-</body>
-</html>
+
+
 
 <script>
-// ═══════════ EXCEL & WORD EXPORT ═══════════
-
 function getSelected(){
   return ['olay','gelisim','kontrol','gida','gunluk','dis','asi'].filter(function(s){
     return document.getElementById('pdf_'+s).checked;
   });
 }
-
-function fv2(v){return(v===null||v===undefined||String(v)==='undefined'||v==='')? '-' : String(v);}
+function fv2(v){return(v===null||v===undefined||String(v)==='undefined'||v==='') ? '-' : String(v);}
 function fd2(d){return formatDate(d)||'-';}
-function srt2(arr,key,asc){return[].concat(arr||[]).sort(function(a,b){var x=a[key]||'',y=b[key]||'';return asc?x.localeCompare(y):y.localeCompare(x);});}
+function srt2(arr,key,asc){
+  return [].concat(arr||[]).sort(function(a,b){
+    var x=a[key]||'', y=b[key]||'';
+    return asc ? x.localeCompare(y) : y.localeCompare(x);
+  });
+}
 
-// ─── EXCEL ──────────────────────────────────────────────
 function exportExcel(){
   var selected=getSelected();
-  if(!selected.length){showToast('En az bir b\u00f6l\u00fcm se\u00e7in!');return;}
-  if(typeof XLSX==='undefined'){showToast('Excel k\u00FCt\u00FCphanesi y\u00FCklenemedi.');return;}
-
+  if(!selected.length){showToast('En az bir bölüm seçin!');return;}
+  if(typeof XLSX==='undefined'){showToast('Excel yüklenemedi.');return;}
   var btn=document.getElementById('excelBtn');
-  btn.textContent='Haz\u0131rlan\u0131yor...';btn.disabled=true;
-
+  btn.textContent='Hazırlanıyor...'; btn.disabled=true;
   try{
     var wb=XLSX.utils.book_new();
     var s=data.settings||{};
     var bName=fv2(s.babyName||'Bebek');
-
-    // Kimlik sayfas\u0131
-    var kimlikRows=[
-      [bName+' - Geli\u015fim G\u00FCnl\u00FC\u011F\u00FC'],
+    var bw=s.birthWeight ? parseFloat(s.birthWeight) : '';
+    var kimlikAoa=[
+      [bName+' - Gelişim Günlüğü'],
       [],
-      ['K\u0130ML\u0130K B\u0130LG\u0130LER\u0130'],
+      ['KIM LIK BILGILERI'],
       ['Ad', bName],
-      ['Do\u011Fum Tarihi', s.birthDate?fd2(s.birthDate):''],
-      ['Do\u011Fum Saati', fv2(s.birthTime)],
-      ['Do\u011Fum Yeri', fv2(s.birthPlace)],
-      ['Do\u011Fum Kilosu', s.birthWeight?(parseFloat(s.birthWeight)>=500?(parseFloat(s.birthWeight)/1000).toFixed(3)+' kg':s.birthWeight+' kg'):''],
-      ['Do\u011Fum Boyu', s.birthHeight?s.birthHeight+' cm':''],
-      ['Do\u011Fum Ba\u015F \u00C7evresi', s.birthHead?s.birthHead+' cm':''],
+      ['Doğum Tarihi', s.birthDate ? fd2(s.birthDate) : ''],
+      ['Doğum Saati', fv2(s.birthTime)],
+      ['Doğum Yeri', fv2(s.birthPlace)],
+      ['Doğum Kilosu', bw ? (bw>=500 ? (bw/1000).toFixed(3)+' kg' : bw+' kg') : ''],
+      ['Doğum Boyu', s.birthHeight ? s.birthHeight+' cm' : ''],
+      ['Doğum Baş Çevresi', s.birthHead ? s.birthHead+' cm' : ''],
       ['Kan Grubu', fv2(s.bloodType)]
     ];
-    var wsKimlik=XLSX.utils.aoa_to_sheet(kimlikRows);
-    wsKimlik['!cols']=[{wch:20},{wch:30}];
-    XLSX.utils.book_append_sheet(wb, wsKimlik, 'Kimlik');
+    var wsK=XLSX.utils.aoa_to_sheet(kimlikAoa);
+    wsK['!cols']=[{wch:22},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, wsK, 'Kimlik');
 
-    // B\u00F6l\u00FCm sayfalar\u0131
     var SHEETS={
-      olay: {
-        title: 'Olaylar',
-        headers: ['Tarih','Saat','Olay','Not'],
-        rows: function(){return srt2(data.olay,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.saat),fv2(r.olay||r.baslik),fv2(r.not)];});}
-      },
-      gelisim: {
-        title: 'Gelişim Ölçümleri',
-        headers: ['Tarih','Ağırlık (kg)','Boy (cm)','Baş Çevresi (cm)','Diğer','Notlar'],
-        rows: function(){return srt2(data.gelisim,'tarih',true).map(function(r){return[fd2(r.tarih),fv2(r.agirlik),fv2(r.boy),fv2(r.bas),fv2(r.diger),fv2(r.notlar||r.not)];});}
-      },
-      kontrol: {
-        title: 'Doktor Kontrolleri',
-        headers: ['Tarih','Hastane','Doktor','Teşhis','Tedavi','Verilen İlaçlar','Tetkik','Doktor Puanı','Hastane Puanı','Not'],
-        rows: function(){return srt2(data.kontrol,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.hastane),fv2(r.doktor),fv2(r.teshis),fv2(r.tedavi),fv2(r.ilac),fv2(r.tetkik),fv2(r.doktorPuan),fv2(r.hastanePuan),fv2(r.not)];});}
-      },
-      gida: {
-        title: 'Gıda Takibi',
-        headers: ['Tarih','Saat','Tür','Gıda Adı','İçerik','Miktar','Alerji Reaksiyonu','Not'],
-        rows: function(){return srt2(data.gida,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.saat),fv2(r.tur),fv2(r.adi),fv2(r.icerik),fv2(r.miktar),fv2(r.alerji),fv2(r.not)];});}
-      },
-      gunluk: {
-        title: 'Günlük',
-        headers: ['Tarih','Başlık','Not / İçerik'],
-        rows: function(){return srt2(data.gunluk,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.baslik),fv2(r.not||r.icerik)];});}
-      },
-      dis: {
-        title: 'Diş Takibi',
-        headers: ['Diş Adı','Konum','Çıkma Tarihi','Düşme Tarihi','Not'],
-        rows: function(){return srt2(data.dis,'cikma',false).map(function(r){return[fv2(r.dis),fv2(r.konum),fd2(r.cikma||r.tarih),fd2(r.dusme),fv2(r.not)];});}
-      },
-      asi: {
-        title: 'Aşı Takvimi',
-        headers: ['Tarih','Dönem','Aşı Adı','Durum','Uygulama Yeri','Açıklama'],
-        rows: function(){return srt2(data.asi,'tarih',true).map(function(r){return[fd2(r.tarih),fv2(r.donem),fv2(r.asi||r.ad),fv2(r.durum),fv2(r.uygulamaYeri),fv2(r.aciklama)];});}
-      }
+      olay:{title:'Olaylar',h:['Tarih','Saat','Olay','Not'],r:function(){return srt2(data.olay,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.olay||x.baslik),fv2(x.not)];});}},
+      gelisim:{title:'Gelisim',h:['Tarih','Agirlik(kg)','Boy(cm)','Bas(cm)','Diger','Notlar'],r:function(){return srt2(data.gelisim,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.agirlik),fv2(x.boy),fv2(x.bas),fv2(x.diger),fv2(x.notlar||x.not)];});}},
+      kontrol:{title:'Doktor',h:['Tarih','Hastane','Doktor','Teshis','Tedavi','Ilaclar','Tetkik','Dr Puani','Hast Puani','Not'],r:function(){return srt2(data.kontrol,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.hastane),fv2(x.doktor),fv2(x.teshis),fv2(x.tedavi),fv2(x.ilac),fv2(x.tetkik),fv2(x.doktorPuan),fv2(x.hastanePuan),fv2(x.not)];});}},
+      gida:{title:'Gida',h:['Tarih','Saat','Tur','Adi','Icerik','Miktar','Alerji','Not'],r:function(){return srt2(data.gida,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.tur),fv2(x.adi),fv2(x.icerik),fv2(x.miktar),fv2(x.alerji),fv2(x.not)];});}},
+      gunluk:{title:'Gunluk',h:['Tarih','Baslik','Not'],r:function(){return srt2(data.gunluk,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.baslik),fv2(x.not||x.icerik)];});}},
+      dis:{title:'Dis',h:['Dis Adi','Konum','Cikma','Dusme','Not'],r:function(){return srt2(data.dis,'cikma',false).map(function(x){return[fv2(x.dis),fv2(x.konum),fd2(x.cikma||x.tarih),fd2(x.dusme),fv2(x.not)];});}},
+      asi:{title:'Asi',h:['Tarih','Donem','Asi Adi','Durum','Yer','Aciklama'],r:function(){return srt2(data.asi,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.donem),fv2(x.asi||x.ad),fv2(x.durum),fv2(x.uygulamaYeri),fv2(x.aciklama)];});}}
     };
 
     selected.forEach(function(key){
       var sec=SHEETS[key];
-      if(!sec)return;
-      var rows=sec.rows();
-      var aoa=[sec.headers].concat(rows.length?rows:[sec.headers.map(function(){return'-';})]);
+      if(!sec) return;
+      var rows=sec.r();
+      var aoa=[sec.h].concat(rows.length ? rows : [sec.h.map(function(){return'-';})]);
       var ws=XLSX.utils.aoa_to_sheet(aoa);
-      // Kolon genişlikleri
-      ws['!cols']=sec.headers.map(function(h){return{wch:Math.max(h.length+4,16)};});
+      ws['!cols']=sec.h.map(function(h){return{wch:Math.max(h.length+4,16)};});
       XLSX.utils.book_append_sheet(wb, ws, sec.title);
     });
 
-    var fname=bName.replace(/\s+/g,'_').replace(/[^\w]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.xlsx';
+    var fname=bName.replace(/[ ]+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.xlsx';
     XLSX.writeFile(wb, fname);
     closePdfModal();
-    showToast('Excel indirildi! \uD83D\uDCCA');
-  }catch(e){
-    showToast('Hata: '+e.message);console.error(e);
-  }finally{
-    btn.textContent='\uD83D\uDCCA Excel';btn.disabled=false;
-  }
+    showToast('Excel indirildi!');
+  } catch(e){showToast('Hata: '+e.message);console.error(e);}
+  finally{btn.textContent='Excel'; btn.disabled=false;}
 }
 
-// ─── WORD ───────────────────────────────────────────────
 function exportWord(){
   var selected=getSelected();
-  if(!selected.length){showToast('En az bir b\u00F6l\u00FCm se\u00E7in!');return;}
-
+  if(!selected.length){showToast('En az bir bölüm seçin!');return;}
+  if(typeof docx==='undefined'){showToast('Word kütüphanesi yüklenemedi.');return;}
   var btn=document.getElementById('wordBtn');
-  btn.textContent='Haz\u0131rlan\u0131yor...';btn.disabled=true;
-
+  btn.textContent='Hazırlanıyor...'; btn.disabled=true;
   try{
+    var D=docx;
     var s=data.settings||{};
     var bName=fv2(s.babyName||'Bebek');
-    var today=new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'});
+    var today=new Date().getDate()+'. '+['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'][new Date().getMonth()]+' '+new Date().getFullYear();
 
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">';
-    html+='<style>';
-    html+='body{font-family:Arial,sans-serif;font-size:11pt;margin:2cm;}';
-    html+='h1{color:#2B579A;font-size:18pt;text-align:center;border-bottom:3px solid #2B579A;padding-bottom:8px;}';
-    html+='h2{color:#ffffff;background:#4fac64;font-size:13pt;padding:8px 12px;margin-top:24px;}';
-    html+='.info-table{width:100%;border-collapse:collapse;margin:12px 0;}';
-    html+='.info-table td{padding:5px 10px;font-size:10pt;}';
-    html+='.info-table td:first-child{font-weight:bold;color:#555;width:160px;}';
-    html+='table{width:100%;border-collapse:collapse;margin:8px 0;font-size:9.5pt;}';
-    html+='th{background:#333744;color:white;padding:6px 8px;text-align:left;}';
-    html+='tr:nth-child(even){background:#f6f8fc;}';
-    html+='tr:nth-child(odd){background:#ffffff;}';
-    html+='td{padding:5px 8px;border:1px solid #dce1e8;}';
-    html+='.footer{margin-top:40px;border-top:1px solid #ddd;padding-top:8px;font-size:8pt;color:#aaa;text-align:center;}';
-    html+='</style></head><body>';
+    var GREEN='4FAC64';
+    var HDR={olay:'E59832',gelisim:'4F8CD2',kontrol:'D25A5A',gida:'B48246',gunluk:'825AC8',dis:'4FAC64',asi:'3CAABE'};
 
-    // Ba\u015Fl\u0131k
-    html+='<h1>'+bName+' &mdash; Geli\u015fim G\u00FCnl\u00FC\u011F\u00FC</h1>';
-    html+='<p style="text-align:center;color:#888;font-size:9pt;">Rapor tarihi: '+today+'</p>';
+    function mRow(cells, isHeader, colorHex){
+      return new D.TableRow({
+        tableHeader: isHeader,
+        children: cells.map(function(c){
+          return new D.TableCell({
+            shading: isHeader ? {fill:colorHex,type:D.ShadingType.SOLID} : {fill:'FFFFFF',type:D.ShadingType.SOLID},
+            children:[new D.Paragraph({
+              children:[new D.TextRun({text:String(c||'-'),bold:isHeader,color:isHeader?'FFFFFF':'111111',size:isHeader?18:17})],
+              spacing:{before:40,after:40}
+            })]
+          });
+        })
+      });
+    }
+
+    function mSection(key, title, headers, rows){
+      var color=HDR[key]||GREEN;
+      var result=[];
+      result.push(new D.Paragraph({
+        children:[new D.TextRun({text:title,bold:true,color:'FFFFFF',size:26})],
+        shading:{fill:color,type:D.ShadingType.SOLID},
+        spacing:{before:300,after:0},
+        indent:{left:160,right:160}
+      }));
+      var tRows=[mRow(headers,true,color)];
+      if(!rows.length){
+        tRows.push(mRow(['Henüz kayıt yok.'],false,color));
+      } else {
+        rows.forEach(function(r){tRows.push(mRow(r,false,color));});
+      }
+      result.push(new D.Table({width:{size:100,type:D.WidthType.PERCENTAGE},rows:tRows}));
+      result.push(new D.Paragraph({text:'',spacing:{before:200}}));
+      return result;
+    }
+
+    var docChildren=[];
+    docChildren.push(new D.Paragraph({
+      children:[new D.TextRun({text:bName+' — Gelişim Günlüğü',bold:true,size:44,color:GREEN})],
+      alignment:D.AlignmentType.CENTER,
+      spacing:{before:400,after:100}
+    }));
+    docChildren.push(new D.Paragraph({
+      children:[new D.TextRun({text:'Rapor: '+today,size:18,color:'999999'})],
+      alignment:D.AlignmentType.CENTER,
+      spacing:{before:0,after:400}
+    }));
 
     // Kimlik
-    html+='<h2>&#128100; Kimlik Bilgileri</h2>';
-    html+='<table class="info-table">';
-    function irow(l,v){if(v&&v!=='-')html+='<tr><td>'+l+'</td><td>'+v+'</td></tr>';}
-    irow('Ad',bName);
-    irow('Do\u011Fum Tarihi',s.birthDate?fd2(s.birthDate):'');
-    irow('Do\u011Fum Saati',fv2(s.birthTime));
-    irow('Do\u011Fum Yeri',fv2(s.birthPlace));
-    if(s.birthWeight){var bw=parseFloat(s.birthWeight);irow('Do\u011Fum Kilosu',bw>=500?(bw/1000).toFixed(3)+' kg':bw+' kg');}
-    irow('Do\u011Fum Boyu',s.birthHeight?s.birthHeight+' cm':'');
-    irow('Do\u011Fum Ba\u015F \u00C7evresi',s.birthHead?s.birthHead+' cm':'');
-    irow('Kan Grubu',fv2(s.bloodType));
-    html+='</table>';
+    var bw2=s.birthWeight ? parseFloat(s.birthWeight) : 0;
+    var kimlikData=[
+      ['Ad',bName],
+      ['Doğum Tarihi',s.birthDate ? fd2(s.birthDate) : '-'],
+      ['Doğum Saati',fv2(s.birthTime)],
+      ['Doğum Yeri',fv2(s.birthPlace)],
+      ['Doğum Kilosu',bw2 ? (bw2>=500 ? (bw2/1000).toFixed(3)+' kg' : bw2+' kg') : '-'],
+      ['Doğum Boyu',s.birthHeight ? s.birthHeight+' cm' : '-'],
+      ['Doğum Baş Çevresi',s.birthHead ? s.birthHead+' cm' : '-'],
+      ['Kan Grubu',fv2(s.bloodType)]
+    ];
+    docChildren.push(new D.Paragraph({
+      children:[new D.TextRun({text:'Kimlik Bilgileri',bold:true,color:'FFFFFF',size:24})],
+      shading:{fill:GREEN,type:D.ShadingType.SOLID},
+      spacing:{before:200,after:0},indent:{left:160}
+    }));
+    docChildren.push(new D.Table({
+      width:{size:100,type:D.WidthType.PERCENTAGE},
+      rows:kimlikData.filter(function(r){return r[1]&&r[1]!=='-';}).map(function(r){
+        return new D.TableRow({children:[
+          new D.TableCell({shading:{fill:'F0F4F0',type:D.ShadingType.SOLID},
+            children:[new D.Paragraph({children:[new D.TextRun({text:r[0],bold:true,size:18})],spacing:{before:40,after:40}})]}),
+          new D.TableCell({children:[new D.Paragraph({children:[new D.TextRun({text:r[1],size:18})],spacing:{before:40,after:40}})]})
+        ]});
+      })
+    }));
+    docChildren.push(new D.Paragraph({text:'',spacing:{before:300}}));
 
-    // B\u00F6l\u00FCmler
     var SECS={
-      olay:{title:'Olaylar',emoji:'&#9889;',
-        headers:['Tarih','Saat','Olay','Not'],
-        rows:function(){return srt2(data.olay,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.saat),fv2(r.olay||r.baslik),fv2(r.not)];});}},
-      gelisim:{title:'Gelişim Ölçümleri',emoji:'&#128200;',
-        headers:['Tarih','Ağırlık (kg)','Boy (cm)','Baş Çevresi (cm)','Diğer','Notlar'],
-        rows:function(){return srt2(data.gelisim,'tarih',true).map(function(r){return[fd2(r.tarih),fv2(r.agirlik),fv2(r.boy),fv2(r.bas),fv2(r.diger),fv2(r.notlar||r.not)];});}},
-      kontrol:{title:'Doktor Kontrolleri',emoji:'&#127973;',
-        headers:['Tarih','Hastane','Doktor','Teşhis','Tedavi','Verilen İlaçlar','Tetkik','Doktor Puanı','Hastane Puanı','Not'],
-        rows:function(){return srt2(data.kontrol,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.hastane),fv2(r.doktor),fv2(r.teshis),fv2(r.tedavi),fv2(r.ilac),fv2(r.tetkik),fv2(r.doktorPuan),fv2(r.hastanePuan),fv2(r.not)];});}},
-      gida:{title:'Gıda Takibi',emoji:'&#127868;',
-        headers:['Tarih','Saat','Tür','Gıda Adı','İçerik','Miktar','Alerji Reaksiyonu','Not'],
-        rows:function(){return srt2(data.gida,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.saat),fv2(r.tur),fv2(r.adi),fv2(r.icerik),fv2(r.miktar),fv2(r.alerji),fv2(r.not)];});}},
-      gunluk:{title:'Günlük',emoji:'&#128212;',
-        headers:['Tarih','Başlık','Not / İçerik'],
-        rows:function(){return srt2(data.gunluk,'tarih',false).map(function(r){return[fd2(r.tarih),fv2(r.baslik),fv2(r.not||r.icerik)];});}},
-      dis:{title:'Diş Takibi',emoji:'&#129463;',
-        headers:['Diş Adı','Konum','Çıkma Tarihi','Düşme Tarihi','Not'],
-        rows:function(){return srt2(data.dis,'cikma',false).map(function(r){return[fv2(r.dis),fv2(r.konum),fd2(r.cikma||r.tarih),fd2(r.dusme),fv2(r.not)];});}},
-      asi:{title:'Aşı Takvimi',emoji:'&#128137;',
-        headers:['Tarih','Dönem','Aşı Adı','Durum','Uygulama Yeri','Açıklama'],
-        rows:function(){return srt2(data.asi,'tarih',true).map(function(r){return[fd2(r.tarih),fv2(r.donem),fv2(r.asi||r.ad),fv2(r.durum),fv2(r.uygulamaYeri),fv2(r.aciklama)];});}}
+      olay:{title:'Olaylar',h:['Tarih','Saat','Olay','Not'],r:function(){return srt2(data.olay,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.olay||x.baslik),fv2(x.not)];});}},
+      gelisim:{title:'Gelişim Ölçümleri',h:['Tarih','Ağırlık(kg)','Boy(cm)','Baş(cm)','Diğer','Not'],r:function(){return srt2(data.gelisim,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.agirlik),fv2(x.boy),fv2(x.bas),fv2(x.diger),fv2(x.notlar||x.not)];});}},
+      kontrol:{title:'Doktor Kontrolleri',h:['Tarih','Hastane','Doktor','Teşhis','Tedavi','Verilen İlaçlar','Tetkik','Dr Puanı','Hast. Puanı','Not'],r:function(){return srt2(data.kontrol,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.hastane),fv2(x.doktor),fv2(x.teshis),fv2(x.tedavi),fv2(x.ilac),fv2(x.tetkik),fv2(x.doktorPuan),fv2(x.hastanePuan),fv2(x.not)];});}},
+      gida:{title:'Gıda Takibi',h:['Tarih','Saat','Tür','Gıda Adı','İçerik','Miktar','Alerji','Not'],r:function(){return srt2(data.gida,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.tur),fv2(x.adi),fv2(x.icerik),fv2(x.miktar),fv2(x.alerji),fv2(x.not)];});}},
+      gunluk:{title:'Günlük',h:['Tarih','Başlık','Not / İçerik'],r:function(){return srt2(data.gunluk,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.baslik),fv2(x.not||x.icerik)];});}},
+      dis:{title:'Diş Takibi',h:['Diş Adı','Konum','Çıkma Tarihi','Düşme Tarihi','Not'],r:function(){return srt2(data.dis,'cikma',false).map(function(x){return[fv2(x.dis),fv2(x.konum),fd2(x.cikma||x.tarih),fd2(x.dusme),fv2(x.not)];});}},
+      asi:{title:'Aşı Takvimi',h:['Tarih','Dönem','Aşı Adı','Durum','Uygulama Yeri','Açıklama'],r:function(){return srt2(data.asi,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.donem),fv2(x.asi||x.ad),fv2(x.durum),fv2(x.uygulamaYeri),fv2(x.aciklama)];});}}
     };
 
     selected.forEach(function(key){
-      var sec=SECS[key];if(!sec)return;
-      html+='<h2>'+sec.emoji+' '+sec.title+'</h2>';
-      html+='<table><tr>';
-      sec.headers.forEach(function(h){html+='<th>'+h+'</th>';});
-      html+='</tr>';
-      var rows=sec.rows();
-      if(!rows.length){html+='<tr><td colspan="'+sec.headers.length+'" style="color:#aaa;text-align:center;">Hen\u00FCz kay\u0131t yok.</td></tr>';}
-      else{rows.forEach(function(row){html+='<tr>';row.forEach(function(c){html+='<td>'+c+'</td>';});html+='</tr>';});}
-      html+='</table>';
+      var sec=SECS[key]; if(!sec) return;
+      mSection(key,sec.title,sec.h,sec.r()).forEach(function(el){docChildren.push(el);});
     });
 
-    html+='<div class="footer">Bebek Takip Pro v1.7.7 | sebasmobil | '+today+'</div>';
-    html+='</body></html>';
+    docChildren.push(new D.Paragraph({
+      children:[new D.TextRun({text:'Bebek Takip Pro v1.7.8 | sebasmobil | '+today,size:14,color:'AAAAAA'})],
+      alignment:D.AlignmentType.CENTER,spacing:{before:400}
+    }));
 
-    // Blob olarak indir — Word HTML format\u0131
-    var blob=new Blob(['\uFEFF'+html],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    var fname=bName.replace(/\s+/g,'_').replace(/[^\w]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.docx';
-    a.href=url;a.download=fname;
-    document.body.appendChild(a);a.click();
-    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
-    closePdfModal();
-    showToast('Word belgesi indirildi! \uD83D\uDCDD (.docx)');
-  }catch(e){
-    showToast('Hata: '+e.message);console.error(e);
-  }finally{
-    btn.textContent='\uD83D\uDCDD Word';btn.disabled=false;
-  }
+    var document2=new D.Document({sections:[{
+      properties:{page:{margin:{top:800,right:800,bottom:800,left:800}}},
+      children:docChildren
+    }]});
+
+    D.Packer.toBlob(document2).then(function(blob){
+      var url=URL.createObjectURL(blob);
+      var a=window.document.createElement('a');
+      var fname=bName.replace(/[ ]+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.docx';
+      a.href=url; a.download=fname;
+      window.document.body.appendChild(a); a.click();
+      setTimeout(function(){window.document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
+      closePdfModal();
+      showToast('Word indirildi!');
+    }).catch(function(e){showToast('Hata: '+e.message);console.error(e);});
+  } catch(e){showToast('Hata: '+e.message);console.error(e);}
+  finally{btn.textContent='Word'; btn.disabled=false;}
 }
 </script>
+
+</body>
+</html>
