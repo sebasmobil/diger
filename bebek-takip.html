@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.7.6
+  Bebek Takip Pro v1.7.7
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.6">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.7">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.7.6</title>
+<title>Bebek Takip Pro v1.7.7</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2497,7 +2497,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.7.6</span>
+  <span>Pro 1.7.7</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6958,7 +6958,7 @@ function doPdf(sections){
       margin:[20,10,20,0]
     }:{text:''},
     {text:'Rapor tarihi: '+today,fontSize:9,color:'#999',alignment:'center',margin:[0,30,0,4]},
-    {text:'Bebek Takip Pro v1.7.6  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
+    {text:'Bebek Takip Pro v1.7.7  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
     {text:'',pageBreak:'after'}
   ];
 
@@ -7014,7 +7014,7 @@ function doPdf(sections){
     defaultStyle:{font:'Roboto',fontSize:9},
     footer:function(page,count){
       return {columns:[
-        {text:'Bebek Takip Pro v1.7.6  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
+        {text:'Bebek Takip Pro v1.7.7  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
         {text:'Sayfa '+page+' / '+count,fontSize:7,color:'#aaa',alignment:'right',margin:[0,0,28,0]}
       ],margin:[0,10,0,0]};
     },
@@ -7221,19 +7221,19 @@ function exportWord(){
       html+='</table>';
     });
 
-    html+='<div class="footer">Bebek Takip Pro v1.7.6 | sebasmobil | '+today+'</div>';
+    html+='<div class="footer">Bebek Takip Pro v1.7.7 | sebasmobil | '+today+'</div>';
     html+='</body></html>';
 
     // Blob olarak indir — Word HTML format\u0131
-    var blob=new Blob(['\uFEFF'+html],{type:'application/msword;charset=utf-8'});
+    var blob=new Blob(['\uFEFF'+html],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    var fname=bName.replace(/\s+/g,'_').replace(/[^\w]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.doc';
+    var fname=bName.replace(/\s+/g,'_').replace(/[^\w]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.docx';
     a.href=url;a.download=fname;
     document.body.appendChild(a);a.click();
     setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
     closePdfModal();
-    showToast('Word belgesi indirildi! \uD83D\uDCDD');
+    showToast('Word belgesi indirildi! \uD83D\uDCDD (.docx)');
   }catch(e){
     showToast('Hata: '+e.message);console.error(e);
   }finally{
