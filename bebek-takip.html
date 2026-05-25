@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.7.9
+  Bebek Takip Pro v1.8.0
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.9">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.8.0">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.7.9</title>
+<title>Bebek Takip Pro v1.8.0</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2184,7 +2184,6 @@ mark.hl {
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 <body>
@@ -2498,7 +2497,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.7.9</span>
+  <span>Pro 1.8.0</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6959,7 +6958,7 @@ function doPdf(sections){
       margin:[20,10,20,0]
     }:{text:''},
     {text:'Rapor tarihi: '+today,fontSize:9,color:'#999',alignment:'center',margin:[0,30,0,4]},
-    {text:'Bebek Takip Pro v1.7.9  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
+    {text:'Bebek Takip Pro v1.8.0  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
     {text:'',pageBreak:'after'}
   ];
 
@@ -7015,7 +7014,7 @@ function doPdf(sections){
     defaultStyle:{font:'Roboto',fontSize:9},
     footer:function(page,count){
       return {columns:[
-        {text:'Bebek Takip Pro v1.7.9  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
+        {text:'Bebek Takip Pro v1.8.0  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
         {text:'Sayfa '+page+' / '+count,fontSize:7,color:'#aaa',alignment:'right',margin:[0,0,28,0]}
       ],margin:[0,10,0,0]};
     },
@@ -7103,150 +7102,106 @@ function exportExcel(){
   finally{btn.textContent='Excel'; btn.disabled=false;}
 }
 
+</script>
+
+
+<script>
 function exportWord(){
   var selected=getSelected();
-  if(!selected.length){showToast('En az bir bölüm seçin!');return;}
+  if(!selected.length){showToast('En az bir b\u00f6l\u00fcm se\u00e7in!');return;}
   var btn=document.getElementById('wordBtn');
-  btn.textContent='Yükleniyor...'; btn.disabled=true;
-
-  function doWord(){
-    if(typeof docx==='undefined'){
-      showToast('Word kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.');
-      btn.textContent='Word'; btn.disabled=false; return;
-    }
-    btn.textContent='Hazırlanıyor...';
-    try{
-    var D=docx;
+  btn.textContent='Haz\u0131rlan\u0131yor...';btn.disabled=true;
+  try{
     var s=data.settings||{};
     var bName=fv2(s.babyName||'Bebek');
-    var today=new Date().getDate()+'. '+['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'][new Date().getMonth()]+' '+new Date().getFullYear();
+    var mn=['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
+    var td=new Date();
+    var today=td.getDate()+' '+mn[td.getMonth()]+' '+td.getFullYear();
+    var bw=s.birthWeight?parseFloat(s.birthWeight):0;
+    var bwStr=bw?(bw>=500?(bw/1000).toFixed(3)+' kg':bw+' kg'):'';
 
-    var GREEN='4FAC64';
-    var HDR={olay:'E59832',gelisim:'4F8CD2',kontrol:'D25A5A',gida:'B48246',gunluk:'825AC8',dis:'4FAC64',asi:'3CAABE'};
+    // RTF renk tablosu
+    var rtf='';
+    rtf+='{\\rtf1\\ansi\\ansicpg1254\\deff0';
+    rtf+='{\\fonttbl{\\f0\\froman\\fcharset162 Times New Roman;}{\\f1\\fswiss\\fcharset162 Arial;}}';
+    rtf+='{\\colortbl ;\\red79\\green172\\blue100;\\red50\\green55\\blue70;\\red255\\green255\\blue255;\\red246\\green248\\blue252;\\red240\\green244\\blue240;\\red229\\green152\\blue50;\\red79\\green140\\blue210;\\red210\\green90\\blue90;\\red180\\green130\\blue70;\\red130\\green90\\blue200;\\red60\\green170\\blue190;}';
+    rtf+='\\widowctrl\\hyphauto';
+    rtf+='\\margl720\\margr720\\margt720\\margb720';
 
-    function mRow(cells, isHeader, colorHex){
-      return new D.TableRow({
-        tableHeader: isHeader,
-        children: cells.map(function(c){
-          return new D.TableCell({
-            shading: isHeader ? {fill:colorHex,type:D.ShadingType.SOLID} : {fill:'FFFFFF',type:D.ShadingType.SOLID},
-            children:[new D.Paragraph({
-              children:[new D.TextRun({text:String(c||'-'),bold:isHeader,color:isHeader?'FFFFFF':'111111',size:isHeader?18:17})],
-              spacing:{before:40,after:40}
-            })]
-          });
-        })
-      });
-    }
-
-    function mSection(key, title, headers, rows){
-      var color=HDR[key]||GREEN;
-      var result=[];
-      result.push(new D.Paragraph({
-        children:[new D.TextRun({text:title,bold:true,color:'FFFFFF',size:26})],
-        shading:{fill:color,type:D.ShadingType.SOLID},
-        spacing:{before:300,after:0},
-        indent:{left:160,right:160}
-      }));
-      var tRows=[mRow(headers,true,color)];
-      if(!rows.length){
-        tRows.push(mRow(['Henüz kayıt yok.'],false,color));
-      } else {
-        rows.forEach(function(r){tRows.push(mRow(r,false,color));});
+    function esc(str){
+      if(!str||str==='-')return'-';
+      var s2=String(str);
+      var out='';
+      for(var i=0;i<s2.length;i++){
+        var c=s2.charCodeAt(i);
+        if(c===92)out+='\\\\';
+        else if(c===123)out+='\\{';
+        else if(c===125)out+='\\}';
+        else if(c>127)out+="\\'"+('00'+c.toString(16)).slice(-2);
+        else out+=s2[i];
       }
-      result.push(new D.Table({width:{size:100,type:D.WidthType.PERCENTAGE},rows:tRows}));
-      result.push(new D.Paragraph({text:'',spacing:{before:200}}));
-      return result;
+      return out;
     }
 
-    var docChildren=[];
-    docChildren.push(new D.Paragraph({
-      children:[new D.TextRun({text:bName+' — Gelişim Günlüğü',bold:true,size:44,color:GREEN})],
-      alignment:D.AlignmentType.CENTER,
-      spacing:{before:400,after:100}
-    }));
-    docChildren.push(new D.Paragraph({
-      children:[new D.TextRun({text:'Rapor: '+today,size:18,color:'999999'})],
-      alignment:D.AlignmentType.CENTER,
-      spacing:{before:0,after:400}
-    }));
+    function secTitle(title, colorNum){
+      return '{\\pard\\cb'+colorNum+'\\cf3\\b\\f1\\fs26 '+esc(title)+'\\b0\\par}';
+    }
+
+    function tableRow(cells, isHeader){
+      var colW=Math.floor(8640/cells.length);
+      var row='{\\trowd\\trgaph108\\trleft-108';
+      for(var i=0;i<cells.length;i++){row+='\\cellx'+(colW*(i+1));}
+      row+='\\pard\\intbl'+(isHeader?'\\cb2\\cf3\\b':'\\cb4\\cf0')+'\\f1\\fs18 ';
+      row+=cells.map(function(c){return esc(c)+'\\cell';}).join(' ');
+      row+='\\row}';
+      return row;
+    }
+
+    // Kapak
+    rtf+='{\\pard\\qc\\cf1\\b\\f1\\fs44 '+esc(bName)+' - Gelisim Gunlugu\\b0\\par}';
+    rtf+='{\\pard\\qc\\f1\\fs18\\cf0 Rapor: '+esc(today)+'\\par}';
+    rtf+='{\\pard\\par}';
 
     // Kimlik
-    var bw2=s.birthWeight ? parseFloat(s.birthWeight) : 0;
-    var kimlikData=[
-      ['Ad',bName],
-      ['Doğum Tarihi',s.birthDate ? fd2(s.birthDate) : '-'],
-      ['Doğum Saati',fv2(s.birthTime)],
-      ['Doğum Yeri',fv2(s.birthPlace)],
-      ['Doğum Kilosu',bw2 ? (bw2>=500 ? (bw2/1000).toFixed(3)+' kg' : bw2+' kg') : '-'],
-      ['Doğum Boyu',s.birthHeight ? s.birthHeight+' cm' : '-'],
-      ['Doğum Baş Çevresi',s.birthHead ? s.birthHead+' cm' : '-'],
-      ['Kan Grubu',fv2(s.bloodType)]
-    ];
-    docChildren.push(new D.Paragraph({
-      children:[new D.TextRun({text:'Kimlik Bilgileri',bold:true,color:'FFFFFF',size:24})],
-      shading:{fill:GREEN,type:D.ShadingType.SOLID},
-      spacing:{before:200,after:0},indent:{left:160}
-    }));
-    docChildren.push(new D.Table({
-      width:{size:100,type:D.WidthType.PERCENTAGE},
-      rows:kimlikData.filter(function(r){return r[1]&&r[1]!=='-';}).map(function(r){
-        return new D.TableRow({children:[
-          new D.TableCell({shading:{fill:'F0F4F0',type:D.ShadingType.SOLID},
-            children:[new D.Paragraph({children:[new D.TextRun({text:r[0],bold:true,size:18})],spacing:{before:40,after:40}})]}),
-          new D.TableCell({children:[new D.Paragraph({children:[new D.TextRun({text:r[1],size:18})],spacing:{before:40,after:40}})]})
-        ]});
-      })
-    }));
-    docChildren.push(new D.Paragraph({text:'',spacing:{before:300}}));
+    rtf+=secTitle('KiMLiK BiLGiLERi',1);
+    var kimlik=[['Ad',bName],['Dogum Tarihi',s.birthDate?fd2(s.birthDate):''],['Dogum Saati',fv2(s.birthTime)],['Dogum Yeri',fv2(s.birthPlace)],['Dogum Kilosu',bwStr],['Dogum Boyu',s.birthHeight?s.birthHeight+' cm':''],['Dogum Bas Cevresi',s.birthHead?s.birthHead+' cm':''],['Kan Grubu',fv2(s.bloodType)]];
+    kimlik.forEach(function(r){if(r[1]&&r[1]!=='-')rtf+=tableRow(r,false);});
+    rtf+='{\\pard\\par}';
 
     var SECS={
-      olay:{title:'Olaylar',h:['Tarih','Saat','Olay','Not'],r:function(){return srt2(data.olay,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.olay||x.baslik),fv2(x.not)];});}},
-      gelisim:{title:'Gelişim Ölçümleri',h:['Tarih','Ağırlık(kg)','Boy(cm)','Baş(cm)','Diğer','Not'],r:function(){return srt2(data.gelisim,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.agirlik),fv2(x.boy),fv2(x.bas),fv2(x.diger),fv2(x.notlar||x.not)];});}},
-      kontrol:{title:'Doktor Kontrolleri',h:['Tarih','Hastane','Doktor','Teşhis','Tedavi','Verilen İlaçlar','Tetkik','Dr Puanı','Hast. Puanı','Not'],r:function(){return srt2(data.kontrol,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.hastane),fv2(x.doktor),fv2(x.teshis),fv2(x.tedavi),fv2(x.ilac),fv2(x.tetkik),fv2(x.doktorPuan),fv2(x.hastanePuan),fv2(x.not)];});}},
-      gida:{title:'Gıda Takibi',h:['Tarih','Saat','Tür','Gıda Adı','İçerik','Miktar','Alerji','Not'],r:function(){return srt2(data.gida,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.tur),fv2(x.adi),fv2(x.icerik),fv2(x.miktar),fv2(x.alerji),fv2(x.not)];});}},
-      gunluk:{title:'Günlük',h:['Tarih','Başlık','Not / İçerik'],r:function(){return srt2(data.gunluk,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.baslik),fv2(x.not||x.icerik)];});}},
-      dis:{title:'Diş Takibi',h:['Diş Adı','Konum','Çıkma Tarihi','Düşme Tarihi','Not'],r:function(){return srt2(data.dis,'cikma',false).map(function(x){return[fv2(x.dis),fv2(x.konum),fd2(x.cikma||x.tarih),fd2(x.dusme),fv2(x.not)];});}},
-      asi:{title:'Aşı Takvimi',h:['Tarih','Dönem','Aşı Adı','Durum','Uygulama Yeri','Açıklama'],r:function(){return srt2(data.asi,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.donem),fv2(x.asi||x.ad),fv2(x.durum),fv2(x.uygulamaYeri),fv2(x.aciklama)];});}}
+      olay:{title:'OLAYLAR',col:6,h:['Tarih','Saat','Olay','Not'],r:function(){return srt2(data.olay,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.olay||x.baslik),fv2(x.not)];});}},
+      gelisim:{title:'GELiSiM',col:7,h:['Tarih','Agirlik(kg)','Boy(cm)','Bas(cm)','Diger','Not'],r:function(){return srt2(data.gelisim,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.agirlik),fv2(x.boy),fv2(x.bas),fv2(x.diger),fv2(x.notlar||x.not)];});}},
+      kontrol:{title:'DOKTOR KONTROLLERi',col:8,h:['Tarih','Hastane','Doktor','Teshis','Tedavi','Ilaclar','Tetkik','Dr Puani','Hast Puani','Not'],r:function(){return srt2(data.kontrol,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.hastane),fv2(x.doktor),fv2(x.teshis),fv2(x.tedavi),fv2(x.ilac),fv2(x.tetkik),fv2(x.doktorPuan),fv2(x.hastanePuan),fv2(x.not)];});}},
+      gida:{title:'GIDA TAKiBi',col:9,h:['Tarih','Saat','Tur','Gida Adi','Icerik','Miktar','Alerji','Not'],r:function(){return srt2(data.gida,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.saat),fv2(x.tur),fv2(x.adi),fv2(x.icerik),fv2(x.miktar),fv2(x.alerji),fv2(x.not)];});}},
+      gunluk:{title:'GUNLUK',col:10,h:['Tarih','Baslik','Not / Icerik'],r:function(){return srt2(data.gunluk,'tarih',false).map(function(x){return[fd2(x.tarih),fv2(x.baslik),fv2(x.not||x.icerik)];});}},
+      dis:{title:'DiS TAKiBi',col:1,h:['Dis Adi','Konum','Cikma Tarihi','Dusme Tarihi','Not'],r:function(){return srt2(data.dis,'cikma',false).map(function(x){return[fv2(x.dis),fv2(x.konum),fd2(x.cikma||x.tarih),fd2(x.dusme),fv2(x.not)];});}},
+      asi:{title:'ASi TAKViMi',col:11,h:['Tarih','Donem','Asi Adi','Durum','Yer','Aciklama'],r:function(){return srt2(data.asi,'tarih',true).map(function(x){return[fd2(x.tarih),fv2(x.donem),fv2(x.asi||x.ad),fv2(x.durum),fv2(x.uygulamaYeri),fv2(x.aciklama)];});}}
     };
 
     selected.forEach(function(key){
-      var sec=SECS[key]; if(!sec) return;
-      mSection(key,sec.title,sec.h,sec.r()).forEach(function(el){docChildren.push(el);});
+      var sec=SECS[key];if(!sec)return;
+      rtf+=secTitle(sec.title, sec.col);
+      rtf+=tableRow(sec.h, true);
+      var rows=sec.r();
+      if(!rows.length){rtf+=tableRow(['Henuz kayit yok.'],false);}
+      else{rows.forEach(function(r){rtf+=tableRow(r,false);});}
+      rtf+='{\\pard\\par}';
     });
 
-    docChildren.push(new D.Paragraph({
-      children:[new D.TextRun({text:'Bebek Takip Pro v1.7.9 | sebasmobil | '+today,size:14,color:'AAAAAA'})],
-      alignment:D.AlignmentType.CENTER,spacing:{before:400}
-    }));
+    rtf+='{\\pard\\qc\\f1\\fs14\\cf0 Bebek Takip Pro v1.8.0 | sebasmobil | '+esc(today)+'\\par}';
+    rtf+='}';
 
-    var document2=new D.Document({sections:[{
-      properties:{page:{margin:{top:800,right:800,bottom:800,left:800}}},
-      children:docChildren
-    }]});
-
-    D.Packer.toBlob(document2).then(function(blob){
-      var url=URL.createObjectURL(blob);
-      var a=window.document.createElement('a');
-      var fname=bName.replace(/[ ]+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.docx';
-      a.href=url; a.download=fname;
-      window.document.body.appendChild(a); a.click();
-      setTimeout(function(){window.document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
-      closePdfModal();
-      showToast('Word indirildi!');
-    }).catch(function(e){showToast('Hata: '+e.message);console.error(e);});
-    } catch(e){showToast('Hata: '+e.message);console.error(e); btn.textContent='Word'; btn.disabled=false;}
-  }
-
-  if(typeof docx!=='undefined'){
-    doWord();
-  } else {
-    var sc=document.createElement('script');
-    sc.src='https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js';
-    sc.onload=function(){setTimeout(doWord,100);};
-    sc.onerror=function(){showToast('Word kütüphanesi yüklenemedi.');btn.textContent='Word';btn.disabled=false;};
-    document.head.appendChild(sc);
-  }
+    var blob=new Blob([rtf],{type:'application/rtf'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var fname=bName.replace(/[ ]+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')+'_'+new Date().toISOString().split('T')[0]+'.rtf';
+    a.href=url;a.download=fname;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
+    closePdfModal();
+    showToast('Word belgesi indirildi!');
+  }catch(e){showToast('Hata: '+e.message);console.error(e);}
+  finally{btn.textContent='Word';btn.disabled=false;}
 }
 </script>
 
