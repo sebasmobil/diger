@@ -1,5 +1,5 @@
 <!--
-  Bebek Takip Pro v1.7.8
+  Bebek Takip Pro v1.7.9
   Copyright (C) 2026 sebasmobil
 
   This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,13 @@
 <meta name="apple-mobile-web-app-title" content="Bebek Takip">
 <meta name="application-name" content="Bebek Takip">
 <meta name="theme-color" content="#4CAF50" id="metaThemeColor">
-<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.8">
+<meta name="description" content="Bebeğinizin sağlık ve gelişim günlüğü — Pro v1.7.9">
 <link rel="apple-touch-icon" id="appleTouchIcon">
 <link rel="icon" type="image/png" id="faviconLink">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap" rel="stylesheet">
-<title>Bebek Takip Pro v1.7.8</title>
+<title>Bebek Takip Pro v1.7.9</title>
 <style>
 /* ===== FONTS ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Fredoka+One&subset=latin,latin-ext&display=swap');
@@ -2184,7 +2184,7 @@ mark.hl {
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 <body>
@@ -2498,7 +2498,7 @@ mark.hl {
 
 <!-- INFO BAR -->
 <div class="info-bar" id="infoBar">
-  <span>Pro 1.7.8</span>
+  <span>Pro 1.7.9</span>
   <span class="info-bar-sep">|</span>
   <span>©sebasmobil</span>
   <span class="info-bar-sep">|</span>
@@ -6959,7 +6959,7 @@ function doPdf(sections){
       margin:[20,10,20,0]
     }:{text:''},
     {text:'Rapor tarihi: '+today,fontSize:9,color:'#999',alignment:'center',margin:[0,30,0,4]},
-    {text:'Bebek Takip Pro v1.7.8  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
+    {text:'Bebek Takip Pro v1.7.9  |  sebasmobil',fontSize:8,color:'#bbb',alignment:'center'},
     {text:'',pageBreak:'after'}
   ];
 
@@ -7015,7 +7015,7 @@ function doPdf(sections){
     defaultStyle:{font:'Roboto',fontSize:9},
     footer:function(page,count){
       return {columns:[
-        {text:'Bebek Takip Pro v1.7.8  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
+        {text:'Bebek Takip Pro v1.7.9  |  sebasmobil',fontSize:7,color:'#aaa',margin:[28,0,0,0]},
         {text:'Sayfa '+page+' / '+count,fontSize:7,color:'#aaa',alignment:'right',margin:[0,0,28,0]}
       ],margin:[0,10,0,0]};
     },
@@ -7106,10 +7106,16 @@ function exportExcel(){
 function exportWord(){
   var selected=getSelected();
   if(!selected.length){showToast('En az bir bölüm seçin!');return;}
-  if(typeof docx==='undefined'){showToast('Word kütüphanesi yüklenemedi.');return;}
   var btn=document.getElementById('wordBtn');
-  btn.textContent='Hazırlanıyor...'; btn.disabled=true;
-  try{
+  btn.textContent='Yükleniyor...'; btn.disabled=true;
+
+  function doWord(){
+    if(typeof docx==='undefined'){
+      showToast('Word kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.');
+      btn.textContent='Word'; btn.disabled=false; return;
+    }
+    btn.textContent='Hazırlanıyor...';
+    try{
     var D=docx;
     var s=data.settings||{};
     var bName=fv2(s.babyName||'Bebek');
@@ -7210,7 +7216,7 @@ function exportWord(){
     });
 
     docChildren.push(new D.Paragraph({
-      children:[new D.TextRun({text:'Bebek Takip Pro v1.7.8 | sebasmobil | '+today,size:14,color:'AAAAAA'})],
+      children:[new D.TextRun({text:'Bebek Takip Pro v1.7.9 | sebasmobil | '+today,size:14,color:'AAAAAA'})],
       alignment:D.AlignmentType.CENTER,spacing:{before:400}
     }));
 
@@ -7229,8 +7235,18 @@ function exportWord(){
       closePdfModal();
       showToast('Word indirildi!');
     }).catch(function(e){showToast('Hata: '+e.message);console.error(e);});
-  } catch(e){showToast('Hata: '+e.message);console.error(e);}
-  finally{btn.textContent='Word'; btn.disabled=false;}
+    } catch(e){showToast('Hata: '+e.message);console.error(e); btn.textContent='Word'; btn.disabled=false;}
+  }
+
+  if(typeof docx!=='undefined'){
+    doWord();
+  } else {
+    var sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js';
+    sc.onload=function(){setTimeout(doWord,100);};
+    sc.onerror=function(){showToast('Word kütüphanesi yüklenemedi.');btn.textContent='Word';btn.disabled=false;};
+    document.head.appendChild(sc);
+  }
 }
 </script>
 
