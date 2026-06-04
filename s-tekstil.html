@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TextilTrack v1.1.0</title>
+<title>TextilTrack v1.0.13</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ===== iPhone Zoom Fix: input focus zoom engeli ===== */
@@ -189,7 +189,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(240,165,0,0.06);}
 .nav-item .icon{font-size:16px;width:20px;text-align:center;}
 .nav-badge{margin-left:auto;background:var(--accent3);color:white;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:600;}
-.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);}
+.sidebar-footer{flex-shrink:0;padding:16px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);}
+.sidebar-scroll{flex:1;overflow-y:auto;padding-bottom:8px;}
+.sidebar-scroll::-webkit-scrollbar{width:3px;}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
 /* ===== DESKTOP MAIN ===== */
 .main{margin-left:var(--sidebar-w);min-height:100vh;}
@@ -466,6 +469,43 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
 .oneri-item:active { background: rgba(240,165,0,.12); }
 .oneri-wrap { position: relative; }
 
+
+/* ===== AYARLAR LİSTE =====*/
+.ayarlar-item {
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px;
+}
+.ayarlar-item-name {
+  flex:1; font-size:14px; color:var(--text); font-family:var(--font-mono);
+}
+.ayarlar-item-edit {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; padding:7px 10px; color:var(--text);
+  font-family:var(--font-mono); font-size:14px; flex:1; outline:none;
+}
+.ayarlar-item-edit:focus { border-color:var(--accent); }
+.ayarlar-btn { 
+  width:32px; height:32px; border-radius:8px; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:14px; flex-shrink:0; transition:all .15s;
+}
+.ayarlar-btn:active { transform:scale(.93); }
+.ayarlar-btn-edit { background:rgba(74,158,255,.12); color:var(--info); }
+.ayarlar-btn-save { background:rgba(45,186,130,.15); color:var(--success); }
+.ayarlar-btn-del  { background:rgba(224,92,92,.12); color:var(--danger); }
+.ayarlar-btn-cancel { background:var(--surface2); color:var(--text3); }
+
+
+.durum-secici-btn {
+  width:100%; background:var(--surface2); border:2px solid var(--border);
+  border-radius:12px; padding:12px; cursor:pointer; transition:all .15s;
+  display:flex; align-items:center; justify-content:center;
+}
+.durum-secici-btn:active { transform:scale(.97); }
+.durum-secici-btn:hover { border-color:var(--accent); background:rgba(240,165,0,.06); }
+.durum-secici-btn.aktif { border-color:var(--accent); background:rgba(240,165,0,.08); }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width:768px){
   .sidebar{transform:translateX(-100%);width:280px;}
@@ -493,7 +533,8 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
   .search-box{display:none;}
   .topbar .btn{display:none;}
   .section-header .btn{font-size:11px;padding:6px 10px;}
-  .toast-container{bottom:80px;right:12px;}
+  .toast-container{top:66px;right:12px;left:12px;}
+  .toast{max-width:100%;}
 }
 
 @media (min-width:769px){
@@ -514,21 +555,19 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
     <div class="logo-mark">⬡ TextilTrack</div>
     <div class="logo-sub">Üretim Takip Sistemi</div>
   </div>
+  <div class="sidebar-scroll">
   <div class="nav-section">Ana Menü</div>
   <div class="nav-item active" onclick="navigate('dashboard')"><span class="icon">◈</span> Dashboard</div>
   <div class="nav-item" onclick="navigate('siparisler')"><span class="icon">◉</span> Siparişler <span class="nav-badge" id="siparis-badge">5</span></div>
-  <div class="nav-item" onclick="navigate('malzeme-giris')"><span class="icon">↓</span> Malzeme Girişi</div>
-  <div class="nav-item" onclick="navigate('malzeme-cikis')"><span class="icon">↑</span> Malzeme Çıkışı</div>
-  <div class="nav-section">Stok & Takip</div>
+  <div class="nav-section">Stok</div>
   <div class="nav-item" onclick="navigate('stok')"><span class="icon">▦</span> Stok Durumu</div>
-  <div class="nav-item" onclick="navigate('stok');filterStokKat('Fermuvar')" id="nav-fv"><span class="icon">⋮⋮</span> Fermuvalar</div>
-  <div class="nav-item" onclick="navigate('stok');filterStokKat('İp')" id="nav-ip"><span class="icon">≈</span> İpler</div>
-  <div class="nav-item" onclick="navigate('stok');filterStokKat('Kumaş')" id="nav-kumas"><span class="icon">◈</span> Kumaşlar</div>
-  <div class="nav-item" onclick="navigate('stok');filterStokKat('Aksesuar')" id="nav-aks"><span class="icon">◎</span> Aksesuar</div>
-  <div class="nav-item" onclick="navigate('stok');filterStokKat('Paketleme')" id="nav-pkt"><span class="icon">◻</span> Paketleme</div>
+  <div class="nav-item" onclick="openStokEkle()"><span class="icon">＋</span> Stok Ekle / Çıkar</div>
   <div class="nav-section">Raporlar</div>
   <div class="nav-item" onclick="navigate('hareketler')"><span class="icon">↕</span> Hareketler</div>
   <div class="nav-item" onclick="navigate('notlar')"><span class="icon">✎</span> Notlar</div>
+  <div class="nav-section">Sistem</div>
+  <div class="nav-item" onclick="navigate('ayarlar')"><span class="icon">⚙</span> Liste Yönetimi</div>
+  </div><!-- /sidebar-scroll -->
   <div class="sidebar-footer">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <span id="version-label" style="font-family:var(--font-mono);font-weight:600;color:var(--accent);font-size:12px">v1.0.1</span>
@@ -552,7 +591,7 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
     <span id="topbar-clock" style="font-family:var(--font-mono);font-size:11px;color:var(--text3);white-space:nowrap"></span>
     <input type="text" class="search-box" placeholder="🔍  Sipariş, malzeme ara..." id="global-search" oninput="globalSearch(this.value)">
     <button class="btn btn-primary" onclick="openYeniSiparis()">+ Sipariş</button>
-    <button class="btn btn-ghost" onclick="openStokEkle()">📦 Stok</button>
+    <button class="btn btn-ghost" onclick="openStokEkle()">＋ Stok</button>
   </div>
 
   <!-- MOBILE TOPBAR -->
@@ -679,6 +718,33 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
       <div id="notlar-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
     </div>
 
+
+    <!-- AYARLAR / LİSTE YÖNETİMİ -->
+    <div id="page-ayarlar" class="page">
+      <div class="section-header">
+        <div class="section-title">Liste Yönetimi</div>
+        <span style="font-size:11px;color:var(--text3)">Tüm listeler uygulama genelinde geçerlidir</span>
+      </div>
+      <div class="tabs" style="flex-wrap:wrap;gap:0;margin-bottom:20px">
+        <div class="tab active" id="atab-musteriler" onclick="ayarlarTab('musteriler',this)">👥 Müşteriler</div>
+        <div class="tab" id="atab-kategoriler" onclick="ayarlarTab('kategoriler',this)">🗂 Kategoriler</div>
+        <div class="tab" id="atab-malzemeler" onclick="ayarlarTab('malzemeler',this)">📦 Malzemeler</div>
+        <div class="tab" id="atab-fvBoylar" onclick="ayarlarTab('fvBoylar',this)">⋮⋮ Fermuvar Boyları</div>
+        <div class="tab" id="atab-ipKodlar" onclick="ayarlarTab('ipKodlar',this)">≈ İp Kodları</div>
+        <div class="tab" id="atab-ipTurler" onclick="ayarlarTab('ipTurler',this)">≈ İp Türleri</div>
+        <div class="tab" id="atab-birimler" onclick="ayarlarTab('birimler',this)">📐 Birimler</div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--text2);margin-bottom:10px" id="ayarlar-liste-adi">Müşteriler</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="form-input" id="ayarlar-yeni-input" placeholder="Yeni öge adı..." style="flex:1" autocomplete="off" autocorrect="off"
+            onkeydown="if(event.key==='Enter'){ayarlarEkle();event.preventDefault();}">
+          <button class="btn btn-primary" onclick="ayarlarEkle()" style="white-space:nowrap">+ Ekle</button>
+        </div>
+      </div>
+      <div id="ayarlar-liste" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -687,8 +753,8 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
   <div class="bn-item active" id="bn-dashboard" onclick="navigate('dashboard')"><span class="bn-icon">◈</span>Ana Sayfa</div>
   <div class="bn-item" id="bn-siparisler" onclick="navigate('siparisler')"><span class="bn-icon">◉</span>Siparişler</div>
   <div class="bn-item" id="bn-stok" onclick="navigate('stok')"><span class="bn-icon">▦</span>Stok</div>
-  <div class="bn-item" id="bn-fermuvalar" onclick="navigate('fermuvalar')"><span class="bn-icon">⋮⋮</span>Fermuvar</div>
-  <div class="bn-item" id="bn-notlar" onclick="navigate('notlar')"><span class="bn-icon">✎</span>Notlar</div>
+  <div class="bn-item" id="bn-hareketler" onclick="navigate('hareketler')"><span class="bn-icon">↕</span>Hareketler</div>
+  <div class="bn-item" id="bn-ayarlar" onclick="navigate('ayarlar')"><span class="bn-icon">⚙</span>Ayarlar</div>
 </nav>
 
 <!-- MOBILE FAB -->
@@ -724,7 +790,7 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
       <!-- KATEGORİ -->
       <div class="form-group">
         <label class="form-label">Kategori</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <div id="stok-kat-tabs" style="display:flex;flex-wrap:wrap;gap:6px">
           <button class="stok-kat-btn active" data-kat="İp" onclick="seçKat('İp',this)">≈ İp</button>
           <button class="stok-kat-btn" data-kat="Fermuvar" onclick="seçKat('Fermuvar',this)">⋮⋮ Fermuvar</button>
           <button class="stok-kat-btn" data-kat="Kumaş" onclick="seçKat('Kumaş',this)">◈ Kumaş</button>
@@ -938,6 +1004,49 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
     </div>
     <div class="modal-body" id="md-body"></div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-malzeme-detay')">Kapat</button></div>
+  </div>
+</div>
+
+
+<!-- Onay Modal -->
+<div class="modal-overlay" id="modal-onay">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title">Onay</div>
+      <div class="modal-close" onclick="closeModal('modal-onay')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p id="onay-mesaj" style="font-size:14px;color:var(--text2);line-height:1.7;margin:0"></p>
+    </div>
+    <div class="modal-footer" style="gap:8px">
+      <button class="btn btn-ghost" onclick="closeModal('modal-onay')" style="flex:1">Vazgeç</button>
+      <button class="btn btn-danger" id="onay-btn" style="flex:1">Sil</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Durum Seçici Popup -->
+<div class="modal-overlay" id="modal-durum">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-header">
+      <div class="modal-title" id="durum-popup-baslik">Durum Değiştir</div>
+      <div class="modal-close" onclick="closeModal('modal-durum')">✕</div>
+    </div>
+    <div class="modal-body" style="padding:12px 16px">
+      <div id="durum-popup-siparis" style="font-size:12px;color:var(--text3);margin-bottom:12px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="durum-secici-btn" data-durum="beklemede" onclick="setDurum('beklemede')">
+          <span class="badge badge-neutral" style="font-size:13px;padding:6px 12px">⏳ Beklemede</span>
+        </button>
+        <button class="durum-secici-btn" data-durum="uretimde" onclick="setDurum('uretimde')">
+          <span class="badge badge-warning" style="font-size:13px;padding:6px 12px">⚙ Üretimde</span>
+        </button>
+        <button class="durum-secici-btn" data-durum="tamamlandi" onclick="setDurum('tamamlandi')">
+          <span class="badge badge-success" style="font-size:13px;padding:6px 12px">✓ Tamamlandı</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1270,9 +1379,9 @@ function navigate(page) {
   const el = document.getElementById('page-'+page);
   if(el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.onclick&&n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');});
-  const bnMap={dashboard:'bn-dashboard',siparisler:'bn-siparisler',stok:'bn-stok',fermuvalar:'bn-fermuvalar',notlar:'bn-notlar'};
+  const bnMap={dashboard:'bn-dashboard',siparisler:'bn-siparisler',stok:'bn-stok',hareketler:'bn-hareketler',ayarlar:'bn-ayarlar'};
   if(bnMap[page]){const b=document.getElementById(bnMap[page]);if(b)b.classList.add('active');}
-  const titles={dashboard:'Dashboard',siparisler:'Siparişler','malzeme-giris':'Malzeme Girişi','malzeme-cikis':'Malzeme Çıkışı',stok:'Stok',fermuvalar:'Fermuvalar',ipler:'İpler',diger:'Diğer',hareketler:'Hareketler',notlar:'Notlar'};
+  const titles={dashboard:'Dashboard',siparisler:'Siparişler','malzeme-giris':'Malzeme Girişi','malzeme-cikis':'Malzeme Çıkışı',stok:'Stok',fermuvalar:'Fermuvalar',ipler:'İpler',diger:'Diğer',hareketler:'Hareketler',notlar:'Notlar',ayarlar:'Liste Yönetimi'};
   const t = titles[page]||page;
   document.getElementById('page-title').textContent=t;
   document.getElementById('m-page-title').textContent=t;
@@ -1281,7 +1390,7 @@ function navigate(page) {
 }
 
 function renderPage(p){
-  ({dashboard:renderDashboard,siparisler:()=>renderSiparisler(),'malzeme-giris':renderGirisler,'malzeme-cikis':renderCikislar,stok:renderStok,fermuvalar:renderFermuvalar,ipler:renderIpler,diger:renderDiger,hareketler:renderHareketler,notlar:renderNotlar}[p]||function(){})();
+  ({dashboard:renderDashboard,siparisler:()=>renderSiparisler(),'malzeme-giris':renderGirisler,'malzeme-cikis':renderCikislar,stok:renderStok,fermuvalar:renderFermuvalar,ipler:renderIpler,diger:renderDiger,hareketler:renderHareketler,notlar:renderNotlar,ayarlar:()=>renderAyarlar()}[p]||function(){})();
 }
 
 // ===== RENDERS =====
@@ -1337,13 +1446,13 @@ function renderSiparisler(filter){
   <td>${durumBadge(s.durum)}</td>
   <td class="actions-cell">
     <button class="btn btn-ghost btn-sm" onclick="showDetay(${s.id})">Detay</button>
-    <button class="btn btn-ghost btn-sm" onclick="toggleDurum(${s.id})">↻</button>
-    ${s.durum!=='tamamlandi'?`<button class="btn btn-success btn-sm" onclick="siparisGeldi(${s.id})" title="Geldi — Stoğa yansıt">✓ Geldi</button>`:''}
+    <button class="btn btn-ghost btn-sm" onclick="openDurumSecici(${s.id})" style="font-size:11px">Durum</button>
+    ${s.durum!=='tamamlandi'?`<button class="btn btn-sm" style="background:rgba(240,165,0,.15);border:1px solid var(--accent);color:var(--accent);font-size:11px" onclick="konfirmGeldi(${s.id})" title="Sipariş geldi — stoğa yansıt">📦 Geldi İşaretle</button>`:''}
   </td>
 </tr>`).join('');
   // Mobile
   const mc=document.getElementById('tbl-siparisler-m');
-  if(mc)mc.innerHTML=data.map(s=>`<div class="m-card"><div class="m-card-top"><div class="m-card-title">${s.musteri} — ${s.order}</div>${durumBadge(s.durum)}</div><div class="m-card-body"><div class="m-card-row"><span class="m-card-key">Ürün Kodu</span><span class="m-card-val td-mono">${s.urunKod}</span></div><div class="m-card-row"><span class="m-card-key">Gelen İş</span><span class="m-card-val">${(s.gelenIs||0).toLocaleString()} adet</span></div><div class="m-card-row"><span class="m-card-key">📅 Sipariş</span><span class="m-card-val" style="font-size:12px">${fd(s.tarih)}</span></div>${s.geldiTarih?`<div class="m-card-row"><span class="m-card-key" style="color:var(--success)">✓ Geldi</span><span class="m-card-val" style="font-size:12px;color:var(--success)">${fd(s.geldiTarih)}</span></div>`:''}</div><div class="m-card-actions"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="showDetay(${s.id})">Detay →</button><button class="btn btn-ghost btn-sm" onclick="toggleDurum(${s.id})">↻</button>${s.durum!=='tamamlandi'?`<button class="btn btn-success btn-sm" onclick="siparisGeldi(${s.id})">✓ Geldi</button>`:''}</div></div>`).join('');
+  if(mc)mc.innerHTML=data.map(s=>`<div class="m-card"><div class="m-card-top"><div class="m-card-title">${s.musteri} — ${s.order}</div>${durumBadge(s.durum)}</div><div class="m-card-body"><div class="m-card-row"><span class="m-card-key">Ürün Kodu</span><span class="m-card-val td-mono">${s.urunKod}</span></div><div class="m-card-row"><span class="m-card-key">Gelen İş</span><span class="m-card-val">${(s.gelenIs||0).toLocaleString()} adet</span></div><div class="m-card-row"><span class="m-card-key">📅 Sipariş</span><span class="m-card-val" style="font-size:12px">${fd(s.tarih)}</span></div>${s.geldiTarih?`<div class="m-card-row"><span class="m-card-key" style="color:var(--success)">✓ Geldi</span><span class="m-card-val" style="font-size:12px;color:var(--success)">${fd(s.geldiTarih)}</span></div>`:''}</div><div class="m-card-actions"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="showDetay(${s.id})">Detay →</button><button class="btn btn-ghost btn-sm" onclick="openDurumSecici(${s.id})" style="font-size:11px">Durum</button>${s.durum!=='tamamlandi'?`<button class="btn btn-sm" style="background:rgba(240,165,0,.15);border:1px solid var(--accent);color:var(--accent);font-size:11px" onclick="konfirmGeldi(${s.id})">📦 Geldi İşaretle</button>`:''}</div></div>`).join('');
 }
 
 function filterSiparisler(f,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderSiparisler(f);}
@@ -1759,12 +1868,7 @@ function saveNot(){
 
 function deleteNot(id){state.notlar=state.notlar.filter(n=>n.id!==id);renderNotlar();toast('Not silindi','info');}
 
-function toggleDurum(id){
-  const s=state.siparisler.find(x=>x.id===id);if(!s)return;
-  const c=['beklemede','uretimde','tamamlandi'];s.durum=c[(c.indexOf(s.durum)+1)%3];
-  document.getElementById('siparis-badge').textContent=state.siparisler.filter(x=>x.durum!=='tamamlandi').length;
-  renderSiparisler();toast(`${s.musteri} ${s.order} → ${s.durum}`,'info');
-}
+
 
 
 // ===== MALZEME DETAY =====
@@ -1899,7 +2003,7 @@ function kaydetHizliHareket(){
 }
 
 // ===== VERSİYON =====
-const APP_VERSION='1.1.0';
+const APP_VERSION='1.0.13';
 
 
 // ===== STOK EKLE / ÇIKAR =====
@@ -2092,6 +2196,226 @@ function initAllOneri(){
     state.lists.malzemeler.forEach(m=>items.add(m));
     return [...items];
   });
+}
+
+
+
+
+
+function konfirmGeldi(id){
+  const s = state.siparisler.find(x=>x.id===id);
+  if(!s) return;
+  onayModal(
+    `<strong>${s.musteri} — ${s.order}</strong> siparişi için <strong>${(s.gelenIs||0).toLocaleString()} adet</strong> stoğa eklenecek ve durum "Üretimde" olarak güncellenecek.<br><br><span style="color:var(--text3);font-size:12px">Bu işlem geri alınamaz.</span>`,
+    ()=>siparisGeldi(id),
+    '📦 Evet, Geldi İşaretle'
+  );
+}
+
+// ===== DURUM SEÇİCİ =====
+let _durumSiparisId = null;
+function openDurumSecici(id){
+  _durumSiparisId = id;
+  const s = state.siparisler.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('durum-popup-baslik').textContent = s.musteri+' — '+s.order;
+  document.getElementById('durum-popup-siparis').textContent = 'Mevcut: '+({beklemede:'Beklemede',uretimde:'Üretimde',tamamlandi:'Tamamlandı'}[s.durum]||s.durum);
+  // Aktif durumu vurgula
+  document.querySelectorAll('.durum-secici-btn').forEach(b=>{
+    b.classList.toggle('aktif', b.dataset.durum===s.durum);
+  });
+  openModal('modal-durum');
+}
+function setDurum(yeniDurum){
+  const s = state.siparisler.find(x=>x.id===_durumSiparisId);
+  if(!s){ closeModal('modal-durum'); return; }
+  s.durum = yeniDurum;
+  s.durumTarih = nowStr();
+  closeModal('modal-durum');
+  document.getElementById('siparis-badge').textContent = state.siparisler.filter(x=>x.durum!=='tamamlandi').length;
+  const labels = {beklemede:'Beklemede',uretimde:'Üretimde',tamamlandi:'Tamamlandı'};
+  toast(s.musteri+' '+s.order+' → '+labels[yeniDurum],'success');
+  const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
+  if(activePage) renderPage(activePage);
+}
+
+// ===== ONAY MODAL =====
+function onayModal(mesaj, onayFn, butonText){
+  document.getElementById('onay-mesaj').innerHTML = mesaj;
+  const btn = document.getElementById('onay-btn');
+  btn.textContent = butonText || '🗑 Sil';
+  btn.onclick = ()=>{ closeModal('modal-onay'); onayFn(); };
+  openModal('modal-onay');
+}
+
+// ===== AYARLAR / LİSTE YÖNETİMİ =====
+let aktifAyarlarKey = 'musteriler';
+
+const ayarlarMetaData = {
+  musteriler: { label:'Müşteriler', icon:'👥', desc:'Sipariş formunda görünen müşteri listesi' },
+  kategoriler: { label:'Kategoriler', icon:'🗂', desc:'Stok kategorileri — Stok Ekle formunda ve filtrelerinde' },
+  malzemeler:  { label:'Malzemeler', icon:'📦', desc:'Malzeme Giriş/Çıkış formunda öneri listesi' },
+  fvBoylar:    { label:'Fermuvar Boyları', icon:'⋮⋮', desc:'Fermuvar formu ve stok adlarında kullanılır' },
+  ipKodlar:    { label:'İp Kodları', icon:'≈', desc:'İp girişi ve sipariş formu ürün kodu listesi' },
+  ipTurler:    { label:'İp Türleri', icon:'≈', desc:'İp girişi türü seçimi' },
+  birimler:    { label:'Birimler', icon:'📐', desc:'Tüm formlardaki birim seçimi' },
+};
+
+function ayarlarTab(key, el){
+  aktifAyarlarKey = key;
+  document.querySelectorAll('[id^="atab-"]').forEach(t=>t.classList.remove('active'));
+  const tabEl = el || document.getElementById('atab-'+key);
+  if(tabEl) tabEl.classList.add('active');
+  renderAyarlarListe();
+}
+
+function renderAyarlar(){
+  ayarlarTab(aktifAyarlarKey);
+}
+
+function renderAyarlarListe(){
+  const key = aktifAyarlarKey;
+  const meta = ayarlarMetaData[key]||{label:key,desc:''};
+  const el = document.getElementById('ayarlar-liste-adi');
+  if(el) el.innerHTML = `<strong>${meta.icon} ${meta.label}</strong> <span style="font-weight:400;color:var(--text3);font-size:11px">— ${meta.desc}</span>`;
+
+  // Kategoriler için stok sayfasındaki tab'ları da güncelle
+  const inp = document.getElementById('ayarlar-yeni-input');
+  if(inp){ inp.value=''; inp.placeholder='Yeni '+meta.label+' ekle...'; }
+
+  const listEl = document.getElementById('ayarlar-liste');
+  if(!listEl) return;
+  const items = state.lists[key]||[];
+
+  if(!items.length){
+    listEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Liste boş — yukarıdan ekleyebilirsiniz</div>';
+    return;
+  }
+
+  listEl.innerHTML = items.map((item,i)=>`
+    <div class="ayarlar-item" id="aitem-${i}">
+      <div class="ayarlar-item-name" id="aname-${i}">${escH(item)}</div>
+      <input class="ayarlar-item-edit" id="aedit-${i}" value="${escH(item)}" style="display:none"
+        onkeydown="if(event.key==='Enter')ayarlarKaydet('${key}',${i})">
+      <button class="ayarlar-btn ayarlar-btn-edit" onclick="ayarlarDuzenle(${i})" title="Düzenle">✏</button>
+      <button class="ayarlar-btn ayarlar-btn-save" id="asave-${i}" onclick="ayarlarKaydet('${key}',${i})" style="display:none" title="Kaydet">✓</button>
+      <button class="ayarlar-btn ayarlar-btn-cancel" id="acancel-${i}" onclick="ayarlarIptal(${i})" style="display:none" title="İptal">✕</button>
+      <button class="ayarlar-btn ayarlar-btn-del" onclick="ayarlarSil('${key}',${i})" title="Sil">🗑</button>
+    </div>
+  `).join('');
+}
+
+function ayarlarDuzenle(i){
+  // Önce tüm düzenleme modlarını kapat
+  document.querySelectorAll('.ayarlar-item-edit').forEach(e=>{ e.style.display='none'; });
+  document.querySelectorAll('[id^="asave-"]').forEach(e=>e.style.display='none');
+  document.querySelectorAll('[id^="acancel-"]').forEach(e=>e.style.display='none');
+  document.querySelectorAll('[id^="aname-"]').forEach(e=>e.style.display='block');
+  document.querySelectorAll('.ayarlar-btn-edit').forEach(e=>e.style.display='flex');
+
+  // Bu item'ı düzenleme moduna al
+  const nameEl = document.getElementById('aname-'+i);
+  const editEl = document.getElementById('aedit-'+i);
+  const saveEl = document.getElementById('asave-'+i);
+  const cancelEl = document.getElementById('acancel-'+i);
+  const editBtn = document.querySelector(`#aitem-${i} .ayarlar-btn-edit`);
+  if(nameEl) nameEl.style.display='none';
+  if(editEl){ editEl.style.display='block'; setTimeout(()=>editEl.focus(),80); }
+  if(saveEl) saveEl.style.display='flex';
+  if(cancelEl) cancelEl.style.display='flex';
+  if(editBtn) editBtn.style.display='none';
+}
+
+function ayarlarIptal(i){
+  renderAyarlarListe();
+}
+
+function ayarlarKaydet(key, i){
+  const editEl = document.getElementById('aedit-'+i);
+  if(!editEl) return;
+  const yeniDeger = editEl.value.trim();
+  if(!yeniDeger){ toast('Boş bırakılamaz','error'); return; }
+  const eskiDeger = state.lists[key][i];
+  if(yeniDeger === eskiDeger){ ayarlarIptal(i); return; }
+
+  // Liste güncelle
+  state.lists[key][i] = yeniDeger;
+
+  // Eğer kategori değiştiyse — stok'taki kategori adlarını da güncelle
+  if(key === 'kategoriler'){
+    Object.values(state.stok).forEach(s=>{ if(s.kategori===eskiDeger) s.kategori=yeniDeger; });
+    state.diger.forEach(d=>{ if(d.tur===eskiDeger) d.tur=yeniDeger; });
+    guncelleCategoryTabs();
+  }
+  // Müşteri değiştiyse siparişlerdeki müşteri adını güncelle
+  if(key === 'musteriler'){
+    state.siparisler.forEach(s=>{ if(s.musteri===eskiDeger) s.musteri=yeniDeger; });
+  }
+
+  renderAyarlarListe();
+  toast('"'+eskiDeger+'" → "'+yeniDeger+'" güncellendi','success');
+}
+
+function ayarlarSil(key, i){
+  const item = state.lists[key][i];
+  let ekBilgi = '';
+  if(key==='kategoriler'){
+    const etkilenen = Object.values(state.stok).filter(s=>s.kategori===item).length;
+    if(etkilenen>0) ekBilgi = `<br><span style="color:var(--warning);font-size:12px">⚠ ${etkilenen} stok kalemi "Diğer" kategorisine taşınacak.</span>`;
+  }
+  if(key==='musteriler'){
+    const etkilenen = state.siparisler.filter(s=>s.musteri===item).length;
+    if(etkilenen>0) ekBilgi = `<br><span style="color:var(--warning);font-size:12px">⚠ ${etkilenen} sipariş bu müşteriyle kayıtlı — siparişler etkilenmez.</span>`;
+  }
+  onayModal(
+    `<strong>"${item}"</strong> listeden silinsin mi?${ekBilgi}`,
+    ()=>{
+      state.lists[key].splice(i,1);
+      if(key==='kategoriler'){
+        Object.values(state.stok).forEach(s=>{ if(s.kategori===item) s.kategori='Diğer'; });
+        guncelleCategoryTabs();
+      }
+      renderAyarlarListe();
+      toast('"'+item+'" silindi','info');
+    },
+    '🗑 Evet, Sil'
+  );
+}
+
+function ayarlarEkle(){
+  const key = aktifAyarlarKey;
+  const inp = document.getElementById('ayarlar-yeni-input');
+  const val = inp?.value.trim();
+  if(!val){ toast('Lütfen bir isim girin','error'); return; }
+  if(state.lists[key].includes(val)){ toast('"'+val+'" zaten listede var','error'); return; }
+  state.lists[key].push(val);
+
+  // Kategori eklendiyse stok sayfası tab'larını ve stok ekle formunu güncelle
+  if(key==='kategoriler') guncelleCategoryTabs();
+
+  inp.value='';
+  renderAyarlarListe();
+  toast('"'+val+'" eklendi','success');
+}
+
+function guncelleCategoryTabs(){
+  // Stok sayfası tab'larını yeniden yaz
+  const stokTabsEl = document.querySelector('#page-stok .tabs');
+  if(!stokTabsEl) return;
+  const cats = state.lists.kategoriler;
+  stokTabsEl.innerHTML = `<div class="tab active" id="tab-kat-hepsi" onclick="filterStokKat('hepsi',this)">Tümü</div>` +
+    cats.map(kat=>`<div class="tab" id="tab-kat-${escH(kat)}" onclick="filterStokKat('${kat.replace(/'/g,"\'").replace(/"/g,'&quot;')}',this)">${escH(kat)}</div>`).join('');
+
+  // Stok Ekle modal kategori butonlarını güncelle
+  const katTabsEl = document.getElementById('stok-kat-tabs');
+  if(!katTabsEl) return;
+  const icons={'İp':'≈','Fermuvar':'⋮⋮','Kumaş':'◈','Aksesuar':'◎','Paketleme':'◻'};
+  katTabsEl.innerHTML = cats.map((kat,idx)=>`
+    <button class="stok-kat-btn${idx===0?' active':''}" data-kat="${escH(kat)}"
+      onclick="seçKat('${kat.replace(/'/g,"\'")}',this)">
+      ${icons[kat]||'◆'} ${escH(kat)}
+    </button>`).join('');
+  if(cats.length) seKategori=cats[0];
 }
 
 // ===== TEMA =====
