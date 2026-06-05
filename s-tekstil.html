@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TextilTrack v1.0.13</title>
+<title>TextilTrack v1.0.18</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ===== iPhone Zoom Fix: input focus zoom engeli ===== */
@@ -218,14 +218,18 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .mobile-topbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--surface);border-bottom:1px solid var(--border);z-index:200;padding:0 16px;align-items:center;gap:12px;}
 .mobile-topbar .m-title{font-family:var(--font-head);font-size:17px;font-weight:700;flex:1;}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-nav-h);background:var(--surface);border-top:1px solid var(--border);z-index:200;align-items:center;justify-content:space-around;padding:0 4px;}
+.bn-fab-center{display:flex;align-items:center;justify-content:center;flex:1;}
+.bn-fab-btn{width:50px;height:50px;border-radius:50%;background:var(--accent);color:#000;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(240,165,0,.4);transition:all .2s;cursor:pointer;line-height:1;}
+.bn-fab-btn.open{transform:rotate(45deg);background:#ffc107;}
+.bn-fab-btn:active{transform:scale(.92);}
 .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px;cursor:pointer;color:var(--text3);font-size:9px;letter-spacing:0.5px;border-radius:8px;transition:all 0.15s;flex:1;min-width:0;}
 .bn-item .bn-icon{font-size:20px;line-height:1;}
 .bn-item.active{color:var(--accent);}
 .bn-item:active{background:var(--surface2);}
-.mobile-fab{display:none;position:fixed;bottom:80px;right:20px;z-index:300;}
+
 .fab-main{width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;font-size:26px;color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(240,165,0,0.4);transition:all 0.2s;}
 .fab-main:active{transform:scale(0.95);}
-.fab-menu{position:absolute;bottom:64px;right:0;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+
 .fab-item{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;color:var(--text);white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,0.4);}
 .fab-item:active{background:var(--surface2);}
 
@@ -486,9 +490,9 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
 }
 .ayarlar-item-edit:focus { border-color:var(--accent); }
 .ayarlar-btn { 
-  width:32px; height:32px; border-radius:8px; border:none;
+  width:38px; height:38px; border-radius:10px; border:none;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-size:14px; flex-shrink:0; transition:all .15s;
+  font-size:16px; flex-shrink:0; transition:all .15s;
 }
 .ayarlar-btn:active { transform:scale(.93); }
 .ayarlar-btn-edit { background:rgba(74,158,255,.12); color:var(--info); }
@@ -752,18 +756,19 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
 <nav class="bottom-nav">
   <div class="bn-item active" id="bn-dashboard" onclick="navigate('dashboard')"><span class="bn-icon">◈</span>Ana Sayfa</div>
   <div class="bn-item" id="bn-siparisler" onclick="navigate('siparisler')"><span class="bn-icon">◉</span>Siparişler</div>
+  <div class="bn-fab-center" onclick="toggleFab()">
+    <div class="bn-fab-btn" id="bn-fab-btn">＋</div>
+  </div>
   <div class="bn-item" id="bn-stok" onclick="navigate('stok')"><span class="bn-icon">▦</span>Stok</div>
   <div class="bn-item" id="bn-hareketler" onclick="navigate('hareketler')"><span class="bn-icon">↕</span>Hareketler</div>
-  <div class="bn-item" id="bn-ayarlar" onclick="navigate('ayarlar')"><span class="bn-icon">⚙</span>Ayarlar</div>
 </nav>
 
-<!-- MOBILE FAB -->
-<div class="mobile-fab" id="mobile-fab">
-  <div class="fab-menu" id="fab-menu" style="display:none">
-    <div class="fab-item" onclick="closeFab();openYeniSiparis()">📋 Yeni Sipariş</div>
-    <div class="fab-item" onclick="closeFab();openStokEkle()">📦 Stok Ekle / Çıkar</div>
-  </div>
-  <button class="fab-main" id="fab-btn" onclick="toggleFab()">＋</button>
+
+<!-- FAB MENU (bottom nav ortasından açılır) -->
+<div id="fab-overlay" onclick="closeFab()" style="display:none;position:fixed;inset:0;z-index:299;"></div>
+<div id="fab-menu-popup" style="display:none;position:fixed;bottom:calc(var(--bottom-nav-h) + 12px);left:50%;transform:translateX(-50%);z-index:300;display:none;flex-direction:column;gap:8px;align-items:center;">
+  <div class="fab-item" onclick="closeFab();openYeniSiparis()">📋 Yeni Sipariş</div>
+  <div class="fab-item" onclick="closeFab();openStokEkle()">📦 Stok Ekle / Çıkar</div>
 </div>
 
 <!-- MOBILE SEARCH OVERLAY -->
@@ -1379,7 +1384,7 @@ function navigate(page) {
   const el = document.getElementById('page-'+page);
   if(el) el.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.onclick&&n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');});
-  const bnMap={dashboard:'bn-dashboard',siparisler:'bn-siparisler',stok:'bn-stok',hareketler:'bn-hareketler',ayarlar:'bn-ayarlar'};
+  const bnMap={dashboard:'bn-dashboard',siparisler:'bn-siparisler',stok:'bn-stok',hareketler:'bn-hareketler'};
   if(bnMap[page]){const b=document.getElementById(bnMap[page]);if(b)b.classList.add('active');}
   const titles={dashboard:'Dashboard',siparisler:'Siparişler','malzeme-giris':'Malzeme Girişi','malzeme-cikis':'Malzeme Çıkışı',stok:'Stok',fermuvalar:'Fermuvalar',ipler:'İpler',diger:'Diğer',hareketler:'Hareketler',notlar:'Notlar',ayarlar:'Liste Yönetimi'};
   const t = titles[page]||page;
@@ -1387,6 +1392,7 @@ function navigate(page) {
   document.getElementById('m-page-title').textContent=t;
   closeSidebar();
   renderPage(page);
+
 }
 
 function renderPage(p){
@@ -1624,14 +1630,23 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('mob
 let fabOpen=false;
 function toggleFab(){
   fabOpen=!fabOpen;
-  const m=document.getElementById('fab-menu');
-  const b=document.getElementById('fab-btn');
-  m.style.display=fabOpen?'flex':'none';
-  b.textContent=fabOpen?'✕':'＋';
-  b.style.transform=fabOpen?'rotate(45deg)':'';
+  const menu=document.getElementById('fab-menu-popup');
+  const btn=document.getElementById('bn-fab-btn');
+  const overlay=document.getElementById('fab-overlay');
+  if(menu) menu.style.display=fabOpen?'flex':'none';
+  if(btn) btn.classList.toggle('open',fabOpen);
+  if(overlay) overlay.style.display=fabOpen?'block':'none';
 }
-function closeFab(){fabOpen=false;document.getElementById('fab-menu').style.display='none';document.getElementById('fab-btn').textContent='＋';document.getElementById('fab-btn').style.transform='';}
-document.addEventListener('click',e=>{if(fabOpen&&!document.getElementById('mobile-fab').contains(e.target))closeFab();});
+function closeFab(){
+  fabOpen=false;
+  const menu=document.getElementById('fab-menu-popup');
+  const btn=document.getElementById('bn-fab-btn');
+  const overlay=document.getElementById('fab-overlay');
+  if(menu) menu.style.display='none';
+  if(btn) btn.classList.remove('open');
+  if(overlay) overlay.style.display='none';
+}
+
 
 // ===== MOBILE SEARCH =====
 function openMobileSearch(){document.getElementById('mobile-search').classList.add('open');setTimeout(()=>document.getElementById('m-search-input').focus(),100);}
@@ -2003,7 +2018,7 @@ function kaydetHizliHareket(){
 }
 
 // ===== VERSİYON =====
-const APP_VERSION='1.0.13';
+const APP_VERSION='1.0.18';
 
 
 // ===== STOK EKLE / ÇIKAR =====
@@ -2154,7 +2169,6 @@ function initOneri(inputId, getItemsFn){
   const wrap = inp.parentElement;
   
   function showOneri(q){
-    // Eski listeyi kaldır
     const old = wrap.querySelector('.oneri-list');
     if(old) old.remove();
     const items = getItemsFn();
@@ -2167,8 +2181,18 @@ function initOneri(inputId, getItemsFn){
       const div = document.createElement('div');
       div.className = 'oneri-item';
       div.textContent = item;
+      // Scroll sırasında seçimi önle: touchstart'ta koordinat kaydet, touchend'de hareket varsa iptal et
+      let touchStartY = 0;
+      div.addEventListener('touchstart', e=>{ touchStartY = e.touches[0].clientY; }, {passive:true});
+      div.addEventListener('touchend', e=>{
+        const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if(dy > 8) return; // scroll hareketi — seçme
+        e.preventDefault();
+        inp.value = item;
+        hideOneri();
+        inp.dispatchEvent(new Event('change'));
+      });
       div.addEventListener('mousedown', e=>{ e.preventDefault(); inp.value=item; hideOneri(); inp.dispatchEvent(new Event('change')); });
-      div.addEventListener('touchend', e=>{ e.preventDefault(); inp.value=item; hideOneri(); inp.dispatchEvent(new Event('change')); });
       ul.appendChild(div);
     });
     wrap.appendChild(ul);
@@ -2297,10 +2321,12 @@ function renderAyarlarListe(){
       <div class="ayarlar-item-name" id="aname-${i}">${escH(item)}</div>
       <input class="ayarlar-item-edit" id="aedit-${i}" value="${escH(item)}" style="display:none"
         onkeydown="if(event.key==='Enter')ayarlarKaydet('${key}',${i})">
-      <button class="ayarlar-btn ayarlar-btn-edit" onclick="ayarlarDuzenle(${i})" title="Düzenle">✏</button>
-      <button class="ayarlar-btn ayarlar-btn-save" id="asave-${i}" onclick="ayarlarKaydet('${key}',${i})" style="display:none" title="Kaydet">✓</button>
-      <button class="ayarlar-btn ayarlar-btn-cancel" id="acancel-${i}" onclick="ayarlarIptal(${i})" style="display:none" title="İptal">✕</button>
-      <button class="ayarlar-btn ayarlar-btn-del" onclick="ayarlarSil('${key}',${i})" title="Sil">🗑</button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="ayarlar-btn ayarlar-btn-edit" id="aeditbtn-${i}" onclick="ayarlarDuzenle(${i})" title="Düzenle">✏</button>
+        <button class="ayarlar-btn ayarlar-btn-save" id="asave-${i}" onclick="ayarlarKaydet('${key}',${i})" style="display:none" title="Kaydet">✓</button>
+        <button class="ayarlar-btn ayarlar-btn-cancel" id="acancel-${i}" onclick="ayarlarIptal(${i})" style="display:none" title="İptal">✕</button>
+        <button class="ayarlar-btn ayarlar-btn-del" onclick="ayarlarSil('${key}',${i})" title="Sil">🗑</button>
+      </div>
     </div>
   `).join('');
 }
@@ -2318,7 +2344,7 @@ function ayarlarDuzenle(i){
   const editEl = document.getElementById('aedit-'+i);
   const saveEl = document.getElementById('asave-'+i);
   const cancelEl = document.getElementById('acancel-'+i);
-  const editBtn = document.querySelector(`#aitem-${i} .ayarlar-btn-edit`);
+  const editBtn = document.getElementById('aeditbtn-'+i);
   if(nameEl) nameEl.style.display='none';
   if(editEl){ editEl.style.display='block'; setTimeout(()=>editEl.focus(),80); }
   if(saveEl) saveEl.style.display='flex';
