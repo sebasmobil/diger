@@ -583,12 +583,12 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
   .m-card-list{display:flex;}
   .form-grid{grid-template-columns:1fr;}
   /* Modal becomes bottom sheet on mobile */
-  .modal-overlay{align-items:flex-end;padding:0;}
-  .modal{border-radius:20px 20px 0 0;width:100%;max-width:100%;max-height:92vh;}
+  .modal-overlay{align-items:flex-end;padding:0;padding-top:78px;}
+  .modal{border-radius:20px 20px 0 0;width:100%;max-width:100%;max-height:calc(100vh - 78px);}
   .search-box{display:none;}
   .topbar .btn{display:none;}
   .section-header .btn{font-size:11px;padding:6px 10px;}
-  .toast-container{top:66px;right:12px;left:12px;}
+  .toast-container{top:82px;right:12px;left:12px;}
   .toast{max-width:100%;}
 }
 
@@ -641,7 +641,7 @@ tbody tr:hover{background:rgba(255,255,255,0.02);}
 <!-- SIDEBAR OVERLAY (mobile) -->
 
 <!-- INFO BAR -->
-<div class="info-bar" id="info-bar" style="position:fixed;top:0;left:0;right:0;z-index:500">
+<div class="info-bar" id="info-bar" style="position:fixed;top:0;left:0;right:0;z-index:150">
   <span class="info-bar-version">S-Tekstil Pro <span id="ib-version">v1.0.19</span></span>
   <span class="info-bar-sep">·</span>
   <span>©sebasmobil</span>
@@ -1839,19 +1839,28 @@ function openNotEkle(){ document.getElementById('not-baslik').value=''; document
 
 function openModal(id){
   closeAllSD();
-  document.getElementById(id).classList.add('open');
+  const el = document.getElementById(id);
+  if(!el) return;
+  // Scroll pozisyonunu kaydet
+  const scrollY = window.scrollY;
+  el.classList.add('open');
   document.body.style.overflow='hidden';
   document.body.style.position='fixed';
+  document.body.style.top='-'+scrollY+'px';
   document.body.style.width='100%';
+  document.body._savedScrollY = scrollY;
   setTimeout(initAllOneri, 120);
 }
 function closeModal(id){
   closeAllSD();
   document.getElementById(id).classList.remove('open');
-  // iOS: scroll kilidini kaldır
+  // Scroll pozisyonunu geri yükle
+  const scrollY = document.body._savedScrollY || 0;
   document.body.style.overflow = '';
   document.body.style.position = '';
+  document.body.style.top = '';
   document.body.style.width = '';
+  window.scrollTo(0, scrollY);
 }
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{
   if(e.target===o){
@@ -2113,7 +2122,7 @@ function kaydetHizliHareket(){
 }
 
 // ===== VERSİYON =====
-const APP_VERSION='1.0.22';
+const APP_VERSION='1.0.23';
 
 
 // ===== STOK EKLE / ÇIKAR =====
