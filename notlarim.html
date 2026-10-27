@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.79
+  Version : Pro 1.0.81
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -283,8 +283,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .detail-link-box{display:flex;align-items:center;gap:8px;padding:11px 13px;background:var(--surface2);border-radius:var(--r2);margin:12px 0;color:var(--blue);font-size:0.83rem;border:1px solid rgba(92,160,224,0.2);word-break:break-all;cursor:pointer;transition:border-color 0.15s}
 .detail-link-box:active{border-color:var(--blue)}
 .detail-meta{font-size:0.68rem;color:var(--text3);margin-top:14px}
-.detail-actions{display:flex;gap:8px;padding:12px 20px 20px}
-.detail-actions .btn{padding:10px;font-size:0.82rem}
+.detail-actions{display:flex;gap:6px;padding:10px 16px 28px;background:var(--surface);border-top:1px solid var(--border2);flex-shrink:0}
+.detail-actions .btn{padding:7px 0;font-size:0.78rem;flex:1;border-radius:10px;font-weight:600}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface);border:1px solid var(--border);border-radius:30px;padding:9px 18px;font-size:0.8rem;font-weight:600;box-shadow:var(--shadow);z-index:999;opacity:0;transition:all 0.22s ease;pointer-events:none;white-space:nowrap;color:var(--text)}
@@ -386,7 +386,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.79</span>
+  <span>Pro 1.0.81</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -780,15 +780,15 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <!-- DETAY MODAL -->
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal('detailModal')">
-  <div class="modal">
+  <div class="modal" style="max-height:96vh;height:96vh">
     <div class="modal-handle"></div>
-    <div class="modal-scroll" style="padding:0 0 4px">
+    <div class="modal-scroll" style="padding:0 0 8px;flex:1">
       <div id="detailContent"></div>
-      <div class="detail-actions">
-        <button class="btn btn-secondary" onclick="editCurrentNote()">✏️ Düzenle</button>
-        <button class="btn btn-danger" onclick="deleteCurrentNote()">🗑 Sil</button>
-        <button class="btn btn-secondary" onclick="closeModal('detailModal')">Kapat</button>
-      </div>
+    </div>
+    <div class="detail-actions">
+      <button class="btn btn-secondary" onclick="editCurrentNote()">✏️ Düzenle</button>
+      <button class="btn btn-danger" onclick="deleteCurrentNote()">🗑 Sil</button>
+      <button class="btn btn-secondary" onclick="closeModal('detailModal')">✕ Kapat</button>
     </div>
   </div>
 </div>
@@ -2062,7 +2062,7 @@ async function openDetail(id){
       return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
     }).join('');
     const progressHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:0.72rem;color:var(--text3)">${doneCount}/${totalCount} tamamlandı</span><div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${totalCount?Math.round(doneCount/totalCount*100):0}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div></div>`;
-    html+=`<div style="margin-top:10px">${progressHtml}<div style="display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto;padding-right:2px" id="liste-scroll-${n.id}">${itemsHtml}</div></div>`;
+    html+=`<div style="margin-top:10px">${progressHtml}<div style="display:flex;flex-direction:column;gap:5px;padding-right:2px" id="liste-scroll-${n.id}">${itemsHtml}</div></div>`;
   }
   if(n.type==='konum'){if(n.konumAdres)html+=`<div class="detail-card-box"><span>📍 ${esc(n.konumAdres)}</span><button class="copy-btn" onclick="copyText('${n.konumAdres.replace(/'/g,"\\'")}')">📋</button></div>`;if(n.konumLink)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.konumLink)}">🗺 Haritada Aç <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;}
   if(n.type==='ses'){
@@ -2211,7 +2211,7 @@ function noteCardHtml(n,i){
         const txt=typeof it==='object'?(it.text||''):it;
         return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
       }).join('');
-      const moreHtml=remaining>0?`<div style="font-size:0.72rem;color:var(--text3);padding:3px 10px;text-align:center">+${remaining} öğe daha →</div>`:'';
+      const moreHtml=remaining>0?`<div style="font-size:0.75rem;font-weight:700;color:var(--accent);padding:5px 10px;text-align:center;background:var(--surface3);border-radius:8px;margin-top:2px;letter-spacing:0.02em">+${remaining} öğe daha · tümünü gör →</div>`:'';
       extras+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${itemsHtml}${moreHtml}</div>`;
     }
     // Kart detay modu açıksa tip'e özgü alanlar
