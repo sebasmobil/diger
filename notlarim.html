@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.81
+  Version : Pro 1.0.82
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -386,7 +386,8 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.81</span>
+  <span>Pro 1.0.82</span>
+
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -638,7 +639,10 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
       <div class="field" id="field-liste" style="display:none">
         <label>Liste Öğeleri</label>
         <div id="liste-items-wrap" style="display:flex;flex-direction:column;gap:6px"></div>
-        <button type="button" onclick="addListeItem()" style="margin-top:8px;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r2);padding:8px;color:var(--accent);font-size:0.82rem;font-weight:600;cursor:pointer;width:100%">＋ Öğe Ekle</button>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" onclick="addListeItem()" style="flex:1;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r2);padding:8px;color:var(--accent);font-size:0.82rem;font-weight:600;cursor:pointer">＋ Öğe Ekle</button>
+          <button type="button" onclick="addListeBaslik()" style="flex:1;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r2);padding:8px;color:var(--text2);font-size:0.82rem;font-weight:600;cursor:pointer">≡ Başlık Ekle</button>
+        </div>
       </div>
 
       <!-- KONUM -->
@@ -1373,18 +1377,37 @@ function addListeItem(val,checked){
     <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
   wrap.appendChild(div);
 }
+function addListeBaslik(val){
+  val=val||'';
+  const wrap=document.getElementById('liste-items-wrap');
+  const div=document.createElement('div');
+  div.className='liste-item liste-baslik-item';
+  div.style.cssText='display:flex;align-items:center;gap:8px';
+  div.innerHTML=`<span style="font-size:0.9rem;flex-shrink:0;color:var(--text3)">≡</span>
+    <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Bölüm başlığı..." data-baslik="1" style="flex:1;padding:9px 11px;font-weight:700;font-size:0.9rem;color:var(--text);background:var(--surface3);border-color:var(--border2)">
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
+  wrap.appendChild(div);
+  div.querySelector('input').focus();
+}
 function getListeData(){
   return [...document.querySelectorAll('.liste-item')].map(d=>{
-    const cb=d.querySelector('button[data-done]');
+    const isBaslik=d.classList.contains('liste-baslik-item');
     const tx=d.querySelector('input[type=text]');
-    return {text:tx?tx.value:'',done:cb?cb.dataset.done==='1':false};
-  }).filter(x=>x.text.trim());
+    if(!tx||!tx.value.trim())return null;
+    if(isBaslik)return{type:'baslik',text:tx.value};
+    const cb=d.querySelector('button[data-done]');
+    return {text:tx.value,done:cb?cb.dataset.done==='1':false};
+  }).filter(Boolean);
 }
 function populateListe(items){
   items=items||[];
   document.getElementById('liste-items-wrap').innerHTML='';
-  if(items.length)items.forEach(it=>addListeItem(it.text||it,it.done));
-  else addListeItem();
+  if(items.length){
+    items.forEach(it=>{
+      if(it.type==='baslik')addListeBaslik(it.text||it);
+      else addListeItem(it.text||it,it.done);
+    });
+  } else addListeItem();
 }
 
 // ── SES KAYDI ──
@@ -2054,14 +2077,20 @@ async function openDetail(id){
   if(n.type==='sifre'&&n.sifrePass)html+=`<div class="detail-card-box" id="pass-row-${id}"><span>🔑 ••••••••</span><button class="copy-btn" onclick="revealPass('${id}','${n.sifrePass.replace(/'/g,"\\'")}')">👁</button><button class="copy-btn" onclick="copyText('${n.sifrePass.replace(/'/g,"\\'")}')">📋</button></div>`;
   if(n.type==='alinti'&&n.alintiKaynak)html+=`<div style="margin-top:8px;font-size:0.72rem;color:var(--text3);font-style:italic">— ${esc(n.alintiKaynak)}</div>`;
   if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
-    const doneCount=n.listeItems.filter(it=>typeof it==='object'?it.done:false).length;
-    const totalCount=n.listeItems.length;
+    const checkItems=n.listeItems.filter(it=>typeof it==='object'?it.type!=='baslik':true);
+    const doneCount=checkItems.filter(it=>typeof it==='object'?it.done:false).length;
+    const totalCount=checkItems.length;
     const itemsHtml=n.listeItems.map((it,i)=>{
+      const isBaslik=typeof it==='object'&&it.type==='baslik';
+      if(isBaslik){
+        const btxt=it.text||'';
+        return`<div style="display:flex;align-items:center;gap:8px;margin-top:10px;margin-bottom:2px"><span style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent)">${esc(btxt)}</span><div style="flex:1;height:1px;background:var(--border)"></div></div>`;
+      }
       const done=typeof it==='object'?it.done:false;
       const txt=typeof it==='object'?(it.text||''):it;
       return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
     }).join('');
-    const progressHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:0.72rem;color:var(--text3)">${doneCount}/${totalCount} tamamlandı</span><div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${totalCount?Math.round(doneCount/totalCount*100):0}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div></div>`;
+    const progressHtml=totalCount>0?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:0.72rem;color:var(--text3)">${doneCount}/${totalCount} tamamlandı</span><div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${Math.round(doneCount/totalCount*100)}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div></div>`:'';
     html+=`<div style="margin-top:10px">${progressHtml}<div style="display:flex;flex-direction:column;gap:5px;padding-right:2px" id="liste-scroll-${n.id}">${itemsHtml}</div></div>`;
   }
   if(n.type==='konum'){if(n.konumAdres)html+=`<div class="detail-card-box"><span>📍 ${esc(n.konumAdres)}</span><button class="copy-btn" onclick="copyText('${n.konumAdres.replace(/'/g,"\\'")}')">📋</button></div>`;if(n.konumLink)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.konumLink)}">🗺 Haritada Aç <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;}
@@ -2204,12 +2233,14 @@ function noteCardHtml(n,i){
     // Liste öğeleri — her zaman göster (showCardDetail bağımsız)
     if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
       const maxShow=5;
-      const shown=n.listeItems.slice(0,maxShow);
-      const remaining=n.listeItems.length-maxShow;
+      const checkOnly=n.listeItems.filter(it=>!(typeof it==='object'&&it.type==='baslik'));
+      const shown=checkOnly.slice(0,maxShow);
+      const remaining=checkOnly.length-maxShow;
       const itemsHtml=shown.map((it,i)=>{
         const done=typeof it==='object'?it.done:false;
         const txt=typeof it==='object'?(it.text||''):it;
-        return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
+        const realIdx=n.listeItems.indexOf(it);
+        return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${realIdx})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
       }).join('');
       const moreHtml=remaining>0?`<div style="font-size:0.75rem;font-weight:700;color:var(--accent);padding:5px 10px;text-align:center;background:var(--surface3);border-radius:8px;margin-top:2px;letter-spacing:0.02em">+${remaining} öğe daha · tümünü gör →</div>`:'';
       extras+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${itemsHtml}${moreHtml}</div>`;
