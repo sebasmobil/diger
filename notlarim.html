@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.82
+  Version : Pro 1.0.84
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -386,7 +386,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.82</span>
+  <span>Pro 1.0.84</span>
 
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
@@ -1365,6 +1365,73 @@ function setType(t,el){
 // ── ŞİFRE ──
 function togglePassVis(){const i=document.getElementById('f-sifre-pass');i.type=i.type==='password'?'text':'password';}
 
+// ── LİSTE SÜRÜKLE-BIRAK ──
+let _dragEl=null,_dragGhost=null,_dragY=0,_dragOffY=0;
+function _listeDragHandle(el){
+  const handle=el.querySelector('.liste-drag-handle');
+  if(!handle)return;
+  function onStart(e){
+    e.preventDefault();
+    _dragEl=el;
+    const wrap=document.getElementById('liste-items-wrap');
+    const rect=el.getBoundingClientRect();
+    const clientY=e.touches?e.touches[0].clientY:e.clientY;
+    _dragOffY=clientY-rect.top;
+    // ghost
+    _dragGhost=el.cloneNode(true);
+    _dragGhost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.85;z-index:9999;pointer-events:none;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);background:var(--surface3)`;
+    document.body.appendChild(_dragGhost);
+    el.style.opacity='0.3';
+    function onMove(e2){
+      const cy=e2.touches?e2.touches[0].clientY:e2.clientY;
+      _dragGhost.style.top=(cy-_dragOffY)+'px';
+      // find target
+      const items=[...wrap.querySelectorAll('.liste-item')].filter(x=>x!==_dragEl);
+      let target=null,before=true;
+      for(const item of items){
+        const r=item.getBoundingClientRect();
+        const mid=r.top+r.height/2;
+        if(cy<mid){target=item;before=true;break;}
+        target=item;before=false;
+      }
+      // indicator
+      wrap.querySelectorAll('.drag-indicator').forEach(x=>x.remove());
+      if(target){
+        const ind=document.createElement('div');
+        ind.className='drag-indicator';
+        ind.style.cssText='height:2px;background:var(--accent);border-radius:2px;margin:1px 0;transition:none';
+        before?target.before(ind):target.after(ind);
+      }
+    }
+    function onEnd(e2){
+      const cy=e2.touches?e2.changedTouches[0].clientY:e2.clientY;
+      _dragGhost.remove();_dragGhost=null;
+      _dragEl.style.opacity='1';
+      wrap.querySelectorAll('.drag-indicator').forEach(x=>x.remove());
+      const items=[...wrap.querySelectorAll('.liste-item')].filter(x=>x!==_dragEl);
+      let target=null,before=true;
+      for(const item of items){
+        const r=item.getBoundingClientRect();
+        const mid=r.top+r.height/2;
+        if(cy<mid){target=item;before=true;break;}
+        target=item;before=false;
+      }
+      if(target){before?target.before(_dragEl):target.after(_dragEl);}
+      _dragEl=null;
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('mouseup',onEnd);
+      document.removeEventListener('touchmove',onMove);
+      document.removeEventListener('touchend',onEnd);
+    }
+    document.addEventListener('mousemove',onMove,{passive:false});
+    document.addEventListener('mouseup',onEnd);
+    document.addEventListener('touchmove',onMove,{passive:false});
+    document.addEventListener('touchend',onEnd);
+  }
+  handle.addEventListener('mousedown',onStart);
+  handle.addEventListener('touchstart',onStart,{passive:false});
+}
+
 // ── LİSTE ──
 function addListeItem(val,checked){
   val=val||'';checked=checked||false;
@@ -1372,10 +1439,11 @@ function addListeItem(val,checked){
   const div=document.createElement('div');
   div.className='liste-item';
   div.style.cssText='display:flex;align-items:center;gap:8px';
-  div.innerHTML=`<button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">${checked?'✅':'⬜'}</button>
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">${checked?'✅':'⬜'}</button>
     <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
     <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
   wrap.appendChild(div);
+  _listeDragHandle(div);
 }
 function addListeBaslik(val){
   val=val||'';
@@ -1383,10 +1451,34 @@ function addListeBaslik(val){
   const div=document.createElement('div');
   div.className='liste-item liste-baslik-item';
   div.style.cssText='display:flex;align-items:center;gap:8px';
-  div.innerHTML=`<span style="font-size:0.9rem;flex-shrink:0;color:var(--text3)">≡</span>
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><span style="font-size:0.9rem;flex-shrink:0;color:var(--accent)">≡</span>
     <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Bölüm başlığı..." data-baslik="1" style="flex:1;padding:9px 11px;font-weight:700;font-size:0.9rem;color:var(--text);background:var(--surface3);border-color:var(--border2)">
+    <button type="button" onclick="addListeItemAfterBaslik(this.closest('.liste-baslik-item'))" style="background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:4px;line-height:1;font-weight:700" title="Bu bölüme öğe ekle">＋</button>
     <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
   wrap.appendChild(div);
+  _listeDragHandle(div);
+  div.querySelector('input').focus();
+}
+function addListeItemAfterBaslik(baslikEl){
+  // Bir sonraki baslik-item'dan önce, ya da wrap sonuna ekle
+  const wrap=document.getElementById('liste-items-wrap');
+  const allItems=[...wrap.querySelectorAll('.liste-item')];
+  const baslikIdx=allItems.indexOf(baslikEl);
+  // Bu başlıktan sonraki ilk başlığı bul
+  let insertBefore=null;
+  for(let i=baslikIdx+1;i<allItems.length;i++){
+    if(allItems[i].classList.contains('liste-baslik-item')){insertBefore=allItems[i];break;}
+  }
+  // Yeni öğeyi oluştur
+  const div=document.createElement('div');
+  div.className='liste-item';
+  div.style.cssText='display:flex;align-items:center;gap:8px';
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="0" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">⬜</button>
+    <input type="text" value="" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
+  if(insertBefore) wrap.insertBefore(div,insertBefore);
+  else wrap.appendChild(div);
+  _listeDragHandle(div);
   div.querySelector('input').focus();
 }
 function getListeData(){
