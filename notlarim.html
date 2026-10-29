@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.88
+  Version : Pro 1.0.90
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -386,7 +386,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.88</span>
+  <span>Pro 1.0.90</span>
 
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
@@ -2457,7 +2457,9 @@ function renderNotes(){
       }
     }
     if(!q)return true;
-    return trLower(n.title).includes(q)||trLower(n.text).includes(q)||trLower(n.link).includes(q)||trLower(n.tag).includes(q)||trLower(n.card).includes(q);
+    const listeMatch=n.listeItems&&n.listeItems.some(it=>trLower(typeof it==='object'?it.text||'':it).includes(q));
+    const extraMatch=trLower(n.sifreUser).includes(q)||trLower(n.kisiAd).includes(q)||trLower(n.kisiTel).includes(q)||trLower(n.kisiEposta).includes(q)||trLower(n.konumAdres).includes(q)||trLower(n.ilacAd).includes(q)||trLower(n.ilacDoz).includes(q)||trLower(n.otpServis).includes(q)||trLower(n.alintiKaynak).includes(q);
+    return trLower(n.title).includes(q)||trLower(n.text).includes(q)||trLower(n.link).includes(q)||trLower(n.tag).includes(q)||trLower(n.card).includes(q)||listeMatch||extraMatch;
   });
   document.getElementById('notesCount').textContent=filtered.length?`${filtered.length} not`:'';
   if(!filtered.length){
@@ -2945,7 +2947,7 @@ function renderLinkNoteList() {
   const q = document.getElementById('linkNoteSearch').value.toLowerCase();
   const list = document.getElementById('linkNoteList');
   const candidates = notes.filter(n => n.id !== editId && (
-    !q || (n.title||n.text||'').toLowerCase().includes(q)
+    !q || (n.title||n.text||'').toLowerCase().includes(q)||(n.listeItems&&n.listeItems.some(it=>(typeof it==='object'?it.text||'':it).toLowerCase().includes(q)))||[(n.sifreUser||''),(n.kisiAd||''),(n.kisiTel||''),(n.kisiEposta||''),(n.konumAdres||''),(n.ilacAd||''),(n.ilacDoz||''),(n.otpServis||''),(n.alintiKaynak||'')].some(v=>v.toLowerCase().includes(q))
   )).slice(0,20);
 
   if(!candidates.length) { list.innerHTML=`<div style="color:var(--text3);font-size:0.82rem;padding:12px">Not bulunamadı</div>`; return; }
