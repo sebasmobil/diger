@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.90
+  Version : Pro 1.0.91
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -386,7 +386,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.90</span>
+  <span>Pro 1.0.91</span>
 
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
@@ -2396,7 +2396,7 @@ function noteCardHtml(n,i){
         const done=typeof it==='object'?it.done:false;
         const txt=typeof it==='object'?(it.text||''):it;
         const realIdx=n.listeItems.indexOf(it);
-        return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${realIdx})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span></div>`;
+        return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${realIdx})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${highlight(txt,q)}</span></div>`;
       }).join('');
       const moreHtml=remaining>0?`<div style="font-size:0.75rem;font-weight:700;color:var(--accent);padding:5px 10px;text-align:center;background:var(--surface3);border-radius:8px;margin-top:2px;letter-spacing:0.02em">+${remaining} öğe daha · tümünü gör →</div>`:'';
       extras+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${itemsHtml}${moreHtml}</div>`;
