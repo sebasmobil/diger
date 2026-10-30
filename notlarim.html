@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.91
+  Version : Pro 1.0.95
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -160,10 +160,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* COMPACT */
 [data-view="compact"] .notes-grid,[data-view="compact"] .group-inner-grid{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border2)}
 
-/* KART */
-.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.18s,box-shadow 0.18s,border-color 0.18s;animation:cardIn 0.28s ease both;position:relative;break-inside:avoid}
+/* KART — swipe wrapper */
+.note-card-wrap{position:relative;overflow:hidden;border-radius:var(--r);animation:cardIn 0.28s ease both;break-inside:avoid}
+.note-card-wrap .swipe-left-bg{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;gap:0;border-radius:0 var(--r) var(--r) 0;overflow:hidden;pointer-events:none}
+.note-card-wrap .swipe-right-bg{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;gap:0;border-radius:var(--r) 0 0 var(--r);overflow:hidden;pointer-events:none}
+.swipe-action{width:0;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;overflow:hidden;transition:width 0.0s;flex-shrink:0;flex-direction:column;gap:2px}
+.swipe-action span{font-size:0.6rem;font-weight:700;letter-spacing:0.03em;opacity:0}
+.swipe-action.edit{background:#5b8ff9}
+.swipe-action.pin{background:var(--accent)}
+.swipe-action.del{background:#e05c5c}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform 0.18s,box-shadow 0.18s,border-color 0.18s;position:relative;will-change:transform}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:none}}
-.note-card:active{transform:scale(0.98)}
 .note-card:hover{border-color:rgba(200,169,110,0.3);box-shadow:var(--shadow)}
 .note-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--tag-color,transparent);border-radius:var(--r) var(--r) 0 0}
 .note-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
@@ -180,13 +187,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-link-chip{display:flex;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;background:var(--surface2);border-radius:8px;font-size:0.73rem;font-weight:700;color:var(--accent);overflow:hidden;border-left:3px solid var(--accent)}
 [data-theme="light"] .note-link-chip{color:var(--accent)}
 .note-link-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.note-footer{padding:7px 13px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border2)}
+.note-footer{padding:6px 13px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border2)}
 [data-theme="dark"] .note-date{color:rgba(255,255,255,0.7)}
 .note-date{font-size:0.67rem;color:var(--card-date-color,var(--text3))}
 .note-actions{display:flex;gap:5px}
-.note-action-btn{width:26px;height:26px;border-radius:7px;border:none;background:var(--surface2);color:var(--text3);cursor:pointer;font-size:0.78rem;display:flex;align-items:center;justify-content:center;transition:var(--trans)}
-.note-action-btn:hover{background:rgba(200,169,110,0.15);color:var(--accent)}
-.note-action-btn.del:hover{background:rgba(224,92,92,0.15);color:var(--red)}
+.note-pin-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;opacity:0.85}
+.note-card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+/* CONTEXT MENÜ (uzun basma) */
+.ctx-menu{position:fixed;z-index:9000;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:200px;overflow:hidden;animation:ctxFadeIn 0.18s cubic-bezier(0.32,0.72,0,1)}
+@keyframes ctxFadeIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+.ctx-overlay{position:fixed;inset:0;z-index:8999;background:rgba(0,0,0,0.25);animation:fadeIn 0.15s ease}
+.ctx-item{display:flex;align-items:center;gap:12px;padding:13px 18px;font-size:0.88rem;font-weight:500;color:var(--text);cursor:pointer;border:none;width:100%;background:none;text-align:left;transition:background 0.12s}
+.ctx-item:hover,.ctx-item:active{background:var(--surface2)}
+.ctx-item.ctx-danger{color:var(--red)}
+.ctx-item .ctx-icon{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0}
+.ctx-sep{height:1px;background:var(--border2);margin:2px 0}
 
 /* LIST GÖRÜNÜM */
 [data-view="list"] .note-card,[data-view="list"] .group-inner-grid .note-card{border-radius:var(--r2);display:flex;align-items:stretch;overflow:hidden}
@@ -386,8 +402,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.91</span>
-
+  <span>Pro 1.0.95</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -798,6 +813,27 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
       <button class="btn btn-secondary" onclick="editCurrentNote()">✏️ Düzenle</button>
       <button class="btn btn-danger" onclick="deleteCurrentNote()">🗑 Sil</button>
       <button class="btn btn-secondary" onclick="closeModal('detailModal')">✕ Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- SİLME ONAY MODALİ -->
+<div class="modal-overlay" id="deleteConfirmModal">
+  <div class="modal" style="max-height:80vh;border-radius:var(--r)">
+    <div class="modal-handle"></div>
+    <div class="modal-scroll" style="padding:16px 18px 8px;flex:1">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span style="font-size:1.4rem">🗑</span>
+        <div>
+          <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px">Not Siliniyor</div>
+          <div style="font-size:0.8rem;color:var(--text3)">Bu işlem geri alınamaz</div>
+        </div>
+      </div>
+      <div id="deletePreviewContent" style="background:var(--surface2);border-radius:var(--r2);padding:14px 16px;border-left:3px solid var(--red)"></div>
+    </div>
+    <div class="detail-actions" style="gap:8px">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('deleteConfirmModal')">Vazgeç</button>
+      <button class="btn btn-danger" style="flex:1" id="deleteConfirmBtn" onclick="_confirmDelete()">🗑 Sil</button>
     </div>
   </div>
 </div>
@@ -2087,8 +2123,49 @@ function toggleListeItemCard(id, idx){
 }
 function editNote(id){const n=notes.find(n=>n.id===id);if(!n)return;editId=n.id;document.getElementById('editModalTitle').textContent='Notu Düzenle';populateForm(n);openModal('editModal')}
 function editCurrentNote(){closeModal('detailModal');setTimeout(()=>editNote(detailId),120)}
-function deleteNote(id,e){if(e)e.stopPropagation();if(!confirm('Bu not silinsin mi?'))return;notes=notes.filter(n=>n.id!==id);save();renderNotes();showToast('🗑 Silindi')}
-function deleteCurrentNote(){if(!detailId)return;if(!confirm('Bu not silinsin mi?'))return;notes=notes.filter(n=>n.id!==detailId);save();closeModal('detailModal');renderNotes();showToast('🗑 Silindi')}
+let _deleteTargetId=null;
+function deleteNote(id,e){if(e)e.stopPropagation();_openDeleteConfirm(id);}
+function deleteCurrentNote(){if(!detailId)return;_openDeleteConfirm(detailId);}
+function _openDeleteConfirm(id){
+  const n=notes.find(x=>x.id===id); if(!n) return;
+  _deleteTargetId=id;
+  // Özet içerik oluştur
+  const icon=TYE[n.type]||'📝';
+  const title=n.title||n.text||n.kisiAd||n.ilacAd||n.otpServis||'İsimsiz not';
+  let preview='';
+  if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
+    const items=n.listeItems.filter(it=>!(typeof it==='object'&&it.type==='baslik')).slice(0,4);
+    const doneC=items.filter(it=>typeof it==='object'?it.done:false).length;
+    preview=`<div style="font-size:0.75rem;color:var(--text3);margin-top:6px">${doneC}/${items.length} tamamlandı</div>`;
+    preview+=items.map(it=>{const done=typeof it==='object'?it.done:false;const txt=typeof it==='object'?it.text:it;return`<div style="font-size:0.82rem;color:var(--text2);margin-top:4px;display:flex;gap:6px"><span>${done?'✅':'⬜'}</span><span style="${done?'text-decoration:line-through;opacity:0.5':''}">${escPure(txt)}</span></div>`;}).join('');
+    if(n.listeItems.length>4) preview+=`<div style="font-size:0.72rem;color:var(--text3);margin-top:4px">+${n.listeItems.length-4} öğe daha…</div>`;
+  } else if(n.text){
+    preview=`<div style="font-size:0.82rem;color:var(--text2);margin-top:6px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${escPure(n.text)}</div>`;
+  } else if(n.kisiTel){
+    preview=`<div style="font-size:0.82rem;color:var(--text2);margin-top:6px">📞 ${escPure(n.kisiTel)}</div>`;
+  }
+  const d=new Date(n.updatedAt||n.createdAt);
+  const ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('deletePreviewContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span style="font-size:1.1rem">${icon}</span>
+      <span style="font-size:0.95rem;font-weight:700;color:var(--text)">${escPure(title)}</span>
+    </div>
+    ${preview}
+    <div style="font-size:0.68rem;color:var(--text3);margin-top:10px">${ds}</div>
+  `;
+  openModal('deleteConfirmModal');
+}
+function _confirmDelete(){
+  if(!_deleteTargetId)return;
+  notes=notes.filter(n=>n.id!==_deleteTargetId);
+  _deleteTargetId=null;
+  save();
+  closeModal('deleteConfirmModal');
+  closeModal('detailModal');
+  renderNotes();
+  showToast('🗑 Silindi');
+}
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function maskCard(s){const c=s.replace(/\s/g,'');return c.length>4?'•••• •••• •••• '+c.slice(-4):s}
@@ -2419,16 +2496,13 @@ function noteCardHtml(n,i){
     }
   }
   const tagHtml=(!isCompact&&n.tag&&currentGroup!=='tag')?`<div class="note-tags"><span class="note-tag" style="color:${tc};border-color:${tc}">${allTagEmojis(n.tag)} ${n.tag}</span></div>`:'';
-  return`<div class="${cardClass}" onclick="openDetail('${n.id}')" style="${cardStyle}">
+  const pinDot=n.pinned?`<div class="note-pin-dot"></div>`:'';
+  return`<div class="${cardClass}" onclick="openDetail('${n.id}')" oncontextmenu="event.preventDefault();openCtxMenu(event,'${n.id}')" data-note-id="${n.id}" style="${cardStyle}">
     ${pinBadge}${top}<div class="compact-dot" style="--tag-color:${allTagColors(n.tag)||'var(--text3)'}"></div>
     <div class="note-body">${tagHtml}${titleHtml}${previewHtml}${extras}</div>
     <div class="note-footer">
       <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}${n.reminder&&new Date(n.reminder)>new Date()?' 🔔':''}</span>
-      <div class="note-actions">
-        <button class="note-action-btn${n.pinned?' pin-active':''}" onclick="event.stopPropagation();togglePin('${n.id}',event)" title="${n.pinned?'Sabiti Kaldır':'Sabitle'}">${n.pinned?'📌':'📍'}</button>
-        <button class="note-action-btn" onclick="event.stopPropagation();editNote('${n.id}')">✏️</button>
-        <button class="note-action-btn del" onclick="deleteNote('${n.id}',event)">🗑</button>
-      </div>
+      <div class="note-actions">${pinDot}</div>
     </div></div>`;
 }
 
@@ -2488,6 +2562,8 @@ function renderNotes(){
     }).join('');
     // Stiller CSS data-view selector ile otomatik uygulanır
   }
+  // Long press olaylarını tüm kartlara ekle
+  grid.querySelectorAll('.note-card[data-note-id]').forEach(_attachLongPress);
 }
 
 // ══════════════════════════════════════════════════
@@ -2499,6 +2575,76 @@ function togglePin(id, e) {
   n.pinned = !n.pinned;
   save(); renderNotes();
   showToast(n.pinned ? '📌 Sabitlendi' : '📌 Sabit kaldırıldı');
+}
+
+// ══════════════════════════════════════════════════
+// CONTEXT MENÜ (uzun basma / sağ tık)
+// ══════════════════════════════════════════════════
+let _ctxTimer=null;
+
+function _attachLongPress(card){
+  let _startX=0,_startY=0,_moved=false,_touch=null,_fired=false;
+  card.addEventListener('touchstart',function(e){
+    _touch=e.touches[0];
+    _startX=_touch.clientX; _startY=_touch.clientY;
+    _moved=false; _fired=false;
+    // Hemen önle — kaydırma olursa scroll pasif dinleyicide zaten çalışır
+    e.preventDefault();
+    _ctxTimer=setTimeout(()=>{
+      if(!_moved){
+        _fired=true;
+        window.getSelection&&window.getSelection().removeAllRanges();
+        openCtxMenu(_touch,card.dataset.noteId);
+      }
+    },480);
+  },{passive:false});
+  card.addEventListener('touchmove',function(e){
+    const dx=Math.abs(e.touches[0].clientX-_startX),dy=Math.abs(e.touches[0].clientY-_startY);
+    if(dx>6||dy>6){_moved=true;clearTimeout(_ctxTimer);}
+  },{passive:true});
+  card.addEventListener('touchend',function(e){
+    clearTimeout(_ctxTimer);
+    // Kısa dokunuşsa (long press tetiklenmediyse) click'i manuel tetikle
+    if(!_fired&&!_moved) card.click();
+  },{passive:true});
+  card.addEventListener('touchcancel',function(){clearTimeout(_ctxTimer);},{passive:true});
+}
+
+function openCtxMenu(posOrEvent, noteId){
+  closeCtxMenu();
+  const n=notes.find(x=>x.id===noteId); if(!n) return;
+  // overlay
+  const ov=document.createElement('div');
+  ov.className='ctx-overlay';
+  ov.addEventListener('click',closeCtxMenu);
+  ov.addEventListener('touchend',closeCtxMenu);
+  document.body.appendChild(ov);
+  // menü
+  const menu=document.createElement('div');
+  menu.className='ctx-menu';
+  menu.id='activeCtxMenu';
+  const pinLabel=n.pinned?'Sabiti Kaldır':'Sabitle';
+  const pinIcon=n.pinned?'📌':'📍';
+  menu.innerHTML=`
+    <button class="ctx-item" onclick="closeCtxMenu();togglePin('${n.id}')"><span class="ctx-icon">${pinIcon}</span>${pinLabel}</button>
+    <button class="ctx-item" onclick="closeCtxMenu();editNote('${n.id}')"><span class="ctx-icon">✏️</span>Düzenle</button>
+    <div class="ctx-sep"></div>
+    <button class="ctx-item ctx-danger" onclick="closeCtxMenu();deleteNote('${n.id}',null)"><span class="ctx-icon">🗑</span>Sil</button>
+  `;
+  document.body.appendChild(menu);
+  // konum ayarla
+  const x=posOrEvent.clientX||posOrEvent.pageX||window.innerWidth/2;
+  const y=posOrEvent.clientY||posOrEvent.pageY||window.innerHeight/2;
+  requestAnimationFrame(()=>{
+    const mw=menu.offsetWidth, mh=menu.offsetHeight;
+    const vw=window.innerWidth, vh=window.innerHeight;
+    menu.style.left=Math.min(x,vw-mw-12)+'px';
+    menu.style.top=Math.min(y,vh-mh-12)+'px';
+  });
+}
+
+function closeCtxMenu(){
+  document.querySelectorAll('.ctx-overlay,.ctx-menu').forEach(el=>el.remove());
 }
 
 // ══════════════════════════════════════════════════
