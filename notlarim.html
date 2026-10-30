@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.98
+  Version : Pro 1.1.00
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -403,7 +403,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.98</span>
+  <span>Pro 1.1.00</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -597,9 +597,9 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <!-- EKLE/DÜZENLE MODAL -->
 <div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
-  <div class="modal">
+  <div class="modal" style="max-height:96vh;height:96vh">
     <div class="modal-handle"></div>
-    <div class="modal-scroll">
+    <div class="modal-scroll" style="flex:1">
       <div class="modal-title" id="editModalTitle">Yeni Not</div>
       <div class="type-grid">
         <div class="type-btn active" data-type="metin"    onclick="setType('metin',this)">📝<span>Metin</span></div>
@@ -795,10 +795,11 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
         <button onclick="openLinkNoteModal()" class="btn btn-secondary" style="font-size:0.8rem;padding:8px 14px;width:auto">+ Not Bağla</button>
       </div>
 
-      <div class="btn-row">
-        <button class="btn btn-secondary" onclick="closeModal('editModal')">İptal</button>
-        <button class="btn btn-primary" onclick="saveNote()">💾 Kaydet</button>
-      </div>
+    </div>
+  </div>
+    <div class="detail-actions">
+      <button class="btn btn-secondary" onclick="closeModal('editModal')">İptal</button>
+      <button class="btn btn-primary" style="flex:2" onclick="saveNote()">Kaydet</button>
     </div>
   </div>
 </div>
@@ -1536,20 +1537,61 @@ function _listeDragHandle(el){
 
 // ── LİSTE ──
 function _autoResizeTa(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}
-function addListeItem(val,checked){
+
+function _makeListeItemDiv(val,checked){
   val=val||'';checked=checked||false;
-  const wrap=document.getElementById('liste-items-wrap');
   const div=document.createElement('div');
   div.className='liste-item';
-  div.style.cssText='display:flex;align-items:flex-start;gap:8px';
-  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:10px 2px 4px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:8px 2px 4px;line-height:1">${checked?'✅':'⬜'}</button>
-    <textarea rows="1" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px;resize:none;overflow:hidden;line-height:1.45;font-family:inherit;font-size:inherit">${val.replace(/</g,'&lt;')}</textarea>
-    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:8px 4px 4px;flex-shrink:0">✕</button>`;
-  wrap.appendChild(div);
-  const ta=div.querySelector('textarea');
-  ta.addEventListener('input',()=>_autoResizeTa(ta));
-  requestAnimationFrame(()=>_autoResizeTa(ta));
+  div.style.cssText='display:flex;align-items:center;gap:8px';
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">${checked?'✅':'⬜'}</button>
+    <input type="text" value="${String(val).replace(/"/g,'&quot;')}" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0">✕</button>`;
+  return div;
+}
+
+function _attachListeItemEvents(div, wrap){
   _listeDragHandle(div);
+  const inp=div.querySelector('input[type=text]');
+  // Enter → yeni öğe ekle
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      const newDiv=_makeListeItemDiv('',false);
+      // Bir sonraki kardeşten önce ekle (yoksa sona)
+      const next=div.nextElementSibling;
+      if(next) wrap.insertBefore(newDiv,next);
+      else wrap.appendChild(newDiv);
+      _attachListeItemEvents(newDiv,wrap);
+      newDiv.querySelector('input').focus();
+      _refreshSectionAddBtns();
+    }
+  });
+  // Paste → çok satırı ayrı öğelere böl
+  inp.addEventListener('paste',function(e){
+    const text=(e.clipboardData||window.clipboardData).getData('text');
+    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    if(lines.length<=1) return; // tek satırsa normal paste
+    e.preventDefault();
+    // İlk satırı mevcut input'a yaz
+    inp.value=(inp.value.slice(0,inp.selectionStart)+lines[0]+inp.value.slice(inp.selectionEnd));
+    // Geri kalan satırları yeni öğe olarak ekle
+    let ref=div.nextElementSibling;
+    lines.slice(1).forEach(line=>{
+      const newDiv=_makeListeItemDiv(line,false);
+      if(ref) wrap.insertBefore(newDiv,ref);
+      else wrap.appendChild(newDiv);
+      _attachListeItemEvents(newDiv,wrap);
+      ref=newDiv.nextElementSibling;
+    });
+    _refreshSectionAddBtns();
+  });
+}
+
+function addListeItem(val,checked){
+  const wrap=document.getElementById('liste-items-wrap');
+  const div=_makeListeItemDiv(val,checked);
+  wrap.appendChild(div);
+  _attachListeItemEvents(div,wrap);
 }
 function addListeBaslik(val){
   val=val||'';
@@ -1580,18 +1622,11 @@ function addListeItemAfterBaslik(baslikEl){
 }
 
 function _insertListeItem(wrap,insertBefore){
-  const div=document.createElement('div');
-  div.className='liste-item';
-  div.style.cssText='display:flex;align-items:flex-start;gap:8px';
-  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:10px 2px 4px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="0" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:8px 2px 4px;line-height:1">⬜</button>
-    <textarea rows="1" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px;resize:none;overflow:hidden;line-height:1.45;font-family:inherit;font-size:inherit"></textarea>
-    <button type="button" onclick="this.parentElement.remove();_refreshSectionAddBtns()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:8px 4px 4px;flex-shrink:0">✕</button>`;
+  const div=_makeListeItemDiv('',false);
   if(insertBefore) wrap.insertBefore(div,insertBefore);
   else wrap.appendChild(div);
-  const ta=div.querySelector('textarea');
-  ta.addEventListener('input',()=>_autoResizeTa(ta));
-  _listeDragHandle(div);
-  ta.focus();
+  _attachListeItemEvents(div,wrap);
+  div.querySelector('input').focus();
 }
 
 // Her bölümün altında "+ bu bölüme ekle" satırı göster
@@ -1625,7 +1660,7 @@ function _insertListeItemBeforeRef(sectionAddEl){
 function getListeData(){
   return [...document.querySelectorAll('.liste-item')].map(d=>{
     const isBaslik=d.classList.contains('liste-baslik-item');
-    const tx=d.querySelector('input[type=text],textarea');
+    const tx=d.querySelector('input[type=text]');
     if(!tx||!tx.value.trim())return null;
     if(isBaslik)return{type:'baslik',text:tx.value};
     const cb=d.querySelector('button[data-done]');
@@ -2509,15 +2544,25 @@ function noteCardHtml(n,i){
     if(n.type==='liste'&&n.listeItems&&n.listeItems.length){
       const maxShow=5;
       const checkOnly=n.listeItems.filter(it=>!(typeof it==='object'&&it.type==='baslik'));
-      const shown=checkOnly.slice(0,maxShow);
-      const remaining=checkOnly.length-maxShow;
-      const itemsHtml=shown.map((it,i)=>{
+      // Arama varsa: eşleşen öğeleri öne al, sonra diğerleri
+      let shown, remaining;
+      if(q){
+        const matched=checkOnly.filter(it=>trLower(typeof it==='object'?it.text||'':it).includes(q));
+        const unmatched=checkOnly.filter(it=>!trLower(typeof it==='object'?it.text||'':it).includes(q));
+        const pool=[...matched,...unmatched];
+        shown=pool.slice(0,maxShow);
+        remaining=checkOnly.length-maxShow;
+      } else {
+        shown=checkOnly.slice(0,maxShow);
+        remaining=checkOnly.length-maxShow;
+      }
+      const itemsHtml=shown.map((it)=>{
         const done=typeof it==='object'?it.done:false;
         const txt=typeof it==='object'?(it.text||''):it;
         const realIdx=n.listeItems.indexOf(it);
         return`<div onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${realIdx})" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none"><span style="font-size:0.9rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.83rem;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${highlight(txt,q)}</span></div>`;
       }).join('');
-      const moreHtml=remaining>0?`<div style="font-size:0.75rem;font-weight:700;color:var(--accent);padding:5px 10px;text-align:center;background:var(--surface3);border-radius:8px;margin-top:2px;letter-spacing:0.02em">+${remaining} öğe daha · tümünü gör →</div>`:'';
+      const moreHtml=remaining>0?`<div onclick="event.stopPropagation();openDetail('${n.id}')" style="font-size:0.75rem;font-weight:700;color:var(--accent);padding:5px 10px;text-align:center;background:var(--surface3);border-radius:8px;margin-top:2px;letter-spacing:0.02em;cursor:pointer">+${remaining} öğe daha · tümünü gör →</div>`:'';
       extras+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${itemsHtml}${moreHtml}</div>`;
     }
     // Kart detay modu açıksa tip'e özgü alanlar
@@ -3226,6 +3271,7 @@ function exportNotes(){
     date: new Date().toISOString(),
     noteCount: notes.length,
     prefs: {theme:currentTheme, view:currentView, sort:currentSort, group:currentGroup, filter:currentFilter},
+    customTags,
     notes
   },null,2)],{type:'application/json'});
   const now = new Date();
@@ -3253,6 +3299,10 @@ function importNotes(e){
       saveAndConfirm().then(()=>{
         showToast(`✅ ${imp.length} not yüklendi ve kaydedildi`);
       });
+      // Özel etiketleri geri yükle
+      if(d.customTags && typeof d.customTags==='object'){
+        try{localStorage.setItem(CTS_KEY,JSON.stringify(d.customTags));loadCustomTags();}catch(ex){}
+      }
       // HATA6 fix: yedekteki prefs varsa geri yükle, UI'ı senkronize et
       if(d.prefs){
         const p=d.prefs;
