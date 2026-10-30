@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.0.95
+  Version : Pro 1.0.97
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -187,7 +187,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .note-link-chip{display:flex;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;background:var(--surface2);border-radius:8px;font-size:0.73rem;font-weight:700;color:var(--accent);overflow:hidden;border-left:3px solid var(--accent)}
 [data-theme="light"] .note-link-chip{color:var(--accent)}
 .note-link-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.note-footer{padding:6px 13px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border2)}
+.note-footer{padding:0 13px 10px;display:flex;align-items:center;justify-content:space-between}
+.note-date-chip{display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;color:var(--text3);margin-top:8px;font-weight:500}
 [data-theme="dark"] .note-date{color:rgba(255,255,255,0.7)}
 .note-date{font-size:0.67rem;color:var(--card-date-color,var(--text3))}
 .note-actions{display:flex;gap:5px}
@@ -402,7 +403,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.0.95</span>
+  <span>Pro 1.0.97</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -1518,6 +1519,7 @@ function _listeDragHandle(el){
       }
       if(target){before?target.before(_dragEl):target.after(_dragEl);}
       _dragEl=null;
+      _refreshSectionAddBtns();
       document.removeEventListener('mousemove',onMove);
       document.removeEventListener('mouseup',onEnd);
       document.removeEventListener('touchmove',onMove);
@@ -1533,16 +1535,20 @@ function _listeDragHandle(el){
 }
 
 // ── LİSTE ──
+function _autoResizeTa(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}
 function addListeItem(val,checked){
   val=val||'';checked=checked||false;
   const wrap=document.getElementById('liste-items-wrap');
   const div=document.createElement('div');
   div.className='liste-item';
-  div.style.cssText='display:flex;align-items:center;gap:8px';
-  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">${checked?'✅':'⬜'}</button>
-    <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
-    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
+  div.style.cssText='display:flex;align-items:flex-start;gap:8px';
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:10px 2px 4px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="${checked?'1':'0'}" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:8px 2px 4px;line-height:1">${checked?'✅':'⬜'}</button>
+    <textarea rows="1" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px;resize:none;overflow:hidden;line-height:1.45;font-family:inherit;font-size:inherit">${val.replace(/</g,'&lt;')}</textarea>
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:8px 4px 4px;flex-shrink:0">✕</button>`;
   wrap.appendChild(div);
+  const ta=div.querySelector('textarea');
+  ta.addEventListener('input',()=>_autoResizeTa(ta));
+  requestAnimationFrame(()=>_autoResizeTa(ta));
   _listeDragHandle(div);
 }
 function addListeBaslik(val){
@@ -1553,11 +1559,12 @@ function addListeBaslik(val){
   div.style.cssText='display:flex;align-items:center;gap:8px';
   div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><span style="font-size:0.9rem;flex-shrink:0;color:var(--accent)">≡</span>
     <input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Bölüm başlığı..." data-baslik="1" style="flex:1;padding:9px 11px;font-weight:700;font-size:0.9rem;color:var(--text);background:var(--surface3);border-color:var(--border2)">
-    <button type="button" onclick="addListeItemAfterBaslik(this.closest('.liste-baslik-item'))" style="background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:4px;line-height:1;font-weight:700" title="Bu bölüme öğe ekle">＋</button>
-    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
+    <button type="button" onclick="addListeItemAfterBaslik(this.closest('.liste-baslik-item'));_refreshSectionAddBtns()" style="background:none;border:none;color:var(--accent);font-size:1.1rem;cursor:pointer;padding:4px;line-height:1;font-weight:700" title="Bu bölüme öğe ekle">＋</button>
+    <button type="button" onclick="this.parentElement.remove();_refreshSectionAddBtns()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
   wrap.appendChild(div);
   _listeDragHandle(div);
   div.querySelector('input').focus();
+  _refreshSectionAddBtns();
 }
 function addListeItemAfterBaslik(baslikEl){
   // Bir sonraki baslik-item'dan önce, ya da wrap sonuna ekle
@@ -1569,22 +1576,56 @@ function addListeItemAfterBaslik(baslikEl){
   for(let i=baslikIdx+1;i<allItems.length;i++){
     if(allItems[i].classList.contains('liste-baslik-item')){insertBefore=allItems[i];break;}
   }
-  // Yeni öğeyi oluştur
+  _insertListeItem(wrap,insertBefore);
+}
+
+function _insertListeItem(wrap,insertBefore){
   const div=document.createElement('div');
   div.className='liste-item';
-  div.style.cssText='display:flex;align-items:center;gap:8px';
-  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:4px 2px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="0" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:2px;line-height:1">⬜</button>
-    <input type="text" value="" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px">
-    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:4px">✕</button>`;
+  div.style.cssText='display:flex;align-items:flex-start;gap:8px';
+  div.innerHTML=`<span class="liste-drag-handle" style="font-size:1.1rem;color:var(--text3);cursor:grab;flex-shrink:0;padding:10px 2px 4px;touch-action:none;line-height:1">⠿</span><button type="button" onclick="this.dataset.done=this.dataset.done==='1'?'0':'1';this.textContent=this.dataset.done==='1'?'✅':'⬜'" data-done="0" style="background:none;border:none;font-size:1.2rem;cursor:pointer;flex-shrink:0;padding:8px 2px 4px;line-height:1">⬜</button>
+    <textarea rows="1" placeholder="Liste öğesi..." style="flex:1;padding:9px 11px;resize:none;overflow:hidden;line-height:1.45;font-family:inherit;font-size:inherit"></textarea>
+    <button type="button" onclick="this.parentElement.remove();_refreshSectionAddBtns()" style="background:none;border:none;color:var(--red);font-size:1rem;cursor:pointer;padding:8px 4px 4px;flex-shrink:0">✕</button>`;
   if(insertBefore) wrap.insertBefore(div,insertBefore);
   else wrap.appendChild(div);
+  const ta=div.querySelector('textarea');
+  ta.addEventListener('input',()=>_autoResizeTa(ta));
   _listeDragHandle(div);
-  div.querySelector('input').focus();
+  ta.focus();
+}
+
+// Her bölümün altında "+ bu bölüme ekle" satırı göster
+function _refreshSectionAddBtns(){
+  const wrap=document.getElementById('liste-items-wrap');
+  if(!wrap)return;
+  // Önce mevcut section-add butonlarını temizle
+  wrap.querySelectorAll('.liste-section-add').forEach(el=>el.remove());
+  const allItems=[...wrap.querySelectorAll('.liste-item')];
+  // Başlık olan itemları bul, her birinin bölüm sonu için buton ekle
+  const baslikIdxs=allItems.map((el,i)=>el.classList.contains('liste-baslik-item')?i:-1).filter(i=>i>=0);
+  baslikIdxs.forEach((bIdx,k)=>{
+    // Bu başlığın bölümü: bIdx+1'den sonraki başlığa (veya sona) kadar
+    const nextBIdx=baslikIdxs[k+1]??allItems.length;
+    // Buton ekleme yeri: bir sonraki başlık öncesi, yoksa wrap sonu
+    const insertRef=allItems[nextBIdx]||null;
+    const btn=document.createElement('div');
+    btn.className='liste-section-add';
+    btn.style.cssText='padding:4px 8px 6px 36px';
+    const baslikEl=allItems[bIdx];
+    btn.innerHTML=`<button type="button" onclick="_insertListeItemBeforeRef(this.closest('.liste-section-add'));_refreshSectionAddBtns()" style="background:none;border:none;color:var(--accent);font-size:0.8rem;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;opacity:0.75"><span style="font-size:1rem;line-height:1">＋</span>Bu bölüme ekle</button>`;
+    if(insertRef) wrap.insertBefore(btn,insertRef);
+    else wrap.appendChild(btn);
+  });
+}
+
+function _insertListeItemBeforeRef(sectionAddEl){
+  const wrap=document.getElementById('liste-items-wrap');
+  _insertListeItem(wrap,sectionAddEl);
 }
 function getListeData(){
   return [...document.querySelectorAll('.liste-item')].map(d=>{
     const isBaslik=d.classList.contains('liste-baslik-item');
-    const tx=d.querySelector('input[type=text]');
+    const tx=d.querySelector('input[type=text],textarea');
     if(!tx||!tx.value.trim())return null;
     if(isBaslik)return{type:'baslik',text:tx.value};
     const cb=d.querySelector('button[data-done]');
@@ -1600,6 +1641,7 @@ function populateListe(items){
       else addListeItem(it.text||it,it.done);
     });
   } else addListeItem();
+  _refreshSectionAddBtns();
 }
 
 // ── SES KAYDI ──
@@ -2497,12 +2539,14 @@ function noteCardHtml(n,i){
   }
   const tagHtml=(!isCompact&&n.tag&&currentGroup!=='tag')?`<div class="note-tags"><span class="note-tag" style="color:${tc};border-color:${tc}">${allTagEmojis(n.tag)} ${n.tag}</span></div>`:'';
   const pinDot=n.pinned?`<div class="note-pin-dot"></div>`:'';
+  const hasReminder=n.reminder&&new Date(n.reminder)>new Date();
+  const dateChip=`<div class="note-date-chip">${isCompact?'':TYE[n.type]+' '}${ds}${hasReminder?' 🔔':''}</div>`;
   return`<div class="${cardClass}" onclick="openDetail('${n.id}')" oncontextmenu="event.preventDefault();openCtxMenu(event,'${n.id}')" data-note-id="${n.id}" style="${cardStyle}">
     ${pinBadge}${top}<div class="compact-dot" style="--tag-color:${allTagColors(n.tag)||'var(--text3)'}"></div>
-    <div class="note-body">${tagHtml}${titleHtml}${previewHtml}${extras}</div>
-    <div class="note-footer">
-      <span class="note-date">${isCompact?'':TYE[n.type]+' '}${ds}${n.reminder&&new Date(n.reminder)>new Date()?' 🔔':''}</span>
-      <div class="note-actions">${pinDot}</div>
+    <div class="note-body">${tagHtml}${titleHtml}${previewHtml}${extras}${isCompact?'':dateChip}</div>
+    <div class="note-footer" style="border-top:none;padding:0 13px 10px">
+      ${isCompact?dateChip:''}
+      <div class="note-actions" style="margin-left:auto">${pinDot}</div>
     </div></div>`;
 }
 
