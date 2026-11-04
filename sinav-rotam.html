@@ -136,8 +136,63 @@ nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width
 nav button.on{color:var(--accent)}
 .modal{position:fixed;inset:0;z-index:80;background:rgba(8,10,25,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px}
 .mbox{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;padding:22px;width:min(440px,100%);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.intro{text-align:center}.ie{font-size:56px;line-height:1.1;margin:4px 0 10px}
+.logo.big{width:78px;height:78px;border-radius:24px;margin:2px auto 12px}.logo.big svg{width:54px;height:54px}
+.intro p{font-size:15px}.dots{display:flex;justify-content:center;gap:8px;margin:18px 0 16px}
+.dot2{width:9px;height:9px;border-radius:9px;background:var(--line);transition:.25s}.dot2.on{background:var(--accent);width:24px}
+.link{display:block;margin:14px auto 0;color:var(--muted);font-size:14px;text-decoration:underline;padding:6px}
 .mbox h2{font-size:19px;margin-bottom:8px}
 .mbox textarea{width:100%;font:13px/1.4 ui-monospace,monospace;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:10px;resize:vertical}
+
+.tour{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.tw{width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0;padding:0 20px}
+.tp0{display:flex;align-items:center;gap:12px;padding:16px 0 6px}
+.tseg{flex:1;display:flex;gap:5px}.tseg i{flex:1;height:5px;border-radius:5px;background:var(--line);transition:.3s}.tseg i.on{background:var(--accent)}
+.tskip{color:var(--muted);font-weight:700;font-size:14px;padding:6px 4px}
+.tbw{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.tbody{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;padding:6px 0 36px;animation:tin .35s ease both}
+.tbody>.art{margin-top:auto}.tbody>.tl{margin-bottom:auto}
+.shint{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);background:var(--accent);color:var(--on-accent);border-radius:99px;padding:7px 15px;font-size:13px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.28);animation:bn 1.6s ease-in-out infinite;white-space:nowrap}
+.shint[hidden]{display:none}@keyframes bn{50%{transform:translate(-50%,4px)}}
+.tbody.back{animation-name:tinb}
+@keyframes tin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes tinb{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+.art{display:grid;place-items:center;min-height:228px;border-radius:28px;background:radial-gradient(circle at 50% 35%,var(--soft),transparent 72%);margin-bottom:16px;padding:14px;flex:none}
+.tbody h2{font-size:25px;letter-spacing:-.02em;margin:0 0 6px;text-align:center}
+.tbody>p{color:var(--muted);text-align:center;margin:0 0 12px;font-size:15px}
+.tl{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.tl li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.tl li .e{flex:none;font-size:18px;line-height:1.2}
+.tbar{padding:10px 0 14px}.tbar .row{gap:10px}.tbar .btn{flex:1;padding:14px}
+.mk{width:min(310px,100%);display:grid;gap:9px}
+.mh{border-radius:20px;padding:14px 16px;color:var(--on-accent);background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#1b1038))}
+.mh .mp{display:flex;gap:6px;font-size:11px;font-weight:700}.mh .mp span{background:rgba(255,255,255,.22);padding:3px 8px;border-radius:99px}
+.mh .mb{display:flex;align-items:baseline;gap:8px;margin-top:6px}.mh .mb b{font-size:54px;line-height:1;font-weight:900;letter-spacing:-.04em}.mh .mb span{font-weight:700}.mh .mb em{display:block;font-style:normal;font-size:11px;font-weight:600;opacity:.9}
+.mh .mbar{height:6px;border-radius:9px;background:rgba(255,255,255,.28);margin-top:10px;overflow:hidden}.mh .mbar i{display:block;height:100%;width:30%;background:#fff;border-radius:9px;animation:grow 2.6s ease-in-out infinite alternate}
+@keyframes grow{from{width:8%}to{width:58%}}
+.mst{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.mst div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 4px;text-align:center;font-size:11px;color:var(--muted)}.mst b{display:block;font-size:15px;color:var(--text)}
+.mt{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}
+.mt b{font-size:13px;display:block;line-height:1.25}.mt small{color:var(--muted);font-size:11.5px}.mt>div{flex:1;min-width:0}
+.mt u{text-decoration:none;font-size:11px;font-weight:800;color:var(--accent);border:1px solid var(--accent);border-radius:9px;padding:4px 8px;white-space:nowrap}
+.ck{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:none;position:relative}
+.ck::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--on-accent);opacity:0}
+.ck.dn{background:var(--accent);border-color:var(--accent)}.ck.dn::after{opacity:1}
+.ck.an{animation:ckA 3s infinite}.ck.an::after{animation:ckT 3s infinite}
+@keyframes ckA{0%,35%{background:transparent;border-color:var(--line)}45%,90%{background:var(--accent);border-color:var(--accent)}100%{background:transparent;border-color:var(--line)}}
+@keyframes ckT{0%,35%{opacity:0}45%,90%{opacity:1}100%{opacity:0}}
+.ag{display:grid;grid-template-columns:30px repeat(6,1fr);gap:4px;align-items:center;font-size:10px;color:var(--muted);font-weight:700}
+.ag i{height:23px;border-radius:7px;border:1.5px solid var(--line);background:var(--bg)}.ag i.on{background:var(--accent);border-color:var(--accent)}.ag i.pl{animation:pl 1.6s infinite}
+@keyframes pl{50%{transform:scale(1.2);background:var(--accent);border-color:var(--accent)}}
+.wr{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px}.wr b{width:30px}.wr small{margin-left:auto;color:var(--muted)}
+.tg{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--soft);color:var(--accent)}
+.tg.r{background:color-mix(in srgb,#f59e0b 22%,var(--card));color:color-mix(in srgb,#f59e0b 70%,var(--text))}.tg.s{background:color-mix(in srgb,#ec4899 18%,var(--card));color:color-mix(in srgb,#ec4899 75%,var(--text))}
+.mchips{display:flex;gap:6px;justify-content:center}.mchips span{padding:5px 11px;border-radius:99px;border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--muted);background:var(--card)}.mchips span.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tlr{display:flex;gap:3px;height:36px}.tlr i{flex:1;border-radius:6px;background:var(--accent)}.tlr i.r{background:#f59e0b}.tlr i.m{background:#ec4899}.tlr i.f{background:#22c55e}.tlr i.g{background:var(--soft)}
+.lg{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11.5px;color:var(--muted);font-weight:600}.lg span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px}
+.mth{display:flex;gap:10px;justify-content:center;align-items:center;color:var(--muted)}.mth .tbtn{width:48px;height:48px}.mth .tbtn svg{width:25px;height:25px}
+.mkc{display:flex;gap:9px;justify-content:center}.mkc i{width:30px;height:30px;border-radius:50%;box-shadow:0 0 0 1.5px var(--line)}
+.pulse{animation:pu 2.2s ease-in-out infinite}@keyframes pu{50%{transform:scale(1.07)}}
+@media(prefers-reduced-motion:reduce){.tbody,.mh .mbar i,.ck.an,.ck.an::after,.ag i.pl,.pulse{animation:none!important}}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:99px;font-weight:650;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .cf{position:fixed;width:8px;height:12px;border-radius:2px;z-index:99;pointer-events:none}
@@ -147,7 +202,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v2.3</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v2.6</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -253,7 +308,7 @@ const PAL=['#41A6D9','#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e'
 
 /* ---------- Durum ---------- */
 const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
-const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},
+const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,
  avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
 let S;
 try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
@@ -355,6 +410,56 @@ mq.addEventListener('change',()=>{if(S.theme==='auto')applyTheme()});
 
 /* ---------- Yardımcılar ---------- */
 function modal(html){closeModal();const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML='<div class="mbox" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m)}
+let tourI=0;
+const row=(a,b)=>'<li><span class="e">'+a+'</span><span>'+b+'</span></li>';
+const INTRO=[
+{t:'Hoş geldin',p:'Sınav Rotam, MEB-AGS ve ÖABT hazırlığın için plan, takip ve motivasyon arkadaşın. 1 dakikada nasıl kullanacağını gösterelim.',
+ art:()=>'<div class="logo big pulse" style="width:104px;height:104px;border-radius:32px">'+$('.logo').innerHTML.replace(/^/,'')+'</div>',
+ l:[['⏳','Sınava kaç gün kaldığını sürekli gösterir.'],['🗓️','Konuları takvimine göre otomatik dağıtır.'],['✅','Ne bitirdiğini takip eder, ritim kazandırır.']]},
+{t:'Sınava kaç gün kaldı?',p:'Ana ekranın en üstünde geri sayım seni karşılar.',
+ art:()=>'<div class="mk"><div class="mh"><div class="mp"><span>MEB-AGS · 8 Mayıs</span><span>ÖABT · 186 gün</span></div><div class="mb"><b>185</b><span>gün kaldı<em>(26 hafta 3 gün)</em></span></div><div class="mbar"><i></i></div></div><div class="mst"><div>🔥<b>3 gün</b>seri</div><div>⏱️<b>24 sa</b>çalışma</div><div>📈<b>%12</b>ilerleme</div></div></div>',
+ l:[['📌','Büyük sayaç MEB-AGS’ye kalan günü ve haftayı, rozet ÖABT’yi gösterir.'],['🔥','Seri, toplam çalışma ve ilerleme kartları ritim tutmana yardım eder.'],['⭐','Sınavlar sekmesinde 28 sınavın tarihi ve başvuru durumu var; istediğini yıldızla.']]},
+{t:'Bugün ne yapacağım?',p:'Ana ekranda bugünün görevleri hazır. İki farklı dokunuş var:',
+ art:()=>'<div class="mk"><div class="mt"><i class="ck an"></i><div><b>Vektörler – Kuvvet, Tork ve Denge</b><small>Fizik · 3 sa</small></div><u>Konu bitti</u></div><div class="mt"><i class="ck"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · 2 sa</small></div><u>Konu bitti</u></div></div>',
+ l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>“Konu bitti”</b> = konuyu tamamen bitirdim. Plan kalan konuları yeniden dağıtır.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
+{t:'Müsait saatlerini işaretle',p:'Plan, senin müsait olduğun saatlere göre yapılır. İlk işin bu.',
+ art:()=>{const R=[[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,0,0,0,0,0],[0,1,0,1,0,0]],D=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  return '<div class="mk"><div class="ag"><span></span>'+['06','09','12','15','18','21'].map(x=>'<span style="text-align:center">'+x+'</span>').join('')+R.map((r,i)=>'<span>'+D[i]+'</span>'+r.map((v,k)=>'<i class="'+(v?'on':'')+(i===5&&k===4?' pl':'')+'"></i>').join('')).join('')+'</div></div>'},
+ l:[['👆','Ayarlar’da kutulara dokun. Her kutu 3 saatlik bir blok. Gün adına dokunursan tüm satır değişir.'],['⚡','“Gündüz”, “Akşamlar”, “Hepsi” gibi hazır seçimler var.'],['🎈','Bir sosyal gün seç; o gün ders konmaz. Düğün, seyahat gibi tek seferlik boş günler de ekleyebilirsin.']]},
+{t:'Plan kendini ayarlar',p:'Plan sekmesinden programı kaç haftada bitireceğini seç.',
+ art:()=>'<div class="mk"><div class="mchips"><span>8</span><span>12</span><span class="on">16 hafta</span><span>24</span></div><div class="wr"><b>Pzt</b><span class="tg">Çalışma</span><small>Fizik · 4 sa</small></div><div class="wr"><b>Cum</b><span class="tg">Çalışma</span><small>Biyoloji · 4 sa</small></div><div class="wr"><b>Cmt</b><span class="tg s">Sosyal</span><small>Kafa dinle 🎈</small></div><div class="wr"><b>Paz</b><span class="tg r">Tekrar</span><small>Haftalık tekrar</small></div></div>',
+ l:[['⚖️','Kısa süre seçersen günler yoğunlaşır, uzun seçersen hafifler. Hiçbir konu atılmaz.'],['⏰','Bir konuda yarım saatten az kalırsa ertesi güne sarkmaz, o gün tamamlanır.'],['📂','“Tüm haftaları aç” ve “Aktif hafta hariç kapat” düğmeleriyle planı tek dokunuşla gez.']]},
+{t:'Tekrar ve deneme hep planda',p:'Konular bitince plan seni boş bırakmaz.',
+ art:()=>{const s='sssrsssrsssrsssr'.split('').map(c=>'<i class="'+(c==='r'?'r':'')+'"></i>').join('');const f='ffffmffffmffffm'.split('').map(c=>'<i class="'+(c==='m'?'m':'f')+'"></i>').join('').slice(0);
+  return '<div class="mk"><div class="tlr">'+s+'<i class="g" style="flex:.4"></i>'+'ffmffmff'.split('').map(c=>'<i class="'+(c==='m'?'m':'f')+'"></i>').join('')+'</div><div class="lg"><span style="--c:var(--accent)">Konu</span><span style="--c:#f59e0b">Tekrar</span><span style="--c:#22c55e">Genel tekrar</span><span style="--c:#ec4899">Deneme</span></div></div>'},
+ l:[['🔁','Tekrar günü her hafta ya da 2–4 haftada bir olabilir. Geçen konuları hatırlatır.'],['🧠','Sınavdan önce 1–6 hafta genel tekrar dönemi vardır (başlangıçta 4 hafta).'],['📝','Genel tekrarda haftalık deneme günleri, sınavdan bir gün önce de hafif tekrar ve erken uyku gelir.']]},
+{t:'Konular senin elinde',p:'Konular sekmesinde hepsi tek listede.',
+ art:()=>'<div class="mk"><div class="mt"><i class="ck dn"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · bitti 5 Kasım</small></div><u>⏱ 5 sa</u></div><div class="mt"><i class="ck"></i><div><b>Organik Kimya (1/2)</b><small>Kimya · planlanan bitiş 2 Ara</small></div><u class="pulse">⏱ 12 sa ✎</u></div><div class="mt"><i class="ck"></i><div><b>Gazlar</b><small>Kimya</small></div><u>⏱ 5 sa</u></div></div>',
+ l:[['⏱','Süre düğmesiyle konunun süresini kendine göre değiştir (0,25 saatlik adımlarla). Plan hemen yenilenir.'],['🏷️','Aynı adlı konular “(1/2), (2/2)” diye numaralanır.'],['🎯','Ders filtreleriyle yalnız Fizik, Kimya gibi tek bir dersi görebilirsin.']]},
+{t:'Senin tarzında',p:'Tema ve renk tamamen sana göre.',
+ art:()=>'<div class="mk" style="gap:16px"><div class="mth"><span class="tbtn"><svg viewBox="0 0 24 24">'+TI.auto+'</svg></span>›<span class="tbtn"><svg viewBox="0 0 24 24">'+TI.light+'</svg></span>›<span class="tbtn"><svg viewBox="0 0 24 24">'+TI.dark+'</svg></span></div><div class="mkc">'+['#41A6D9','#823cdf','#22c55e','#f59e0b','#ef4444','#ec4899'].map(c=>'<i style="background:'+c+'"></i>').join('')+'</div></div>',
+ l:[['🌗','Tema simgesine dokundukça Otomatik → Açık → Koyu döner. Otomatik, telefonunun temasını izler.'],['🎨','Palet simgesinden hazır renk, özel renk ya da ton kaydırıcıyla sonsuz renk seç.'],['📲','Web adresinden açtıysan tarayıcının “Ana Ekrana Ekle” seçeneğiyle uygulama gibi kullanabilirsin.']]},
+{t:'Verin güvende kalsın',p:'İlerleme yalnızca bu cihazda saklanır.',
+ art:()=>'<div class="mk"><div class="mt"><span style="font-size:26px">💾</span><div><b>Yedeği kopyala</b><small>Metni bir yere yapıştırıp sakla</small></div></div><div class="mt"><span style="font-size:26px">📲</span><div><b>Yeni telefonda “Yedeği yükle”</b><small>İşaretlerin ve planın geri gelir</small></div></div></div>',
+ l:[['💾','Ayarlar’daki yedek kartından yedeği kopyala; telefon değiştirirsen yükle.'],['⚠️','“Her şeyi sıfırla” neyin silineceğini yazar ve onayını bekler.'],['🚀','Hazırsın! İlk adım: müsait saatlerini işaretle.']]}
+];
+function showIntro(i,dir){
+ dir=dir||1;tourI=i;
+ let T=$('#tour');
+ if(!T){T=document.createElement('div');T.id='tour';T.className='tour';document.body.appendChild(T);
+  let x0=null,y0=0;T.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  T.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)<Math.abs(dy)*1.5)return;if(dx<-60&&tourI<INTRO.length-1)showIntro(tourI+1,1);else if(dx>60&&tourI>0)showIntro(tourI-1,-1)},{passive:true})}
+ const s=INTRO[i],n=INTRO.length,last=i===n-1,nm=(S.name||'').replace(/</g,'&lt;');
+ T.innerHTML='<div class="tw"><div class="tp0"><div class="tseg">'+INTRO.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div><button class="tskip" data-act="introskip">Geç</button></div>'+
+ '<div class="tbw"><div class="tbody'+(dir<0?' back':'')+'"><div class="art">'+s.art()+'</div><h2>'+(i===0&&nm?s.t+' '+nm:s.t)+'</h2><p>'+s.p+'</p><ul class="tl">'+s.l.map(r=>row(r[0],r[1])).join('')+'</ul></div><button class="shint" data-act="tourscroll" hidden>Aşağı kaydır ↓</button></div>'+
+ '<div class="tbar"><div class="row">'+(i>0?'<button class="btn ghost" data-act="intro" data-i="'+(i-1)+'">Geri</button>':'')+
+ (last?'<button class="btn ghost" data-act="introskip">Başla</button><button class="btn" data-act="tourgo">Müsaitliğimi ayarla</button>':'<button class="btn" data-act="intro" data-i="'+(i+1)+'">İleri</button>')+
+ '</div><button class="link" data-act="intronever">Bir daha gösterme</button></div></div>';
+ const tb=T.querySelector('.tbody');tb.addEventListener('scroll',tourHint,{passive:true});requestAnimationFrame(tourHint);setTimeout(tourHint,400);
+}
+function tourHint(){const b=$('#tour .tbody'),k=$('#tour .shint');if(!b||!k)return;k.hidden=!(b.scrollHeight-b.clientHeight>10&&b.scrollTop+b.clientHeight<b.scrollHeight-10)}
+addEventListener('resize',tourHint);
+function closeTour(){const t=$('#tour');if(t)t.remove()}
 function closeModal(){const m=$('#modal');if(m)m.remove()}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
 function boom(x,y){
@@ -490,6 +595,7 @@ function vSettings(){
  '<div class="tags">'+S.offDates.sort().map(d=>'<span class="badge">'+fd(pd(d))+' <button data-act="deloff" data-d="'+d+'" aria-label="Sil" style="font-weight:900">×</button></span>').join('')+'</div></section>'+
  '<section class="card"><h2>Kişisel</h2><div class="fld"><label>Adın (selamlama için)</label><input type="text" data-chg="name" value="'+S.name.replace(/"/g,'&quot;')+'" placeholder="Örn. Ayşe"></div>'+
  '</section>'+
+ '<section class="card"><h2>👋 Tanıtım</h2><p class="sm muted">Uygulamanın kısa tanıtımı '+(S.introOff?'şu an <b>gösterilmiyor</b>':'şu an <b>her açılışta gösteriliyor</b> (“Bir daha gösterme”ye basana kadar)')+'.</p><div style="height:12px"></div><button class="btn ghost" data-act="introopen">Tanıtımı göster</button></section>'+
  '<section class="card"><h2>💾 Yedekle ve başka cihaza taşı</h2>'+
  '<p class="sm muted">Yaptığın işaretlemeler, planın ve ayarların <b>sadece bu telefonda/bilgisayarda</b> saklanır. Telefon değiştirirsen ya da tarayıcı verilerini silersen kaybolabilir. Yedek almak bunu önler.</p>'+
  '<ol class="sm muted" style="padding-left:20px;margin:10px 0">'+
@@ -556,6 +662,12 @@ const A={
   modal('<h2>Konu süresi</h2><p class="sm muted">'+SUB[i.s].n+' · '+i.t+'</p><div class="row" style="margin:14px 0 6px"><input type="number" id="hv" min="0.25" max="60" step="0.25" inputmode="decimal" value="'+HOURS(i)+'"><b>saat</b></div><p class="sm muted">Önerilen süre: '+fh(i.h)+'. Bu konuya kendi sürene göre plan yapılır. Çeyrek saat (0,25) adımlarla girebilirsin.</p><div class="row" style="margin-top:14px;flex-wrap:wrap;justify-content:flex-end"><button class="btn ghost" data-act="hreset" data-id="'+i.id+'">Önerilene dön</button><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="hsave" data-id="'+i.id+'">Kaydet</button></div>')},
  hsave(t){const v=parseFloat(String($('#hv').value).replace(',','.'));if(!(v>=0.25&&v<=60)){toast('0,25 ile 60 saat arasında bir süre gir');return}S.hours=S.hours||{};S.hours[t.dataset.id]=v;save();closeModal();render();toast('Süre güncellendi, plan yenilendi ✓')},
  hreset(t){if(S.hours)delete S.hours[t.dataset.id];save();closeModal();render()},
+ intro(t){const i=+t.dataset.i;showIntro(i,i>=tourI?1:-1)},
+ introskip(){closeTour()},
+ tourscroll(){const b=$('#tour .tbody');if(b)b.scrollBy({top:Math.max(160,b.clientHeight*.6),behavior:'smooth'})},
+ intronever(){S.introOff=true;save();closeTour();toast('Tanıtım artık gösterilmeyecek. Ayarlar’dan tekrar açabilirsin')},
+ introopen(){S.introOff=false;save();showIntro(0)},
+ tourgo(){closeTour();S.tab='settings';save();render();scrollTo({top:0})},
  mclose(){closeModal()}
 };
 function milestone(){
@@ -570,9 +682,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.act!=='palette'&&!t.closest('#pop'))$('#pop').hidden=true;
  A[t.dataset.act]&&A[t.dataset.act](t,e);
 });
-let lastTap=0;
-document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<350&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTap=n},{passive:false});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTour()}else if($('#tour')){if(e.key==='ArrowRight'&&tourI<INTRO.length-1)showIntro(tourI+1,1);if(e.key==='ArrowLeft'&&tourI>0)showIntro(tourI-1,-1)}});
 document.addEventListener('change',e=>{
  const c=e.target.dataset.chg;if(!c)return;const v=e.target.value;
  if(c==='weeksR'){S.weeks=+v}
@@ -592,7 +702,7 @@ document.addEventListener('input',e=>{
  else if(c==='weeksR'){const w=+e.target.value;$('#wl').textContent=w;const st=addD(PLAN.start,w*7-1);const mx=addD(pd(EX[0].d),-S.finalDays-1);$('#wd').textContent=fd(st>mx?mx:st)}
 });
 $('#sw').innerHTML=PAL.map(c=>'<button data-act="sw" data-c="'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>').join('');
-applyTheme();render();
+applyTheme();render();if(!S.introOff)showIntro(0);
 let lastDay=iso(new Date());
 setInterval(()=>{const d=iso(new Date());if(d!==lastDay){lastDay=d;render()}},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastDay=iso(new Date());render()}});
