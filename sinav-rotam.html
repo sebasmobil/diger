@@ -73,6 +73,9 @@ background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 
 .row{display:flex;align-items:center;gap:10px}.sp{flex:1}
 .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:var(--soft);color:var(--accent);font-size:12.5px;font-weight:700}
 :root[data-theme=dark] .badge{color:color-mix(in srgb,var(--accent) 55%,#fff)}
+.card.today{border:2px solid var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 14%,transparent)}
+.cont{display:inline-block;margin-top:6px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--soft);padding:3px 9px;border-radius:99px}.cont.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--card))}
+.pc{font-size:11px;font-weight:800;color:var(--accent);background:var(--soft);padding:1px 6px;border-radius:99px;margin-left:3px}
 .task{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;margin-bottom:9px;background:var(--bg);transition:.2s}
 .task.on .tx{opacity:.55}.task.on .tt{text-decoration:line-through}
 .chk{width:32px;height:32px;border-radius:10px;border:2.5px solid color-mix(in srgb,var(--text) 42%,var(--card));background:var(--card);display:grid;place-items:center;flex:none;transition:.2s;color:transparent}
@@ -205,7 +208,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v3.2</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v3.3</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -368,6 +371,8 @@ function buildPlan(){
    if(left<1e-6){endOf[it.id]=day.key;idx++;left=rem[idx]?HOURS(rem[idx]):0}
   }
  }
+ const pcs={};for(const day of sd)day.tasks.forEach(t=>{if(t.id)(pcs[t.id]=pcs[t.id]||[]).push({day,t})});
+ for(const k in pcs){const a=pcs[k];a.forEach((o,i)=>{o.t.pi=i;o.t.pn=a.length;if(i<a.length-1){o.t.nx=a[i+1].day.date;o.t.nh=a[i+1].t.h}})}
  const effDate=id=>S.done[id]?pd(S.done[id]):(endOf[id]?pd(endOf[id]):null);
  const win=(day,a,b)=>ITEMS.filter(i=>{const e=effDate(i.id);if(!e)return false;const df=diffD(e,day.date);return df>=a&&df<=b});
  const acc='var(--accent)';
@@ -489,11 +494,17 @@ const opt=(arr,sel)=>arr.map(([v,l])=>'<option value="'+v+'"'+(String(v)===Strin
 const CHK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 
 /* ---------- Görünümler ---------- */
+function contHtml(day,t){
+ if(!t.id||!t.pn)return'';
+ if(t.pn===1)return'<div class="cont ok">✓ Bu konu bugün biter</div>';
+ if(t.pi>=t.pn-1)return'<div class="cont ok">✓ Son parça · konu bugün biter</div>';
+ const d=diffD(day.date,t.nx);
+ return'<div class="cont">↻ Parça '+(t.pi+1)+'/'+t.pn+' · devamı '+(d===1?'<b>yarın</b>':'<b>'+DS[wdi(t.nx)]+', '+fd(t.nx)+'</b>')+' ('+fh(t.nh)+')</div>'}
 function taskHtml(day,t,i){
  const k=day.key+'|'+(t.id||i),on=S.ticks[k];
  return '<div class="task'+(on?' on':'')+'"><span class="dot" style="--c:'+t.c+'"></span>'+
   '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
-  '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+'</div>'+
+  '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+'</div>'+contHtml(day,t)+
   (t.sub?'<ul class="subl">'+t.sub.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'')+'</div>'+
   (t.id?'<button class="mini" data-act="finish" data-id="'+t.id+'">Konu bitti</button>':'')+'</div>';
 }
@@ -518,15 +529,15 @@ function vHome(){
   body=day.tasks.map((t,i)=>taskHtml(day,t,i)).join('');
  }
  const goal=day?day.tasks.reduce((a,t)=>a+t.h,0):0;
- const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow" style="padding-left:0;padding-right:0"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+TYPE[d.type][0]+'</span>'+
-  d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
+ const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow" style="padding-left:0;padding-right:0"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+(d.key===iso(addD(today,1))?'YARIN · ':'')+TYPE[d.type][0]+'</span>'+
+  d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pn>1?' <small class="pc">'+(t.pi+1)+'/'+t.pn+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
  return '<div class="greet">'+g+'</div><p class="quote">“'+todayQuote()+'”</p>'+
  '<section class="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+hero+
  '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub" style="margin-top:8px;font-size:13px">Konuların %'+pct+'\'i tamam ('+dn+'/'+total+')</div></section>'+
  (P.short>0.5?'<div class="warn">⚠️ Seçtiğin süre ve müsaitlikle <b>yaklaşık '+Math.ceil(P.short)+' saat</b> konu açıkta kalıyor. Plan sekmesinden süreyi uzat ya da Ayarlar\'dan müsaitlik ekle.</div>':'')+
  '<div class="stats"><div class="stat"><div class="si"><svg class="ring" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="'+(pct*1.634)+' 163.4" transform="rotate(-90 32 32)"/></svg></div><b>%'+pct+'</b><small>İlerleme</small></div>'+
  '<div class="stat"><div class="si">🔥</div><b>'+streak()+' gün</b><small>seri</small></div><div class="stat"><div class="si">⏱️</div><b>'+(Object.values(S.log).reduce((a,b)=>a+b,0)).toFixed(0)+' sa</b><small>toplam çalışma</small></div></div>'+
- '<section class="card"><div class="row"><h2 style="margin:0">Bugün · '+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>'+
+ '<section class="card today"><div class="row"><span class="badge">BUGÜN</span><h2 style="margin:0">'+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>'+
  '<section class="card"><h2>Bugün kaç saat çalıştın?</h2><div class="stepper"><button data-act="hour" data-v="-0.5" aria-label="Azalt">−</button><b>'+(log?fh(log):'0')+'</b><button data-act="hour" data-v="0.5" aria-label="Artır">+</button></div>'+
  (goal?'<p class="sm muted" style="text-align:center;margin-top:8px">Bugünkü hedef: '+fh(goal)+'</p>':'')+
  '<div style="height:14px"></div><div class="bars">'+bars.map(([d,v],i)=>'<div class="b'+(i===6?' t':'')+'"><i style="height:'+Math.max(4,v/mx*100)+'%"></i><span>'+DS[wdi(d)]+'</span></div>').join('')+'</div></section>'+
@@ -542,7 +553,7 @@ function vPlan(){
   return '<details data-now="'+(isNow?1:0)+'"'+(isNow?' open':'')+'><summary><span class="sp">'+n+'. hafta · '+fd(a)+' – '+fd(b)+'</span><span class="badge">'+Math.round(hrs)+' sa</span></summary>'+
   ds.map(d=>'<div class="drow'+(d.key===tk?' today':'')+'"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+TYPE[d.type][0]+'</span>'+
    (d.type==='social'?'<div class="muted">'+SOCIAL[(d.date.getDate()+d.w)%SOCIAL.length]+'</div>':'')+
-   d.tasks.map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('')+'</details>';
+   d.tasks.map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pn>1?' <small class="pc">'+(t.pi+1)+'/'+t.pn+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('')+'</details>';
  }).join('');
  const avg=P.sdN?(P.need/P.sdN):0;
  return '<h1 class="greet">Plan</h1><p class="quote">Konular senin müsaitliğine göre otomatik dağıtılır. Bitirdiklerini işaretledikçe kalanlar yeniden yayılır.</p>'+
