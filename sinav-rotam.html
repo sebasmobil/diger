@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#823cdf">
+<title>AGS Yol Arkadaşı</title>
+<script>
+try{var s=JSON.parse(localStorage.getItem('agsYolArkadasi.v1')||'{}');var t=s.theme||'auto';
+document.documentElement.dataset.theme=t==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;
+if(s.accent)document.documentElement.style.setProperty('--accent',s.accent)}catch(e){}
+</script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--accent:#823cdf;--on-accent:#fff;--bg:#f4f5fb;--card:#fff;--text:#14172b;--muted:#656b85;--line:#e4e7f2;
+--soft:color-mix(in srgb,var(--accent) 11%,var(--card));--ok:#16a34a;--warn:#d97706;--bad:#dc2626;color-scheme:light}
+:root[data-theme=dark]{--bg:#0d0f1e;--card:#171a2f;--text:#eef0ff;--muted:#9aa1c4;--line:#272b4a;
+--soft:color-mix(in srgb,var(--accent) 20%,var(--card));color-scheme:dark}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+padding-bottom:calc(92px + env(safe-area-inset-bottom));transition:background .25s,color .25s}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+h1,h2,h3,p{margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:10px;height:60px;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em;flex:1;min-width:0}
+.logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#ff5fa2));display:grid;place-items:center;color:var(--on-accent);flex:none}
+.brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;color:var(--accent);flex:none;transition:.2s}
+.tbtn:active{transform:scale(.92)}.tbtn svg{width:21px;height:21px}
+.bt{display:flex;flex-direction:column;line-height:1.15;min-width:0}.bt small{font-size:11px;color:var(--muted);font-weight:700}
+.pop{position:absolute;right:16px;top:64px;width:min(300px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.pop[hidden]{display:none}
+.pop h3{font-size:14px;margin-bottom:10px}
+.sw{display:flex;flex-wrap:wrap;gap:9px}
+.sw button{width:32px;height:32px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1.5px var(--line)}
+.sw button.on{box-shadow:0 0 0 2.5px var(--text)}
+.pop label{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--muted)}
+.pop input[type=color]{width:44px;height:34px;border:0;border-radius:10px;background:none;padding:0;cursor:pointer}
+.hue{width:100%;margin-top:12px;-webkit-appearance:none;appearance:none;height:12px;border-radius:99px;background:linear-gradient(90deg,hsl(0 80% 58%),hsl(60 80% 58%),hsl(120 80% 58%),hsl(180 80% 58%),hsl(240 80% 58%),hsl(300 80% 58%),hsl(360 80% 58%))}
+.hue::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--text)}
+.hue::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--text)}
+main{padding-top:18px}
+section.card,.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,23,43,.04)}
+.card h2{font-size:17px;letter-spacing:-.01em;margin-bottom:12px}
+.muted{color:var(--muted)}.sm{font-size:13px}
+.greet{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:2px 2px 4px}
+.quote{color:var(--muted);margin:0 2px 16px;font-size:15px}
+.hero{border-radius:26px;padding:22px;margin-bottom:14px;color:var(--on-accent);position:relative;overflow:hidden;
+background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#1b1038))}
+.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.13)}
+.pills{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.pill{background:rgba(255,255,255,.2);padding:5px 11px;border-radius:99px;font-size:13px;font-weight:600}
+.big{display:flex;align-items:baseline;gap:10px;margin:14px 0 2px;position:relative;z-index:1}
+.big b{font-size:76px;line-height:1;font-weight:900;letter-spacing:-.04em}
+.big span{font-size:20px;font-weight:700;opacity:.92}.big em{display:block;font-style:normal;font-size:14px;font-weight:600;opacity:.9}
+.hero .sub{opacity:.92;position:relative;z-index:1}
+.bar{height:9px;border-radius:99px;background:rgba(255,255,255,.25);margin-top:16px;overflow:hidden;position:relative;z-index:1}
+.bar i{display:block;height:100%;border-radius:99px;background:#fff;transition:width .6s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:150px}
+.si{width:56px;height:56px;display:grid;place-items:center;font-size:34px;line-height:1}
+.stat b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stat small{color:var(--muted);font-size:12px}
+.ring{width:56px;height:56px;display:block}
+.ring circle{fill:none;stroke-width:7}.ring .bg{stroke:var(--line)}.ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dasharray .6s}
+.row{display:flex;align-items:center;gap:10px}.sp{flex:1}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:var(--soft);color:var(--accent);font-size:12.5px;font-weight:700}
+:root[data-theme=dark] .badge{color:color-mix(in srgb,var(--accent) 55%,#fff)}
+.task{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;margin-bottom:9px;background:var(--bg);transition:.2s}
+.task.on{opacity:.55}.task.on .tt{text-decoration:line-through}
+.chk{width:28px;height:28px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;flex:none;transition:.2s;color:transparent}
+.task.on .chk{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.dot{width:6px;align-self:stretch;border-radius:9px;background:var(--c,var(--accent));flex:none}
+.tx{flex:1;min-width:0}.tt{font-weight:650;line-height:1.3}.ts{color:var(--muted);font-size:13px}
+.subl{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+.mini{border:1px solid var(--accent);color:var(--accent);border-radius:10px;padding:5px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.mini:hover{background:var(--soft)}
+.note{border-radius:18px;padding:18px;text-align:center;background:var(--soft)}
+.note .em{font-size:34px}.note b{display:block;margin:4px 0}
+.warn{background:color-mix(in srgb,var(--warn) 14%,var(--card));border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:16px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.stepper{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:6px}
+.stepper button{width:40px;height:40px;border-radius:13px;background:var(--soft);color:var(--accent);font-size:22px;font-weight:700}
+.stepper b{min-width:92px;text-align:center;font-size:20px}
+.bars{display:flex;gap:8px;align-items:flex-end;height:90px}
+.b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%;font-size:11px;color:var(--muted)}
+.b i{width:100%;max-width:30px;border-radius:8px 8px 4px 4px;background:var(--accent);min-height:4px;opacity:.9}
+.b.t span{color:var(--accent);font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.chip{padding:7px 13px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=date],input[type=text],select{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:12px}
+.kv b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}.kv small{color:var(--muted);font-size:12.5px}
+details{border:1px solid var(--line);border-radius:18px;background:var(--card);margin-bottom:10px;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:10px;font-weight:700}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"›";transform:rotate(90deg);color:var(--muted);font-size:20px;transition:.2s}
+details[open] summary:after{transform:rotate(-90deg)}
+.drow{display:flex;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}
+.drow.today{background:var(--soft)}
+.dl{width:46px;flex:none;text-align:center;line-height:1.1}.dl b{display:block;font-size:20px}.dl small{color:var(--muted);font-size:12px}
+.dc{flex:1;min-width:0;font-size:14px}
+.tag{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
+.ln{display:flex;gap:7px;align-items:baseline;margin-top:3px}.ln i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none;transform:translateY(-1px)}.ln em{font-style:normal;color:var(--muted);margin-left:auto;white-space:nowrap}
+.ex{display:flex;gap:14px;align-items:center}
+.exd{width:74px;flex:none;text-align:center;background:var(--soft);border-radius:16px;padding:10px 4px}
+.exd b{display:block;font-size:28px;font-weight:900;line-height:1;letter-spacing:-.03em}.exd small{display:block;font-size:12px;color:var(--muted)}
+.ex.main .exd{background:var(--accent);color:var(--on-accent)}.ex.main .exd small{color:inherit;opacity:.85}
+.ex.past{opacity:.5}
+.star{font-size:22px;color:var(--muted)}.star.on{color:#f59e0b}
+.tp{display:flex;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
+.tp:last-child{border:0}.tp.on .tt{text-decoration:line-through;color:var(--muted)}.tp.on .chk{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.wh{font-weight:800;margin:16px 4px 4px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.agrid{display:grid;grid-template-columns:50px repeat(6,1fr);gap:6px;align-items:center}
+.gh{font-size:10.5px;text-align:center;color:var(--muted);font-weight:600}
+.gl{font-weight:700;font-size:13px;text-align:left;color:var(--muted)}
+.cell{height:34px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);transition:.15s}
+.cell.on{background:var(--accent);border-color:var(--accent)}
+.fld{margin-bottom:14px}.fld label{display:block;font-size:13.5px;font-weight:650;margin-bottom:6px}
+.btn{padding:11px 16px;border-radius:13px;background:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.ghost{background:var(--soft);color:var(--accent)}.btn.red{background:color-mix(in srgb,var(--bad) 14%,var(--card));color:var(--bad)}
+.tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav .wrap{display:flex;padding:0 6px}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;font-size:11.5px;font-weight:650;color:var(--muted);transition:.2s}
+nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--accent)}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(8,10,25,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px}
+.mbox{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;padding:22px;width:min(440px,100%);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.mbox h2{font-size:19px;margin-bottom:8px}
+.mbox textarea{width:100%;font:13px/1.4 ui-monospace,monospace;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:10px;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:99px;font-weight:650;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.cf{position:fixed;width:8px;height:12px;border-radius:2px;z-index:99;pointer-events:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:380px){.big b{font-size:62px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/></svg></div><div class="bt"><span>AGS Yol Arkadaşı</span><small id="ver">v1.9</small></div></div>
+  <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
+  <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
+  <div class="pop" id="pop" hidden>
+    <h3>Renk teması</h3>
+    <div class="sw" id="sw"></div>
+    <label>Özel renk <input type="color" id="cc" data-chg="accent"></label>
+    <input type="range" class="hue" id="hue" min="0" max="360" value="250" data-chg="hue" aria-label="Renk tonu">
+    <p class="sm muted" style="margin-top:10px">Sonsuz renk: paletten seç, renk kutusuna dokun ya da kaydırıcıyı oynat.</p>
+  </div>
+</div></header>
+<main class="wrap" id="view"></main>
+<nav><div class="wrap" id="nav"></div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+'use strict';
+const LS='agsYolArkadasi.v1';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const DAY=864e5;
+const DAYS=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+const DS=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const BLOCKS=['06–09','09–12','12–15','15–18','18–21','21–24'];
+const BH=3;
+const MONTHS=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+function pd(s){const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+const sod=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const diffD=(a,b)=>Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/DAY);
+const wdi=d=>(d.getDay()+6)%7;
+const fd=d=>d.getDate()+' '+MONTHS[d.getMonth()];
+const fdy=d=>fd(d)+' '+d.getFullYear();
+const fdl=d=>fdy(d)+' '+DAYS[wdi(d)];
+function fh(h){const m=Math.round(h*4)*15;if(m<=0)return'';const H=Math.floor(m/60),M=m%60;return(H?H+' sa':'')+(H&&M?' ':'')+(M?M+' dk':'')}
+
+/* ---------- Veri ---------- */
+const SUB={
+ fizik:{n:'Fizik',c:'#3b82f6',h:6},kimya:{n:'Kimya',c:'#ec4899',h:6},biyoloji:{n:'Biyoloji',c:'#22c55e',h:6},
+ cografya:{n:'Coğrafya',c:'#f97316',h:5},tarih:{n:'Tarih',c:'#b9770e',h:5},egitim:{n:'Eğitim Bilimleri',c:'#8b5cf6',h:5},
+ mevzuat:{n:'Mevzuat',c:'#a855f7',h:4},yetenek:{n:'Sözel & Sayısal Yetenek',c:'#14b8a6',h:4},fen:{n:'Genel Fen',c:'#6366f1',h:3}
+};
+const Y=['yetenek','Sözel Y. 2 sa + Sayısal Y. 2 sa'];
+const WK=[
+[['fizik','Vektörler – Kuvvet, Tork ve Denge'],['kimya','Atom ve Periyodik Sistem'],['biyoloji','Canlıların Temel Bileşenleri'],['cografya',"Coğrafi Konum ve İklim, Türkiye'nin Yer Şekilleri"],Y],
+[['fizik','Tek Boyutta Hareket ve Newton Hareket Yasaları'],['kimya','Modern Atom Teorisi'],['biyoloji','Canlıların Temel Bileşenleri'],['cografya','Yeryüzü Şekilleri, Nüfus, Tarım–Hayvancılık, Madenler'],Y],
+[['fizik','İş, Güç, Enerji Yasaları ve Atışlar'],['kimya','Kimyasal Türler Arası Etkileşim'],['biyoloji','Hücre ve Organeller'],['cografya','Enerji Kaynakları, Ulaşım, Turizm ve Bölgesel Kalkınma Projeleri'],Y],
+[['fizik','İtme, Momentum ve Basit Harmonik Hareket'],['kimya','Kimyasal Hesaplamalar'],['biyoloji','Sınıflandırma'],['tarih','İlk Türk Devletleri (Osmanlı öncesi)'],['fen','Astronomi çalış']],
+[['fizik','Çembersel Hareket, Kütle Çekim Yasası ve Kepler Yasaları'],['kimya','Organik Kimya'],['biyoloji','Hücre Bölünmesi'],['tarih','Osmanlı Devleti'],Y],
+[['fizik','Mekanik Fizik Genel Tekrarı'],['kimya','Organik Kimya'],['biyoloji','Kalıtım'],['tarih','Osmanlı Devleti – Atatürk Dönemi'],Y],
+[['fizik','Elektrostatik ve Elektrik Akımı'],['kimya','Gazlar'],['biyoloji','Protein Sentezi'],['tarih','Atatürk Dönemi'],Y],
+[['fizik','Elektriksel Kuvvet, Alan, İş–Potansiyel; Levha ve Sığaçlar'],['kimya','Sıvı Çözeltiler'],['biyoloji','Hücresel Solunum'],['tarih','Çağdaş Türk ve Dünya Tarihi'],['fen','Yer Bilimi çalış']],
+[['fizik','Manyetik Alan ve Kuvvet, Alternatif Akım ve Transformatörler'],['kimya','Kimyasal Tepkimelerde Enerji ve Hız'],['biyoloji','Bitki Fizyolojisi'],['egitim','Eğitimin Temelleri'],Y],
+[['fizik','Isı ve Sıcaklık, Termodinamik'],['kimya','Kimyasal Tepkimelerde Denge'],['biyoloji','Sistemler'],['egitim','Eğitimin Temelleri'],Y],
+[['fizik','Optik ve Dalgalar'],['kimya','Kimyasal Tepkimelerde Denge'],['biyoloji','Sistemler'],['egitim','Eğitimin Temelleri – 1982 Anayasası'],Y],
+[['fizik','Dalgalar ve Atom Fiziği'],['kimya','Elektrokimya'],['biyoloji','Sistemler'],['mevzuat','Mevzuat: 222 – 1739 – 7528 sayılı kanunlar'],['fen','Çevre Bilimi çalış']]
+];
+const ITEMS=[];
+WK.forEach((w,wi)=>w.forEach((it,ri)=>ITEMS.push({id:'w'+(wi+1)+'-'+(ri+1),wk:wi+1,s:it[0],t:it[1],h:SUB[it[0]].h})));
+
+// [id, ad, sınav, başvuru başı, başvuru sonu, geç başvuru, sonuç]
+const EXR=[
+['ags','MEB-AGS (Akademi Giriş Sınavı)','2027-05-08','2027-03-19','2027-03-29','2027-04-06','2027-06-11'],
+['oabt','MEB-AGS-ÖABT (Alan Bilgisi Testi)','2027-05-09','2027-03-19','2027-03-29','2027-04-06','2027-06-11'],
+['yds1e','e-YDS 2027/1 İngilizce','2027-01-16','2027-01-04','2027-01-07',0,'2027-01-16'],
+['etep1','e-TEP 2027/1 İngilizce','2027-01-30','2027-01-06','2027-01-13',0,'2027-02-26'],
+['yds2e','e-YDS 2027/2 İngilizce','2027-02-06','2027-01-20','2027-01-28',0,'2027-02-06'],
+['ekys','MEB-EKYS (Yönetici Seçme)','2027-02-21','2027-01-06','2027-01-13','2027-01-20','2027-03-19'],
+['dguy','DGUY (Gelir İdaresi Uzman Yrd.)','2027-02-27','2027-01-29','2027-02-03','2027-02-08','2027-03-23'],
+['yokdil1','YÖKDİL/1','2027-02-28','2027-01-12','2027-01-20','2027-01-28','2027-03-26'],
+['msu','MSÜ (Askerî Öğrenci Aday)','2027-03-20','2027-01-13','2027-02-10','2027-02-16','2027-04-15'],
+['tus','TUS 1. Dönem','2027-03-27','2027-02-02','2027-02-10','2027-02-17','2027-04-22'],
+['sts1','STS Tıp Doktorluğu 1. Dönem','2027-03-27','2027-02-02','2027-02-10','2027-02-17','2027-04-22'],
+['yds1','YDS/1','2027-03-28','2027-02-03','2027-02-11','2027-02-18','2027-04-21'],
+['etep2','e-TEP 2027/2 İngilizce','2027-04-03','2027-03-03','2027-03-17',0,'2027-04-30'],
+['dib','DİB-MBSTS','2027-04-04','2027-02-09','2027-02-17','2027-02-25','2027-04-21'],
+['yos','TR-YÖS/1','2027-04-11','2027-01-14','2027-02-03','2027-02-11','2027-05-06'],
+['yds3e','e-YDS 2027/3 İspanyolca/İtalyanca','2027-04-17',0,0,0,'2027-04-17'],
+['ales','ALES/1','2027-04-18','2027-02-24','2027-03-04','2027-03-17','2027-05-07'],
+['yds4e','e-YDS 2027/4 İngilizce','2027-04-24','2027-04-07','2027-04-14',0,'2027-04-24'],
+['hmgs','HMGS/1','2027-04-25','2027-03-05','2027-03-17','2027-03-24','2027-05-14'],
+['yds5e','e-YDS 2027/5 Farsça/Yunanca/Bulgarca','2027-05-02',0,0,0,'2027-05-02'],
+['ykd1','e-YÖKDİL 2027/1 İngilizce-Sosyal','2027-05-29','2027-05-04','2027-05-12',0,'2027-05-29'],
+['ykd2','e-YÖKDİL 2027/2','2027-05-30','2027-05-04','2027-05-12',0,'2027-05-30'],
+['ykd3','e-YÖKDİL 2027/3 İngilizce-Fen','2027-06-05','2027-05-04','2027-05-27',0,'2027-06-05'],
+['stso','STS Öğretmenlik','2027-06-12','2027-04-28','2027-05-05','2027-05-12','2027-06-25'],
+['tyt','YKS 1. Oturum (TYT)','2027-06-19','2027-02-04','2027-03-02','2027-03-16','2027-07-21'],
+['ayt','YKS 2. ve 3. Oturum (AYT – YDT)','2027-06-20','2027-02-04','2027-03-02','2027-03-16','2027-07-21'],
+['yds6e','e-YDS 2027/6 İngilizce','2027-06-26','2027-06-09','2027-06-17',0,'2027-06-26'],
+['yds7e','e-YDS 2027/7 Arapça/Rusça','2027-07-03','2027-06-15','2027-06-24',0,'2027-07-03']
+];
+const EX=EXR.map(r=>({id:r[0],n:r[1],d:r[2],ap:r[3]?[r[3],r[4]]:null,late:r[5]||null,res:r[6]}));
+
+const QUOTES=['Bugün yaptığın küçük emek, sınav sabahındaki huzurdur.','Mükemmel olmak zorunda değilsin; sadece bugün bir adım at.','Disiplin, motivasyonun bittiği yerde başlar.','Her çözdüğün soru seni hedefe bir adım yaklaştırır.','Yorulduysan dinlen, ama vazgeçme.','Çok çalışan değil, düzenli çalışan kazanır.','Bugünün sayfası, yarının atamasıdır.','Zor olan başlamaktı; başladın bile. Devam et.','Kendine verdiğin söz, en değerli sözdür.','İlerleme küçük de olsa ilerlemedir.','Bugün 1 konu bitir; haftaya kendine teşekkür edeceksin.','Hedefin net, yolun planlı. Sadece uygula.'];
+const SOCIAL=['Arkadaşlarınla bir kahve ya da yürüyüş yap.','Sevdiğin bir diziyi/filmi aç, suçluluk olmadan izle.','Dışarı çık, biraz güneş ve temiz hava al.','Aileni ya da eski bir dostunu ara.','Spor yap, müzik dinle, kafanı boşalt.','Güzel bir yemek yap ya da dışarıda ye.','Hobine zaman ayır: çiz, oyna, gez.'];
+const FCYC=[['Fizik genel tekrar','fizik'],['Kimya genel tekrar','kimya'],['Biyoloji genel tekrar','biyoloji'],['Tarih & Coğrafya tekrarı','tarih'],['Eğitim Bilimleri & Mevzuat tekrarı','egitim'],['Sözel & Sayısal Yetenek soru bankası','yetenek']];
+const TYPE={study:['Çalışma günü'],review:['Tekrar günü'],social:['Sosyal gün'],off:['Müsait değil'],final:['Genel tekrar'],mock:['Deneme günü'],eve:['Sınav arifesi'],exam:['SINAV GÜNÜ']};
+const PAL=['#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e','#f59e0b','#f97316','#ef4444','#ec4899','#a855f7'];
+
+/* ---------- Durum ---------- */
+const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
+const DEF={theme:'auto',accent:'#823cdf',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,
+ avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
+let S;
+try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+let PLAN=null;
+
+/* ---------- Plan motoru ---------- */
+function buildPlan(){
+ const today=sod(new Date()),exam=pd(EX[0].d),lastDay=addD(pd(EX[1].d),0);
+ let start=pd(S.startDate);if(start<today)start=today;
+ const finalN=S.finalDays,N=S.reviewEvery||1,m0=addD(start,-wdi(start));
+ const isRev=d=>Math.floor(diffD(m0,d)/7)%N===N-1;
+ const maxEnd=addD(exam,-finalN-1);
+ const maxWeeks=Math.max(1,Math.floor((diffD(start,exam)-finalN)/7));
+ let studyEnd=addD(start,S.weeks*7-1);
+ if(studyEnd>maxEnd)studyEnd=maxEnd;
+ const rem=ITEMS.filter(i=>!S.done[i.id]);
+ const off=new Set(S.offDates);
+ const days=[];
+ for(let d=start;d<=lastDay;d=addD(d,1)){
+  const w=wdi(d),key=iso(d),cap=(S.avail[w]||[]).filter(Boolean).length*BH;
+  let type;
+  if(d>=exam)type='exam';
+  else if(key===iso(addD(exam,-1)))type='eve';
+  else if(off.has(key)||w===S.socialDay)type='social';
+  else if(d>studyEnd)type=(w===S.reviewDay)?'mock':'final';
+  else if(w===S.reviewDay&&isRev(d))type='review';
+  else type='study';
+  if(cap===0&&['study','review','final','mock'].includes(type))type='off';
+  days.push({date:d,key,w,type,cap,tasks:[]});
+ }
+ const sd=days.filter(x=>x.type==='study');
+ const need=rem.reduce((a,i)=>a+i.h,0);
+ const capT=sd.reduce((a,x)=>a+x.cap,0);
+ const ratio=capT?Math.min(1,need/capT):0;
+ let cum=0,given=0,idx=0,left=rem[0]?rem[0].h:0;const endOf={};
+ for(const day of sd){
+  cum+=day.cap;
+  const target=cum*ratio;let q=target-given;given=target;
+  while(q>1e-6&&idx<rem.length){
+   const t=Math.min(q,left);const it=rem[idx];
+   day.tasks.push({id:it.id,t:it.t,s:SUB[it.s].n,c:SUB[it.s].c,h:t});
+   q-=t;left-=t;
+   if(left<1e-6){endOf[it.id]=day.key;idx++;left=rem[idx]?rem[idx].h:0}
+  }
+ }
+ const effDate=id=>S.done[id]?pd(S.done[id]):(endOf[id]?pd(endOf[id]):null);
+ const win=(day,a,b)=>ITEMS.filter(i=>{const e=effDate(i.id);if(!e)return false;const df=diffD(e,day.date);return df>=a&&df<=b});
+ const acc='var(--accent)';
+ let rc=0,fc=0,mc=0;
+ for(const day of days){
+  if(day.type==='review'){
+   rc++;const wk=win(day,1,7*N),sp=rc%2===0?win(day,7*N+8,7*N+28):[];const c=day.cap;
+   const nm=l=>l.map(i=>SUB[i.s].n+': '+i.t);
+   if(wk.length)day.tasks.push({t:N===1?'Haftalık tekrar':N+' haftalık tekrar',s:N===1?'Geçen hafta bitirdiğin konular':'Son '+N+' haftada bitirdiğin konular',c:acc,h:c*(sp.length?.45:.6),sub:nm(wk)});
+   if(sp.length)day.tasks.push({t:'Aralıklı tekrar',s:'2–5 hafta önceki konular unutulmasın',c:acc,h:c*.25,sub:nm(sp)});
+   if(!wk.length&&!sp.length)day.tasks.push({t:'Eksik konu tamamlama',s:'Geride kalanları yakala, soru çöz',c:acc,h:c*.8});
+   day.tasks.push({t:'Yanlış defteri + mini deneme',s:'Yanlışlarını tekrar çöz',c:acc,h:Math.max(.5,c-day.tasks.reduce((a,t)=>a+t.h,0))});
+  }else if(day.type==='final'){
+   const f=FCYC[fc%FCYC.length];fc++;
+   day.tasks.push({t:f[0],s:'Özet çıkar, soru çöz, eksik konuyu kapat',c:SUB[f[1]].c,h:day.cap});
+  }else if(day.type==='mock'){
+   mc++;
+   day.tasks.push({t:mc%2?'MEB-AGS deneme sınavı':'ÖABT deneme sınavı',s:'Gerçek sınav süresiyle çöz',c:acc,h:Math.min(3,day.cap*.6)});
+   day.tasks.push({t:'Deneme analizi',s:'Yanlışları ve boşları konulara ayır',c:acc,h:Math.max(1,day.cap-Math.min(3,day.cap*.6))});
+  }else if(day.type==='eve'){
+   day.tasks.push({t:'Hafif tekrar, erken uyu',s:'Yeni konu yok. Çantanı ve kimliğini hazırla.',c:'var(--ok)',h:Math.min(2,day.cap||2)});
+  }else if(day.type==='exam'){
+   const isAgs=iso(day.date)===EX[0].d;
+   day.tasks.push({t:isAgs?'MEB-AGS':'MEB-AGS-ÖABT',s:'Derin nefes. Hazırlandın, gerisi sadece uygulama.',c:acc,h:0});
+  }
+ }
+ return{days,rem,need,capT,short:Math.max(0,need-capT),studyEnd,maxWeeks,start,endOf,sdN:sd.length,capped:S.weeks*7-1>diffD(start,studyEnd)};
+}
+
+/* ---------- Tema ---------- */
+const TI={light:'<circle cx="12" cy="12" r="4.3" fill="currentColor"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+dark:'<path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7z" fill="currentColor"/>',
+auto:'<circle cx="11" cy="12" r="6.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 5.4a6.6 6.6 0 0 0 0 13.2z" fill="currentColor"/><path d="M20.4 12h2M18.6 6.6l1.4-1.4M18.6 17.4l1.4 1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'};
+const TN={light:'Açık tema',dark:'Koyu tema',auto:'Otomatik (sistemi takip eder)'};
+const mq=matchMedia('(prefers-color-scheme: dark)');
+function lum(h){const n=parseInt(h.slice(1),16),f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(n>>16)+.7152*f((n>>8)&255)+.0722*f(n&255)}
+function hsl2hex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l);const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return'#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('')}
+function applyTheme(){
+ const t=S.theme==='auto'?(mq.matches?'dark':'light'):S.theme;
+ const r=document.documentElement;r.dataset.theme=t;
+ r.style.setProperty('--accent',S.accent);
+ r.style.setProperty('--on-accent',lum(S.accent)>0.42?'#111':'#fff');
+ const m=$('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0d0f1e':S.accent;
+ $('#ticon').innerHTML=TI[S.theme]||TI.auto;const tb=$('#tbtn');tb.title=TN[S.theme]||'';tb.setAttribute('aria-label','Tema: '+(TN[S.theme]||''));
+ $$('#sw button').forEach(b=>b.classList.toggle('on',b.dataset.c.toLowerCase()===S.accent.toLowerCase()));
+ const cc=$('#cc');if(cc)cc.value=S.accent;
+}
+mq.addEventListener('change',()=>{if(S.theme==='auto')applyTheme()});
+
+/* ---------- Yardımcılar ---------- */
+function modal(html){closeModal();const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML='<div class="mbox" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m)}
+function closeModal(){const m=$('#modal');if(m)m.remove()}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
+function boom(x,y){
+ const cols=[S.accent,'#f59e0b','#22c55e','#ec4899','#3b82f6'];
+ for(let i=0;i<30;i++){
+  const e=document.createElement('i');e.className='cf';e.style.left=x+'px';e.style.top=y+'px';e.style.background=cols[i%5];document.body.appendChild(e);
+  const a=Math.random()*Math.PI*2,v=70+Math.random()*150;
+  e.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:'translate('+Math.cos(a)*v+'px,'+(Math.sin(a)*v+130)+'px) rotate('+Math.random()*720+'deg)',opacity:0}],{duration:900+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove();
+ }
+}
+function streak(){let n=0,d=sod(new Date());if(!(S.log[iso(d)]>0))d=addD(d,-1);while(S.log[iso(d)]>0){n++;d=addD(d,-1)}return n}
+const doy=()=>{const d=new Date();return Math.floor((d-new Date(d.getFullYear(),0,0))/DAY)};
+const doneCount=()=>ITEMS.filter(i=>S.done[i.id]).length;
+const opt=(arr,sel)=>arr.map(([v,l])=>'<option value="'+v+'"'+(String(v)===String(sel)?' selected':'')+'>'+l+'</option>').join('');
+const CHK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+
+/* ---------- Görünümler ---------- */
+function taskHtml(day,t,i){
+ const k=day.key+'|'+(t.id||i),on=S.ticks[k];
+ return '<div class="task'+(on?' on':'')+'"><span class="dot" style="--c:'+t.c+'"></span>'+
+  '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
+  '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+'</div>'+
+  (t.sub?'<ul class="subl">'+t.sub.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'')+'</div>'+
+  (t.id?'<button class="mini" data-act="finish" data-id="'+t.id+'">Konu bitti</button>':'')+'</div>';
+}
+function vHome(){
+ const P=PLAN,today=sod(new Date()),dA=diffD(today,pd(EX[0].d)),dO=diffD(today,pd(EX[1].d));
+ const total=ITEMS.length,dn=doneCount(),pct=Math.round(dn/total*100),tk=iso(today),day=P.days.find(x=>x.key===tk);
+ const log=S.log[tk]||0,h=new Date().getHours();
+ const g=(h<5?'İyi geceler':h<12?'Günaydın':h<18?'Merhaba':'İyi akşamlar')+(S.name?' '+S.name:'')+' 👋';
+ let hero;
+ if(dA>0)hero='<div class="big"><b>'+dA+'</b><span>gün kaldı<em>('+Math.floor(dA/7)+' hafta '+dA%7+' gün)</em></span></div><div class="sub">'+fdl(pd(EX[0].d))+'</div>';
+ else if(dA===0)hero='<div class="big"><b>🏁</b><span>Bugün sınav günü!</span></div><div class="sub">Derin nefes al. Hazırsın.</div>';
+ else hero='<div class="big"><b>✓</b><span>Sınav tamamlandı</span></div><div class="sub">Emeğine sağlık. Sonuç: '+fd(pd(EX[0].res))+'</div>';
+ const bars=[];let mx=4;for(let i=6;i>=0;i--){const d=addD(today,-i);const v=S.log[iso(d)]||0;mx=Math.max(mx,v);bars.push([d,v])}
+ let body='';
+ if(!day){
+  body='<div class="note"><div class="em">⏳</div><b>Plan '+fd(P.start)+' tarihinde başlıyor</b><span class="muted sm">Başlangıç tarihini Ayarlar\'dan değiştirebilirsin.</span></div>';
+ }else if(day.type==='social'){
+  body='<div class="note"><div class="em">🎈</div><b>Bugün sosyal gün — suçluluk yok!</b><span class="muted">'+SOCIAL[(doy()+tk.length)%SOCIAL.length]+'</span></div>';
+ }else if(day.type==='off'){
+  body='<div class="note"><div class="em">🛋️</div><b>Bugün müsait değilsin</b><span class="muted sm">Dinlen. Müsaitlik saatlerini Ayarlar\'dan değiştirebilirsin.</span></div>';
+ }else{
+  body=day.tasks.map((t,i)=>taskHtml(day,t,i)).join('');
+ }
+ const goal=day?day.tasks.reduce((a,t)=>a+t.h,0):0;
+ const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow" style="padding-left:0;padding-right:0"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+TYPE[d.type][0]+'</span>'+
+  d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
+ return '<div class="greet">'+g+'</div><p class="quote">“'+QUOTES[doy()%QUOTES.length]+'”</p>'+
+ '<section class="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+hero+
+ '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub" style="margin-top:8px;font-size:13px">Konuların %'+pct+'\'i tamam ('+dn+'/'+total+')</div></section>'+
+ (P.short>0.5?'<div class="warn">⚠️ Seçtiğin süre ve müsaitlikle <b>yaklaşık '+Math.ceil(P.short)+' saat</b> konu açıkta kalıyor. Plan sekmesinden süreyi uzat ya da Ayarlar\'dan müsaitlik ekle.</div>':'')+
+ '<div class="stats"><div class="stat"><div class="si"><svg class="ring" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="'+(pct*1.634)+' 163.4" transform="rotate(-90 32 32)"/></svg></div><b>%'+pct+'</b><small>İlerleme</small></div>'+
+ '<div class="stat"><div class="si">🔥</div><b>'+streak()+' gün</b><small>seri</small></div><div class="stat"><div class="si">⏱️</div><b>'+(Object.values(S.log).reduce((a,b)=>a+b,0)).toFixed(0)+' sa</b><small>toplam çalışma</small></div></div>'+
+ '<section class="card"><div class="row"><h2 style="margin:0">Bugün · '+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>'+
+ '<section class="card"><h2>Bugün kaç saat çalıştın?</h2><div class="stepper"><button data-act="hour" data-v="-0.5" aria-label="Azalt">−</button><b>'+(log?fh(log):'0')+'</b><button data-act="hour" data-v="0.5" aria-label="Artır">+</button></div>'+
+ (goal?'<p class="sm muted" style="text-align:center;margin-top:8px">Bugünkü hedef: '+fh(goal)+'</p>':'')+
+ '<div style="height:14px"></div><div class="bars">'+bars.map(([d,v],i)=>'<div class="b'+(i===6?' t':'')+'"><i style="height:'+Math.max(4,v/mx*100)+'%"></i><span>'+DS[wdi(d)]+'</span></div>').join('')+'</div></section>'+
+ (nxt?'<section class="card"><h2>Önümüzdeki günler</h2>'+nxt+'</section>':'');
+}
+function vPlan(){
+ const P=PLAN,rem=P.rem.length,wkChoices=[6,8,12,16,20,24].filter(w=>w<P.maxWeeks);
+ const wks={};P.days.forEach(d=>{const ws=iso(addD(d.date,-d.w));(wks[ws]=wks[ws]||[]).push(d)});
+ const tk=iso(sod(new Date()));let n=0;
+ const wkHtml=Object.keys(wks).map(k=>{
+  n++;const ds=wks[k],a=ds[0].date,b=ds[ds.length-1].date,isNow=ds.some(d=>d.key===tk);
+  const hrs=ds.reduce((s,d)=>s+d.tasks.reduce((x,t)=>x+t.h,0),0);
+  return '<details'+(isNow?' open':'')+'><summary><span class="sp">'+n+'. hafta · '+fd(a)+' – '+fd(b)+'</span><span class="badge">'+Math.round(hrs)+' sa</span></summary>'+
+  ds.map(d=>'<div class="drow'+(d.key===tk?' today':'')+'"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+TYPE[d.type][0]+'</span>'+
+   (d.type==='social'?'<div class="muted">'+SOCIAL[(d.date.getDate()+d.w)%SOCIAL.length]+'</div>':'')+
+   d.tasks.map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('')+'</details>';
+ }).join('');
+ const avg=P.sdN?(P.need/P.sdN):0;
+ return '<h1 class="greet">Plan</h1><p class="quote">Konular senin müsaitliğine göre otomatik dağıtılır. Bitirdiklerini işaretledikçe kalanlar yeniden yayılır.</p>'+
+ '<section class="card"><h2>Programı kaç haftada bitireyim?</h2><div class="chips">'+wkChoices.map(w=>'<button class="chip'+(S.weeks===w?' on':'')+'" data-act="weeks" data-v="'+w+'">'+w+' hafta</button>').join('')+
+ '<button class="chip'+(S.weeks>=P.maxWeeks?' on':'')+'" data-act="weeks" data-v="'+P.maxWeeks+'">Sınava kadar ('+P.maxWeeks+')</button></div>'+
+ '<input type="range" min="2" max="'+P.maxWeeks+'" value="'+Math.min(S.weeks,P.maxWeeks)+'" data-chg="weeksR" aria-label="Hafta sayısı"><div class="sm muted" style="margin-top:4px">Seçili: <b id="wl">'+Math.min(S.weeks,P.maxWeeks)+'</b> hafta · konular <b id="wd">'+fd(P.studyEnd)+'</b> tarihinde biter</div>'+
+ '<div style="height:14px"></div><div class="grid2"><div class="kv"><b>'+rem+' konu</b><small>kalan ('+P.need+' saat)</small></div><div class="kv"><b>'+fd(P.studyEnd)+'</b><small>konuların bitiş günü</small></div>'+
+ '<div class="kv"><b>'+(avg?fh(avg):'–')+'</b><small>çalışma gününe düşen</small></div><div class="kv"><b>'+Math.round(P.capT)+' sa</b><small>toplam müsait süre</small></div></div>'+
+ '<p class="sm muted" style="margin-top:12px">Konular bittikten sonra sınava kadar <b>genel tekrar</b> ve <b>deneme</b> günleri otomatik eklenir.</p></section>'+
+ (P.short>0.5?'<div class="warn">⚠️ Bu süreye <b>yaklaşık '+Math.ceil(P.short)+' saat</b> sığmıyor. Haftaları artır ya da Ayarlar\'da müsaitlik ekle.</div>':'')+
+ wkHtml;
+}
+function vTopics(){
+ const f=S.filter,dn=doneCount(),pct=Math.round(dn/ITEMS.length*100);
+ const subs=Object.keys(SUB);
+ let html='<h1 class="greet">Konular</h1><p class="quote">Bitirdiğin konuya dokun. Plan kalan konulara göre kendini yeniler.</p>'+
+ '<section class="card"><div class="row"><b>'+dn+' / '+ITEMS.length+' konu</b><span class="sp"></span><span class="badge">%'+pct+'</span></div><div class="bar" style="background:var(--line)"><i style="background:var(--accent);width:'+pct+'%"></i></div>'+
+ '<div class="chips" style="margin-top:14px"><button class="chip'+(f==='all'?' on':'')+'" data-act="filter" data-v="all">Hepsi</button>'+
+ subs.map(s=>'<button class="chip'+(f===s?' on':'')+'" data-act="filter" data-v="'+s+'">'+SUB[s].n+'</button>').join('')+'</div></section>';
+ let last=0,open=false;
+ ITEMS.filter(i=>f==='all'||i.s===f).forEach(i=>{
+  if(i.wk!==last){if(open)html+='</section>';html+='<div class="wh">'+i.wk+'. hafta (orijinal program)</div><section class="card" style="padding:6px 16px">';last=i.wk;open=true}
+  const on=!!S.done[i.id],pl=PLAN.endOf[i.id];
+  html+='<div class="tp'+(on?' on':'')+'"><button class="chk" data-act="done" data-id="'+i.id+'" aria-label="İşaretle">'+CHK+'</button><span class="dot" style="--c:'+SUB[i.s].c+';align-self:stretch"></span><div class="tx"><div class="tt">'+i.t+'</div><div class="ts">'+SUB[i.s].n+' · '+fh(i.h)+(on?' · bitti '+fd(pd(S.done[i.id])):(pl?' · planlanan bitiş '+fd(pd(pl)):''))+'</div></div></div>';
+ });
+ if(open)html+='</section>';
+ return html;
+}
+function apStatus(e,today){
+ if(!e.ap)return null;
+ const a=pd(e.ap[0]),b=pd(e.ap[1]);
+ if(today<a)return['Başvuru '+diffD(today,a)+' gün sonra açılır',''];
+ if(today<=b)return['Başvuru açık · '+(diffD(today,b)===0?'son gün!':diffD(today,b)+' gün kaldı'),'ok'];
+ if(e.late&&today<=pd(e.late))return['Geç başvuru: '+fd(pd(e.late)),'warn'];
+ return['Başvuru kapandı',''];
+}
+function vExams(){
+ const today=sod(new Date());
+ const list=EX.map(e=>({...e,dd:diffD(today,pd(e.d)),pin:S.pins.includes(e.id)}));
+ let L=list.filter(e=>S.exf==='pins'?e.pin:S.exf==='soon'?e.dd>=0:true);
+ L.sort((a,b)=>(a.pin!==b.pin?(a.pin?-1:1):0)||((a.dd<0)-(b.dd<0))||(a.dd-b.dd));
+ return '<h1 class="greet">Sınavlar</h1><p class="quote">Yıldızladığın sınavlar ana ekranda öne çıkar. Tarihler 2027 ÖSYM takvimindendir; resmî duyurularla kontrol et.</p>'+
+ '<div class="chips"><button class="chip'+(S.exf==='pins'?' on':'')+'" data-act="exf" data-v="pins">⭐ Takip ettiklerim</button><button class="chip'+(S.exf==='soon'?' on':'')+'" data-act="exf" data-v="soon">Yaklaşanlar</button><button class="chip'+(S.exf==='all'?' on':'')+'" data-act="exf" data-v="all">Tümü</button></div>'+
+ (L.length?L.map(e=>{
+  const st=apStatus(e,today),main=e.id==='ags'||e.id==='oabt';
+  return '<section class="card ex'+(main?' main':'')+(e.dd<0?' past':'')+'"><div class="exd"><b>'+(e.dd>=0?e.dd:'✓')+'</b><small>'+(e.dd===0?'bugün':e.dd>0?'gün':'geçti')+'</small>'+(e.dd>6?'<small>('+Math.floor(e.dd/7)+' hf)</small>':'')+'</div>'+
+  '<div class="tx"><div class="tt">'+e.n+'</div><div class="ts">'+fdl(pd(e.d))+'</div>'+(e.dd>0?'<div class="ts">'+Math.floor(e.dd/7)+' hafta '+e.dd%7+' gün</div>':'')+
+  (st&&e.dd>0?'<div class="ts" style="'+(st[1]==='ok'?'color:var(--ok);font-weight:700':st[1]==='warn'?'color:var(--warn);font-weight:700':'')+'">'+st[0]+'</div>':'')+
+  '<div class="ts">Sonuç: '+fd(pd(e.res))+'</div></div><button class="star'+(e.pin?' on':'')+'" data-act="pin" data-id="'+e.id+'" aria-label="Takip et">'+(e.pin?'★':'☆')+'</button></section>';
+ }).join(''):'<div class="note">Henüz yıldızladığın sınav yok. “Tümü”nden seç.</div>');
+}
+function vSettings(){
+ const wkh=Object.values(S.avail).reduce((a,r)=>a+r.filter(Boolean).length*BH,0);
+ const dOpts=DAYS.map((d,i)=>[i,d]);
+ return '<h1 class="greet">Ayarlar</h1><p class="quote">Müsait olduğun saatleri işaretle; plan buna göre şekillenir.</p>'+
+ '<section class="card"><h2>Müsait saatlerim</h2><p class="sm muted" style="margin-bottom:12px">Dokunarak aç/kapat. Gün adına dokunursan tüm satır değişir. Her kutu 3 saatlik bir blok. Haftalık toplam: <b>'+wkh+' sa</b></p>'+
+ '<div class="chips"><button class="chip" data-act="preset" data-p="day">Gündüz</button><button class="chip" data-act="preset" data-p="eve">Akşamlar</button><button class="chip" data-act="preset" data-p="all">Hepsi</button><button class="chip" data-act="preset" data-p="none">Temizle</button></div>'+
+ '<div class="agrid"><span></span>'+BLOCKS.map(b=>'<span class="gh">'+b+'</span>').join('')+
+ DAYS.map((n,w)=>'<button class="gl" data-act="rowav" data-w="'+w+'">'+DS[w]+'</button>'+BLOCKS.map((b,i)=>'<button class="cell'+(S.avail[w][i]?' on':'')+'" data-act="av" data-w="'+w+'" data-i="'+i+'" aria-label="'+n+' '+b+'"></button>').join('')).join('')+'</div></section>'+
+ '<section class="card"><h2>Haftalık düzen</h2><div class="fld"><label>Tekrar günü (tekrar + mini deneme yapılan gün)</label><select data-chg="review">'+opt(dOpts,S.reviewDay)+'</select></div>'+
+ '<div class="fld"><label>Tekrar günü ne sıklıkla olsun?</label><select data-chg="every">'+opt([[1,'Her hafta'],[2,'2 haftada bir'],[3,'3 haftada bir'],[4,'4 haftada bir']],S.reviewEvery||1)+'</select></div>'+
+ '<div class="fld"><label>Sosyal gün (ders yok, kafa dinle)</label><select data-chg="social">'+opt([[-1,'Yok']].concat(dOpts),S.socialDay)+'</select></div>'+
+ '<div class="fld"><label>Sınavdan önce genel tekrar süresi</label><select data-chg="final">'+opt([[7,'Son 7 gün (1 hafta)'],[14,'Son 14 gün (2 hafta)'],[21,'Son 21 gün (3 hafta)'],[28,'Son 28 gün (4 hafta)'],[35,'Son 35 gün (5 hafta)'],[42,'Son 42 gün (6 hafta)']],S.finalDays)+'</select></div>'+
+ '<div class="fld"><label>Planın başlangıç tarihi</label><input type="date" data-chg="start" value="'+S.startDate+'"></div></section>'+
+ '<section class="card"><h2>Tek seferlik boş günler</h2><p class="sm muted">Düğün, hasta olma, seyahat… O gün plana ders konmaz.</p><div class="row" style="margin-top:10px"><input type="date" id="offd"><button class="btn" data-act="addoff">Ekle</button></div>'+
+ '<div class="tags">'+S.offDates.sort().map(d=>'<span class="badge">'+fd(pd(d))+' <button data-act="deloff" data-d="'+d+'" aria-label="Sil" style="font-weight:900">×</button></span>').join('')+'</div></section>'+
+ '<section class="card"><h2>Kişisel</h2><div class="fld"><label>Adın (selamlama için)</label><input type="text" data-chg="name" value="'+S.name.replace(/"/g,'&quot;')+'" placeholder="Örn. Ayşe"></div>'+
+ '</section>'+
+ '<section class="card"><h2>💾 Yedekle ve başka cihaza taşı</h2>'+
+ '<p class="sm muted">Yaptığın işaretlemeler, planın ve ayarların <b>sadece bu telefonda/bilgisayarda</b> saklanır. Telefon değiştirirsen ya da tarayıcı verilerini silersen kaybolabilir. Yedek almak bunu önler.</p>'+
+ '<ol class="sm muted" style="padding-left:20px;margin:10px 0">'+
+ '<li><b>Yedeği kopyala</b> düğmesine bas. Bir uzun metin kopyalanır.</li>'+
+ '<li>Bu metni kendine mesaj at ya da bir nota yapıştır (WhatsApp, Notlar vb.).</li>'+
+ '<li>Yeni cihazda uygulamayı aç, <b>Yedeği yükle</b>\'ye bas ve metni yapıştır. Her şey geri gelir.</li></ol>'+
+ '<div class="row" style="flex-wrap:wrap"><button class="btn ghost" data-act="export">Yedeği kopyala</button><button class="btn ghost" data-act="import">Yedeği yükle</button></div></section>'+
+ '<section class="card" style="border-color:color-mix(in srgb,var(--bad) 40%,var(--line))"><h2>⚠️ Her şeyi sıfırla</h2>'+
+ '<p class="sm muted">Bu düğme uygulamayı ilk günkü haline döndürür: işaretlediğin tüm konular, çalışma saatlerin, seri, müsaitlik ve ayarların silinir. <b>Geri alınamaz.</b> Emin değilsen önce yukarıdan yedek al.</p>'+
+ '<div style="height:12px"></div><button class="btn red" data-act="reset">Her şeyi sıfırla</button></section>';
+}
+const NAV=[['home','Bugün','<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
+['plan','Plan','<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>'],
+['topics','Konular','<path d="M10 6h11M10 12h11M10 18h11M3.5 6l1.5 1.5L7.5 4.5M3.5 12l1.5 1.5 2.5-3M3.5 18l1.5 1.5 2.5-3"/>'],
+['exams','Sınavlar','<path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/>'],
+['settings','Ayarlar','<path d="M4 7h9M18 7h2M4 17h2M11 17h9"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="8.5" cy="17" r="2.3"/>']];
+const VIEWS={home:vHome,plan:vPlan,topics:vTopics,exams:vExams,settings:vSettings};
+function render(){
+ PLAN=buildPlan();
+ $('#nav').innerHTML=NAV.map(n=>'<button class="'+(S.tab===n[0]?'on':'')+'" data-act="tab" data-v="'+n[0]+'"><svg viewBox="0 0 24 24">'+n[2]+'</svg>'+n[1]+'</button>').join('');
+ $('#view').innerHTML=(VIEWS[S.tab]||vHome)();
+}
+
+/* ---------- Etkileşim ---------- */
+const A={
+ tab(t){S.tab=t.dataset.v;save();render();scrollTo({top:0})},
+ theme(){const o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast(TN[S.theme])},
+ palette(){const p=$('#pop');p.hidden=!p.hidden},
+ sw(t){S.accent=t.dataset.c;save();applyTheme()},
+ weeks(t){S.weeks=+t.dataset.v;save();render()},
+ filter(t){S.filter=t.dataset.v;save();render()},
+ exf(t){S.exf=t.dataset.v;save();render()},
+ pin(t){const i=S.pins.indexOf(t.dataset.id);i<0?S.pins.push(t.dataset.id):S.pins.splice(i,1);save();render()},
+ done(t){const id=t.dataset.id;if(S.done[id])delete S.done[id];else{S.done[id]=iso(sod(new Date()));const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);milestone()}save();render()},
+ finish(t){const r=t.getBoundingClientRect();boom(r.left+r.width/2,r.top);S.done[t.dataset.id]=iso(sod(new Date()));milestone();save();render()},
+ tick(t){
+  const k=t.dataset.k,h=+t.dataset.h,d=t.dataset.d;
+  if(S.ticks[k]){delete S.ticks[k];S.log[d]=Math.max(0,(S.log[d]||0)-h)}
+  else{S.ticks[k]=1;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
+  save();render()},
+ hour(t){const k=iso(sod(new Date()));S.log[k]=Math.max(0,Math.round(((S.log[k]||0)+ +t.dataset.v)*2)/2);save();render()},
+ av(t){const w=t.dataset.w,i=+t.dataset.i;S.avail[w][i]=S.avail[w][i]?0:1;save();render()},
+ rowav(t){const r=S.avail[t.dataset.w],on=r.every(Boolean);for(let i=0;i<6;i++)r[i]=on?0:1;save();render()},
+ preset(t){const p=t.dataset.p,m={day:[0,1,1,1,0,0],eve:[0,0,0,1,1,1],all:[1,1,1,1,1,1],none:[0,0,0,0,0,0]}[p];S.avail=av(m);save();render()},
+ addoff(){const v=$('#offd').value;if(v&&!S.offDates.includes(v)){S.offDates.push(v);save();render()}},
+ deloff(t){S.offDates=S.offDates.filter(x=>x!==t.dataset.d);save();render()},
+ export(){const s=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('Yedek kopyalandı ✓ Şimdi bir yere yapıştırıp sakla')).catch(()=>{modal('<h2>Yedek metni</h2><p class="sm muted">Otomatik kopyalanamadı. Aşağıdaki metne uzun basıp “Tümünü seç” ve “Kopyala” de, sonra bir yere yapıştırıp sakla.</p><textarea id="bk" readonly rows="6">'+s.replace(/</g,'&lt;')+'</textarea><div class="row" style="margin-top:12px"><button class="btn" data-act="mclose">Tamam</button></div>');const x=$('#bk');x.focus();x.select()})},
+ import(){modal('<h2>Yedeği yükle</h2><p class="sm muted">Daha önce kopyaladığın yedek metnini aşağıya yapıştır. Yüklenince şu anki ilerlemenin yerine geçer.</p><textarea id="bk" rows="6" placeholder="Yedek metnini buraya yapıştır"></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="importgo">Yedeği yükle</button></div>')},
+ importgo(){const s=($('#bk').value||'').trim();if(!s)return;try{const o=JSON.parse(s);if(typeof o!=='object'||!o)throw 0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);save();closeModal();applyTheme();render();toast('Yedek yüklendi ✓')}catch(e){toast('Bu metin geçerli bir yedek değil')}},
+ reset(){
+  const dn=doneCount(),hrs=Object.values(S.log).reduce((a,b)=>a+b,0),days=Object.keys(S.log).filter(k=>S.log[k]>0).length;
+  modal('<h2>⚠️ Her şey sıfırlansın mı?</h2><p class="sm muted">“Evet, sıfırla”ya basarsan şunlar silinir:</p>'+
+  '<ul class="sm" style="padding-left:20px;margin:10px 0;line-height:1.7"><li><b>'+dn+' konu</b> işaretin (hepsi “bitmedi” olur)</li>'+
+  '<li><b>'+(hrs?fh(hrs):'0 saat')+'</b> çalışma kaydın ('+days+' gün) ve serin</li>'+
+  '<li>Müsaitlik saatlerin, tekrar/sosyal gün seçimin ve boş günlerin</li>'+
+  '<li>Hafta sayısı, başlangıç tarihi ve genel tekrar süresi ayarların</li>'+
+  '<li>Seçtiğin renk, tema ve adın da varsayılana döner</li></ul>'+
+  '<p class="sm"><b>Bu işlem geri alınamaz.</b> Emin değilsen “Vazgeç”e bas; önce yedek almak için Ayarlar’daki yedek kartını kullan.</p>'+
+  '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn red" data-act="resetgo">Evet, sıfırla</button></div>')},
+ resetgo(){S=JSON.parse(JSON.stringify(DEF));save();closeModal();applyTheme();render();scrollTo({top:0});toast('Her şey sıfırlandı')},
+ mclose(){closeModal()}
+};
+function milestone(){
+ const p=Math.round(doneCount()/ITEMS.length*100);
+ const m=[100,75,50,25].find(x=>p>=x&&S.seen<x);
+ if(m){S.seen=m;toast(m===100?'Tüm konular tamam! Şimdi tekrar ve deneme zamanı 🏆':'%'+m+' tamamlandı! Böyle devam 🎉')}
+}
+document.addEventListener('click',e=>{
+ if(e.target.id==='modal'){closeModal();return}
+ const t=e.target.closest('[data-act]');
+ if(!t){if(!e.target.closest('#pop'))$('#pop').hidden=true;return}
+ if(t.dataset.act!=='palette'&&!t.closest('#pop'))$('#pop').hidden=true;
+ A[t.dataset.act]&&A[t.dataset.act](t,e);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('change',e=>{
+ const c=e.target.dataset.chg;if(!c)return;const v=e.target.value;
+ if(c==='weeksR'){S.weeks=+v}
+ else if(c==='final'){S.finalDays=+v}
+ else if(c==='every'){S.reviewEvery=+v}
+ else if(c==='review'){S.reviewDay=+v;if(S.socialDay===S.reviewDay)S.socialDay=-1}
+ else if(c==='social'){S.socialDay=+v;if(S.socialDay===S.reviewDay)S.reviewDay=(S.reviewDay+1)%7}
+ else if(c==='start'){S.startDate=v||iso(sod(new Date()))}
+ else if(c==='name'){S.name=v.trim().slice(0,24);save();return}
+ else return;
+ save();render();
+});
+document.addEventListener('input',e=>{
+ const c=e.target.dataset.chg;
+ if(c==='accent'){S.accent=e.target.value;save();applyTheme()}
+ else if(c==='hue'){S.accent=hsl2hex(+e.target.value,78,56);save();applyTheme()}
+ else if(c==='weeksR'){const w=+e.target.value;$('#wl').textContent=w;const st=addD(PLAN.start,w*7-1);const mx=addD(pd(EX[0].d),-S.finalDays-1);$('#wd').textContent=fd(st>mx?mx:st)}
+});
+$('#sw').innerHTML=PAL.map(c=>'<button data-act="sw" data-c="'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>').join('');
+applyTheme();render();
+let lastDay=iso(new Date());
+setInterval(()=>{const d=iso(new Date());if(d!==lastDay){lastDay=d;render()}},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastDay=iso(new Date());render()}});
+})();
+</script>
+</body>
+</html>
