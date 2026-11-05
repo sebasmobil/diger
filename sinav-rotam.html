@@ -204,6 +204,7 @@ nav button.on{color:var(--accent)}
 .sw2{width:48px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:none;transition:.2s}.sw2 i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:.2s}
 .swrow.on{border-color:var(--accent);background:var(--soft)}.swrow.on .sw2{background:var(--accent)}.swrow.on .sw2 i{left:23px}
 #fab{position:fixed;z-index:35;width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:0 8px 22px rgba(0,0,0,.28),0 0 0 3px color-mix(in srgb,var(--bg) 75%,transparent);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .15s,box-shadow .15s}
+#fab[hidden]{display:none}
 #fab svg{width:30px;height:30px;pointer-events:none}#fab.drag{transform:scale(1.14);box-shadow:0 14px 32px rgba(0,0,0,.36),0 0 0 3px color-mix(in srgb,var(--bg) 75%,transparent)}
 .toast{z-index:95;position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:99px;font-weight:650;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -214,7 +215,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v3.7</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v3.8</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -764,6 +765,7 @@ function render(){
  $('#nav').innerHTML=NAV.map(n=>'<button class="'+(S.tab===n[0]?'on':'')+'" data-act="tab" data-v="'+n[0]+'"><svg viewBox="0 0 24 24">'+n[2]+'</svg>'+n[1]+'</button>').join('');
  $('#view').innerHTML=(VIEWS[S.tab]||vHome)();
  if(S.tab==='plan')syncTgl();
+ const fb=$('#fab');if(fb){fb.hidden=S.tab!=='plan';if(!fb.hidden&&window.__placeFab)window.__placeFab()}
 }
 
 /* ---------- Etkileşim ---------- */
