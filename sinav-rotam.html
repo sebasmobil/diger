@@ -16,9 +16,9 @@ if(s.accent)document.documentElement.style.setProperty('--accent',s.accent)}catc
 </script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-:root{--accent:#41A6D9;--on-accent:#fff;--bg:#f4f5fb;--card:#fff;--text:#14172b;--muted:#656b85;--line:#e4e7f2;
---soft:color-mix(in srgb,var(--accent) 11%,var(--card));--ok:#16a34a;--warn:#d97706;--bad:#dc2626;color-scheme:light}
-:root[data-theme=dark]{--bg:#0d0f1e;--card:#171a2f;--text:#eef0ff;--muted:#9aa1c4;--line:#272b4a;
+:root{--accent:#41A6D9;--on-accent:#fff;--bg:#eceef8;--card:#fff;--text:#14172b;--muted:#656b85;--line:#e4e7f2;
+--sh:0 6px 20px rgba(32,38,90,.10),0 1px 3px rgba(32,38,90,.06);--soft:color-mix(in srgb,var(--accent) 11%,var(--card));--ok:#16a34a;--warn:#d97706;--bad:#dc2626;color-scheme:light}
+:root[data-theme=dark]{--sh:0 8px 22px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04);--bg:#0b0d1b;--card:#1a1e38;--text:#eef0ff;--muted:#9aa1c4;--line:#272b4a;
 --soft:color-mix(in srgb,var(--accent) 20%,var(--card));color-scheme:dark}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -47,22 +47,24 @@ header .wrap{display:flex;align-items:center;gap:10px;height:60px;position:relat
 .hue::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--text)}
 .hue::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--text)}
 main{padding-top:18px}
-section.card,.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,23,43,.04)}
+section.card,.card{background:var(--card);border:0;border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--sh)}
 .card h2{font-size:17px;letter-spacing:-.01em;margin-bottom:12px}
 .muted{color:var(--muted)}.sm{font-size:13px}
 .greet{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:2px 2px 4px}
 .quote{color:var(--muted);margin:0 2px 16px;font-size:15px}
-.hero{border-radius:26px;padding:22px;margin-bottom:14px;color:var(--on-accent);position:relative;overflow:hidden;
+.hero{border-radius:24px;padding:15px 18px 16px;margin-bottom:14px;color:var(--on-accent);position:relative;overflow:hidden;
 background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#1b1038))}
-.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.13)}
+.hbar{display:flex;align-items:center;gap:10px;margin-top:11px;position:relative;z-index:1;font-size:12.5px;font-weight:700}.hbar .bar{flex:1;margin-top:0;height:7px}.hbar span{white-space:nowrap;opacity:.95}
+.hero:after{content:"";position:absolute;right:-60px;top:-60px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.13)}
 .pills{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
 .pill{background:rgba(255,255,255,.2);padding:5px 11px;border-radius:99px;font-size:13px;font-weight:600}
-.big{display:flex;align-items:baseline;gap:10px;margin:14px 0 2px;position:relative;z-index:1}
-.big b{font-size:76px;line-height:1;font-weight:900;letter-spacing:-.04em}
-.big span{font-size:20px;font-weight:700;opacity:.92}.big em{display:block;font-style:normal;font-size:14px;font-weight:600;opacity:.9}
+.big{display:flex;align-items:baseline;gap:10px;margin:10px 0 0;position:relative;z-index:1}
+.big b{font-size:50px;line-height:1;font-weight:900;letter-spacing:-.04em}
+.big span{font-size:17px;font-weight:700;opacity:.95}.big em{display:block;font-style:normal;font-size:13px;font-weight:600;opacity:.9}
 .hero .sub{opacity:.92;position:relative;z-index:1}
 .bar{height:9px;border-radius:99px;background:rgba(255,255,255,.25);margin-top:16px;overflow:hidden;position:relative;z-index:1}
 .bar i{display:block;height:100%;border-radius:99px;background:#fff;transition:width .6s}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:16px 8px}.sum>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}.sum b{font-size:20px;font-weight:800;letter-spacing:-.02em}.sum small{color:var(--muted);font-size:12px}.sum .si{width:44px;height:44px;font-size:28px}.sum .ring{width:44px;height:44px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:150px}
 .si{width:56px;height:56px;display:grid;place-items:center;font-size:34px;line-height:1}
@@ -73,10 +75,10 @@ background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 
 .row{display:flex;align-items:center;gap:10px}.sp{flex:1}
 .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:var(--soft);color:var(--accent);font-size:12.5px;font-weight:700}
 :root[data-theme=dark] .badge{color:color-mix(in srgb,var(--accent) 55%,#fff)}
-.card.today{border:2px solid var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 14%,transparent)}
+.card.today{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 16%,var(--card)),var(--card) 130px);box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 26%,transparent),var(--sh)}
 .cont{display:inline-block;margin-top:6px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--soft);padding:3px 9px;border-radius:99px}.cont.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--card))}
 .pc{font-size:11px;font-weight:800;color:var(--accent);background:var(--soft);padding:1px 6px;border-radius:99px;margin-left:3px}
-.task{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:16px;margin-bottom:9px;background:var(--bg);transition:.2s}
+.task{display:flex;align-items:center;gap:12px;padding:12px;border:0;border-radius:16px;margin-bottom:9px;background:var(--bg);transition:.2s}
 .task.on .tx{opacity:.55}.task.on .tt{text-decoration:line-through}
 .chk{width:32px;height:32px;border-radius:10px;border:2.5px solid color-mix(in srgb,var(--text) 42%,var(--card));background:var(--card);display:grid;place-items:center;flex:none;transition:.2s;color:transparent}
 .chk svg{width:20px;height:20px}
@@ -105,13 +107,19 @@ input[type=date],input[type=text],input[type=number],select{font:inherit;color:v
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kv{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:12px}
 .kv b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em}.kv small{color:var(--muted);font-size:12.5px}
-details{border:1px solid var(--line);border-radius:18px;background:var(--card);margin-bottom:10px;overflow:hidden}
+details{border:0;box-shadow:var(--sh);border-radius:20px;background:var(--card);margin-bottom:10px;overflow:hidden}
 summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:10px;font-weight:700}
 summary::-webkit-details-marker{display:none}
 summary:after{content:"›";transform:rotate(90deg);color:var(--muted);font-size:20px;transition:.2s}
 details[open] summary:after{transform:rotate(-90deg)}
 .drow{display:flex;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}
 .drow.today{background:var(--soft)}
+.drow.dn{border-top:0;background:var(--bg);border-radius:16px;margin-bottom:8px;padding:11px 13px}.drow.dn.tm{background:var(--soft)}
+.hint{color:var(--muted);font-size:13.5px;margin:-8px 2px 14px;line-height:1.4}
+.dcard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:box-shadow .2s,transform .15s}.dcard.press{transform:scale(.985)}.dcard.lift{position:relative;z-index:20;transition:box-shadow .15s;box-shadow:0 22px 46px rgba(0,0,0,.34)}
+.mvc{background:var(--card);border-radius:16px;padding:13px 16px;font-weight:700;font-size:14px;box-shadow:var(--sh)}.mvc.b{background:var(--accent);color:var(--on-accent);animation:mvB 3.4s ease-in-out infinite}.mvc.a{animation:mvA 3.4s ease-in-out infinite}
+@keyframes mvB{0%,22%{transform:none}34%{transform:scale(1.05);box-shadow:0 14px 28px rgba(0,0,0,.28)}55%,70%{transform:translateY(-52px) scale(1.05);box-shadow:0 14px 28px rgba(0,0,0,.28)}82%,100%{transform:none}}
+@keyframes mvA{0%,40%{transform:none}55%,70%{transform:translateY(52px)}82%,100%{transform:none}}
 .dl{width:46px;flex:none;text-align:center;line-height:1.1}.dl b{display:block;font-size:20px}.dl small{color:var(--muted);font-size:12px}
 .dc{flex:1;min-width:0;font-size:14px}
 .tag{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
@@ -140,7 +148,8 @@ nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
 nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 nav button.on{color:var(--accent)}
 .modal{position:fixed;inset:0;z-index:80;background:rgba(8,10,25,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px}
-.mbox{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;padding:22px;width:min(440px,100%);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.modal{overscroll-behavior:contain;touch-action:pan-y}.tour{overscroll-behavior:none}
+.mbox{-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;padding:22px;width:min(440px,100%);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
 .intro{text-align:center}.ie{font-size:56px;line-height:1.1;margin:4px 0 10px}
 .logo.big{width:78px;height:78px;border-radius:24px;margin:2px auto 12px}.logo.big svg{width:54px;height:54px}
 .intro p{font-size:15px}.dots{display:flex;justify-content:center;gap:8px;margin:18px 0 16px}
@@ -215,7 +224,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v3.8</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.0</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -328,7 +337,7 @@ const PAL=['#41A6D9','#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e'
 
 /* ---------- Durum ---------- */
 const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
-const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,
+const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
  avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
 let S;
 try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
@@ -431,7 +440,11 @@ function applyTheme(){
 mq.addEventListener('change',()=>{if(S.theme==='auto')applyTheme()});
 
 /* ---------- Yardımcılar ---------- */
-function modal(html){closeModal();const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML='<div class="mbox" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m)}
+let dragOn=false,lockY=null;
+function lockScroll(){if(lockY!==null)return;lockY=window.scrollY||document.documentElement.scrollTop||0;const b=document.body.style;b.position='fixed';b.top=(-lockY)+'px';b.left='0';b.right='0';b.width='100%'}
+function unlockScroll(){if(lockY===null||$('#modal')||$('#tour'))return;const b=document.body.style;b.position='';b.top='';b.left='';b.right='';b.width='';const y=lockY;lockY=null;const de=document.documentElement,sb=de.style.scrollBehavior;de.style.scrollBehavior='auto';window.scrollTo(0,y);de.style.scrollBehavior=sb}
+document.addEventListener('touchmove',e=>{if(dragOn){e.preventDefault();return}if(!($('#modal')||$('#tour')))return;if(e.target.closest('.mbox,.tbody,textarea'))return;e.preventDefault()},{passive:false});
+function modal(html){closeModal(true);const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML='<div class="mbox" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m);lockScroll()}
 let tourI=0;
 const row=(a,b)=>'<li><span class="e">'+a+'</span><span>'+b+'</span></li>';
 const INTRO=[
@@ -444,6 +457,9 @@ const INTRO=[
 {t:'Bugün ne yapacağım?',p:'Ana ekranda bugünün görevleri hazır. İki farklı dokunuş var:',
  art:()=>'<div class="mk"><div class="mt"><i class="ck an"></i><div><b>Vektörler – Kuvvet, Tork ve Denge</b><small>Fizik · 3 sa</small></div><u>Konu bitti</u></div><div class="mt"><i class="ck"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · 2 sa</small></div><u>Konu bitti</u></div></div>',
  l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>“Konu bitti”</b> = konuyu tamamen bitirdim. Plan kalan konuları yeniden dağıtır.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
+{t:'Kartlarını sen sırala',p:'Bugün sekmesindeki kartlar sana göre dizilir.',
+ art:()=>'<div class="mk"><div class="mvc a">Önümüzdeki günler</div><div class="mvc b">Bugünün görevleri</div><div class="mvc">Kaç gün kaldı</div></div>',
+ l:[['✋','Bir kartı yarım saniye basılı tut; hafifçe yükselir ve titreşir.'],['↕️','Parmağını bırakmadan yukarı ya da aşağı sürükle. Diğer kartlar yer açar, ekranın kenarına yaklaşınca sayfa kendiliğinden kayar.'],['💾','Bıraktığın sıra kaydedilir. Başlangıç sırasına dönmek için Bugün sayfasının altındaki bağlantıya bas.']]},
 {t:'Müsait saatlerini işaretle',p:'Plan, senin müsait olduğun saatlere göre yapılır. İlk işin bu.',
  art:()=>{const R=[[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,1,0,1,1,0],[0,0,0,0,0,0],[0,1,0,1,0,0]],D=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
   return '<div class="mk"><div class="ag"><span></span>'+['06','09','12','15','18','21'].map(x=>'<span style="text-align:center">'+x+'</span>').join('')+R.map((r,i)=>'<span>'+D[i]+'</span>'+r.map((v,k)=>'<i class="'+(v?'on':'')+(i===5&&k===4?' pl':'')+'"></i>').join('')).join('')+'</div></div>'},
@@ -468,7 +484,7 @@ const INTRO=[
 function showIntro(i,dir){
  dir=dir||1;tourI=i;
  let T=$('#tour');
- if(!T){T=document.createElement('div');T.id='tour';T.className='tour';document.body.appendChild(T);
+ if(!T){T=document.createElement('div');T.id='tour';T.className='tour';document.body.appendChild(T);lockScroll();
   let x0=null,y0=0;T.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
   T.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)<Math.abs(dy)*1.5)return;if(dx<-60&&tourI<INTRO.length-1)showIntro(tourI+1,1);else if(dx>60&&tourI>0)showIntro(tourI-1,-1)},{passive:true})}
  const s=INTRO[i],n=INTRO.length,last=i===n-1,nm=(S.name||'').replace(/</g,'&lt;');
@@ -600,8 +616,8 @@ async function buildPdf(o){
   if(!blob)throw new Error('Görüntü oluşturulamadı');
   imgs.push({b:new Uint8Array(await blob.arrayBuffer()),w:cv.width,h:cv.height});await new Promise(r=>setTimeout(r,0))}
  return pdfFile(imgs)}
-function closeTour(){const t=$('#tour');if(t)t.remove()}
-function closeModal(){const m=$('#modal');if(m)m.remove()}
+function closeTour(){const t=$('#tour');if(t)t.remove();unlockScroll()}
+function closeModal(keep){const m=$('#modal');if(m)m.remove();if(keep!==true)unlockScroll()}
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
 function boom(x,y){
  const cols=[S.accent,'#f59e0b','#22c55e','#ec4899','#3b82f6'];
@@ -637,10 +653,10 @@ function vHome(){
  const total=ITEMS.length,dn=doneCount(),pct=Math.round(dn/total*100),tk=iso(today),day=P.days.find(x=>x.key===tk);
  const log=S.log[tk]||0,h=new Date().getHours();
  const g=(h<5?'İyi geceler':h<12?'Günaydın':h<18?'Merhaba':'İyi akşamlar')+(S.name?' '+S.name:'')+' 👋';
- let hero;
- if(dA>0)hero='<div class="big"><b>'+dA+'</b><span>gün kaldı<em>('+Math.floor(dA/7)+' hafta '+dA%7+' gün)</em></span></div><div class="sub">'+fdl(pd(EX[0].d))+'</div>';
- else if(dA===0)hero='<div class="big"><b>🏁</b><span>Bugün sınav günü!</span></div><div class="sub">Derin nefes al. Hazırsın.</div>';
- else hero='<div class="big"><b>✓</b><span>Sınav tamamlandı</span></div><div class="sub">Emeğine sağlık. Sonuç: '+fd(pd(EX[0].res))+'</div>';
+ let big;
+ if(dA>0)big='<div class="big"><b>'+dA+'</b><span>gün kaldı<em>('+Math.floor(dA/7)+' hafta '+dA%7+' gün)</em></span></div>';
+ else if(dA===0)big='<div class="big"><b>🏁</b><span>Bugün sınav günü!</span></div>';
+ else big='<div class="big"><b>✓</b><span>Sınav tamamlandı</span></div>';
  const bars=[];let mx=4;for(let i=6;i>=0;i--){const d=addD(today,-i);const v=S.log[iso(d)]||0;mx=Math.max(mx,v);bars.push([d,v])}
  let body='';
  if(!day){
@@ -653,19 +669,29 @@ function vHome(){
   body=day.tasks.map((t,i)=>taskHtml(day,t,i)).join('');
  }
  const goal=day?day.tasks.reduce((a,t)=>a+t.h,0):0;
- const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow" style="padding-left:0;padding-right:0"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+(d.key===iso(addD(today,1))?'YARIN · ':'')+TYPE[d.type][0]+'</span>'+
+ const tm=iso(addD(today,1));
+ const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow dn'+(d.key===tm?' tm':'')+'"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+(d.key===tm?'YARIN · ':'')+TYPE[d.type][0]+'</span>'+
   d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pn>1?' <small class="pc">'+(t.pi+1)+'/'+t.pn+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
+ const tot=Object.values(S.log).reduce((a,b)=>a+b,0);
+ const cards={
+  hero:'<section class="hero dcard" data-card="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+big+
+   '<div class="hbar"><div class="bar"><i style="width:'+pct+'%"></i></div><span>%'+pct+' · '+dn+'/'+total+' konu</span></div></section>',
+  stats:'<section class="card sum dcard" data-card="stats"><div><svg class="ring" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="'+(pct*1.634)+' 163.4" transform="rotate(-90 32 32)"/></svg><b>%'+pct+'</b><small>İlerleme</small></div>'+
+   '<div><span class="si">🔥</span><b>'+streak()+' gün</b><small>seri</small></div><div><span class="si">⏱️</span><b>'+tot.toFixed(0)+' sa</b><small>toplam çalışma</small></div></section>',
+  today:'<section class="card today dcard" data-card="today"><div class="row"><span class="badge">BUGÜN</span><h2 style="margin:0">'+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>',
+  hours:'<section class="card dcard" data-card="hours"><h2>Bugün kaç saat çalıştın?</h2><div class="stepper"><button data-act="hour" data-v="-0.5" aria-label="Azalt">−</button><b>'+(log?fh(log):'0')+'</b><button data-act="hour" data-v="0.5" aria-label="Artır">+</button></div>'+
+   (goal?'<p class="sm muted" style="text-align:center;margin-top:8px">Bugünkü hedef: '+fh(goal)+'</p>':'')+
+   '<div style="height:14px"></div><div class="bars">'+bars.map(([d,v],i)=>'<div class="b'+(i===6?' t':'')+'"><i style="height:'+Math.max(4,v/mx*100)+'%"></i><span>'+DS[wdi(d)]+'</span></div>').join('')+'</div></section>'
+ };
+ if(nxt)cards.next='<section class="card dcard" data-card="next"><h2>Önümüzdeki günler</h2>'+nxt+'</section>';
+ const def=['hero','stats','today','hours','next'].filter(k=>cards[k]);
+ const ord=(S.homeOrder||[]).filter(k=>cards[k]);def.forEach(k=>{if(!ord.includes(k))ord.push(k)});
+ const changed=ord.join()!==def.join();
  return '<div class="greet">'+g+'</div><p class="quote">“'+todayQuote()+'”</p>'+
- '<section class="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+hero+
- '<div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub" style="margin-top:8px;font-size:13px">Konuların %'+pct+'\'i tamam ('+dn+'/'+total+')</div></section>'+
+ (S.reorderSeen?'':'<p class="hint">Kartları basılı tutup sürükleyerek istediğin sıraya dizebilirsin.</p>')+
  (P.short>0.5?'<div class="warn">⚠️ Seçtiğin süre ve müsaitlikle <b>yaklaşık '+Math.ceil(P.short)+' saat</b> konu açıkta kalıyor. Plan sekmesinden süreyi uzat ya da Ayarlar\'dan müsaitlik ekle.</div>':'')+
- '<div class="stats"><div class="stat"><div class="si"><svg class="ring" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="'+(pct*1.634)+' 163.4" transform="rotate(-90 32 32)"/></svg></div><b>%'+pct+'</b><small>İlerleme</small></div>'+
- '<div class="stat"><div class="si">🔥</div><b>'+streak()+' gün</b><small>seri</small></div><div class="stat"><div class="si">⏱️</div><b>'+(Object.values(S.log).reduce((a,b)=>a+b,0)).toFixed(0)+' sa</b><small>toplam çalışma</small></div></div>'+
- '<section class="card today"><div class="row"><span class="badge">BUGÜN</span><h2 style="margin:0">'+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>'+
- '<section class="card"><h2>Bugün kaç saat çalıştın?</h2><div class="stepper"><button data-act="hour" data-v="-0.5" aria-label="Azalt">−</button><b>'+(log?fh(log):'0')+'</b><button data-act="hour" data-v="0.5" aria-label="Artır">+</button></div>'+
- (goal?'<p class="sm muted" style="text-align:center;margin-top:8px">Bugünkü hedef: '+fh(goal)+'</p>':'')+
- '<div style="height:14px"></div><div class="bars">'+bars.map(([d,v],i)=>'<div class="b'+(i===6?' t':'')+'"><i style="height:'+Math.max(4,v/mx*100)+'%"></i><span>'+DS[wdi(d)]+'</span></div>').join('')+'</div></section>'+
- (nxt?'<section class="card"><h2>Önümüzdeki günler</h2>'+nxt+'</section>':'');
+ '<div id="cards">'+ord.map(k=>cards[k]).join('')+'</div>'+
+ (changed?'<button class="link" data-act="homereset">Kart sırasını başlangıca döndür</button>':'');
 }
 function vPlan(){
  const P=PLAN,rem=P.rem.length,wkChoices=[6,8,12,16,20,24].filter(w=>w<P.maxWeeks);
@@ -833,6 +859,7 @@ const A={
   try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Sınav Rotam planı'});return}}catch(e){if(e&&e.name==='AbortError')return}
   A.pdfdl()},
  pdfdl(){if(!PDFBLOB)return;const u=URL.createObjectURL(PDFBLOB),a=document.createElement('a');a.href=u;a.download=PDFNAME;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)},
+ homereset(){S.homeOrder=null;save();render()},
  mclose(){closeModal()}
 };
 function milestone(){
@@ -854,6 +881,37 @@ document.addEventListener('touchend',e=>{const n=Date.now(),dbl=n-lastTap<400;la
  if(!dbl||e.target.closest('input,textarea,select,label'))return;
  e.preventDefault();const b=e.target.closest('button,a,summary,[data-act]');if(b)b.click()},{passive:false});
 document.addEventListener('dblclick',e=>{if(!e.target.closest('input,textarea,select'))e.preventDefault()});
+/* kart sürükleme (Bugün) */
+(()=>{let st=null,tm=null,raf=0,just=0;const box=()=>$('#cards');
+ const cancelT=()=>{clearTimeout(tm);tm=null};
+ function flip(c,fn){const els=[...c.children].filter(x=>x!==st.el),b=els.map(x=>x.getBoundingClientRect().top);fn();
+  els.forEach((x,i)=>{const d=b[i]-x.getBoundingClientRect().top;if(d&&x.animate)x.animate([{transform:'translateY('+d+'px)'},{transform:'none'}],{duration:180,easing:'ease'})})}
+ function applyT(){const el=st.el;el.style.transform='';const nt=el.getBoundingClientRect().top;el.style.transform='translateY('+(st.y-st.grab-nt)+'px) scale(1.02)'}
+ function frame(){const el=st.el,c=box(),H=innerHeight;
+  if(st.y<110)scrollBy(0,-Math.min(16,(110-st.y)/5+4));else if(st.y>H-130)scrollBy(0,Math.min(16,(st.y-(H-130))/5+4));
+  applyT();const mid=st.y-st.grab+el.offsetHeight/2;
+  for(const s of [...c.children]){if(s===el)continue;const r=s.getBoundingClientRect(),sm=r.top+r.height/2,after=el.compareDocumentPosition(s)&Node.DOCUMENT_POSITION_FOLLOWING;
+   if(after&&mid>sm){flip(c,()=>c.insertBefore(el,s.nextSibling));applyT();break}
+   if(!after&&mid<sm){flip(c,()=>c.insertBefore(el,s));applyT();break}}}
+ function activate(){if(!st||st.active)return;st.active=true;dragOn=true;const el=st.el;el.classList.remove('press');el.classList.add('lift');
+  st.grab=st.y-el.getBoundingClientRect().top;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+  const step=()=>{if(!st||!st.active)return;frame();raf=requestAnimationFrame(step)};step()}
+ function end(){if(!st)return;cancelT();const s=st;st=null;s.el.classList.remove('press');if(!s.active)return;
+  dragOn=false;cancelAnimationFrame(raf);const el=s.el,from=el.getBoundingClientRect().top;el.style.transform='';const to=el.getBoundingClientRect().top;
+  if(el.animate)el.animate([{transform:'translateY('+(from-to)+'px) scale(1.02)'},{transform:'none'}],{duration:180,easing:'ease'});
+  el.classList.remove('lift');S.homeOrder=[...box().children].map(x=>x.dataset.card);S.reorderSeen=true;save();just=Date.now();
+  setTimeout(()=>{if(S.tab==='home')render()},200)}
+ document.addEventListener('pointerdown',e=>{const el=e.target.closest&&e.target.closest('.dcard'),b=box();if(!el||!b||!b.contains(el)||st)return;
+  if(e.pointerType==='mouse'&&e.button!==0)return;if(e.target.closest('input,textarea,select'))return;
+  st={el,id:e.pointerId,sx:e.clientX,sy:e.clientY,y:e.clientY,active:false,type:e.pointerType};
+  if(e.pointerType!=='mouse'){el.classList.add('press');tm=setTimeout(activate,380)}});
+ document.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;st.y=e.clientY;
+  if(!st.active&&Math.hypot(e.clientX-st.sx,e.clientY-st.sy)>8){if(st.type==='mouse')activate();else{cancelT();st.el.classList.remove('press');st=null}}});
+ document.addEventListener('pointerup',e=>{if(st&&e.pointerId===st.id)end()});
+ document.addEventListener('pointercancel',e=>{if(st&&e.pointerId===st.id){if(st.active)end();else{cancelT();st.el.classList.remove('press');st=null}}});
+ document.addEventListener('click',e=>{if(Date.now()-just<400){e.stopPropagation();e.preventDefault()}},true);
+ document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.dcard'))e.preventDefault()});
+})();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTour()}else if($('#tour')){if(e.key==='ArrowRight'&&tourI<INTRO.length-1)showIntro(tourI+1,1);if(e.key==='ArrowLeft'&&tourI>0)showIntro(tourI-1,-1)}});
 document.addEventListener('change',e=>{
  const c=e.target.dataset.chg;if(!c)return;const v=e.target.value;
