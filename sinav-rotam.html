@@ -224,7 +224,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.0</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.1</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -337,7 +337,7 @@ const PAL=['#41A6D9','#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e'
 
 /* ---------- Durum ---------- */
 const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
-const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
+const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},prog:{},doneBy:{},frozen:null,ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
  avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
 let S;
 try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
@@ -370,26 +370,39 @@ function buildPlan(){
   if(cap===0&&['study','review','final','mock'].includes(type))type='off';
   days.push({date:d,key,w,type,cap,tasks:[]});
  }
- const sd=days.filter(x=>x.type==='study');
- const need=rem.reduce((a,i)=>a+HOURS(i),0);
+ const tk0=iso(today),td=days.find(x=>x.key===tk0);
+ const fz=(S.frozen&&S.frozen.date===tk0)?S.frozen:null;
+ let frozenToday=false;
+ if(fz&&td&&td.type==='study'&&fz.tasks.length){td.tasks=fz.tasks.map(x=>({...x}));frozenToday=true}
+ const sd=days.filter(x=>x.type==='study'&&!(frozenToday&&x===td));
+ const plannedToday={};
+ if(frozenToday)td.tasks.forEach(t=>{if(t.id&&!S.ticks[tk0+'|'+t.id])plannedToday[t.id]=(plannedToday[t.id]||0)+t.h});
+ const baseH=i=>Math.max(.25,HOURS(i)-((S.prog[i.id]||{}).h||0));
+ const remH=i=>{const v=baseH(i)-(plannedToday[i.id]||0);return v>0.01?v:0};
+ const al=rem.filter(i=>remH(i)>0);
+ const need=rem.reduce((a,i)=>a+baseH(i),0);
+ const needF=al.reduce((a,i)=>a+remH(i),0);
  const capT=sd.reduce((a,x)=>a+x.cap,0);
- const ratio=capT?Math.min(1,need/capT):0;
- let cum=0,given=0,idx=0,left=rem[0]?HOURS(rem[0]):0;const endOf={};
+ const ratio=capT?Math.min(1,needF/capT):0;
+ let cum=0,given=0,idx=0,left=al[0]?remH(al[0]):0;const endOf={};
  for(const day of sd){
   cum+=day.cap;
   const target=cum*ratio;let q=target-given;given=target;
-  while(q>1e-6&&idx<rem.length){
-   const it=rem[idx];
-   if(left>=HOURS(it)-1e-9&&q<0.25){given-=q;break}
+  while(q>1e-6&&idx<al.length){
+   const it=al[idx];
+   if(left>=remH(it)-1e-9&&q<0.25){given-=q;break}
    let t=Math.min(q,left);
    q-=t;left-=t;
    if(left>1e-6&&left<=0.5&&q<=1e-6){t+=left;given+=left;left=0}
    day.tasks.push({id:it.id,t:it.t,s:SUB[it.s].n,c:SUB[it.s].c,h:t});
-   if(left<1e-6){endOf[it.id]=day.key;idx++;left=rem[idx]?HOURS(rem[idx]):0}
+   if(left<1e-6){endOf[it.id]=day.key;idx++;left=al[idx]?remH(al[idx]):0}
   }
  }
- const pcs={};for(const day of sd)day.tasks.forEach(t=>{if(t.id)(pcs[t.id]=pcs[t.id]||[]).push({day,t})});
- for(const k in pcs){const a=pcs[k];a.forEach((o,i)=>{o.t.pi=i;o.t.pn=a.length;if(i<a.length-1){o.t.nx=a[i+1].day.date;o.t.nh=a[i+1].t.h}})}
+ const pcs={};for(const day of days)day.tasks.forEach(t=>{if(t.id)(pcs[t.id]=pcs[t.id]||[]).push({day,t})});
+ for(const k in pcs){const a=pcs[k];const tdone=(frozenToday&&S.ticks[tk0+'|'+k])?1:0;const b=Math.max(0,((S.prog[k]||{}).n||0)-tdone);
+  a.forEach((o,i)=>{o.t.pi=i;o.t.pn=a.length;o.t.pk=b+i+1;o.t.pm=b+a.length;o.t.last=i===a.length-1;if(i<a.length-1){o.t.nx=a[i+1].day.date;o.t.nh=a[i+1].t.h}});
+  endOf[k]=a[a.length-1].day.key}
+ if(!frozenToday&&td&&td.type==='study'&&td.tasks.length){S.frozen={date:tk0,type:'study',tasks:td.tasks.map(t=>({id:t.id,t:t.t,s:t.s,c:t.c,h:t.h}))};save()}
  const effDate=id=>S.done[id]?pd(S.done[id]):(endOf[id]?pd(endOf[id]):null);
  const win=(day,a,b)=>ITEMS.filter(i=>{const e=effDate(i.id);if(!e)return false;const df=diffD(e,day.date);return df>=a&&df<=b});
  const acc='var(--accent)';
@@ -416,7 +429,7 @@ function buildPlan(){
    day.tasks.push({t:isAgs?'MEB-AGS':'MEB-AGS-ÖABT',s:'Derin nefes. Hazırlandın, gerisi sadece uygulama.',c:acc,h:0});
   }
  }
- return{days,rem,need,capT,short:Math.max(0,need-capT),studyEnd,maxWeeks,start,endOf,sdN:sd.length,capped:S.weeks*7-1>diffD(start,studyEnd)};
+ return{days,rem,need,capT,short:Math.max(0,needF-capT),studyEnd,maxWeeks,start,endOf,sdN:sd.length,capped:S.weeks*7-1>diffD(start,studyEnd)};
 }
 
 /* ---------- Tema ---------- */
@@ -455,8 +468,8 @@ const INTRO=[
  art:()=>'<div class="mk"><div class="mh"><div class="mp"><span>MEB-AGS · 8 Mayıs</span><span>ÖABT · 186 gün</span></div><div class="mb"><b>185</b><span>gün kaldı<em>(26 hafta 3 gün)</em></span></div><div class="mbar"><i></i></div></div><div class="mst"><div>🔥<b>3 gün</b>seri</div><div>⏱️<b>24 sa</b>çalışma</div><div>📈<b>%12</b>ilerleme</div></div></div>',
  l:[['📌','Büyük sayaç MEB-AGS’ye kalan günü ve haftayı, rozet ÖABT’yi gösterir.'],['🔥','Seri, toplam çalışma ve ilerleme kartları ritim tutmana yardım eder.'],['⭐','Sınavlar sekmesinde 28 sınavın tarihi ve başvuru durumu var; istediğini yıldızla.']]},
 {t:'Bugün ne yapacağım?',p:'Ana ekranda bugünün görevleri hazır. İki farklı dokunuş var:',
- art:()=>'<div class="mk"><div class="mt"><i class="ck an"></i><div><b>Vektörler – Kuvvet, Tork ve Denge</b><small>Fizik · 3 sa</small></div><u>Konu bitti</u></div><div class="mt"><i class="ck"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · 2 sa</small></div><u>Konu bitti</u></div></div>',
- l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>“Konu bitti”</b> = konuyu tamamen bitirdim. Plan kalan konuları yeniden dağıtır.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
+ art:()=>'<div class="mk"><div class="mt"><i class="ck an"></i><div><b>Vektörler – Kuvvet, Tork ve Denge</b><small>Fizik · 3 sa</small></div><u>Erken bitirdim</u></div><div class="mt"><i class="ck"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · 2 sa</small></div><u>Erken bitirdim</u></div></div>',
+ l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>Konunun son parçasını</b> işaretlersen konu kendiliğinden biter. Konu bugünkü kadar sürmediyse <b>“Erken bitirdim”</b> ile bitir; plan kalanları yeniden dağıtır.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
 {t:'Kartlarını sen sırala',p:'Bugün sekmesindeki kartlar sana göre dizilir.',
  art:()=>'<div class="mk"><div class="mvc a">Önümüzdeki günler</div><div class="mvc b">Bugünün görevleri</div><div class="mvc">Kaç gün kaldı</div></div>',
  l:[['✋','Bir kartı yarım saniye basılı tut; hafifçe yükselir ve titreşir.'],['↕️','Parmağını bırakmadan yukarı ya da aşağı sürükle. Diğer kartlar yer açar, ekranın kenarına yaklaşınca sayfa kendiliğinden kayar.'],['💾','Bıraktığın sıra kaydedilir. Başlangıç sırasına dönmek için Bugün sayfasının altındaki bağlantıya bas.']]},
@@ -636,17 +649,17 @@ const CHK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="c
 /* ---------- Görünümler ---------- */
 function contHtml(day,t){
  if(!t.id||!t.pn)return'';
- if(t.pn===1)return'<div class="cont ok">✓ Bu konu bugün biter</div>';
- if(t.pi>=t.pn-1)return'<div class="cont ok">✓ Son parça · konu bugün biter</div>';
+ if(S.done[t.id]&&t.last)return'<div class="cont ok">✓ Konu tamamlandı</div>';
+ if(t.last)return'<div class="cont ok">✓ '+(t.pm>1?'Son parça · ':'')+'işaretlersen konu biter</div>';
  const d=diffD(day.date,t.nx);
- return'<div class="cont">↻ Parça '+(t.pi+1)+'/'+t.pn+' · devamı '+(d===1?'<b>yarın</b>':'<b>'+DS[wdi(t.nx)]+', '+fd(t.nx)+'</b>')+' ('+fh(t.nh)+')</div>'}
+ return'<div class="cont">↻ Parça '+t.pk+'/'+t.pm+' · devamı '+(d===1?'<b>yarın</b>':'<b>'+DS[wdi(t.nx)]+', '+fd(t.nx)+'</b>')+' ('+fh(t.nh)+')</div>'}
 function taskHtml(day,t,i){
  const k=day.key+'|'+(t.id||i),on=S.ticks[k];
  return '<div class="task'+(on?' on':'')+'"><span class="dot" style="--c:'+t.c+'"></span>'+
-  '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
+  '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" data-id="'+(t.id||'')+'" data-last="'+(t.last?1:0)+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
   '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+'</div>'+contHtml(day,t)+
   (t.sub?'<ul class="subl">'+t.sub.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'')+'</div>'+
-  (t.id?'<button class="mini" data-act="finish" data-id="'+t.id+'">Konu bitti</button>':'')+'</div>';
+  (t.id&&!t.last?'<button class="mini" data-act="finish" data-id="'+t.id+'">Erken bitirdim</button>':'')+'</div>';
 }
 function vHome(){
  const P=PLAN,today=sod(new Date()),dA=diffD(today,pd(EX[0].d)),dO=diffD(today,pd(EX[1].d));
@@ -671,7 +684,7 @@ function vHome(){
  const goal=day?day.tasks.reduce((a,t)=>a+t.h,0):0;
  const tm=iso(addD(today,1));
  const nxt=P.days.filter(x=>x.key>tk).slice(0,6).map(d=>'<div class="drow dn'+(d.key===tm?' tm':'')+'"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+(d.key===tm?'YARIN · ':'')+TYPE[d.type][0]+'</span>'+
-  d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pn>1?' <small class="pc">'+(t.pi+1)+'/'+t.pn+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
+  d.tasks.filter(t=>t.h||d.type==='exam').slice(0,3).map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pm>1?' <small class="pc">'+t.pk+'/'+t.pm+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('');
  const tot=Object.values(S.log).reduce((a,b)=>a+b,0);
  const cards={
   hero:'<section class="hero dcard" data-card="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+big+
@@ -703,7 +716,7 @@ function vPlan(){
   return '<details data-now="'+(isNow?1:0)+'"'+(isNow?' open':'')+'><summary><span class="sp">'+n+'. hafta · '+fd(a)+' – '+fd(b)+'</span><span class="badge">'+Math.round(hrs)+' sa</span></summary>'+
   ds.map(d=>'<div class="drow'+(d.key===tk?' today':'')+'"><div class="dl"><b>'+d.date.getDate()+'</b><small>'+DS[d.w]+'</small></div><div class="dc"><span class="tag">'+TYPE[d.type][0]+'</span>'+
    (d.type==='social'?'<div class="muted">'+SOCIAL[(d.date.getDate()+d.w)%SOCIAL.length]+'</div>':'')+
-   d.tasks.map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pn>1?' <small class="pc">'+(t.pi+1)+'/'+t.pn+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('')+'</details>';
+   d.tasks.map(t=>'<div class="ln"><i style="--c:'+t.c+'"></i><span>'+t.t+(t.pm>1?' <small class="pc">'+t.pk+'/'+t.pm+'</small>':'')+'</span>'+(t.h?'<em>'+fh(t.h)+'</em>':'')+'</div>').join('')+'</div></div>').join('')+'</details>';
  }).join('');
  const avg=P.sdN?(P.need/P.sdN):0;
  return '<h1 class="greet">Plan</h1><p class="quote">Konular senin müsaitliğine göre otomatik dağıtılır. Bitirdiklerini işaretledikçe kalanlar yeniden yayılır.</p>'+
@@ -725,7 +738,7 @@ function vTopics(){
  subs.map(s=>'<button class="chip'+(f===s?' on':'')+'" data-act="filter" data-v="'+s+'">'+SUB[s].n+'</button>').join('')+'</div></section>';
  html+='<section class="card" style="padding:6px 16px">'+ITEMS.filter(i=>f==='all'||i.s===f).map(i=>{
   const on=!!S.done[i.id],pl=PLAN.endOf[i.id],cu=(S.hours||{})[i.id]>0;
-  return '<div class="tp'+(on?' on':'')+'"><button class="chk" data-act="done" data-id="'+i.id+'" aria-label="İşaretle">'+CHK+'</button><span class="dot" style="--c:'+SUB[i.s].c+';align-self:stretch"></span><div class="tx"><div class="tt">'+i.t+'</div><div class="ts">'+SUB[i.s].n+(on?' · bitti '+fd(pd(S.done[i.id])):(pl?' · planlanan bitiş '+fd(pd(pl)):''))+'</div></div><button class="mini" data-act="edith" data-id="'+i.id+'" aria-label="Süreyi düzenle">⏱ '+fh(HOURS(i))+(cu?' ✎':'')+'</button></div>'}).join('')+'</section>';
+  return '<div class="tp'+(on?' on':'')+'"><button class="chk" data-act="done" data-id="'+i.id+'" aria-label="İşaretle">'+CHK+'</button><span class="dot" style="--c:'+SUB[i.s].c+';align-self:stretch"></span><div class="tx"><div class="tt">'+i.t+'</div><div class="ts">'+SUB[i.s].n+(on?' · bitti '+fd(pd(S.done[i.id])):(pl?' · planlanan bitiş '+fd(pd(pl)):''))+(!on&&(S.prog[i.id]||{}).h>0?' · yapılan '+fh(S.prog[i.id].h)+' / '+fh(HOURS(i)):'')+'</div></div><button class="mini" data-act="edith" data-id="'+i.id+'" aria-label="Süreyi düzenle">⏱ '+fh(HOURS(i))+(cu?' ✎':'')+'</button></div>'}).join('')+'</section>';
  return html;
 }
 function apStatus(e,today){
@@ -800,23 +813,27 @@ const A={
  theme(){const o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast(TN[S.theme])},
  palette(){const p=$('#pop');p.hidden=!p.hidden},
  sw(t){S.accent=t.dataset.c;save();applyTheme()},
- weeks(t){S.weeks=+t.dataset.v;save();render()},
+ weeks(t){S.frozen=null;S.weeks=+t.dataset.v;save();render()},
  filter(t){S.filter=t.dataset.v;save();render()},
  exf(t){S.exf=t.dataset.v;save();render()},
  pin(t){const i=S.pins.indexOf(t.dataset.id);i<0?S.pins.push(t.dataset.id):S.pins.splice(i,1);save();render()},
- done(t){const id=t.dataset.id;if(S.done[id])delete S.done[id];else{S.done[id]=iso(sod(new Date()));const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);milestone()}save();render()},
- finish(t){const r=t.getBoundingClientRect();boom(r.left+r.width/2,r.top);S.done[t.dataset.id]=iso(sod(new Date()));milestone();save();render()},
+ done(t){const id=t.dataset.id;delete S.doneBy[id];if(S.done[id]){delete S.done[id];delete S.prog[id]}else{if(S.frozen)S.frozen.tasks=S.frozen.tasks.filter(x=>x.id!==id);S.done[id]=iso(sod(new Date()));const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);milestone()}save();render()},
+ finish(t){delete S.doneBy[t.dataset.id];if(S.frozen)S.frozen.tasks=S.frozen.tasks.filter(x=>x.id!==t.dataset.id);const r=t.getBoundingClientRect();boom(r.left+r.width/2,r.top);S.done[t.dataset.id]=iso(sod(new Date()));milestone();save();render()},
  tick(t){
-  const k=t.dataset.k,h=+t.dataset.h,d=t.dataset.d;
-  if(S.ticks[k]){delete S.ticks[k];S.log[d]=Math.max(0,(S.log[d]||0)-h)}
-  else{S.ticks[k]=1;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
+  const k=t.dataset.k,h=+t.dataset.h,d=t.dataset.d,id=t.dataset.id,last=t.dataset.last==='1';
+  if(S.ticks[k]){delete S.ticks[k];S.log[d]=Math.max(0,(S.log[d]||0)-h);
+   if(id){const p=S.prog[id];if(p){p.h=Math.max(0,p.h-h);p.n=Math.max(0,p.n-1);if(!p.n)delete S.prog[id]}
+    if(S.doneBy[id]==='auto'){delete S.done[id];delete S.doneBy[id]}}}
+  else{S.ticks[k]=1;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);
+   if(id){const p=S.prog[id]=S.prog[id]||{h:0,n:0};p.h+=h;p.n++;if(last&&!S.done[id]){S.done[id]=d;S.doneBy[id]='auto';milestone();toast('Konu tamamlandı 🎉');save();render();return}}
+   toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
   save();render()},
  hour(t){const k=iso(sod(new Date()));S.log[k]=Math.max(0,Math.round(((S.log[k]||0)+ +t.dataset.v)*2)/2);save();render()},
- av(t){const w=t.dataset.w,i=+t.dataset.i;S.avail[w][i]=S.avail[w][i]?0:1;save();render()},
- rowav(t){const r=S.avail[t.dataset.w],on=r.every(Boolean);for(let i=0;i<6;i++)r[i]=on?0:1;save();render()},
- preset(t){const p=t.dataset.p,m={day:[0,1,1,1,0,0],eve:[0,0,0,1,1,1],all:[1,1,1,1,1,1],none:[0,0,0,0,0,0]}[p];S.avail=av(m);save();render()},
- addoff(){const v=$('#offd').value;if(v&&!S.offDates.includes(v)){S.offDates.push(v);save();render()}},
- deloff(t){S.offDates=S.offDates.filter(x=>x!==t.dataset.d);save();render()},
+ av(t){S.frozen=null;const w=t.dataset.w,i=+t.dataset.i;S.avail[w][i]=S.avail[w][i]?0:1;save();render()},
+ rowav(t){S.frozen=null;const r=S.avail[t.dataset.w],on=r.every(Boolean);for(let i=0;i<6;i++)r[i]=on?0:1;save();render()},
+ preset(t){S.frozen=null;const p=t.dataset.p,m={day:[0,1,1,1,0,0],eve:[0,0,0,1,1,1],all:[1,1,1,1,1,1],none:[0,0,0,0,0,0]}[p];S.avail=av(m);save();render()},
+ addoff(){S.frozen=null;const v=$('#offd').value;if(v&&!S.offDates.includes(v)){S.offDates.push(v);save();render()}},
+ deloff(t){S.frozen=null;S.offDates=S.offDates.filter(x=>x!==t.dataset.d);save();render()},
  export(){const s=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('Yedek kopyalandı ✓ Şimdi bir yere yapıştırıp sakla')).catch(()=>{modal('<h2>Yedek metni</h2><p class="sm muted">Otomatik kopyalanamadı. Aşağıdaki metne uzun basıp “Tümünü seç” ve “Kopyala” de, sonra bir yere yapıştırıp sakla.</p><textarea id="bk" readonly rows="6">'+s.replace(/</g,'&lt;')+'</textarea><div class="row" style="margin-top:12px"><button class="btn" data-act="mclose">Tamam</button></div>');const x=$('#bk');x.focus();x.select()})},
  import(){modal('<h2>Yedeği yükle</h2><p class="sm muted">Daha önce kopyaladığın yedek metnini aşağıya yapıştır. Yüklenince şu anki ilerlemenin yerine geçer.</p><textarea id="bk" rows="6" placeholder="Yedek metnini buraya yapıştır"></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="importgo">Yedeği yükle</button></div>')},
  importgo(){const s=($('#bk').value||'').trim();if(!s)return;try{const o=JSON.parse(s);if(typeof o!=='object'||!o)throw 0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);save();closeModal();applyTheme();render();toast('Yedek yüklendi ✓')}catch(e){toast('Bu metin geçerli bir yedek değil')}},
@@ -834,8 +851,8 @@ const A={
  toggleall(){const ds=$$('#view details'),all=ds.every(d=>d.open);ds.forEach(d=>d.open=all?d.dataset.now==='1':true);syncTgl()},
  edith(t){const i=ITEMS.find(x=>x.id===t.dataset.id);
   modal('<h2>Konu süresi</h2><p class="sm muted">'+SUB[i.s].n+' · '+i.t+'</p><div class="row" style="margin:14px 0 6px"><input type="number" id="hv" min="0.25" max="60" step="0.25" inputmode="decimal" value="'+HOURS(i)+'"><b>saat</b></div><p class="sm muted">Önerilen süre: '+fh(i.h)+'. Bu konuya kendi sürene göre plan yapılır. Çeyrek saat (0,25) adımlarla girebilirsin.</p><div class="row" style="margin-top:14px;flex-wrap:wrap;justify-content:flex-end"><button class="btn ghost" data-act="hreset" data-id="'+i.id+'">Önerilene dön</button><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="hsave" data-id="'+i.id+'">Kaydet</button></div>');const hv=$('#hv');if(hv)hv.focus()},
- hsave(t){const v=parseFloat(String($('#hv').value).replace(',','.'));if(!(v>=0.25&&v<=60)){toast('0,25 ile 60 saat arasında bir süre gir');return}S.hours=S.hours||{};S.hours[t.dataset.id]=v;save();closeModal();render();toast('Süre güncellendi, plan yenilendi ✓')},
- hreset(t){if(S.hours)delete S.hours[t.dataset.id];save();closeModal();render()},
+ hsave(t){S.frozen=null;const v=parseFloat(String($('#hv').value).replace(',','.'));if(!(v>=0.25&&v<=60)){toast('0,25 ile 60 saat arasında bir süre gir');return}S.hours=S.hours||{};S.hours[t.dataset.id]=v;save();closeModal();render();toast('Süre güncellendi, plan yenilendi ✓')},
+ hreset(t){S.frozen=null;if(S.hours)delete S.hours[t.dataset.id];save();closeModal();render()},
  intro(t){const i=+t.dataset.i;showIntro(i,i>=tourI?1:-1)},
  introskip(){closeTour()},
  introflag(t){S.introOff=!S.introOff;save();t.querySelector('.ck').classList.toggle('dn',S.introOff);t.setAttribute('aria-checked',S.introOff);if(S.introOff)toast('Tamam, tanıtım bir daha gösterilmeyecek. Ayarlar’dan açabilirsin')},
@@ -923,7 +940,7 @@ document.addEventListener('change',e=>{
  else if(c==='start'){S.startDate=v||iso(sod(new Date()))}
  else if(c==='name'){S.name=v.trim().slice(0,24);save();return}
  else return;
- save();render();
+ S.frozen=null;save();render();
 });
 document.addEventListener('input',e=>{
  const c=e.target.dataset.chg;
