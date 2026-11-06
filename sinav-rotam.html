@@ -229,7 +229,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.7</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.9</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -351,6 +351,7 @@ let PLAN=null;
 const HOURS=i=>{const v=(S.hours||{})[i.id];return v>0?v:i.h};
 
 /* ---------- Plan motoru ---------- */
+const tkey=(dk,t,i)=>dk+'|'+(t.id?t.id+(t.kx||''):i);
 function buildPlan(){
  const today=sod(new Date()),exam=pd(EX[0].d),lastDay=addD(pd(EX[1].d),0);
  let start=pd(S.startDate);if(start<today)start=today;
@@ -381,7 +382,7 @@ function buildPlan(){
  if(fz&&td&&td.type==='study'&&fz.tasks.length){td.tasks=fz.tasks.map(x=>({...x}));frozenToday=true}
  const sd=days.filter(x=>x.type==='study'&&!(frozenToday&&x===td));
  const plannedToday={};
- if(frozenToday)td.tasks.forEach(t=>{if(t.id&&!S.ticks[tk0+'|'+t.id])plannedToday[t.id]=(plannedToday[t.id]||0)+t.h});
+ if(frozenToday)td.tasks.forEach(t=>{if(t.id&&!S.ticks[tkey(tk0,t)])plannedToday[t.id]=(plannedToday[t.id]||0)+t.h});
  const baseH=i=>Math.max(.25,HOURS(i)-((S.prog[i.id]||{}).h||0));
  const remH=i=>{const v=baseH(i)-(plannedToday[i.id]||0);return v>0.01?v:0};
  const al=rem.filter(i=>remH(i)>0);
@@ -404,7 +405,7 @@ function buildPlan(){
   }
  }
  const pcs={};for(const day of days)day.tasks.forEach(t=>{if(t.id)(pcs[t.id]=pcs[t.id]||[]).push({day,t})});
- for(const k in pcs){const a=pcs[k];const tdone=(frozenToday&&S.ticks[tk0+'|'+k])?1:0;const b=Math.max(0,((S.prog[k]||{}).n||0)-tdone);
+ for(const k in pcs){const a=pcs[k];const tdone=frozenToday?td.tasks.filter(x=>x.id===k&&S.ticks[tkey(tk0,x)]).length:0;const b=Math.max(0,((S.prog[k]||{}).n||0)-tdone);
   a.forEach((o,i)=>{o.t.pi=i;o.t.pn=a.length;o.t.pk=b+i+1;o.t.pm=b+a.length;o.t.last=i===a.length-1;if(i<a.length-1){o.t.nx=a[i+1].day.date;o.t.nh=a[i+1].t.h}});
   endOf[k]=a[a.length-1].day.key}
  if(!frozenToday&&td&&td.type==='study'&&td.tasks.length){S.frozen={date:tk0,type:'study',tasks:td.tasks.map(t=>({id:t.id,t:t.t,s:t.s,c:t.c,h:t.h}))};save()}
@@ -659,9 +660,9 @@ function contHtml(day,t){
  if(S.done[t.id]&&t.last)return'<div class="cont ok">✓ Konu tamamlandı</div>';
  if(t.last)return'<div class="cont ok">'+(t.pm>1?'Son parça · ':'')+'işaretlersen konu biter</div>';
  const d=diffD(day.date,t.nx);
- return'<div class="cont">Parça '+t.pk+'/'+t.pm+' · devamı '+(d===1?'yarın':d<7?DS[wdi(t.nx)]:fd(t.nx))+' · '+fh(t.nh)+'</div>'}
+ return'<div class="cont">Parça '+t.pk+'/'+t.pm+' · devamı '+(d===0?'bugün, aşağıda':d===1?'yarın':d<7?DS[wdi(t.nx)]:fd(t.nx))+' · '+fh(t.nh)+'</div>'}
 function taskHtml(day,t,i){
- const k=day.key+'|'+(t.id||i),on=S.ticks[k];
+ const k=tkey(day.key,t,i),on=S.ticks[k];
  return '<div class="task'+(on?' on':'')+'"><span class="dot" style="--c:'+t.c+'"></span>'+
   '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" data-id="'+(t.id||'')+'" data-last="'+(t.last?1:0)+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
   '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+(t.pulled?' · ⚡ öne çekildi':'')+'</div>'+(t.id?'<div class="tm">'+contHtml(day,t)+(t.pulled&&!on?'<button class="mini" data-act="unpull" data-id="'+t.id+'">Geri gönder</button>':(t.id&&!t.last?'<button class="mini" data-act="finish" data-id="'+t.id+'">Erken bitirdim</button>':''))+'</div>':'')+
@@ -673,7 +674,7 @@ function aheadInfo(){
  const nd=diffD(start,end)+1;if(nd<1)return null;
  let tot=0,dn=0;ITEMS.forEach(i=>{const h=HOURS(i);tot+=h;dn+=S.done[i.id]?h:Math.min(h,(S.prog[i.id]||{}).h||0)});
  if(dn>=tot-1e-6)return null;
- const tk=iso(today);if(S.frozen&&S.frozen.date===tk)S.frozen.tasks.forEach(t=>{if(t.id&&!t.pulled&&S.ticks[tk+'|'+t.id])dn-=t.h});
+ const tk=iso(today);if(S.frozen&&S.frozen.date===tk)S.frozen.tasks.forEach(t=>{if(t.id&&!t.pulled&&S.ticks[tkey(tk,t)])dn-=t.h});
  const el=Math.min(nd,diffD(start,today)),per=tot/nd,df=(dn-tot*el/nd)/per;
  if(Math.abs(df)<0.5)return['ok','👌 Plan temposundasın'];
  const n=Math.round(Math.abs(df));
@@ -700,7 +701,7 @@ function vHome(){
  }else{
   body=day.tasks.map((t,i)=>taskHtml(day,t,i)).join('');
   const fz=S.frozen&&S.frozen.date===tk?S.frozen:null,tsk=day.tasks.filter(t=>t.id);
-  if(day.type==='study'&&fz&&tsk.length&&tsk.every(t=>S.ticks[tk+'|'+t.id]||S.done[t.id])){
+  if(day.type==='study'&&fz&&tsk.length&&tsk.every(t=>S.ticks[tkey(tk,t)]||S.done[t.id])){
    const inT=new Set(fz.tasks.map(x=>x.id)),nx=ITEMS.find(i=>!S.done[i.id]&&!inT.has(i.id)),pu=fz.pulled||0;
    if(pu>=3)body+='<div class="note" style="margin-top:10px;padding:12px"><b>Bugün 3 ekstra konu yaptın 🎉</b><span class="muted sm">Yeterli. Dinlen, yarın taze devam.</span></div>';
    else if(nx){const hh=Math.max(.25,HOURS(nx)-((S.prog[nx.id]||{}).h||0));
@@ -858,12 +859,28 @@ const A={
    if(id){const p=S.prog[id]=S.prog[id]||{h:0,n:0};p.h+=h;p.n++;if(last&&!S.done[id]){S.done[id]=d;S.doneBy[id]='auto';milestone();toast('Konu tamamlandı 🎉');save();render();return}}
    toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
   save();render()},
- unpull(t){const id=t.dataset.id,f=S.frozen;if(!f)return;const x=f.tasks.find(y=>y.id===id&&y.pulled);if(!x||S.ticks[f.date+'|'+id])return;
+ unpull(t){const id=t.dataset.id,f=S.frozen;if(!f)return;const x=f.tasks.find(y=>y.id===id&&y.pulled);if(!x||S.ticks[tkey(f.date,x)])return;
   f.tasks=f.tasks.filter(y=>y!==x);f.pulled=Math.max(0,(f.pulled||0)-1);save();render();toast('Geri gönderildi, plana döndü')},
- pull(){const tk=iso(sod(new Date())),f=S.frozen;if(!f||f.date!==tk)return;if((f.pulled||0)>=3){toast('Bugün için en fazla 3 ekstra konu');return}
+ pull(t){const tk=iso(sod(new Date())),f=S.frozen;if(!f||f.date!==tk)return;if((f.pulled||0)>=3){toast('Bugün için en fazla 3 ekstra konu');return}
+  const st=ITEMS.find(i=>!S.done[i.id]&&((S.prog[i.id]||{}).h||0)>0&&!f.tasks.some(x=>x.id===i.id&&!S.ticks[tkey(tk,x)]));
+  if(st&&!(t&&t.dataset&&t.dataset.force)){
+   const hh=Math.max(.25,HOURS(st)-S.prog[st.id].h),dn=S.prog[st.id].h,nd=PLAN.days.find(d=>d.key>tk&&d.tasks.some(x=>x.id===st.id));
+   modal('<h2>Yarım kalan konu var</h2><p class="sm"><b>'+st.t+'</b> yarım kaldı: '+fh(dn)+' yaptın, '+fh(hh)+' kaldı.'+(nd?' Planda devamı <b>'+DS[nd.w]+', '+fd(nd.date)+'</b> günü.':'')+' Ne yapalım?</p>'+
+   '<div style="display:grid;gap:9px;margin-top:14px">'+
+   '<button class="btn" data-act="pullrest" data-id="'+st.id+'">Kalan parçayı ('+fh(hh)+') da bugün yap</button>'+
+   '<button class="btn ghost" data-act="pulldone" data-id="'+st.id+'">Konuyu tamamen anladım, bitmiş say</button>'+
+   '<button class="btn ghost" data-act="pullnew" data-force="1">Yeni konuyu getir, '+(nd?DS[nd.w]+' ':'')+'devam etsin</button>'+
+   '<button class="btn ghost" data-act="mclose">Vazgeç</button></div>');return}
   const inT=new Set(f.tasks.map(x=>x.id)),it=ITEMS.find(i=>!S.done[i.id]&&!inT.has(i.id));if(!it)return;
   const h=Math.max(.25,HOURS(it)-((S.prog[it.id]||{}).h||0));
   f.tasks.push({id:it.id,t:it.t,s:SUB[it.s].n,c:SUB[it.s].c,h,pulled:1});f.pulled=(f.pulled||0)+1;save();render();toast('Öne çekildi: '+it.t)},
+ pullnew(t){closeModal();A.pull(t)},
+ pullrest(t){closeModal();const f=S.frozen,it=ITEM_BY[t.dataset.id];if(!f||!it)return;
+  const h=Math.max(.25,HOURS(it)-((S.prog[it.id]||{}).h||0));
+  f.tasks.push({id:it.id,t:it.t,s:SUB[it.s].n,c:SUB[it.s].c,h,pulled:1,kx:'b'});f.pulled=(f.pulled||0)+1;save();render();toast('Kalan parça bugüne eklendi')},
+ pulldone(t){closeModal();const f=S.frozen,id=t.dataset.id;if(!f)return;
+  delete S.doneBy[id];S.done[id]=iso(sod(new Date()));f.tasks=f.tasks.filter(x=>x.id!==id||S.ticks[tkey(f.date,x)]);
+  milestone();toast('Konu bitti sayıldı 🎉');save();render();A.pull({dataset:{}})},
  hour(t){const k=iso(sod(new Date()));S.log[k]=Math.max(0,Math.round(((S.log[k]||0)+ +t.dataset.v)*2)/2);save();render()},
  av(t){S.frozen=null;const w=t.dataset.w,i=+t.dataset.i;S.avail[w][i]=S.avail[w][i]?0:1;save();render()},
  rowav(t){S.frozen=null;const r=S.avail[t.dataset.w],on=r.every(Boolean);for(let i=0;i<6;i++)r[i]=on?0:1;save();render()},
