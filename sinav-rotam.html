@@ -170,7 +170,8 @@ nav button.on{color:var(--accent)}
 .tw{width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0;padding:0 20px}
 .tp0{display:flex;align-items:center;gap:12px;padding:16px 0 6px}
 .tseg{flex:1;display:flex;gap:5px}.tseg i{flex:1;height:5px;border-radius:5px;background:var(--line);transition:.3s}.tseg i.on{background:var(--accent)}
-.tck{display:flex;align-items:center;gap:10px;padding:8px 2px 6px;color:var(--text);font-weight:650;font-size:14px;align-self:flex-start}
+.tck{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:12px 14px;border-radius:14px;background:var(--soft);border:1.5px solid color-mix(in srgb,var(--accent) 55%,transparent);color:var(--text);text-align:left}
+.tck b{display:block;font-size:15.5px}.tck small{display:block;margin-top:1px;font-size:12.5px;color:var(--muted)}
 .tskip{color:var(--muted);font-weight:700;font-size:14px;padding:6px 4px}
 .tbw{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
 .tbody{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;padding:6px 0 36px;animation:tin .35s ease both}
@@ -232,7 +233,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.10</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.12</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -512,9 +513,9 @@ function showIntro(i,dir){
   let x0=null,y0=0;T.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
   T.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)<Math.abs(dy)*1.5)return;if(dx<-60&&tourI<INTRO.length-1)showIntro(tourI+1,1);else if(dx>60&&tourI>0)showIntro(tourI-1,-1)},{passive:true})}
  const s=INTRO[i],n=INTRO.length,last=i===n-1,nm=(S.name||'').replace(/</g,'&lt;');
- T.innerHTML='<div class="tw"><div class="tp0"><div class="tseg">'+INTRO.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div></div><button class="tck" data-act="introflag" role="checkbox" aria-checked="'+S.introOff+'"><i class="ck'+(S.introOff?' dn':'')+'"></i>Bir daha gösterme</button>'+
+ T.innerHTML='<div class="tw"><div class="tp0"><div class="tseg">'+INTRO.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div></div>'+
  '<div class="tbw"><div class="tbody'+(dir<0?' back':'')+'"><div class="art">'+s.art()+'</div><h2>'+(i===0&&nm?s.t+' '+nm:s.t)+'</h2><p>'+s.p+'</p><ul class="tl">'+s.l.map(r=>row(r[0],r[1])).join('')+'</ul></div><button class="shint" data-act="tourscroll" hidden>Aşağı kaydır ↓</button></div>'+
- '<div class="tbar"><div class="row">'+(i>0?'<button class="btn ghost" data-act="intro" data-i="'+(i-1)+'">Geri</button>':'')+
+ '<div class="tbar"><button class="tck" data-act="introflag" role="checkbox" aria-checked="'+S.introOff+'"><i class="ck'+(S.introOff?' dn':'')+'"></i><span><b>Bir daha gösterme</b><small>İşaretlersen bu tanıtım açılışta çıkmaz</small></span></button><div class="row">'+(i>0?'<button class="btn ghost" data-act="intro" data-i="'+(i-1)+'">Geri</button>':'')+
  (last?'<button class="btn ghost" data-act="introskip">Başla</button><button class="btn" data-act="tourgo">Müsaitliğimi ayarla</button>':'<button class="btn" data-act="intro" data-i="'+(i+1)+'">İleri</button>')+
  '</div><button class="link" data-act="introskip">Geç</button></div></div>';
  const tb=T.querySelector('.tbody');tb.addEventListener('scroll',tourHint,{passive:true});requestAnimationFrame(tourHint);setTimeout(tourHint,400);
@@ -857,7 +858,7 @@ const A={
   const k=t.dataset.k,h=+t.dataset.h,d=t.dataset.d,id=t.dataset.id,last=t.dataset.last==='1';
   if(S.ticks[k]){delete S.ticks[k];S.log[d]=Math.max(0,(S.log[d]||0)-h);
    if(id){const p=S.prog[id];if(p){p.h=Math.max(0,p.h-h);p.n=Math.max(0,p.n-1);if(!p.n)delete S.prog[id]}
-    if(S.doneBy[id]==='auto'){delete S.done[id];delete S.doneBy[id]}}}
+    if(S.doneBy[id]==='auto'||S.done[id]===d){delete S.done[id];delete S.doneBy[id]}}}
   else{S.ticks[k]=1;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);
    if(id){const p=S.prog[id]=S.prog[id]||{h:0,n:0};p.h+=h;p.n++;if(last&&!S.done[id]){S.done[id]=d;S.doneBy[id]='auto';milestone();toast('Konu tamamlandı 🎉');save();render();return}}
    toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
