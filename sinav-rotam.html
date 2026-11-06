@@ -88,6 +88,9 @@ background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 
 .subl{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
 .mini{border:1px solid var(--accent);color:var(--accent);border-radius:10px;padding:5px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
 .mini:hover{background:var(--soft)}
+.pull{display:block;width:100%;margin-top:10px;padding:13px 14px;border-radius:16px;border:1.5px dashed var(--accent);color:var(--accent);background:transparent;text-align:left;font:inherit}
+.pull b{display:block;font-size:14.5px}.pull small{display:block;margin-top:2px;font-size:12.5px;opacity:.85}
+.ahead{margin-top:9px;font-size:12.5px;font-weight:700;position:relative;z-index:1}
 .note{border-radius:18px;padding:18px;text-align:center;background:var(--soft)}
 .note .em{font-size:34px}.note b{display:block;margin:4px 0}
 .warn{background:color-mix(in srgb,var(--warn) 14%,var(--card));border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:16px;padding:12px 14px;margin-bottom:14px;font-size:14px}
@@ -224,7 +227,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.1</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.3</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -337,7 +340,7 @@ const PAL=['#41A6D9','#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e'
 
 /* ---------- Durum ---------- */
 const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
-const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',done:{},prog:{},doneBy:{},frozen:null,ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
+const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',pace:'light',done:{},prog:{},doneBy:{},frozen:null,ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
  avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
 let S;
 try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
@@ -383,7 +386,7 @@ function buildPlan(){
  const need=rem.reduce((a,i)=>a+baseH(i),0);
  const needF=al.reduce((a,i)=>a+remH(i),0);
  const capT=sd.reduce((a,x)=>a+x.cap,0);
- const ratio=capT?Math.min(1,needF/capT):0;
+ const ratio=capT?(S.pace==='early'?1:Math.min(1,needF/capT)):0;
  let cum=0,given=0,idx=0,left=al[0]?remH(al[0]):0;const endOf={};
  for(const day of sd){
   cum+=day.cap;
@@ -403,6 +406,8 @@ function buildPlan(){
   a.forEach((o,i)=>{o.t.pi=i;o.t.pn=a.length;o.t.pk=b+i+1;o.t.pm=b+a.length;o.t.last=i===a.length-1;if(i<a.length-1){o.t.nx=a[i+1].day.date;o.t.nh=a[i+1].t.h}});
   endOf[k]=a[a.length-1].day.key}
  if(!frozenToday&&td&&td.type==='study'&&td.tasks.length){S.frozen={date:tk0,type:'study',tasks:td.tasks.map(t=>({id:t.id,t:t.t,s:t.s,c:t.c,h:t.h}))};save()}
+ const withT=days.filter(x=>x.type==='study'&&x.tasks.length),lastStudy=withT.length?withT[withT.length-1].date:studyEnd;
+ if(S.pace==='early')for(const x of sd)if(x.type==='study'&&!x.tasks.length&&x.date>lastStudy)x.type='final';
  const effDate=id=>S.done[id]?pd(S.done[id]):(endOf[id]?pd(endOf[id]):null);
  const win=(day,a,b)=>ITEMS.filter(i=>{const e=effDate(i.id);if(!e)return false;const df=diffD(e,day.date);return df>=a&&df<=b});
  const acc='var(--accent)';
@@ -429,7 +434,7 @@ function buildPlan(){
    day.tasks.push({t:isAgs?'MEB-AGS':'MEB-AGS-ÖABT',s:'Derin nefes. Hazırlandın, gerisi sadece uygulama.',c:acc,h:0});
   }
  }
- return{days,rem,need,capT,short:Math.max(0,needF-capT),studyEnd,maxWeeks,start,endOf,sdN:sd.length,capped:S.weeks*7-1>diffD(start,studyEnd)};
+ return{days,rem,need,capT,short:Math.max(0,needF-capT),studyEnd,lastStudy,maxWeeks,start,endOf,sdN:sd.length,capped:S.weeks*7-1>diffD(start,studyEnd)};
 }
 
 /* ---------- Tema ---------- */
@@ -469,7 +474,7 @@ const INTRO=[
  l:[['📌','Büyük sayaç MEB-AGS’ye kalan günü ve haftayı, rozet ÖABT’yi gösterir.'],['🔥','Seri, toplam çalışma ve ilerleme kartları ritim tutmana yardım eder.'],['⭐','Sınavlar sekmesinde 28 sınavın tarihi ve başvuru durumu var; istediğini yıldızla.']]},
 {t:'Bugün ne yapacağım?',p:'Ana ekranda bugünün görevleri hazır. İki farklı dokunuş var:',
  art:()=>'<div class="mk"><div class="mt"><i class="ck an"></i><div><b>Vektörler – Kuvvet, Tork ve Denge</b><small>Fizik · 3 sa</small></div><u>Erken bitirdim</u></div><div class="mt"><i class="ck"></i><div><b>Atom ve Periyodik Sistem</b><small>Kimya · 2 sa</small></div><u>Erken bitirdim</u></div></div>',
- l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>Konunun son parçasını</b> işaretlersen konu kendiliğinden biter. Konu bugünkü kadar sürmediyse <b>“Erken bitirdim”</b> ile bitir; plan kalanları yeniden dağıtır.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
+ l:[['☑️','<b>Kutu</b> = bugünkü parçayı yaptım. Çalışma saatin kendiliğinden kaydedilir.'],['🏁','<b>Konunun son parçasını</b> işaretlersen konu kendiliğinden biter. Konu bugünkü kadar sürmediyse <b>“Erken bitirdim”</b> ile bitir; plan kalanları yeniden dağıtır.'],['⚡','Bugünkü işlerini bitirdin ve formdaysan <b>“Formdayım”</b> düğmesiyle sıradaki konuyu bugüne alabilirsin (günde en fazla 3). Sonraki günler otomatik hafifler.'],['✍️','Saati elle düzeltmek için “Bugün kaç saat çalıştın?” bölümünü kullan.']]},
 {t:'Kartlarını sen sırala',p:'Bugün sekmesindeki kartlar sana göre dizilir.',
  art:()=>'<div class="mk"><div class="mvc a">Önümüzdeki günler</div><div class="mvc b">Bugünün görevleri</div><div class="mvc">Kaç gün kaldı</div></div>',
  l:[['✋','Bir kartı yarım saniye basılı tut; hafifçe yükselir ve titreşir.'],['↕️','Parmağını bırakmadan yukarı ya da aşağı sürükle. Diğer kartlar yer açar, ekranın kenarına yaklaşınca sayfa kendiliğinden kayar.'],['💾','Bıraktığın sıra kaydedilir. Başlangıç sırasına dönmek için Bugün sayfasının altındaki bağlantıya bas.']]},
@@ -549,7 +554,7 @@ function legend(c,y){const g=c.g,mono=c.mono;
 function drawHead(c,title){const g=c.g,mono=c.mono,acc=c.acc,P=PLAN,today=c.M.today;
  tx(g,'Sınav Rotam',8,13,95,9,{b:1,c:acc});
  tx(g,(S.name?S.name+' · ':'')+title,8,20.2,95,3.8,{b:1,c:'#222'});
- tx(g,'Hazırlanma: '+fdy(today)+' · Konular '+fd(P.studyEnd)+' tarihinde biter',8,25,95,2.5,{c:'#666'});
+ tx(g,'Hazırlanma: '+fdy(today)+' · Konular '+fd(P.lastStudy)+' tarihinde biter',8,25,95,2.5,{c:'#666'});
  const dA=diffD(today,pd(EX[0].d)),dO=diffD(today,pd(EX[1].d));
  const tiles=[['MEB-AGS · '+fdy(pd(EX[0].d)),dA>=0?dA+' gün':'Tamamlandı',dA>=0?Math.floor(dA/7)+' hafta '+dA%7+' gün kaldı':''],
   ['ÖABT · '+fdy(pd(EX[1].d)),dO>=0?dO+' gün':'Tamamlandı',dO>=0?Math.floor(dO/7)+' hafta '+dO%7+' gün kaldı':''],
@@ -657,15 +662,28 @@ function taskHtml(day,t,i){
  const k=day.key+'|'+(t.id||i),on=S.ticks[k];
  return '<div class="task'+(on?' on':'')+'"><span class="dot" style="--c:'+t.c+'"></span>'+
   '<button class="chk" data-act="tick" data-k="'+k+'" data-h="'+t.h+'" data-d="'+day.key+'" data-id="'+(t.id||'')+'" data-last="'+(t.last?1:0)+'" aria-label="Tamamlandı işaretle">'+CHK+'</button>'+
-  '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+'</div>'+contHtml(day,t)+
+  '<div class="tx"><div class="tt">'+t.t+'</div><div class="ts">'+t.s+(t.h?' · '+fh(t.h):'')+(t.pulled?' · ⚡ öne çekildi':'')+'</div>'+contHtml(day,t)+
   (t.sub?'<ul class="subl">'+t.sub.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'')+'</div>'+
   (t.id&&!t.last?'<button class="mini" data-act="finish" data-id="'+t.id+'">Erken bitirdim</button>':'')+'</div>';
+}
+function aheadInfo(){
+ const today=sod(new Date()),start=pd(S.startDate);if(today<start)return null;
+ const exam=pd(EX[0].d);let end=addD(start,S.weeks*7-1);const mx=addD(exam,-S.finalDays-1);if(end>mx)end=mx;
+ const nd=diffD(start,end)+1;if(nd<1)return null;
+ let tot=0,dn=0;ITEMS.forEach(i=>{const h=HOURS(i);tot+=h;dn+=S.done[i.id]?h:Math.min(h,(S.prog[i.id]||{}).h||0)});
+ if(dn>=tot-1e-6)return null;
+ const tk=iso(today);if(S.frozen&&S.frozen.date===tk)S.frozen.tasks.forEach(t=>{if(t.id&&!t.pulled&&S.ticks[tk+'|'+t.id])dn-=t.h});
+ const el=Math.min(nd,diffD(start,today)),per=tot/nd,df=(dn-tot*el/nd)/per;
+ if(Math.abs(df)<0.5)return['ok','👌 Plan temposundasın'];
+ const n=Math.round(Math.abs(df));
+ return df>0?['up','🚀 Planın yaklaşık '+(n<1?'yarım':n)+' gün önündesin']:['dn','🐢 Planın yaklaşık '+(n<1?'yarım':n)+' gün gerisindesin · plan kalanı senin için yeniden dağıttı'];
 }
 function vHome(){
  const P=PLAN,today=sod(new Date()),dA=diffD(today,pd(EX[0].d)),dO=diffD(today,pd(EX[1].d));
  const total=ITEMS.length,dn=doneCount(),pct=Math.round(dn/total*100),tk=iso(today),day=P.days.find(x=>x.key===tk);
  const log=S.log[tk]||0,h=new Date().getHours();
  const g=(h<5?'İyi geceler':h<12?'Günaydın':h<18?'Merhaba':'İyi akşamlar')+(S.name?' '+S.name:'')+' 👋';
+ const AH=aheadInfo();
  let big;
  if(dA>0)big='<div class="big"><b>'+dA+'</b><span>gün kaldı<em>('+Math.floor(dA/7)+' hafta '+dA%7+' gün)</em></span></div>';
  else if(dA===0)big='<div class="big"><b>🏁</b><span>Bugün sınav günü!</span></div>';
@@ -680,6 +698,13 @@ function vHome(){
   body='<div class="note"><div class="em">🛋️</div><b>Bugün müsait değilsin</b><span class="muted sm">Dinlen. Müsaitlik saatlerini Ayarlar\'dan değiştirebilirsin.</span></div>';
  }else{
   body=day.tasks.map((t,i)=>taskHtml(day,t,i)).join('');
+  const fz=S.frozen&&S.frozen.date===tk?S.frozen:null,tsk=day.tasks.filter(t=>t.id);
+  if(day.type==='study'&&fz&&tsk.length&&tsk.every(t=>S.ticks[tk+'|'+t.id]||S.done[t.id])){
+   const inT=new Set(fz.tasks.map(x=>x.id)),nx=ITEMS.find(i=>!S.done[i.id]&&!inT.has(i.id)),pu=fz.pulled||0;
+   if(pu>=3)body+='<div class="note" style="margin-top:10px;padding:12px"><b>Bugün 3 ekstra konu yaptın 🎉</b><span class="muted sm">Yeterli. Dinlen, yarın taze devam.</span></div>';
+   else if(nx){const hh=Math.max(.25,HOURS(nx)-((S.prog[nx.id]||{}).h||0));
+    body+='<button class="pull" data-act="pull"><b>⚡ Formdayım, sıradaki konuyu getir</b><small>'+nx.t+' · '+fh(hh)+(pu?' · bugün '+pu+'/3 ekstra':'')+'</small></button>'}
+  }
  }
  const goal=day?day.tasks.reduce((a,t)=>a+t.h,0):0;
  const tm=iso(addD(today,1));
@@ -688,7 +713,7 @@ function vHome(){
  const tot=Object.values(S.log).reduce((a,b)=>a+b,0);
  const cards={
   hero:'<section class="hero dcard" data-card="hero"><div class="pills"><span class="pill">MEB-AGS · '+fd(pd(EX[0].d))+'</span><span class="pill">ÖABT · '+(dO>=0?dO+' gün':'bitti')+'</span></div>'+big+
-   '<div class="hbar"><div class="bar"><i style="width:'+pct+'%"></i></div><span>%'+pct+' · '+dn+'/'+total+' konu</span></div></section>',
+   '<div class="hbar"><div class="bar"><i style="width:'+pct+'%"></i></div><span>%'+pct+' · '+dn+'/'+total+' konu</span></div>'+(AH?'<div class="ahead">'+AH[1]+'</div>':'')+'</section>',
   stats:'<section class="card sum dcard" data-card="stats"><div><svg class="ring" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="'+(pct*1.634)+' 163.4" transform="rotate(-90 32 32)"/></svg><b>%'+pct+'</b><small>İlerleme</small></div>'+
    '<div><span class="si">🔥</span><b>'+streak()+' gün</b><small>seri</small></div><div><span class="si">⏱️</span><b>'+tot.toFixed(0)+' sa</b><small>toplam çalışma</small></div></section>',
   today:'<section class="card today dcard" data-card="today"><div class="row"><span class="badge">BUGÜN</span><h2 style="margin:0">'+DAYS[wdi(today)]+', '+fd(today)+'</h2></div><div style="height:12px"></div>'+body+'</section>',
@@ -722,8 +747,8 @@ function vPlan(){
  return '<h1 class="greet">Plan</h1><p class="quote">Konular senin müsaitliğine göre otomatik dağıtılır. Bitirdiklerini işaretledikçe kalanlar yeniden yayılır.</p>'+
  '<section class="card"><h2>Programı kaç haftada bitireyim?</h2><div class="chips">'+wkChoices.map(w=>'<button class="chip'+(S.weeks===w?' on':'')+'" data-act="weeks" data-v="'+w+'">'+w+' hafta</button>').join('')+
  '<button class="chip'+(S.weeks>=P.maxWeeks?' on':'')+'" data-act="weeks" data-v="'+P.maxWeeks+'">Sınava kadar ('+P.maxWeeks+')</button></div>'+
- '<input type="range" min="2" max="'+P.maxWeeks+'" value="'+Math.min(S.weeks,P.maxWeeks)+'" data-chg="weeksR" aria-label="Hafta sayısı"><div class="sm muted" style="margin-top:4px">Seçili: <b id="wl">'+Math.min(S.weeks,P.maxWeeks)+'</b> hafta · konular <b id="wd">'+fd(P.studyEnd)+'</b> tarihinde biter</div>'+
- '<div style="height:14px"></div><div class="grid2"><div class="kv"><b>'+rem+' konu</b><small>kalan ('+P.need+' saat)</small></div><div class="kv"><b>'+fd(P.studyEnd)+'</b><small>konuların bitiş günü</small></div>'+
+ '<input type="range" min="2" max="'+P.maxWeeks+'" value="'+Math.min(S.weeks,P.maxWeeks)+'" data-chg="weeksR" aria-label="Hafta sayısı"><div class="sm muted" style="margin-top:4px">Seçili: <b id="wl">'+Math.min(S.weeks,P.maxWeeks)+'</b> hafta · konular <b id="wd">'+fd(P.lastStudy)+'</b> tarihinde biter</div>'+
+ '<div style="height:14px"></div><div class="grid2"><div class="kv"><b>'+rem+' konu</b><small>kalan ('+P.need+' saat)</small></div><div class="kv"><b>'+fd(P.lastStudy)+'</b><small>konuların bitiş günü</small></div>'+
  '<div class="kv"><b>'+(avg?fh(avg):'–')+'</b><small>çalışma gününe düşen</small></div><div class="kv"><b>'+Math.round(P.capT)+' sa</b><small>toplam müsait süre</small></div></div>'+
  '<p class="sm muted" style="margin-top:12px">Konular bittikten sonra sınava kadar <b>genel tekrar</b> ve <b>deneme</b> günleri otomatik eklenir.</p></section>'+
  (P.short>0.5?'<div class="warn">⚠️ Bu süreye <b>yaklaşık '+Math.ceil(P.short)+' saat</b> sığmıyor. Haftaları artır ya da Ayarlar\'da müsaitlik ekle.</div>':'')+
@@ -776,6 +801,7 @@ function vSettings(){
  '<div class="fld"><label>Tekrar günü ne sıklıkla olsun?</label><select data-chg="every">'+opt([[1,'Her hafta'],[2,'2 haftada bir'],[3,'3 haftada bir'],[4,'4 haftada bir']],S.reviewEvery||1)+'</select></div>'+
  '<div class="fld"><label>Sosyal gün (ders yok, kafa dinle)</label><select data-chg="social">'+opt([[-1,'Yok']].concat(dOpts),S.socialDay)+'</select></div>'+
  '<div class="fld"><label>Sınavdan önce genel tekrar süresi</label><select data-chg="final">'+opt([[7,'Son 7 gün (1 hafta)'],[14,'Son 14 gün (2 hafta)'],[21,'Son 21 gün (3 hafta)'],[28,'Son 28 gün (4 hafta)'],[35,'Son 35 gün (5 hafta)'],[42,'Son 42 gün (6 hafta)']],S.finalDays)+'</select></div>'+
+ '<div class="fld"><label>Konuları erken bitirirsem</label><select data-chg="pace">'+opt([['light','Günlerim hafiflesin (bitiş tarihine yay)'],['early','Bitiş öne gelsin (aynı tempo)']],S.pace||'light')+'</select><p class="sm muted" style="margin-top:6px">'+((S.pace||'light')==='early'?'Aynı tempoda gidersin, konular erken biter; boşalan günler genel tekrara döner.':'Günlük yük azalır, konular seçtiğin bitiş tarihine kadar rahatça yayılır.')+'</p></div>'+
  '<div class="fld"><label>Planın başlangıç tarihi</label><input type="date" data-chg="start" value="'+S.startDate+'"></div></section>'+
  '<section class="card"><h2>Tek seferlik boş günler</h2><p class="sm muted">Düğün, hasta olma, seyahat… O gün plana ders konmaz.</p><div class="row" style="margin-top:10px"><input type="date" id="offd"><button class="btn" data-act="addoff">Ekle</button></div>'+
  '<div class="tags">'+S.offDates.sort().map(d=>'<span class="badge">'+fd(pd(d))+' <button data-act="deloff" data-d="'+d+'" aria-label="Sil" style="font-weight:900">×</button></span>').join('')+'</div></section>'+
@@ -828,6 +854,10 @@ const A={
    if(id){const p=S.prog[id]=S.prog[id]||{h:0,n:0};p.h+=h;p.n++;if(last&&!S.done[id]){S.done[id]=d;S.doneBy[id]='auto';milestone();toast('Konu tamamlandı 🎉');save();render();return}}
    toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
   save();render()},
+ pull(){const tk=iso(sod(new Date())),f=S.frozen;if(!f||f.date!==tk)return;if((f.pulled||0)>=3){toast('Bugün için en fazla 3 ekstra konu');return}
+  const inT=new Set(f.tasks.map(x=>x.id)),it=ITEMS.find(i=>!S.done[i.id]&&!inT.has(i.id));if(!it)return;
+  const h=Math.max(.25,HOURS(it)-((S.prog[it.id]||{}).h||0));
+  f.tasks.push({id:it.id,t:it.t,s:SUB[it.s].n,c:SUB[it.s].c,h,pulled:1});f.pulled=(f.pulled||0)+1;save();render();toast('Öne çekildi: '+it.t)},
  hour(t){const k=iso(sod(new Date()));S.log[k]=Math.max(0,Math.round(((S.log[k]||0)+ +t.dataset.v)*2)/2);save();render()},
  av(t){S.frozen=null;const w=t.dataset.w,i=+t.dataset.i;S.avail[w][i]=S.avail[w][i]?0:1;save();render()},
  rowav(t){S.frozen=null;const r=S.avail[t.dataset.w],on=r.every(Boolean);for(let i=0;i<6;i++)r[i]=on?0:1;save();render()},
@@ -938,6 +968,7 @@ document.addEventListener('change',e=>{
  else if(c==='review'){S.reviewDay=+v;if(S.socialDay===S.reviewDay)S.socialDay=-1}
  else if(c==='social'){S.socialDay=+v;if(S.socialDay===S.reviewDay)S.reviewDay=(S.reviewDay+1)%7}
  else if(c==='start'){S.startDate=v||iso(sod(new Date()))}
+ else if(c==='pace'){S.pace=v==='early'?'early':'light'}
  else if(c==='name'){S.name=v.trim().slice(0,24);save();return}
  else return;
  S.frozen=null;save();render();
