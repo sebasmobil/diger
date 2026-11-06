@@ -27,7 +27,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 h1,h2,h3,p{margin:0}
 .wrap{max-width:760px;margin:0 auto;padding:0 16px}
 html{background:var(--bg);height:100%;overscroll-behavior-y:none}
-header{padding-top:env(safe-area-inset-top);position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+header{padding-top:env(safe-area-inset-top);position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;gap:10px;height:60px;position:relative}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em;flex:1;min-width:0}
 .logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#ff5fa2));display:grid;place-items:center;color:var(--on-accent);flex:none}
@@ -147,7 +147,7 @@ details[open] summary:after{transform:rotate(-90deg)}
 .btn{padding:11px 16px;border-radius:13px;background:var(--accent);color:var(--on-accent);font-weight:700}
 .btn.ghost{background:var(--soft);color:var(--accent)}.btn.red{background:color-mix(in srgb,var(--bad) 14%,var(--card));color:var(--bad)}
 .tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-nav{position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);z-index:30;background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);z-index:30;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav .wrap{display:flex;padding:0 6px}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;font-size:11.5px;font-weight:650;color:var(--muted);transition:.2s}
 nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -229,7 +229,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.6</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.7</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
