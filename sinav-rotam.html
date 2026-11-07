@@ -233,7 +233,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.12</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.13</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -346,7 +346,7 @@ const PAL=['#41A6D9','#823cdf','#6d5efc','#2563eb','#0ea5e9','#14b8a6','#22c55e'
 
 /* ---------- Durum ---------- */
 const av=(a)=>{const o={};for(let i=0;i<7;i++)o[i]=a.slice();return o};
-const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',pace:'light',done:{},prog:{},doneBy:{},frozen:null,ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
+const DEF={theme:'auto',accent:'#41A6D9',name:'Merve',pace:'light',done:{},tickH:{},prog:{},doneBy:{},frozen:null,ticks:{},log:{},startDate:iso(sod(new Date())),weeks:16,finalDays:28,reviewEvery:1,hours:{},introOff:false,fab:null,homeOrder:null,reorderSeen:false,
  avail:av([0,1,0,1,1,0]),reviewDay:6,socialDay:5,offDates:[],pins:['ags','oabt'],tab:'home',filter:'all',exf:'pins',seen:0};
 let S;
 try{S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){S=JSON.parse(JSON.stringify(DEF))}
@@ -355,6 +355,10 @@ let PLAN=null;
 const HOURS=i=>{const v=(S.hours||{})[i.id];return v>0?v:i.h};
 
 /* ---------- Plan motoru ---------- */
+function tickId(rest){return ITEM_BY[rest]?rest:(ITEM_BY[rest.slice(0,-1)]?rest.slice(0,-1):null)}
+function dropTick(k){const i=k.indexOf('|'),dk=k.slice(0,i),id=tickId(k.slice(i+1)),h=(S.tickH||{})[k]||0;
+ delete S.ticks[k];if(S.tickH)delete S.tickH[k];if(h)S.log[dk]=Math.max(0,(S.log[dk]||0)-h);
+ if(id&&h){const p=S.prog[id];if(p){p.h=Math.max(0,p.h-h);p.n=Math.max(0,p.n-1);if(!p.n)delete S.prog[id]}}}
 const tkey=(dk,t,i)=>dk+'|'+(t.id?t.id+(t.kx||''):i);
 function buildPlan(){
  const today=sod(new Date()),exam=pd(EX[0].d),lastDay=addD(pd(EX[1].d),0);
@@ -381,6 +385,7 @@ function buildPlan(){
   days.push({date:d,key,w,type,cap,tasks:[]});
  }
  const tk0=iso(today),td=days.find(x=>x.key===tk0);
+ {let ch=false;const pre=tk0+'|';for(const k of Object.keys(S.ticks)){if(!k.startsWith(pre))continue;const id=tickId(k.slice(pre.length));if(id&&!S.done[id]&&!((S.prog[id]||{}).n>0)){dropTick(k);ch=true}}if(ch)save()}
  const fz=(S.frozen&&S.frozen.date===tk0)?S.frozen:null;
  let frozenToday=false;
  if(fz&&td&&td.type==='study'&&fz.tasks.length){td.tasks=fz.tasks.map(x=>({...x}));frozenToday=true}
@@ -849,17 +854,17 @@ const A={
  filter(t){S.filter=t.dataset.v;save();render()},
  exf(t){S.exf=t.dataset.v;save();render()},
  pin(t){const i=S.pins.indexOf(t.dataset.id);i<0?S.pins.push(t.dataset.id):S.pins.splice(i,1);save();render()},
- done(t){const id=t.dataset.id;delete S.doneBy[id];if(S.done[id]){delete S.done[id];delete S.prog[id];S.frozen=null}else{if(S.frozen)S.frozen.tasks=S.frozen.tasks.filter(x=>x.id!==id);S.done[id]=iso(sod(new Date()));const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);milestone()}save();render()},
+ done(t){const id=t.dataset.id;delete S.doneBy[id];if(S.done[id]){const tk=iso(sod(new Date()));for(const k of Object.keys(S.ticks))if(k===tk+'|'+id||k===tk+'|'+id+'b')dropTick(k);delete S.done[id];delete S.prog[id];S.frozen=null}else{if(S.frozen)S.frozen.tasks=S.frozen.tasks.filter(x=>x.id!==id);S.done[id]=iso(sod(new Date()));const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);milestone()}save();render()},
  finish(t){const it=ITEM_BY[t.dataset.id];if(!it)return;
   modal('<h2>Konuyu erken bitirdin mi?</h2><p class="sm"><b>'+it.t+'</b> bitti olarak işaretlenecek. Plan, boşalan zamana sıradaki konuyu getirecek.</p><p class="sm muted" style="margin-top:8px">Yanlışlıkla bastıysan “Vazgeç”e bas. Sonradan Konular sekmesinden işareti kaldırırsan konu bugüne geri döner.</p>'+
   '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="finishgo" data-id="'+it.id+'">Evet, bitti</button></div>')},
  finishgo(t){const id=t.dataset.id;closeModal();delete S.doneBy[id];if(S.frozen)S.frozen.tasks=S.frozen.tasks.filter(x=>x.id!==id);boom(innerWidth/2,innerHeight/2);S.done[id]=iso(sod(new Date()));milestone();save();render()},
  tick(t){
   const k=t.dataset.k,h=+t.dataset.h,d=t.dataset.d,id=t.dataset.id,last=t.dataset.last==='1';
-  if(S.ticks[k]){delete S.ticks[k];S.log[d]=Math.max(0,(S.log[d]||0)-h);
-   if(id){const p=S.prog[id];if(p){p.h=Math.max(0,p.h-h);p.n=Math.max(0,p.n-1);if(!p.n)delete S.prog[id]}
+  if(S.ticks[k]){const hh=(S.tickH||{})[k]||h;delete S.ticks[k];delete S.tickH[k];S.log[d]=Math.max(0,(S.log[d]||0)-hh);
+   if(id){const p=S.prog[id];if(p){p.h=Math.max(0,p.h-hh);p.n=Math.max(0,p.n-1);if(!p.n)delete S.prog[id]}
     if(S.doneBy[id]==='auto'||S.done[id]===d){delete S.done[id];delete S.doneBy[id]}}}
-  else{S.ticks[k]=1;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);
+  else{S.ticks[k]=1;S.tickH[k]=h;S.log[d]=(S.log[d]||0)+h;const r=t.getBoundingClientRect();boom(r.left+14,r.top+14);
    if(id){const p=S.prog[id]=S.prog[id]||{h:0,n:0};p.h+=h;p.n++;if(last&&!S.done[id]){S.done[id]=d;S.doneBy[id]='auto';milestone();toast('Konu tamamlandı 🎉');save();render();return}}
    toast(['Harika, devam! 💪','Bir adım daha yaklaştın.','İşte bu tempo! 🔥','Süper, bunu da hallettin.'][Math.floor(Math.random()*4)])}
   save();render()},
