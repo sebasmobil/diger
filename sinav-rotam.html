@@ -233,7 +233,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.13</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.14</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -567,9 +567,8 @@ function drawHead(c,title){const g=c.g,mono=c.mono,acc=c.acc,P=PLAN,today=c.M.to
  tx(g,'Sınav Rotam',8,13,95,9,{b:1,c:acc});
  tx(g,(S.name?S.name+' · ':'')+title,8,20.2,95,3.8,{b:1,c:'#222'});
  tx(g,'Hazırlanma: '+fdy(today)+' · Konular '+fd(P.lastStudy)+' tarihinde biter',8,25,95,2.5,{c:'#666'});
- const dA=diffD(today,pd(EX[0].d)),dO=diffD(today,pd(EX[1].d));
- const tiles=[['MEB-AGS · '+fdy(pd(EX[0].d)),dA>=0?dA+' gün':'Tamamlandı',dA>=0?Math.floor(dA/7)+' hafta '+dA%7+' gün kaldı':''],
-  ['ÖABT · '+fdy(pd(EX[1].d)),dO>=0?dO+' gün':'Tamamlandı',dO>=0?Math.floor(dO/7)+' hafta '+dO%7+' gün kaldı':''],
+ const tiles=[['MEB-AGS',fdy(pd(EX[0].d)),'Sınav tarihi'],
+  ['ÖABT',fdy(pd(EX[1].d)),'Sınav tarihi'],
   ['İlerleme',doneCount()+' / '+ITEMS.length+' konu',Math.round(P.need)+' saat çalışma kalan']];
  tiles.forEach((t,i)=>{const x=103+i*63;pr(g,x,8,60,18,mono?'#f0f0f0':hexA(S.accent,.12),mono?'#999':hexA(S.accent,.5),.2,2.5);
   tx(g,t[0],x+3,12.2,54,2.4,{c:'#555'});tx(g,t[1],x+3,18.2,54,5.6,{b:1,c:acc});tx(g,t[2],x+3,23,54,2.4,{c:'#555'})});
@@ -597,7 +596,7 @@ function cellDraw(c,cl,x,y,w,h){const g=c.g,mono=c.mono,day=cl.day;
  else if(t==='eve')flat(mono?'#cfcfcf':'#38bdf8','ARİFE');
  else if(t==='exam')flat('#111827',day.key===EX[0].d?'MEB-AGS':'ÖABT','#fff');
  else{pr(g,cx,y+.3,cw,h-.6,'#eceef3');hatch(g,cx,y+.3,cw,h-.6,'#c4c8d4')}
- if(iso(c.M.today)===day.key)pr(g,x+.15,y+.15,w-.3,h-.3,null,c.acc,.6)}
+}
 function drawMatrix(c,rows){const g=c.g,mono=c.mono,acc=c.acc;drawHead(c,'Çalışma programı');
  const X0=8,LW=32,DW=(281-LW)/7,Y0=41,HH=5.2,YE=203,rh=Math.min(8.5,(YE-Y0-HH)/rows.length);
  pr(g,X0,Y0,281,HH,acc);const hc=lum(acc)>.42?'#111':'#fff';
