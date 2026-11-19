@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.2.0
+  Version : Pro 1.2.2
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -405,7 +405,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.2.0</span>
+  <span>Pro 1.2.2</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -809,6 +809,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal('detailModal')">
   <div class="modal" style="max-height:96vh;height:96vh">
     <div class="modal-handle"></div>
+    <div id="detailStickyHeader" style="flex-shrink:0;padding:0 20px 12px;border-bottom:1px solid var(--border2);display:none"></div>
     <div class="modal-scroll" style="padding:0 0 8px;flex:1">
       <div id="detailContent"></div>
     </div>
@@ -2226,6 +2227,18 @@ function toggleListeItemCard(id, idx){
   if(typeof it==='object') it.done=!it.done;
   else n.listeItems[idx]={text:it,done:true};
   save();
+  // Sticky header progress güncelle
+  const checkItems=n.listeItems.filter(x=>typeof x==='object'?x.type!=='baslik':true);
+  const doneCount=checkItems.filter(x=>typeof x==='object'?x.done:false).length;
+  const totalCount=checkItems.length;
+  const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
+  const sh=document.getElementById('detailStickyHeader');
+  if(sh&&sh.style.display!=='none'){
+    const bar=sh.querySelector('div[style*="height:5px"] div');
+    const cnt=sh.querySelector('span');
+    if(bar) bar.style.width=pct+'%';
+    if(cnt) cnt.textContent=doneCount+'/'+totalCount;
+  }
   renderNotes();
   // Detay modalı açıksa yenile
   const dm=document.getElementById('detailModal');
@@ -2423,20 +2436,37 @@ async function openDetail(id){
     const checkItems=n.listeItems.filter(it=>typeof it==='object'?it.type!=='baslik':true);
     const doneCount=checkItems.filter(it=>typeof it==='object'?it.done:false).length;
     const totalCount=checkItems.length;
+    const pct=totalCount>0?Math.round(doneCount/totalCount*100):0;
+    // Sticky header'a başlık + progress bar yerleştir
+    const sh=document.getElementById('detailStickyHeader');
+    if(sh){
+      sh.style.display='block';
+      sh.innerHTML=`
+        <div style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:8px">${esc(n.title||'Liste')}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.4s"></div>
+          </div>
+          <span style="font-size:0.72rem;font-weight:700;color:var(--text3);flex-shrink:0">${doneCount}/${totalCount}</span>
+        </div>`;
+    }
+    // Öğeleri render et — baslik'ler sticky section header olarak
     const itemsHtml=n.listeItems.map((it,i)=>{
       const isBaslik=typeof it==='object'&&it.type==='baslik';
       if(isBaslik){
         const btxt=it.text||'';
-        return`<div style="display:flex;align-items:center;gap:8px;margin-top:10px;margin-bottom:2px"><span style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent)">${esc(btxt)}</span><div style="flex:1;height:1px;background:var(--border)"></div></div>`;
+        return`<div class="liste-section-sticky" style="position:sticky;top:0;z-index:10;background:var(--surface);padding:10px 0 4px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent)">${esc(btxt)}</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>`;
       }
       const done=typeof it==='object'?it.done:false;
       const txt=typeof it==='object'?(it.text||''):it;
       const rating=typeof it==='object'?(it.rating||0):0;
       const ratingHtml=rating>0?`<span class="li-rating-display" style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(rating)}<span style="opacity:0.25">${'★'.repeat(5-rating)}</span></span>`:'';
-      return`<div class="liste-detail-item" data-note-id="${n.id}" data-item-idx="${i}" onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;flex:1;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span>${ratingHtml}</div>`;
+      return`<div class="liste-detail-item" data-note-id="${n.id}" data-item-idx="${i}" onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${done?'rgba(52,199,89,0.06)':'var(--surface2)'};border-radius:12px;border:1px solid var(--border);cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:opacity 0.15s"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;flex:1;${done?'text-decoration:line-through;opacity:0.4':'color:var(--text)'}">${esc(txt)}</span>${ratingHtml}</div>`;
     }).join('');
-    const progressHtml=totalCount>0?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:0.72rem;color:var(--text3)">${doneCount}/${totalCount} tamamlandı</span><div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${Math.round(doneCount/totalCount*100)}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 0.3s"></div></div></div>`:'';
-    html+=`<div style="margin-top:10px">${progressHtml}<div style="display:flex;flex-direction:column;gap:5px;padding-right:2px" id="liste-scroll-${n.id}">${itemsHtml}</div></div>`;
+    html+=`<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;padding:0 2px" id="liste-scroll-${n.id}">${itemsHtml}</div>`;
   }
   if(n.type==='konum'){if(n.konumAdres)html+=`<div class="detail-card-box"><span>📍 ${esc(n.konumAdres)}</span><button class="copy-btn" onclick="copyText('${n.konumAdres.replace(/'/g,"\\'")}')">📋</button></div>`;if(n.konumLink)html+=`<div class="detail-link-box" onclick="openLinkConfirm(this.dataset.url)" data-url="${esc(n.konumLink)}">🗺 Haritada Aç <span style="margin-left:auto;font-size:0.75rem;opacity:0.5">↗</span></div>`;}
   if(n.type==='ses'){
@@ -2789,25 +2819,28 @@ function openListeItemCtx(pos, el){
   // Yıldız satırı — in-place güncelleme için id'li
   const starsRow=`<div id="_lictx_stars" style="display:flex;align-items:center;gap:4px;padding:10px 18px;border-bottom:1px solid var(--border2)">
     <span style="font-size:0.75rem;color:var(--text3);margin-right:4px">Puan:</span>
-    ${[1,2,3,4,5].map(i=>`<button data-sv="${i}" onclick="_ctxSetRating('${noteId}',${idx},${i})" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px;color:var(--accent);opacity:${i<=rating?'1':'0.2'};transition:opacity 0.15s">★</button>`).join('')}
-    <button id="_lictx_reset" onclick="_ctxSetRating('${noteId}',${idx},0)" style="background:none;border:none;font-size:0.7rem;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:6px;border:1px solid var(--border);display:${rating>0?'inline':'none'}">sıfırla</button>
+    ${[1,2,3,4,5].map(i=>`<button data-sv="${i}" onclick="_ctxSetRating('${noteId}',${idx},${i});closeCtxMenu()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px;color:var(--accent);opacity:${i<=rating?'1':'0.2'};transition:opacity 0.15s">★</button>`).join('')}
+    <button id="_lictx_reset" onclick="_ctxSetRating('${noteId}',${idx},0);closeCtxMenu()" style="background:none;border:none;font-size:0.7rem;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:6px;border:1px solid var(--border);display:${rating>0?'inline':'none'}">sıfırla</button>
   </div>`;
 
   window._ctxItemTxt=txt; // güvenli saklama
   const items=[
     {icon:'📋',label:'Metni Kopyala',fn:`copyText(window._ctxItemTxt);closeCtxMenu()`},
-    {icon:'✏️',label:'Öğeyi Düzenle',fn:`_ctxEditItem('${noteId}',${idx})`},
+    {icon:'✏️',label:'Öğeyi Düzenle',fn:`_ctxEditItem('${noteId}',${idx});closeCtxMenu()`},
     {icon:'🗑',label:'Öğeyi Sil',fn:`_ctxDeleteItem('${noteId}',${idx})`,danger:true},
   ];
 
   menu.innerHTML=starsRow+items.map(it=>`<button class="ctx-item${it.danger?' ctx-danger':''}" onclick="${it.fn}"><span class="ctx-icon">${it.icon}</span>${it.label}</button>`).join('');
 
-  const x=pos.clientX||pos.pageX||window.innerWidth/2;
-  const y=pos.clientY||pos.pageY||window.innerHeight/2;
   document.body.appendChild(ov);document.body.appendChild(menu);
-  const mw=menu.offsetWidth||220, mh=menu.offsetHeight||200;
-  menu.style.left=Math.min(x,window.innerWidth-mw-8)+'px';
-  menu.style.top=Math.min(y,window.innerHeight-mh-8)+'px';
+  // Önce DOM'a ekle, sonra gerçek boyutu ölç
+  const mw=menu.offsetWidth||240, mh=menu.offsetHeight||220;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const x=pos.clientX||pos.pageX||vw/2;
+  const y=pos.clientY||pos.pageY||vh/2;
+  // Sağa taşarsa sola aç, alta taşarsa yukarı aç
+  menu.style.left=Math.max(8, Math.min(x, vw-mw-8))+'px';
+  menu.style.top=Math.max(8, Math.min(y, vh-mh-8))+'px';
   window._ctxMenuEl=menu;window._ctxOvEl=ov;
   window._ctxItemNoteId=noteId;window._ctxItemIdx=idx;
 }
@@ -3391,6 +3424,8 @@ function closeModal(id){
   // Detay modalı kapanınca çalan sesi durdur
   if(id==='detailModal'){
     document.querySelectorAll('#detailContent audio').forEach(a=>{a.pause();a.currentTime=0;});
+    const sh=document.getElementById('detailStickyHeader');
+    if(sh){sh.style.display='none';sh.innerHTML='';}
   }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('editModal');closeModal('detailModal');closePanel()}});
