@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.1.09
+  Version : Pro 1.1.10
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -403,7 +403,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.1.09</span>
+  <span>Pro 1.1.10</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -2430,7 +2430,7 @@ async function openDetail(id){
       const done=typeof it==='object'?it.done:false;
       const txt=typeof it==='object'?(it.text||''):it;
       const rating=typeof it==='object'?(it.rating||0):0;
-      const ratingHtml=rating>0?`<span style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(rating)}<span style="opacity:0.25">${'★'.repeat(5-rating)}</span></span>`:'';
+      const ratingHtml=rating>0?`<span class="li-rating-display" style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(rating)}<span style="opacity:0.25">${'★'.repeat(5-rating)}</span></span>`:'';
       return`<div class="liste-detail-item" data-note-id="${n.id}" data-item-idx="${i}" onclick="event.stopPropagation();toggleListeItemCard('${n.id}',${i})" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none"><span style="font-size:1rem;flex-shrink:0">${done?'✅':'⬜'}</span><span style="font-size:0.85rem;flex:1;${done?'text-decoration:line-through;opacity:0.5':'color:var(--text)'}">${esc(txt)}</span>${ratingHtml}</div>`;
     }).join('');
     const progressHtml=totalCount>0?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:0.72rem;color:var(--text3)">${doneCount}/${totalCount} tamamlandı</span><div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${Math.round(doneCount/totalCount*100)}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div></div>`:'';
@@ -2818,17 +2818,20 @@ function _ctxSetRating(noteId,idx,val){
     const resetBtn=document.getElementById('_lictx_reset');
     if(resetBtn) resetBtn.style.display=val>0?'inline':'none';
   }
-  // Arka planda detay içeriğini de güncelle (menü kapandığında hazır)
-  renderNotes();
-  const dc=document.getElementById('detailContent');
-  if(dc){
-    const starred=dc.querySelector(`.liste-detail-item[data-note-id="${noteId}"][data-item-idx="${idx}"]`);
-    if(starred){
-      const rspan=starred.querySelector('span[data-rating-display]');
-      const ratingHtml=val>0?`<span data-rating-display style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(val)}<span style="opacity:0.25">${'★'.repeat(5-val)}</span></span>`:'';
-      if(rspan) rspan.outerHTML=ratingHtml;
+  // Detay ekranındaki öğeyi anında güncelle
+  const itemEl=document.querySelector(`.liste-detail-item[data-note-id="${noteId}"][data-item-idx="${idx}"]`);
+  if(itemEl){
+    // Mevcut rating span'ı bul veya oluştur
+    let rspan=itemEl.querySelector('.li-rating-display');
+    if(val>0){
+      const html=`<span class="li-rating-display" style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(val)}<span style="opacity:0.25">${'★'.repeat(5-val)}</span></span>`;
+      if(rspan) rspan.outerHTML=html;
+      else itemEl.insertAdjacentHTML('beforeend',html);
+    } else {
+      if(rspan) rspan.remove();
     }
   }
+  renderNotes();
 }
 function _ctxDeleteItem(noteId,idx){
   const n=notes.find(x=>x.id===noteId);if(!n||!n.listeItems)return;
