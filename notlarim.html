@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.1.07
+  Version : Pro 1.1.08
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -403,7 +403,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.1.07</span>
+  <span>Pro 1.1.08</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -2775,11 +2775,14 @@ function openListeItemCtx(pos, el){
   const txt=typeof it==='object'?(it.text||''):it;
   const rating=typeof it==='object'?(it.rating||0):0;
 
-  // Yıldız satırı
-  const starsRow=`<div style="display:flex;align-items:center;gap:4px;padding:10px 18px;border-bottom:1px solid var(--border2)">
+  const ov=document.createElement('div');ov.className='ctx-overlay';ov.onclick=closeCtxMenu;
+  const menu=document.createElement('div');menu.className='ctx-menu';
+
+  // Yıldız satırı — in-place güncelleme için id'li
+  const starsRow=`<div id="_lictx_stars" style="display:flex;align-items:center;gap:4px;padding:10px 18px;border-bottom:1px solid var(--border2)">
     <span style="font-size:0.75rem;color:var(--text3);margin-right:4px">Puan:</span>
-    ${[1,2,3,4,5].map(i=>`<button onclick="_ctxSetRating('${noteId}',${idx},${i})" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px;color:var(--accent);opacity:${i<=rating?'1':'0.2'};transition:opacity 0.1s" data-csr="${i}">${i<=rating?'★':'★'}</button>`).join('')}
-    ${rating>0?`<button onclick="_ctxSetRating('${noteId}',${idx},0)" style="background:none;border:none;font-size:0.7rem;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:6px;border:1px solid var(--border)">sıfırla</button>`:''}
+    ${[1,2,3,4,5].map(i=>`<button data-sv="${i}" onclick="_ctxSetRating('${noteId}',${idx},${i})" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px;color:var(--accent);opacity:${i<=rating?'1':'0.2'};transition:opacity 0.15s">★</button>`).join('')}
+    <button id="_lictx_reset" onclick="_ctxSetRating('${noteId}',${idx},0)" style="background:none;border:none;font-size:0.7rem;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:6px;border:1px solid var(--border);display:${rating>0?'inline':'none'}">sıfırla</button>
   </div>`;
 
   const items=[
@@ -2788,30 +2791,53 @@ function openListeItemCtx(pos, el){
     {icon:'🗑',label:'Öğeyi Sil',fn:`_ctxDeleteItem('${noteId}',${idx})`,danger:true},
   ];
 
-  const ov=document.createElement('div');ov.className='ctx-overlay';ov.onclick=closeCtxMenu;
-  const menu=document.createElement('div');menu.className='ctx-menu';
-  menu.innerHTML=starsRow+items.map(it=>`<button class="ctx-item${it.danger?' ctx-danger':''}" onclick="${it.fn};closeCtxMenu()"><span class="ctx-icon">${it.icon}</span>${it.label}</button>`).join('');
+  menu.innerHTML=starsRow+items.map(it=>`<button class="ctx-item${it.danger?' ctx-danger':''}" onclick="${it.fn}"><span class="ctx-icon">${it.icon}</span>${it.label}</button>`).join('');
 
   const x=pos.clientX||pos.pageX||window.innerWidth/2;
   const y=pos.clientY||pos.pageY||window.innerHeight/2;
   document.body.appendChild(ov);document.body.appendChild(menu);
-  const mw=menu.offsetWidth||220, mh=menu.offsetHeight||180;
+  const mw=menu.offsetWidth||220, mh=menu.offsetHeight||200;
   menu.style.left=Math.min(x,window.innerWidth-mw-8)+'px';
   menu.style.top=Math.min(y,window.innerHeight-mh-8)+'px';
   window._ctxMenuEl=menu;window._ctxOvEl=ov;
+  window._ctxItemNoteId=noteId;window._ctxItemIdx=idx;
 }
 
 function _ctxSetRating(noteId,idx,val){
   const n=notes.find(x=>x.id===noteId);if(!n||!n.listeItems)return;
   const it=n.listeItems[idx];
-  if(typeof it==='object') it.rating=val||undefined;
+  if(typeof it==='object') it.rating=val?val:undefined; else return;
   save();
-  openDetail(noteId); // detayı yenile
+  // Menü açıkken yıldızları in-place güncelle, detayı arka planda yenile
+  const starsEl=document.getElementById('_lictx_stars');
+  if(starsEl){
+    starsEl.querySelectorAll('button[data-sv]').forEach(b=>{
+      b.style.opacity=parseInt(b.dataset.sv)<=val?'1':'0.2';
+    });
+    const resetBtn=document.getElementById('_lictx_reset');
+    if(resetBtn) resetBtn.style.display=val>0?'inline':'none';
+  }
+  // Arka planda detay içeriğini de güncelle (menü kapandığında hazır)
+  renderNotes();
+  const dc=document.getElementById('detailContent');
+  if(dc){
+    const starred=dc.querySelector(`.liste-detail-item[data-note-id="${noteId}"][data-item-idx="${idx}"]`);
+    if(starred){
+      const rspan=starred.querySelector('span[data-rating-display]');
+      const ratingHtml=val>0?`<span data-rating-display style="font-size:0.7rem;letter-spacing:-2px;flex-shrink:0;color:var(--accent);white-space:nowrap">${'★'.repeat(val)}<span style="opacity:0.25">${'★'.repeat(5-val)}</span></span>`:'';
+      if(rspan) rspan.outerHTML=ratingHtml;
+    }
+  }
 }
 function _ctxDeleteItem(noteId,idx){
   const n=notes.find(x=>x.id===noteId);if(!n||!n.listeItems)return;
-  n.listeItems.splice(idx,1);
-  save();renderNotes();openDetail(noteId);
+  const it=n.listeItems[idx];
+  const txt=typeof it==='object'?(it.text||''):it;
+  closeCtxMenu();
+  showConfirm(`"${txt}" silinsin mi?`,function(){
+    n.listeItems.splice(idx,1);
+    save();renderNotes();openDetail(noteId);
+  });
 }
 function _ctxEditItem(noteId,idx){
   const n=notes.find(x=>x.id===noteId);if(!n||!n.listeItems)return;
