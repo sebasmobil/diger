@@ -14,7 +14,7 @@
   Bu programla birlikte GNU Affero Genel Kamu Lisansı'nın bir kopyasını
   almış olmalısınız. Almadıysanız <https://www.gnu.org/licenses/> adresine bakın.
 
-  Version : Pro 1.2.3
+  Version : Pro 1.3.0
   License : GNU AGPL v3.0 — https://www.gnu.org/licenses/agpl-3.0.html
   Author  : sebasmobil
   Year    : 2026
@@ -447,7 +447,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
 
 <div id="stickyHeader" style="position:sticky;top:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
 <div class="version-bar">
-  <span>Pro 1.2.2</span>
+  <span>Pro 1.3.0</span>
   <span class="vb-sep">|</span>
   <span>©sebasmobil 2026</span>
   <span class="vb-sep">|</span>
@@ -461,7 +461,7 @@ input[type=time].has-value::-webkit-datetime-edit-ampm-field{color:var(--text)}
   <!-- Expandable Search Overlay -->
   <div class="search-wrap" id="searchWrap">
     <span class="search-icon">⌕</span>
-    <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()" autocomplete="off" autocorrect="off" spellcheck="false">
+    <input type="text" id="searchInput" placeholder="Notlarda ara…" oninput="renderNotes()" onclick="this.select()" autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="search-close-btn" onclick="closeSearch()" title="Kapat">İptal</button>
   </div>
   <div class="topbar-actions">
@@ -2632,7 +2632,9 @@ function noteCardHtml(n,i){
   const pinBadge='';
 
   let top='';
-  if(!isCompact){
+  // Arama varken liste notlarında fotoğrafı gizle — eşleşen öğeler görünsün
+  const _hideImgForSearch = q && n.type==='liste';
+  if(!isCompact && !_hideImgForSearch){
     const _imgs=n.images&&n.images.length?n.images:(n.img?[n.img]:[]);
     if(_imgs.length>0){
       const _multiTag=_imgs.length>1?`<div style="position:absolute;bottom:6px;right:7px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:3px"><span>📷</span>${_imgs.length}</div>`:'';
@@ -2656,11 +2658,13 @@ function noteCardHtml(n,i){
       // Arama varsa: eşleşen öğeleri öne al, sonra diğerleri
       let shown, remaining;
       if(q){
-        const matched=checkOnly.filter(it=>trLower(typeof it==='object'?it.text||'':it).includes(q));
-        const unmatched=checkOnly.filter(it=>!trLower(typeof it==='object'?it.text||'':it).includes(q));
-        const pool=[...matched,...unmatched];
-        shown=pool.slice(0,maxShow);
-        remaining=checkOnly.length-maxShow;
+        const matched=checkOnly.filter(it=>trLower(typeof it==='object'?it.text||'':it).includes(trLower(q)));
+        const unmatched=checkOnly.filter(it=>!trLower(typeof it==='object'?it.text||'':it).includes(trLower(q)));
+        // Eşleşenlerin tümünü göster, sonra diğerlerinden maxShow'u doldur
+        const matchedCount=matched.length;
+        const fillCount=Math.max(0,maxShow-matchedCount);
+        shown=[...matched,...unmatched.slice(0,fillCount)];
+        remaining=checkOnly.length-shown.length;
       } else {
         shown=checkOnly.slice(0,maxShow);
         remaining=checkOnly.length-maxShow;
@@ -3465,11 +3469,10 @@ function clearLinkNote() {
 function openSearch(){
   const wrap=document.getElementById('searchWrap');
   wrap.classList.add('open');
-  setTimeout(()=>{
-    const inp=document.getElementById('searchInput');
-    inp.focus();
-    inp.select();
-  },60);
+  const inp=document.getElementById('searchInput');
+  inp.focus();
+  inp.select();
+  setTimeout(()=>{inp.focus();inp.select();},80);
 }
 function closeSearch(){
   const wrap=document.getElementById('searchWrap');
