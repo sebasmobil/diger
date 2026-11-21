@@ -233,7 +233,7 @@ nav button.on{color:var(--accent)}
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.14</small></div></div>
+  <div class="brand"><div class="logo"><svg width="24" height="24" viewBox="96 112 320 320" aria-hidden="true"><path d="M190 424L322 424L276 254L236 254Z" fill="#fff" opacity=".93"/><line x1="256" y1="410" x2="256" y2="266" stroke="color-mix(in srgb,var(--accent) 72%,#000)" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/><rect x="252" y="124" width="9" height="132" rx="4" fill="#fff"/><path d="M261 128H326L308 156L326 184H261Z" fill="#ffd166"/></svg></div><div class="bt"><span>Sınav Rotam</span><small id="ver">v4.15</small></div></div>
   <button class="tbtn" id="tbtn" data-act="theme" aria-label="Tema"><svg id="ticon" viewBox="0 0 24 24"></svg></button>
   <button class="tbtn" data-act="palette" aria-label="Renk paleti" title="Renk teması"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.9-.9 1.6-1.9-.3-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.6" cy="11.2" r="1.1" fill="currentColor"/><circle cx="10.2" cy="7.4" r="1.1" fill="currentColor"/><circle cx="14.6" cy="7.4" r="1.1" fill="currentColor"/></svg></button>
   <div class="pop" id="pop" hidden>
@@ -474,6 +474,7 @@ let dragOn=false,lockY=null;
 function lockScroll(){if(lockY!==null)return;lockY=window.scrollY||document.documentElement.scrollTop||0;const b=document.body.style;b.position='fixed';b.top=(-lockY)+'px';b.left='0';b.right='0';b.width='100%'}
 function unlockScroll(){if(lockY===null||$('#modal')||$('#tour'))return;const b=document.body.style;b.position='';b.top='';b.left='';b.right='';b.width='';const y=lockY;lockY=null;const de=document.documentElement,sb=de.style.scrollBehavior;de.style.scrollBehavior='auto';window.scrollTo(0,y);de.style.scrollBehavior=sb}
 document.addEventListener('touchmove',e=>{if(dragOn){e.preventDefault();return}if(!($('#modal')||$('#tour')))return;if(e.target.closest('.mbox,.tbody,textarea'))return;e.preventDefault()},{passive:false});
+function restoreBackup(s){if(!s)return;try{const o=JSON.parse(s);if(typeof o!=='object'||!o||Array.isArray(o))throw 0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);save();closeModal();applyTheme();render();toast('Yedek yüklendi ✓')}catch(e){toast('Bu metin ya da dosya geçerli bir yedek değil')}}
 function modal(html){closeModal(true);const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML='<div class="mbox" role="dialog" aria-modal="true">'+html+'</div>';document.body.appendChild(m);lockScroll()}
 let tourI=0;
 const row=(a,b)=>'<li><span class="e">'+a+'</span><span>'+b+'</span></li>';
@@ -509,7 +510,7 @@ const INTRO=[
  l:[['🌗','Tema simgesine dokundukça Otomatik → Açık → Koyu döner. Otomatik, telefonunun temasını izler.'],['🎨','Palet simgesinden hazır renk, özel renk ya da ton kaydırıcıyla sonsuz renk seç.'],['📲','Web adresinden açtıysan tarayıcının “Ana Ekrana Ekle” seçeneğiyle uygulama gibi kullanabilirsin.']]},
 {t:'Verin güvende kalsın',p:'İlerleme yalnızca bu cihazda saklanır.',
  art:()=>'<div class="mk"><div class="mt"><span style="font-size:26px">💾</span><div><b>Yedeği kopyala</b><small>Metni bir yere yapıştırıp sakla</small></div></div><div class="mt"><span style="font-size:26px">📲</span><div><b>Yeni telefonda “Yedeği yükle”</b><small>İşaretlerin ve planın geri gelir</small></div></div></div>',
- l:[['💾','Ayarlar’daki yedek kartından yedeği kopyala; telefon değiştirirsen yükle.'],['⚠️','“Her şeyi sıfırla” neyin silineceğini yazar ve onayını bekler.'],['🚀','Hazırsın! İlk adım: müsait saatlerini işaretle.']]}
+ l:[['💾','Ayarlar’daki yedek kartından yedeği dosya olarak indir ya da kopyala; telefon değiştirirsen yükle.'],['⚠️','“Her şeyi sıfırla” neyin silineceğini yazar ve onayını bekler.'],['🚀','Hazırsın! İlk adım: müsait saatlerini işaretle.']]}
 ];
 function showIntro(i,dir){
  dir=dir||1;tourI=i;
@@ -821,10 +822,10 @@ function vSettings(){
  '<section class="card"><h2>💾 Yedekle ve başka cihaza taşı</h2>'+
  '<p class="sm muted">Yaptığın işaretlemeler, planın ve ayarların <b>sadece bu telefonda/bilgisayarda</b> saklanır. Telefon değiştirirsen ya da tarayıcı verilerini silersen kaybolabilir. Yedek almak bunu önler.</p>'+
  '<ol class="sm muted" style="padding-left:20px;margin:10px 0">'+
- '<li><b>Yedeği kopyala</b> düğmesine bas. Bir uzun metin kopyalanır.</li>'+
- '<li>Bu metni kendine mesaj at ya da bir nota yapıştır (WhatsApp, Notlar vb.).</li>'+
- '<li>Yeni cihazda uygulamayı aç, <b>Yedeği yükle</b>\'ye bas ve metni yapıştır. Her şey geri gelir.</li></ol>'+
- '<div class="row" style="flex-wrap:wrap"><button class="btn ghost" data-act="export">Yedeği kopyala</button><button class="btn ghost" data-act="import">Yedeği yükle</button></div></section>'+
+ '<li><b>Dosya olarak indir</b>e bas: yedek bir <b>.json</b> dosyası olur. Telefonda “Dosyalara kaydet” ya da kendine gönder.</li>'+
+ '<li>Dilersen <b>Yedeği kopyala</b> ile metin olarak da alabilirsin (Notlar, WhatsApp vb.).</li>'+
+ '<li>Yeni cihazda <b>Yedeği yükle</b>\'ye bas; dosyayı seç ya da metni yapıştır. Her şey geri gelir.</li></ol>'+
+ '<div class="row" style="flex-wrap:wrap"><button class="btn" data-act="exportfile">Dosya olarak indir (.json)</button><button class="btn ghost" data-act="export">Yedeği kopyala</button><button class="btn ghost" data-act="import">Yedeği yükle</button></div></section>'+
  '<section class="card" style="border-color:color-mix(in srgb,var(--bad) 40%,var(--line))"><h2>⚠️ Her şeyi sıfırla</h2>'+
  '<p class="sm muted">Bu düğme uygulamayı ilk günkü haline döndürür: işaretlediğin tüm konular, çalışma saatlerin, seri, müsaitlik ve ayarların silinir. <b>Geri alınamaz.</b> Emin değilsen önce yukarıdan yedek al.</p>'+
  '<div style="height:12px"></div><button class="btn red" data-act="reset">Her şeyi sıfırla</button></section>';
@@ -896,8 +897,15 @@ const A={
  addoff(){S.frozen=null;const v=$('#offd').value;if(v&&!S.offDates.includes(v)){S.offDates.push(v);save();render()}},
  deloff(t){S.frozen=null;S.offDates=S.offDates.filter(x=>x!==t.dataset.d);save();render()},
  export(){const s=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('Yedek kopyalandı ✓ Şimdi bir yere yapıştırıp sakla')).catch(()=>{modal('<h2>Yedek metni</h2><p class="sm muted">Otomatik kopyalanamadı. Aşağıdaki metne uzun basıp “Tümünü seç” ve “Kopyala” de, sonra bir yere yapıştırıp sakla.</p><textarea id="bk" readonly rows="6">'+s.replace(/</g,'&lt;')+'</textarea><div class="row" style="margin-top:12px"><button class="btn" data-act="mclose">Tamam</button></div>');const x=$('#bk');x.focus();x.select()})},
- import(){modal('<h2>Yedeği yükle</h2><p class="sm muted">Daha önce kopyaladığın yedek metnini aşağıya yapıştır. Yüklenince şu anki ilerlemenin yerine geçer.</p><textarea id="bk" rows="6" placeholder="Yedek metnini buraya yapıştır"></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="importgo">Yedeği yükle</button></div>')},
- importgo(){const s=($('#bk').value||'').trim();if(!s)return;try{const o=JSON.parse(s);if(typeof o!=='object'||!o)throw 0;S=Object.assign(JSON.parse(JSON.stringify(DEF)),o);save();closeModal();applyTheme();render();toast('Yedek yüklendi ✓')}catch(e){toast('Bu metin geçerli bir yedek değil')}},
+ import(){modal('<h2>Yedeği yükle</h2><p class="sm muted">Yüklenince şu anki ilerlemenin yerine geçer.</p><button class="btn" data-act="importfile" style="width:100%;margin:6px 0 12px">📁 Yedek dosyasını seç (.json)</button><p class="sm muted">ya da kopyaladığın yedek metnini yapıştır:</p><textarea id="bk" rows="6" placeholder="Yedek metnini buraya yapıştır"></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn ghost" data-act="mclose">Vazgeç</button><button class="btn" data-act="importgo">Yedeği yükle</button></div>')},
+ importgo(){restoreBackup(($('#bk').value||'').trim())},
+ exportfile(){const txt=JSON.stringify(S,null,1),name='sinav-rotam-yedek-'+iso(sod(new Date()))+'.json',blob=new Blob([txt],{type:'application/json'});
+  const dl=()=>{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('Yedek dosyası indirildi ✓')};
+  try{const f=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Sınav Rotam yedeği'}).then(()=>toast('Yedek kaydedildi ✓')).catch(e=>{if(e&&e.name!=='AbortError')dl()});return}}catch(e){}
+  dl()},
+ importfile(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json,text/plain';
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return;if(f.size>5e6){toast('Bu dosya bir yedek gibi görünmüyor');return}const r=new FileReader();r.onload=()=>restoreBackup(String(r.result||'').trim());r.onerror=()=>toast('Dosya okunamadı');r.readAsText(f)};
+  i.click()},
  reset(){
   const dn=doneCount(),hrs=Object.values(S.log).reduce((a,b)=>a+b,0),days=Object.keys(S.log).filter(k=>S.log[k]>0).length;
   modal('<h2>⚠️ Her şey sıfırlansın mı?</h2><p class="sm muted">“Evet, sıfırla”ya basarsan şunlar silinir:</p>'+
